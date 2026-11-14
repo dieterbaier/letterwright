@@ -1,0 +1,4 @@
+# Wie von `gradle init` erzeugt: Zeilenenden der Wrapper-Skripte festlegen.
+/gradlew        text eol=lf
+*.bat           text eol=crlf
+*.jar           binary
