@@ -1,0 +1,71 @@
+---
+id: DOC-08000-crosscutting-concepts
+type: Document
+title: 'Querschnittliche Konzepte'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Bedrohungsmodell, Sicherheit, Test, Beobachtbarkeit, Fehlerbehandlung, Barrierefreiheit und Platzhalter.'
+tags:
+- arc42
+- concepts
+relations: []
+metadata_version: '1.0'
+---
+[[crosscutting-concepts]]
+= Querschnittliche Konzepte
+
+== Bedrohungsmodell
+
+[cols="1,2,2", options="header"]
+|===
+| Bedrohung | Angriffsweg | Gegenmaßnahme
+| Template-Injection | Manipulierte Vorlage führt Code aus | Abgesicherte FreeMarker-Konfiguration, Tests (xref:r-004-template-injection-durch-vorlagen[R-004])
+| Unberechtigter Zugriff auf Schreiben | Erratene oder fremde IDs | UUIDs, Berechtigungsprüfung bei jedem Zugriff, 404 statt 403 (xref:qs-009-zugriffsschutz-beim-download[QS-009])
+| Cross-Site-Scripting | Platzhalterwerte oder Vorlageninhalt mit Skript | HTML-Escaping als Standard, HTML-Sanitizing des Editor-Inhalts, kein Skript in Vorlagen
+| Schadhafte Uploads | Manipulierte Logos (SVG mit Skript) | SVG bereinigen oder nur Rasterformate, Größenlimit
+| Datenabfluss über Logs | Personenbezogene Daten im Log | Nur IDs und Versionen loggen
+|===
+
+== Sicherheit
+
+Authentifizierung und Autorisierung kommen aus der Spring Security des Hosts. Die
+Bibliothek ruft für jede Aktion den Port `Berechtigungspruefung` auf. Ein
+Default-Adapter bildet Aktionen auf konfigurierbare Rollen ab (z. B.
+`SSW_VORLAGEN_PFLEGEN`, `SSW_SCHREIBEN_ERZEUGEN`).
+
+== Test
+
+* Domäne und Anwendung: JUnit 5 und Mockito, ohne Spring.
+* Adapter: Testcontainers (PostgreSQL, MariaDB), Spring-Slice-Tests.
+* Architektur: ArchUnit.
+* Rendering: Referenzvorlagen mit veraPDF-Prüfung und Wiedergabetreue-Test.
+* Frontend: Vitest, React Testing Library, axe-core; E2E mit Playwright in der Beispielanwendung.
+* Gate: 80 % Zeilen- und Zweigabdeckung je Modul (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+
+== Beobachtbarkeit
+
+Micrometer-Metriken für Dauer von Vorschau und PDF-Erzeugung sowie Anzahl
+fehlgeschlagener Konformitätsprüfungen; strukturierte Logs mit Korrelations-ID,
+ohne personenbezogene Inhalte. Die Metriken laufen in das Monitoring des Hosts.
+
+== Fehlerbehandlung
+
+Fachliche Fehler (fehlende Berechtigung, abgelaufener Snapshot, nicht konformes
+PDF) werden als RFC-9457-Problem-Details an das Frontend gegeben und dort
+barrierefrei angezeigt. Technische Fehler brechen das Speichern ab, ohne
+Teilergebnisse zu persistieren.
+
+== Barrierefreiheit
+
+Vorlagen tragen Semantik (Überschriften, Listen, Tabellen, Alternativtexte,
+Dokumentsprache). Der Editor erzwingt Alternativtexte. Die Vorschau ist HTML mit
+Landmarken und Tastaturbedienung; das PDF ist nach PDF/UA-1 getaggt.
+
+== Platzhalter
+
+Syntax `${pfad.zum.wert}`, Defaults, Wiederholungs- und Bedingungsblöcke; fehlende
+Werte bleiben sichtbar (xref:adr-008-platzhaltersprache[ADR-008]). Werte liefert der
+Host bereits formatiert.

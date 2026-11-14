@@ -1,0 +1,143 @@
+---
+id: ADR-001-einbettbare-bibliothek
+type: ADR
+title: 'Standardschreiben als einbettbare Bibliothek'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Standardschreiben wird als Spring-Boot-Starter plus npm-Paket mit React-Komponenten ausgeliefert, nicht als eigener Service.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- integration
+- produktform
+relations:
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Eine Bibliothek integriert sich ohne zusätzlichen Betrieb in bestehende Host-Anwendungen.'
+  reviewed: false
+- type: introduces_risk
+  target: R-007-bindung-an-spring-boot-hauptversion
+  status: proposed
+  rationale: 'Ein Starter ist an die Spring-Boot-Hauptversion der Host-Anwendung gebunden.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-001-einbettbare-bibliothek]]
+== ADR-001: Standardschreiben als einbettbare Bibliothek
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor, Standardschreiben als **einbettbare Bibliothek** auszuliefern:
+
+* Backend: ein **Spring-Boot-Starter** samt Modulen, der in der Host-Anwendung läuft,
+  deren Datenbank, Transaktionen und Spring Security nutzt und REST-Endpunkte unter
+  einem konfigurierbaren Pfad bereitstellt.
+* Frontend: ein **npm-Paket mit React-Komponenten**, das die Host-Anwendung in ihre
+  Oberfläche einbettet und das gegen diese REST-Endpunkte arbeitet.
+
+=== Kontext
+
+Issue #1 verlangt ein Paket, das in bestehende Anwendungen integriert wird. Die
+Domänendaten stammen aus einem Spring-Boot-Backend, das die Schreiben auch
+persistiert. Der Owner hat Variante (a), die Bibliothek, bestätigt. Es gibt keine
+Mandantenfähigkeit und kein Mengengerüst.
+
+=== Entscheidungstreiber
+
+* Einfache Integration in bestehende Spring-Boot-/React-Anwendungen.
+* Kein zusätzlicher Betrieb (Deployment, Monitoring, Netzwerk).
+* Domänendaten und Security bleiben in der Host-Anwendung.
+
+=== Betrachtete Optionen
+
+==== Option 1: Bibliothek (Spring-Boot-Starter und npm-Paket)
+
+Läuft im Prozess der Host-Anwendung. Datenzugriff über In-Process-Ports, Security
+über die Spring Security des Hosts. Nachteil: Die Bibliothek ist an den Technologie-Stack
+und die Spring-Boot-Hauptversion des Hosts gebunden.
+
+==== Option 2: Eigenständiger Service mit REST-API und eigener Datenbank
+
+Unabhängig deploybar und technologisch entkoppelt. Der Host muss jedoch Domänendaten
+über das Netz liefern, Identitäten durchreichen und einen weiteren Dienst betreiben.
+
+==== Option 3: Nur Frontend-Paket (Rendering im Browser)
+
+Kein Backend-Anteil. Widerspricht jedoch der Anforderung, im Backend zu persistieren,
+und erschwert PDF/A-konforme, reproduzierbare Erzeugung.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Einfache Integration | +1 | 0 | +1
+| Kein zusätzlicher Betrieb | +1 | -1 | +1
+| Daten und Security beim Host | +1 | -1 | 0
+| Persistenz und PDF/A im Backend | +1 | +1 | -1
+| Unabhängigkeit vom Host-Stack | -1 | +1 | 0
+s| Summe s| +3 s| 0 s| +1
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Keine zusätzliche Laufzeitkomponente; Transaktionen mit Host-Daten sind möglich.
+* Autorisierung über die bestehende Spring Security des Hosts.
+
+==== Negativ
+
+* Kompatibilität zu Java-, Spring-Boot- und React-Versionen des Hosts muss aktiv gepflegt werden.
+* Schwere Abhängigkeiten der Bibliothek (z. B. PDF-Rendering) landen im Host-Artefakt.
+
+==== Neutral oder Folgearbeiten
+
+* ADR-002 legt die Ports zwischen Bibliothek und Host fest.
+* ADR-009 legt die unterstützten Versionen fest.
+
+=== Impact
+
+include::generated/adr-001-einbettbare-bibliothek-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-001-einbettbare-bibliothek-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-001-einbettbare-bibliothek-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Alle Ziel-Hosts nutzen Spring Boot und React.
+
+=== Open Questions
+
+* Muss die Bibliothek auch in Hosts ohne React-Frontend nutzbar sein (nur REST)?
+
+=== Review Notes
+
+Owner hat die Produktform im Issue bestätigt. Vor `accepted` ist die offene Frage zu klären.

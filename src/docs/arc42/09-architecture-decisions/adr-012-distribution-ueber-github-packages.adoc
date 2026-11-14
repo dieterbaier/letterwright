@@ -1,0 +1,133 @@
+---
+id: ADR-012-distribution-ueber-github-packages
+type: ADR
+title: 'Distribution über GitHub Packages'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Maven-Artefakte und das npm-Paket werden über GitHub Packages veröffentlicht; ein späterer Wechsel zu Maven Central und npmjs bleibt möglich.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- distribution
+- release
+relations:
+- type: depends_on
+  target: ADR-001-einbettbare-bibliothek
+  status: proposed
+  rationale: 'Eine Bibliothek muss als Artefakt verteilt werden.'
+  reviewed: false
+- type: introduces_risk
+  target: R-008-zugangshuerde-bei-github-packages
+  status: proposed
+  rationale: 'GitHub Packages verlangt auch für öffentliche Pakete ein Token.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-012-distribution-ueber-github-packages]]
+== ADR-012: Distribution über GitHub Packages
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor, Releases über **GitHub Packages** zu veröffentlichen (Maven-Registry
+und npm-Registry), ausgelöst durch Git-Tags in GitHub Actions. Lizenz bleibt **MIT**.
+
+Antwort auf die Frage des Owners: Die Wahl ist **nicht kriegsentscheidend**. Sie
+betrifft weder Architektur noch Code, nur Build-Konfiguration und die Dokumentation
+für Konsumenten, und kann jederzeit geändert werden.
+
+=== Kontext
+
+Der Owner wünscht GitHub Packages, kann Vor- und Nachteile aber nicht einschätzen.
+
+=== Entscheidungstreiber
+
+* Geringer Einrichtungsaufwand.
+* Einfacher Zugang für Konsumenten.
+* Später änderbar.
+
+=== Betrachtete Optionen
+
+==== Option 1: GitHub Packages
+
+Vorteile: integriert in das Repository und GitHub Actions, keine zusätzliche Registrierung.
+Nachteil: Konsumenten brauchen auch für öffentliche Pakete ein GitHub-Token mit
+`read:packages` in ihrer Maven- bzw. npm-Konfiguration.
+
+==== Option 2: Maven Central und npmjs.org
+
+Vorteile: ohne Token nutzbar, Standard für Open Source. Nachteile: Namespace-
+Verifizierung, Signierung (GPG) und Registrierung erforderlich, mehr Einrichtungsaufwand.
+
+==== Option 3: Kein Publishing, Einbindung als Git-Submodule oder Quellcode
+
+Kein Registry-Aufwand. Für Konsumenten unüblich und schwer versionierbar.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Geringer Einrichtungsaufwand | +1 | -1 | +1
+| Einfacher Zugang für Konsumenten | -1 | +1 | -1
+| Später änderbar | +1 | +1 | 0
+s| Summe s| +1 s| +1 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Release-Pipeline mit wenig Aufwand aufsetzbar.
+
+==== Negativ
+
+* Konsumenten müssen ein Token konfigurieren (R-008).
+
+==== Neutral oder Folgearbeiten
+
+* Bei externer Nutzung Maven Central und npmjs.org erneut bewerten.
+
+=== Impact
+
+include::generated/adr-012-distribution-ueber-github-packages-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-012-distribution-ueber-github-packages-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-012-distribution-ueber-github-packages-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Die ersten Konsumenten haben ohnehin GitHub-Zugang.
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Niedrige Dringlichkeit; kann mit dem ersten Release-Epic akzeptiert werden.

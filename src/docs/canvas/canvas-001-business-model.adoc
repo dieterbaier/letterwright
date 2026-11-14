@@ -1,0 +1,12 @@
+[[business-model-canvas]]
+= Business Model Canvas
+:id: CANVAS-001-business-model
+
+Entwurf, KI-gestützt erstellt, nicht reviewed.
+
+* *Kundensegmente*: Teams, die Spring-Boot-/React-Fachanwendungen bauen und Schreiben erzeugen müssen.
+* *Nutzenversprechen*: Normgerechte, barrierefreie, archivierbare Schreiben ohne Eigenentwicklung.
+* *Kanäle*: GitHub, GitHub Packages.
+* *Schlüsselaktivitäten*: Bibliothek, Editor, Rendering, Doku.
+* *Kostenstruktur*: Entwicklungszeit; keine Lizenzkosten (nur Open Source).
+* *Einnahmen*: keine; Open Source (MIT).

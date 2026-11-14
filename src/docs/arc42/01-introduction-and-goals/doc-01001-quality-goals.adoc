@@ -1,0 +1,52 @@
+---
+id: DOC-01001-quality-goals
+type: Document
+title: 'Qualitätsziele'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Die fünf Qualitätsziele, die Architekturentscheidungen treiben.'
+tags:
+- quality
+relations: []
+metadata_version: '1.0'
+---
+[[quality-goals]]
+== Qualitätsziele
+
+[cols="1,2,4", options="header"]
+|===
+| ID | Ziel | Begründung
+
+| QG-001
+| Barrierefreiheit und Normkonformität
+| Vorschau und gespeichertes Dokument sind barrierefrei; gespeicherte Dokumente sind
+  PDF/A-konform (xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002],
+  xref:qs-003-barrierefreie-vorschau[QS-003]).
+
+| QG-002
+| Wiedergabetreue
+| Vorschau und gespeichertes Dokument sehen gleich aus; geschäftliches Briefpapier hält
+  DIN 5008 ein (xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004],
+  xref:qs-005-din-5008-masshaltigkeit[QS-005]).
+
+| QG-003
+| Pflegbarkeit durch Fachanwender
+| Briefpapier und Standardschreiben werden von Nicht-Technikern gepflegt
+  (xref:qs-006-briefpapier-pflege-durch-fachanwender[QS-006]).
+
+| QG-004
+| Integrierbarkeit
+| Die Bibliothek lässt sich mit geringem Aufwand in bestehende Anwendungen einbinden
+  (xref:qs-007-integration-in-host-anwendung[QS-007]).
+
+| QG-005
+| Nachvollziehbarkeit
+| Gespeicherte Schreiben bleiben unverändert und sind ihren Vorlagenversionen
+  zuordenbar (xref:qs-008-unveraenderliche-schreiben[QS-008]).
+|===
+
+Testbarkeit mit 80 % Abdeckung ist eine verbindliche Randbedingung
+(xref:qs-011-testabdeckung-als-build-gate[QS-011]).

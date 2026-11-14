@@ -1,0 +1,66 @@
+---
+id: DOC-05000-building-block-view
+type: Document
+title: 'Bausteinsicht'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Ebene-1-Bausteine der Bibliothek innerhalb der Host-Anwendung.'
+tags:
+- arc42
+- building-blocks
+relations: []
+metadata_version: '1.0'
+---
+[[building-block-view]]
+= Bausteinsicht
+
+== Ebene 1
+
+[plantuml,bausteine-ebene-1,svg]
+----
+@startuml
+!include <C4/C4_Component>
+System_Boundary(host, "Host-Anwendung") {
+  Container_Boundary(fe, "Frontend (npm-Paket)") {
+    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte, barrierefreie Vorschau")
+    Component(ui_uebersicht, "Übersicht", "React", "Gespeicherte Schreiben listen, laden, löschen")
+    Component(ui_editor, "Vorlagen-Editor", "React, ProseMirror", "Briefpapier und Standardschreiben pflegen")
+  }
+  Container_Boundary(be, "Backend (Spring-Boot-Starter)") {
+    Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
+    Component(app, "anwendung", "Java", "Anwendungsfälle")
+    Component(dom, "domaene", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
+    Component(ren, "adapter-rendering", "FreeMarker, openhtmltopdf, veraPDF", "Zusammenführen, PDF, Konformität")
+    Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
+  }
+  Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie")
+  ContainerDb_Ext(db, "Host-Datenbank", "SQL")
+}
+Rel(ui_vorschau, web, "REST/JSON, HTML")
+Rel(ui_uebersicht, web, "REST/JSON, PDF")
+Rel(ui_editor, web, "REST/JSON")
+Rel(web, app, "ruft")
+Rel(app, dom, "nutzt")
+Rel(app, ren, "Port Renderer")
+Rel(app, per, "Ports Repository, DokumentAblage")
+Rel(app, spi, "SPIs")
+Rel(per, db, "JDBC")
+@enduml
+----
+
+[cols="1,3,2", options="header"]
+|===
+| Baustein | Verantwortung | Ablage im Repository
+| domaene | Fachmodell und Regeln, frei von Frameworks | `backend/domaene`
+| anwendung | Anwendungsfälle, Ports (SPI) | `backend/anwendung`
+| adapter-web | REST-Endpunkte, Fehlerabbildung | `backend/adapter-web`
+| adapter-rendering | Zusammenführen (FreeMarker), PDF (openhtmltopdf), Konformität (veraPDF) | `backend/adapter-rendering`
+| adapter-persistenz-jdbc | Repositories, DokumentAblage, Liquibase-Changelog | `backend/adapter-persistenz-jdbc`
+| spring-boot-starter | Autokonfiguration, Default-Adapter | `backend/spring-boot-starter`
+| Frontend-Paket | Vorschau, Übersicht, Editor | `frontend/`
+|===
+
+Die Grenze entspricht der xref:system-scope-and-context[Kontextabgrenzung].

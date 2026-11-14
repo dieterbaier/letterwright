@@ -1,0 +1,148 @@
+---
+id: ADR-006-datenbankagnostische-persistenz
+type: ADR
+title: 'Datenbankagnostische Persistenz mit JDBC und Liquibase'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Persistenz über Spring JDBC mit portablem Liquibase-Changelog und konfigurierbarem Tabellenpräfix; PDFs als BLOB über den Port DokumentAblage; Tests gegen PostgreSQL und MariaDB.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- persistenz
+- datenbank
+- liquibase
+relations:
+- type: depends_on
+  target: ADR-002-hexagonale-architektur-und-ports
+  status: proposed
+  rationale: 'Persistenz ist ein Adapter hinter Repository- und Ablage-Ports.'
+  reviewed: false
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Kein Eingriff in die JPA-Konfiguration des Hosts.'
+  reviewed: false
+- type: introduces_risk
+  target: R-006-unterschiede-der-datenbanken-bei-blobs
+  status: proposed
+  rationale: 'BLOB-Typen und Größenlimits unterscheiden sich je Datenbank.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-006-datenbankagnostische-persistenz]]
+== ADR-006: Datenbankagnostische Persistenz mit JDBC und Liquibase
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* Persistenz-Adapter auf Basis von **Spring JDBC** (`JdbcClient`), nicht JPA. Die
+  Bibliothek registriert damit keine Entitäten im `EntityManager` des Hosts.
+* Schema per **Liquibase-Changelog** mit portablen Liquibase-Typen, als Datei, die der
+  Host in seinen Master-Changelog einbindet. Optional führt der Starter ihn selbst aus.
+* **Konfigurierbares Tabellenpräfix** (Default `ssw_`), um Namenskonflikte zu vermeiden.
+* PDFs als **BLOB** hinter dem Port `DokumentAblage`; ein Objektspeicher-Adapter kann
+  später folgen.
+* **Unterstützte Datenbanken** im MVP: PostgreSQL und MariaDB/MySQL, beide per
+  Testcontainers im CI getestet. H2 nur für schnelle Tests.
+
+=== Kontext
+
+Der Owner will Datenbankagnostik, Liquibase und BLOB-Speicherung mit Port für einen
+späteren Objektspeicher. Es gibt kein Mengengerüst. Die Bibliothek läuft in der
+Datenbank der Host-Anwendung.
+
+=== Entscheidungstreiber
+
+* Datenbankagnostik.
+* Keine Seiteneffekte auf die Persistenzkonfiguration des Hosts.
+* Einfache Integration des Schemas über Liquibase.
+
+=== Betrachtete Optionen
+
+==== Option 1: Spring JDBC und Liquibase
+
+Explizites SQL über wenige Tabellen, volle Kontrolle über BLOB-Streaming, keine
+Konflikte mit dem Persistence-Unit des Hosts. Etwas mehr Mapping-Code.
+
+==== Option 2: JPA (Hibernate) und Liquibase
+
+Vertraut, weniger Mapping-Code. Entitäten müssen im Host gescannt werden; Konflikte
+mit Hibernate-Einstellungen des Hosts sind möglich; BLOB-Handling ist dialektabhängig.
+
+==== Option 3: Spring Data JDBC und Liquibase
+
+Aggregat-orientiert und DDD-nah, aber eigene Konventionen (Namensstrategie,
+Repositories) können mit Host-Konfiguration kollidieren.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Datenbankagnostik | +1 | +1 | +1
+| Keine Seiteneffekte im Host | +1 | -1 | 0
+| Wenig Code | -1 | +1 | 0
+| Kontrolle über BLOB-Streaming | +1 | -1 | 0
+s| Summe s| +2 s| 0 s| +1
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Bibliothek ist mit Hosts mit und ohne JPA kombinierbar.
+* Speicherort der PDFs kann später ohne Domänenänderung wechseln.
+
+==== Negativ
+
+* Mapping-Code muss getestet werden (zählt zur Testabdeckung).
+
+==== Neutral oder Folgearbeiten
+
+* Liste unterstützter Datenbanken erweitern, wenn ein Host Oracle oder SQL Server verlangt.
+
+=== Impact
+
+include::generated/adr-006-datenbankagnostische-persistenz-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-006-datenbankagnostische-persistenz-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-006-datenbankagnostische-persistenz-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Gespeicherte Schreiben sind wenige hundert KB groß.
+
+=== Open Questions
+
+* Welche Datenbanken setzen die geplanten Host-Anwendungen ein? (Q-ARCH-001)
+
+=== Review Notes
+
+Die Liste der unterstützten Datenbanken ist mit dem Owner zu bestätigen.

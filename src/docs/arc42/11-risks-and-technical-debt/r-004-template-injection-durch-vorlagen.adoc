@@ -1,0 +1,84 @@
+---
+id: R-004-template-injection-durch-vorlagen
+type: Risk
+title: 'Template-Injection über gepflegte Vorlagen'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Von Benutzern gepflegte FreeMarker-Vorlagen könnten zur Ausführung von Code im Host missbraucht werden.'
+tags:
+- risk
+- sicherheit
+- platzhalter
+relations:
+- type: affects
+  target: QS-009-zugriffsschutz-beim-download
+  status: proposed
+  rationale: 'Code-Ausführung im Host hebelt jede Zugriffsprüfung aus.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-004-template-injection-durch-vorlagen]]
+== R-004: Template-Injection über gepflegte Vorlagen
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil Vorlagen von Benutzern gepflegt und mit einer mächtigen Template-Sprache ausgewertet werden, kann ein manipulierter Ausdruck Java-Klassen oder -Methoden aufrufen, was zu Codeausführung und Datenabfluss in der Host-Anwendung führt.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Low.
+| Impact | High.
+| Priority | High.
+| Timeframe | Near-term.
+| Confidence | High.
+|===
+
+Bekanntes Angriffsmuster (SSTI); mit restriktiver Konfiguration gut beherrschbar.
+
+=== Mitigation Options
+
+* Abgesicherte FreeMarker-Konfiguration nach ADR-008.
+* Datenmodell nur aus Maps, Listen und Strings.
+* Automatisierte Tests mit bekannten SSTI-Payloads.
+* Pflegerecht nur für berechtigte Vorlagenverwalter.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-004-template-injection-durch-vorlagen-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-004-template-injection-durch-vorlagen-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-004-template-injection-durch-vorlagen-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

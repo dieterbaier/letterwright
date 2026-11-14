@@ -1,0 +1,39 @@
+---
+id: DOC-01002-requirements-overview
+type: Document
+title: 'Aufgabenstellung'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Funktionale Anforderungen aus Issue #1.'
+tags:
+- requirements
+relations: []
+metadata_version: '1.0'
+---
+[[requirements-overview]]
+== Aufgabenstellung
+
+Quelle: Issue #1 und die Antworten des Owners im Issue.
+
+.Benutzer (Sachbearbeiter)
+* Standardschreiben mit aktuellen Daten als Vorschau ansehen.
+* Schreiben speichern; als Ergebnis gibt es einen Download-Link.
+* Übersicht der gespeicherten Schreiben.
+* Gespeicherte Schreiben herunterladen oder drucken.
+* Gespeicherte Schreiben löschen (Regeln bestimmt die Host-Anwendung).
+
+.Vorlagenverwalter (Fachanwender)
+* Briefpapier definieren: Typ privat oder geschäftlich (DIN 5008 Form A oder B,
+  Default B), Header mit Slogan und Logo, Absender, Empfängeranschrift, Betreff,
+  Informationsblöcke auf der ersten Seite, Fußzeile, Seitenzahlen.
+* Standardschreiben definieren, mit Platzhaltern, Wiederholungs- und
+  Bedingungsblöcken sowie Defaultwerten.
+* Briefpapier einem Standardschreiben zuweisen.
+
+.Nicht im MVP (später, unter Umständen)
+* Mehrsprachigkeit von Vorlagen und UI.
+* Anlagen.
+* Mandantenfähigkeit (ausdrücklich nicht gefordert).

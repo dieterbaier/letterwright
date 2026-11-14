@@ -1,0 +1,83 @@
+---
+id: R-002-abweichung-zweier-render-engines
+type: Risk
+title: 'Abweichungen zwischen Vorschau- und PDF-Engine'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Paged.js und openhtmltopdf können dasselbe HTML unterschiedlich umbrechen.'
+tags:
+- risk
+- rendering
+- wiedergabetreue
+relations:
+- type: affects
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: proposed
+  rationale: 'Unterschiedliche Umbrüche verletzen die Wiedergabetreue.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-002-abweichung-zweier-render-engines]]
+== R-002: Abweichungen zwischen Vorschau- und PDF-Engine
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil Vorschau und PDF von zwei verschiedenen Layout-Engines erzeugt werden, können Seitenumbrüche, Silbentrennung oder Abstände abweichen, was dazu führt, dass das gespeicherte Schreiben nicht der Vorschau entspricht.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | High.
+| Priority | High.
+| Timeframe | Near-term.
+| Confidence | Low.
+|===
+
+Ohne Prototyp ist das Ausmaß nicht abschätzbar; einfache Brieflayouts senken die Wahrscheinlichkeit.
+
+=== Mitigation Options
+
+* Wiedergabetreue-Test aus QS-004 für alle Referenzvorlagen.
+* Gleiche eingebettete Schriften, keine automatische Silbentrennung.
+* Rückfallebene: Chromium für beide Wege (ADR-004, Option 2).
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-002-abweichung-zweier-render-engines-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-002-abweichung-zweier-render-engines-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-002-abweichung-zweier-render-engines-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Ab welcher Abweichung ist die Rückfallebene zu ziehen?
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

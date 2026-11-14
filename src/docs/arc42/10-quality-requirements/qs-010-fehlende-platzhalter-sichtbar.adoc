@@ -1,0 +1,70 @@
+---
+id: QS-010-fehlende-platzhalter-sichtbar
+type: QualityScenario
+title: 'Fehlende Platzhalterwerte sind sichtbar'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Fehlt ein Wert ohne Default, zeigt die Vorschau den Platzhalter markiert an, statt still einen leeren Text zu erzeugen.'
+tags:
+- quality
+- platzhalter
+- usability
+relations: []
+metadata_version: '1.0'
+---
+[[qs-010-fehlende-platzhalter-sichtbar]]
+== QS-010: Fehlende Platzhalterwerte sind sichtbar
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Benutzer
+| Stimulus | Öffnet die Vorschau eines Standardschreibens, für das der Host einen Wert nicht liefert.
+| Environment | Normalbetrieb.
+| Artifact | Zusammenführung von Vorlage und Daten, Vorschau.
+| Response | Der Platzhalter erscheint sichtbar markiert und ist für Screenreader als fehlender Wert erkennbar; ein Defaultwert wird verwendet, wenn definiert.
+| Response Measure | 100 % der fehlenden Werte ohne Default sind in Tests sichtbar markiert; 0 Abbrüche der Vorschau wegen fehlender Werte.
+|===
+
+=== Begründung
+
+Vom Owner gefordertes Verhalten.
+
+=== Annahmen
+
+* Die Markierung erscheint nicht im gespeicherten PDF, wenn Speichern mit fehlenden Werten gesperrt ist.
+
+=== Impact
+
+include::generated/qs-010-fehlende-platzhalter-sichtbar-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-010-fehlende-platzhalter-sichtbar-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-010-fehlende-platzhalter-sichtbar-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Darf mit fehlenden Werten gespeichert werden? (Q-PO-007)
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

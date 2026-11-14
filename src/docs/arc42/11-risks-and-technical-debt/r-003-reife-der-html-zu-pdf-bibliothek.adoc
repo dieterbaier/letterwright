@@ -1,0 +1,88 @@
+---
+id: R-003-reife-der-html-zu-pdf-bibliothek
+type: Risk
+title: 'Wartungszustand der HTML-zu-PDF-Bibliothek'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'openhtmltopdf wird von einer kleinen Community gepflegt; Fehler oder Stillstand treffen den Kern.'
+tags:
+- risk
+- abhaengigkeit
+- rendering
+relations:
+- type: affects
+  target: QS-001-pdfa-konformitaet
+  status: proposed
+  rationale: 'Fehler in der Bibliothek können die PDF/A-Konformität brechen.'
+  reviewed: false
+- type: affects
+  target: QS-002-barrierefreies-pdf
+  status: proposed
+  rationale: 'Fehler im Tagging verletzen PDF/UA.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-003-reife-der-html-zu-pdf-bibliothek]]
+== R-003: Wartungszustand der HTML-zu-PDF-Bibliothek
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil openhtmltopdf ein Community-Projekt mit wenigen Maintainern ist, können Fehler unbehoben bleiben oder Updates ausbleiben, was die Konformität und die Sicherheit der PDF-Erzeugung gefährdet.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | Medium.
+| Priority | Medium.
+| Timeframe | Medium-term.
+| Confidence | Low.
+|===
+
+Der aktuelle Wartungsstand ist vor Annahme von ADR-004 zu prüfen.
+
+=== Mitigation Options
+
+* Renderer hinter dem Port `Renderer` kapseln.
+* Wartungsstand und Lizenz (LGPL) vor Annahme von ADR-004 prüfen.
+* Alternative (Apache FOP oder Chromium) als dokumentierte Rückfallebene.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-003-reife-der-html-zu-pdf-bibliothek-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-003-reife-der-html-zu-pdf-bibliothek-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-003-reife-der-html-zu-pdf-bibliothek-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Ist ein Fork mit eigener Pflege akzeptabel?
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

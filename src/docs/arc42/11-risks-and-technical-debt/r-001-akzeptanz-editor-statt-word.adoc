@@ -1,0 +1,82 @@
+---
+id: R-001-akzeptanz-editor-statt-word
+type: Risk
+title: 'Akzeptanz eines Editors statt Word'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Fachanwender könnten einen geführten Editor gegenüber ihren gewohnten DOCX-Vorlagen ablehnen.'
+tags:
+- risk
+- usability
+- vorlagen
+relations:
+- type: affects
+  target: QS-006-briefpapier-pflege-durch-fachanwender
+  status: proposed
+  rationale: 'Ablehnung gefährdet die Pflege durch Fachanwender.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-001-akzeptanz-editor-statt-word]]
+== R-001: Akzeptanz eines Editors statt Word
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil die Fachanwender heute mit DOCX-Dateien arbeiten, kann ein neuer, bausteinbasierter Editor abgelehnt werden, was zu Vorlagenpflege durch Entwickler oder zur Forderung nach DOCX-Unterstützung führt.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | High.
+| Priority | High.
+| Timeframe | Near-term.
+| Confidence | Medium.
+|===
+
+Gewohnheit ist stark; gleichzeitig ist die Gestaltungsfreiheit bei Briefen ohnehin durch DIN 5008 begrenzt.
+
+=== Mitigation Options
+
+* Prototyp mit echten DOCX-Vorlagen und Fachanwendern vor Annahme von ADR-003.
+* DOCX-Import für Textinhalte als Erweiterung einplanen.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-001-akzeptanz-editor-statt-word-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-001-akzeptanz-editor-statt-word-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-001-akzeptanz-editor-statt-word-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Welche Fachanwender können am Prototyp-Test teilnehmen?
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

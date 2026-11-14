@@ -1,0 +1,155 @@
+---
+id: ADR-009-build-monorepo-und-versionen
+type: ADR
+title: 'Monorepo, Gradle und aktuelle Plattformversionen'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Monorepo mit Gradle (Kotlin DSL) für das Backend und npm-Workspaces für das Frontend; aktuelle stabile Spring-Boot-Version (4.x) auf Java 25 mit Bytecode-Ziel 21; ArchUnit und Testcontainers.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- build
+- versionen
+- monorepo
+relations:
+- type: depends_on
+  target: ADR-001-einbettbare-bibliothek
+  status: proposed
+  rationale: 'Die unterstützten Versionen bestimmen, welche Hosts die Bibliothek nutzen können.'
+  reviewed: false
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Aktuelle, unterstützte Versionen erleichtern die Integration in neue Hosts.'
+  reviewed: false
+- type: introduces_risk
+  target: R-007-bindung-an-spring-boot-hauptversion
+  status: proposed
+  rationale: 'Hosts auf älteren Spring-Boot-Hauptversionen können den Starter nicht nutzen.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-009-build-monorepo-und-versionen]]
+== ADR-009: Monorepo, Gradle und aktuelle Plattformversionen
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* **Monorepo** mit
+** `backend/` – Gradle-Multiprojekt (Kotlin DSL): `domaene`, `anwendung`,
+   `adapter-persistenz-jdbc`, `adapter-rendering`, `adapter-web`,
+   `spring-boot-starter`.
+** `frontend/` – npm-Workspace mit dem Paket der React-Komponenten (TypeScript, Vite,
+   UnoCSS).
+** `beispiel/` – Beispiel-Host-Anwendung (Spring Boot und React), sobald
+   Anwendungsfälle gefunden sind.
+* **Versionen**: die **aktuelle stabile Spring-Boot-Version (4.x)**, entwickelt und
+  getestet mit **Java 25 (LTS)**, kompiliert mit `--release 21`, damit Hosts auf
+  Java 21 die Bibliothek nutzen können. Die genauen Patch-Versionen werden beim
+  Anlegen des Builds festgelegt.
+* **ArchUnit** prüft die hexagonalen Abhängigkeitsregeln, **Testcontainers** die
+  Persistenz gegen echte Datenbanken.
+
+Antwort auf die Frage des Owners „Warum nicht die neueste Spring-Boot-Version?“:
+Der ursprüngliche Vorschlag 3.x war Vorsicht wegen der Kompatibilität mit Hosts.
+Ein Starter ist an die Spring-Boot-Hauptversion des Hosts gebunden. Da noch keine
+Bestands-Hosts feststehen und ältere Linien aus der freien Unterstützung fallen,
+ist die neueste stabile Version die bessere Wahl.
+
+=== Kontext
+
+Owner bestätigt Gradle mit Kotlin DSL, Monorepo, ArchUnit und Testcontainers und
+fragt, warum nicht die neueste Spring-Boot-Version gewählt wird.
+
+=== Entscheidungstreiber
+
+* Lange Unterstützung der Plattform.
+* Breite Nutzbarkeit in Hosts.
+* Ein Repository für Backend, Frontend, Beispiel und Doku.
+
+=== Betrachtete Optionen
+
+==== Option 1: Spring Boot 4.x, Java 25 mit Ziel 21, Monorepo
+
+Lange Unterstützung, modernste Plattform. Hosts auf Spring Boot 3 sind ausgeschlossen.
+
+==== Option 2: Spring Boot 3.x, Java 21, Monorepo
+
+Breiter kompatibel mit bestehenden Hosts, aber kürzere verbleibende Unterstützung
+und baldiger Migrationsaufwand.
+
+==== Option 3: Spring Boot 4.x, getrennte Repositories für Backend und Frontend
+
+Unabhängige Releases, aber API-Änderungen über Repository-Grenzen hinweg schwerer
+abzustimmen, Doku verstreut.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Lange Unterstützung | +1 | -1 | +1
+| Breite Nutzbarkeit in Hosts | 0 | +1 | 0
+| Ein Repository | +1 | +1 | -1
+s| Summe s| +2 s| +1 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Keine absehbare Migration einer Hauptversion während des MVP.
+
+==== Negativ
+
+* Hosts auf Spring Boot 3 können die Bibliothek nicht nutzen (R-007).
+
+==== Neutral oder Folgearbeiten
+
+* Bei Bedarf eines Hosts auf Spring Boot 3: eigene Kompatibilitätslinie bewerten.
+
+=== Impact
+
+include::generated/adr-009-build-monorepo-und-versionen-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-009-build-monorepo-und-versionen-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-009-build-monorepo-und-versionen-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Die geplanten Hosts sind neu oder können auf die aktuelle Spring-Boot-Version gehen.
+
+=== Open Questions
+
+* Gibt es bereits bekannte Host-Anwendungen mit fester Spring-Boot- oder Java-Version? (Q-ARCH-002)
+
+=== Review Notes
+
+Versionen beim Anlegen des Builds gegen die dann aktuellen Releases prüfen.

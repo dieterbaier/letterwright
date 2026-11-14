@@ -1,0 +1,70 @@
+---
+id: QS-004-wiedergabetreue-vorschau-und-pdf
+type: QualityScenario
+title: 'Wiedergabetreue zwischen Vorschau und PDF'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Vorschau und gespeichertes PDF haben gleiche Seitenanzahl und gleiche Umbruchstellen.'
+tags:
+- quality
+- wiedergabetreue
+- rendering
+relations: []
+metadata_version: '1.0'
+---
+[[qs-004-wiedergabetreue-vorschau-und-pdf]]
+== QS-004: Wiedergabetreue zwischen Vorschau und PDF
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Benutzer
+| Stimulus | Prüft die Vorschau und speichert anschließend.
+| Environment | Normalbetrieb; Referenzvorlagen mit ein bis drei Seiten im CI.
+| Artifact | Rendering-Pipeline (Paged.js und PDF-Renderer).
+| Response | Das gespeicherte PDF entspricht der Vorschau.
+| Response Measure | Für alle Referenzvorlagen: gleiche Seitenanzahl, gleiche erste und letzte Textzeile je Seite, Positionsabweichung zentraler Bausteine ≤ 1 mm.
+|===
+
+=== Begründung
+
+Der Owner verlangt, dass Vorschau und endgültiges Dokument gleich aussehen.
+
+=== Annahmen
+
+* Gleiche eingebettete Schriften in beiden Wegen.
+
+=== Impact
+
+include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Ist eine Abweichung von 1 mm akzeptabel?
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

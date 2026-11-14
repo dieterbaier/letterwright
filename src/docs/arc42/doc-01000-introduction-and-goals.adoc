@@ -1,0 +1,24 @@
+---
+id: DOC-01000-introduction-and-goals
+type: Document
+title: 'Einführung und Ziele'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Zweck, Qualitätsziele und Stakeholder der Bibliothek Standardschreiben.'
+tags:
+- arc42
+relations: []
+metadata_version: '1.0'
+---
+[[introduction-and-goals]]
+= Einführung und Ziele
+
+Standardschreiben ist eine einbettbare Bibliothek für Spring-Boot-/React-Anwendungen.
+Sie zeigt Benutzern Standardschreiben auf einem definierten Briefpapier, befüllt mit
+aktuellen Domänendaten, als barrierefreie Vorschau an und speichert sie auf Wunsch
+als barrierefreies PDF/A-Dokument zum Download.
+
+include::generated/doc-01000-introduction-and-goals-includes.adoc[]

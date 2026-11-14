@@ -1,0 +1,15 @@
+[[vision-mission]]
+= Vision und Mission
+:id: DOC-002-vision-mission
+
+== Vision
+
+Jede Anwendung kann normgerechte, barrierefreie und archivierbare Schreiben
+erzeugen, deren Gestaltung Fachanwender selbst bestimmen.
+
+== Mission
+
+Standardschreiben liefert eine einbettbare Bibliothek, die Briefpapier und
+Standardschreiben als pflegbare Vorlagen verwaltet, mit Domänendaten des Hosts
+befüllt, eine barrierefreie Vorschau zeigt und unveränderliche PDF/A-Dokumente
+speichert.

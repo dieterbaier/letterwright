@@ -1,0 +1,20 @@
+---
+id: DOC-13000-appendix
+type: Document
+title: 'Anhang'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Anhang mit Fragen und Antworten.'
+tags:
+- arc42
+- appendix
+relations: []
+metadata_version: '1.0'
+---
+[[appendix]]
+= Anhang
+
+include::../doc-005-questions-and-answers.adoc[leveloffset=+1]

@@ -1,0 +1,70 @@
+---
+id: QS-009-zugriffsschutz-beim-download
+type: QualityScenario
+title: 'Zugriffsschutz beim Download'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Ein Benutzer ohne Berechtigung erhält weder Inhalt noch vertrauliche Metadaten eines Schreibens.'
+tags:
+- quality
+- sicherheit
+- vertraulichkeit
+relations: []
+metadata_version: '1.0'
+---
+[[qs-009-zugriffsschutz-beim-download]]
+== QS-009: Zugriffsschutz beim Download
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Angemeldeter Benutzer ohne Berechtigung für ein bestimmtes Schreiben
+| Stimulus | Ruft Download, Übersicht oder Löschen mit der ID eines fremden Schreibens auf.
+| Environment | Normalbetrieb; Angreifer kennt oder errät IDs.
+| Artifact | REST-Endpunkte und Anwendungsfälle.
+| Response | Die Anfrage wird abgelehnt; die Antwort unterscheidet nicht zwischen nicht vorhanden und nicht berechtigt.
+| Response Measure | 100 % der Zugriffsversuche in automatisierten Tests liefern 404 ohne Dokumentinhalt, Dateinamen, Empfänger oder Betreff.
+|===
+
+=== Begründung
+
+Schreiben enthalten personenbezogene Daten.
+
+=== Annahmen
+
+* IDs sind nicht fortlaufend (UUID).
+
+=== Impact
+
+include::generated/qs-009-zugriffsschutz-beim-download-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-009-zugriffsschutz-beim-download-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-009-zugriffsschutz-beim-download-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Wessen Schreiben darf ein Benutzer in der Übersicht sehen? (Q-PO-003)
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

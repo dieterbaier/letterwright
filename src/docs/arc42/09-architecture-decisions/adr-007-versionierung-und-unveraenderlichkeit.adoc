@@ -1,0 +1,142 @@
+---
+id: ADR-007-versionierung-und-unveraenderlichkeit
+type: ADR
+title: 'Versionierte Vorlagen und unveränderliche Schreiben'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Vorlagen sind versioniert; ein gespeichertes Schreiben verweist auf die verwendeten Vorlagenversionen und speichert das PDF mit Prüfsumme unverändert; Speichern verwendet den Datenstand der Vorschau.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- versionierung
+- nachvollziehbarkeit
+relations:
+- type: addresses
+  target: QS-008-unveraenderliche-schreiben
+  status: proposed
+  rationale: 'Gespeicherte PDFs werden nie neu erzeugt.'
+  reviewed: false
+- type: addresses
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: proposed
+  rationale: 'Speichern rendert mit demselben Datenstand wie die Vorschau.'
+  reviewed: false
+- type: depends_on
+  target: ADR-006-datenbankagnostische-persistenz
+  status: proposed
+  rationale: 'Versionen und Dokumente werden über die Persistenz-Adapter abgelegt.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-007-versionierung-und-unveraenderlichkeit]]
+== ADR-007: Versionierte Vorlagen und unveränderliche Schreiben
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* Briefpapier und Standardschreiben haben **Versionen** mit Zustand *Entwurf*,
+  *veröffentlicht* oder *zurückgezogen*. Veröffentlichte Versionen sind unveränderlich;
+  Änderungen erzeugen eine neue Version.
+* Ein **gespeichertes Schreiben** speichert das erzeugte PDF, eine SHA-256-Prüfsumme
+  und die IDs der verwendeten Vorlagenversionen. Es wird **nie neu gerendert**.
+* Die **Vorschau** erzeugt einen kurzlebigen **Datenstand (Snapshot)**. Speichern
+  rendert das PDF aus genau diesem Snapshot, damit das Gespeicherte der Vorschau
+  entspricht, auch wenn sich Domänendaten zwischenzeitlich geändert haben.
+* Das Löschen eines Schreibens entscheidet die `Loeschrichtlinie` des Hosts (ADR-002).
+
+=== Kontext
+
+Der Owner hat bestätigt: Vorlagen werden versioniert, das gespeicherte PDF bleibt
+unverändert. Lösch- und Aufbewahrungsregeln entscheidet die Host-Anwendung.
+
+=== Entscheidungstreiber
+
+* Nachvollziehbarkeit: Was der Benutzer gesehen hat, wird gespeichert.
+* Unveränderlichkeit gespeicherter Schreiben.
+* Einfaches Modell für Fachanwender (Entwurf, veröffentlicht).
+
+=== Betrachtete Optionen
+
+==== Option 1: Versionierte Vorlagen, PDF unverändert, Speichern aus Vorschau-Snapshot
+
+Gespeichertes entspricht exakt der Vorschau. Snapshot muss kurzzeitig gehalten werden.
+
+==== Option 2: Versionierte Vorlagen, Speichern liest Daten neu
+
+Kein Snapshot nötig. Gespeichertes kann von der Vorschau abweichen.
+
+==== Option 3: Keine Versionierung, PDF unverändert
+
+Einfach, aber nicht nachvollziehbar, mit welcher Vorlage ein Schreiben entstand;
+laufende Bearbeitung beeinflusst Vorschauen anderer Benutzer.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Gespeichertes entspricht Vorschau | +1 | -1 | -1
+| Nachvollziehbarkeit | +1 | +1 | -1
+| Einfachheit | 0 | +1 | +1
+s| Summe s| +2 s| +1 s| -1
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Gespeicherte Schreiben sind revisionssicher nachvollziehbar.
+
+==== Negativ
+
+* Snapshot-Verwaltung (Ablaufzeit, Speicherort) ist zusätzlicher Aufwand.
+
+==== Neutral oder Folgearbeiten
+
+* Ablaufzeit des Snapshots festlegen (Annahme: 30 Minuten).
+
+=== Impact
+
+include::generated/adr-007-versionierung-und-unveraenderlichkeit-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-007-versionierung-und-unveraenderlichkeit-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-007-versionierung-und-unveraenderlichkeit-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Ein Snapshot darf personenbezogene Daten kurzzeitig serverseitig halten.
+
+=== Open Questions
+
+* Darf der Benutzer in der Vorschau Inhalte vor dem Speichern noch manuell ändern? (Q-PO-006)
+
+=== Review Notes
+
+Kernaussagen hat der Owner bestätigt; Snapshot-Mechanik ist neu und zu prüfen.

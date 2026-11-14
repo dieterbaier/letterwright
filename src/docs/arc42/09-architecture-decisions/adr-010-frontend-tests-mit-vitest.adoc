@@ -1,0 +1,130 @@
+---
+id: ADR-010-frontend-tests-mit-vitest
+type: ADR
+title: 'Frontend-Tests mit Vitest statt Jest'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Die React-Komponenten werden mit Vitest und React Testing Library getestet, weil Vitest die Vite-Konfiguration direkt nutzt und Jest-kompatibel ist.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- frontend
+- test
+relations:
+- type: addresses
+  target: QS-011-testabdeckung-als-build-gate
+  status: proposed
+  rationale: 'Vitest liefert die Frontend-Abdeckung für das Build-Gate.'
+  reviewed: false
+- type: addresses
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'axe-core läuft in den Vitest-Komponententests.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-010-frontend-tests-mit-vitest]]
+== ADR-010: Frontend-Tests mit Vitest statt Jest
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen **Vitest** mit **React Testing Library**, **jsdom** und
+**vitest-axe** bzw. axe-core vor. Die Abdeckung misst Vitest mit dem V8-Provider.
+
+=== Kontext
+
+Das Issue nennt „Nest“; gemeint war Jest. Der Owner akzeptiert Vitest, verlangt aber
+eine Begründung per ADR. Gebaut wird mit Vite.
+
+=== Entscheidungstreiber
+
+* Gleiche Transformations-Pipeline in Build und Test (TypeScript, UnoCSS, ESM).
+* Jest-kompatible API, geringe Einarbeitung.
+* Geschwindigkeit und Wartungsaufwand der Konfiguration.
+
+=== Betrachtete Optionen
+
+==== Option 1: Vitest
+
+Nutzt `vite.config.ts` direkt, native ESM- und TypeScript-Unterstützung, Jest-kompatible
+API (`describe`, `it`, `expect`, `vi.fn` statt `jest.fn`).
+
+==== Option 2: Jest
+
+Sehr verbreitet. Braucht eigene Transformation (ts-jest oder Babel), ESM-Unterstützung
+ist experimentell, Vite-Plugins (UnoCSS) müssen separat nachgebildet werden.
+
+==== Option 3: Jest mit vite-jest-Brücke
+
+Behält Jest, nutzt teilweise die Vite-Pipeline. Zusätzliche, wenig gepflegte
+Abhängigkeit.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Gleiche Pipeline wie der Build | +1 | -1 | 0
+| Jest-kompatible API | +1 | +1 | +1
+| Geringer Konfigurationsaufwand | +1 | -1 | -1
+s| Summe s| +3 s| -1 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Keine doppelte Build-Konfiguration für Tests.
+
+==== Negativ
+
+* Einige Jest-spezifische Plugins sind nicht direkt nutzbar.
+
+==== Neutral oder Folgearbeiten
+
+* Testkonventionen im Frontend-README festhalten.
+
+=== Impact
+
+include::generated/adr-010-frontend-tests-mit-vitest-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-010-frontend-tests-mit-vitest-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-010-frontend-tests-mit-vitest-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Keine Abhängigkeit zu Jest-spezifischen Werkzeugen in den Hosts.
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Kann akzeptiert werden, sobald der Owner die Begründung bestätigt.

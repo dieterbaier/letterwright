@@ -1,0 +1,82 @@
+---
+id: R-006-unterschiede-der-datenbanken-bei-blobs
+type: Risk
+title: 'Unterschiede der Datenbanken bei BLOBs'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'BLOB-Typen, Größenlimits und Streaming verhalten sich je Datenbank unterschiedlich.'
+tags:
+- risk
+- persistenz
+- datenbank
+relations:
+- type: affects
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Datenbankspezifische Probleme erschweren die Integration.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-006-unterschiede-der-datenbanken-bei-blobs]]
+== R-006: Unterschiede der Datenbanken bei BLOBs
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil die Bibliothek datenbankagnostisch sein soll, können BLOB-Typen, Größenlimits (z. B. MySQL BLOB 64 KB) oder Streaming-Verhalten je Datenbank abweichen, was zu Fehlern beim Speichern oder Laden in einzelnen Host-Datenbanken führt.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | Medium.
+| Priority | Medium.
+| Timeframe | Near-term.
+| Confidence | Medium.
+|===
+
+Liquibase bildet Typen ab, Größenlimits müssen aber geprüft werden.
+
+=== Mitigation Options
+
+* Testcontainers-Matrix für jede unterstützte Datenbank.
+* Port DokumentAblage erlaubt Ausweichen auf Objektspeicher.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Welche Datenbanken setzen die Hosts ein? (Q-ARCH-001)
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

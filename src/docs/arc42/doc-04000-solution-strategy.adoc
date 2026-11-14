@@ -1,0 +1,33 @@
+---
+id: DOC-04000-solution-strategy
+type: Document
+title: 'Lösungsstrategie'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Zentrale Lösungsansätze und ihre Zuordnung zu Qualitätszielen.'
+tags:
+- arc42
+- strategy
+relations: []
+metadata_version: '1.0'
+---
+[[solution-strategy]]
+= Lösungsstrategie
+
+[cols="2,3,1", options="header"]
+|===
+| Ansatz | Kurzbeschreibung | Ziel
+| Einbettbare Bibliothek | Spring-Boot-Starter und npm-Paket statt eigenem Service (xref:adr-001-einbettbare-bibliothek[ADR-001]) | QG-004
+| Ports and Adapters | Frameworkfreier Kern, Host liefert Daten, Berechtigung, Löschregeln per SPI (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) | QG-004
+| Ein internes Vorlagenformat | Semantisches HTML mit Paged-Media-CSS, gepflegt in bausteinbasiertem Editor (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | QG-001, QG-002, QG-003
+| Ein HTML für zwei Ausgaben | Paged.js für die Vorschau, openhtmltopdf für das PDF (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]) | QG-002
+| Konformität im Build | PDF/A-2b, PDF/UA-1, WCAG 2.1 AA, geprüft mit veraPDF und axe-core (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]) | QG-001
+| Unveränderlichkeit | Versionierte Vorlagen, PDF mit Prüfsumme, Speichern aus Vorschau-Snapshot (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]) | QG-005
+|===
+
+Vor der Umsetzung klärt ein *Prototyp* die beiden kritischen, offenen Punkte:
+Pflegbarkeit des Vorlagenformats durch Fachanwender und Wiedergabetreue zweier
+Render-Engines.

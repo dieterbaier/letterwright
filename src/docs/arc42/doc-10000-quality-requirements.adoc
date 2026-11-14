@@ -1,0 +1,39 @@
+---
+id: DOC-10000-quality-requirements
+type: Document
+title: 'Qualitätsanforderungen'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Qualitätsbaum und messbare Qualitätsszenarien.'
+tags:
+- arc42
+- quality
+relations: []
+metadata_version: '1.0'
+---
+[[quality-requirements]]
+= Qualitätsanforderungen
+
+== Qualitätsbaum
+
+* Barrierefreiheit und Normkonformität
+** PDF/A (QS-001)
+** Barrierefreies PDF (QS-002)
+** Barrierefreie Vorschau (QS-003)
+* Wiedergabetreue
+** Vorschau gleich PDF (QS-004)
+** DIN 5008 (QS-005)
+* Pflegbarkeit durch Fachanwender (QS-006)
+* Integrierbarkeit (QS-007)
+* Nachvollziehbarkeit (QS-008)
+* Sicherheit (QS-009)
+* Benutzbarkeit bei fehlenden Daten (QS-010)
+* Testbarkeit (QS-011)
+* Effizienz (QS-012)
+
+include::10-quality-requirements/generated/doc-10001-quality-scenarios.adoc[]
+
+include::generated/doc-10000-quality-requirements-includes.adoc[]

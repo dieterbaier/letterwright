@@ -1,0 +1,82 @@
+---
+id: DOC-06000-runtime-view
+type: Document
+title: 'Laufzeitsicht'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Laufzeitszenarien Vorschau, Speichern, Download und Fehlerfall beim Speichern.'
+tags:
+- arc42
+- runtime
+relations: []
+metadata_version: '1.0'
+---
+[[runtime-view]]
+= Laufzeitsicht
+
+== Vorschau anzeigen
+
+[plantuml,laufzeit-vorschau,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Vorschau (React)" as UI
+participant "adapter-web" as Web
+participant "anwendung" as App
+participant "Host: PlatzhalterdatenAnbieter" as Host
+participant "adapter-rendering" as Ren
+SB -> UI: Standardschreiben für Bezug wählen
+UI -> Web: POST /vorschau (Standardschreiben, Bezug)
+Web -> App: Vorschau erzeugen
+App -> Host: Berechtigung und Datenkontext anfragen
+Host --> App: Datenkontext (formatiert)
+App -> Ren: Vorlagenversion + Daten zusammenführen
+Ren --> App: HTML
+App -> App: Snapshot speichern (befristet)
+App --> Web: HTML, Snapshot-ID
+Web --> UI: 200
+UI -> UI: Paged.js paginiert
+@enduml
+----
+
+== Schreiben speichern und herunterladen
+
+[plantuml,laufzeit-speichern,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Vorschau (React)" as UI
+participant "anwendung" as App
+participant "adapter-rendering" as Ren
+participant "adapter-persistenz-jdbc" as Per
+SB -> UI: Speichern
+UI -> App: POST /schreiben (Snapshot-ID)
+App -> Ren: PDF aus Snapshot erzeugen
+Ren --> App: PDF
+App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
+Ren --> App: konform
+App -> Per: PDF, SHA-256, Vorlagenversionen speichern
+App --> UI: 201, Download-Link
+SB -> UI: Download
+UI -> App: GET /schreiben/{id}/pdf
+App -> App: Berechtigung prüfen (Host)
+App --> UI: PDF (unverändert)
+@enduml
+----
+
+== Fehlerfall: PDF nicht konform oder Rendering schlägt fehl
+
+Schlägt die PDF-Erzeugung oder die Konformitätsprüfung fehl, wird **nichts
+persistiert**. Der Benutzer erhält eine verständliche Meldung, der Snapshot bleibt
+bis zu seinem Ablauf erhalten, sodass Speichern nach Behebung (z. B. Korrektur der
+Vorlage) wiederholt werden kann. Der Fehler wird mit Vorlagenversion und
+Korrelations-ID protokolliert, ohne personenbezogene Inhalte.
+
+== Fehlerfall: Snapshot abgelaufen
+
+Ist der Snapshot beim Speichern abgelaufen, lehnt die Bibliothek das Speichern ab
+und fordert eine neue Vorschau an, statt mit neu gelesenen Daten zu speichern
+(xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).

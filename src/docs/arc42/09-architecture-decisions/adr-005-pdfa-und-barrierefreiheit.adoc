@@ -1,0 +1,156 @@
+---
+id: ADR-005-pdfa-und-barrierefreiheit
+type: ADR
+title: 'PDF/A-, PDF/UA- und WCAG-Zielniveau'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Gespeicherte Schreiben sind PDF/A-2b und PDF/UA-1, die Vorschau erfüllt WCAG 2.1 AA; veraPDF und axe-core prüfen das im Build.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- pdfa
+- barrierefreiheit
+- compliance
+relations:
+- type: addresses
+  target: QS-001-pdfa-konformitaet
+  status: proposed
+  rationale: 'Legt das PDF/A-Niveau und seine Prüfung fest.'
+  reviewed: false
+- type: addresses
+  target: QS-002-barrierefreies-pdf
+  status: proposed
+  rationale: 'Legt PDF/UA-1 als Ziel und veraPDF als Prüfwerkzeug fest.'
+  reviewed: false
+- type: addresses
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'Legt WCAG 2.1 AA und axe-core für die Vorschau fest.'
+  reviewed: false
+- type: depends_on
+  target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
+  status: proposed
+  rationale: 'Die Rendering-Bibliothek muss die Niveaus erzeugen können.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-005-pdfa-und-barrierefreiheit]]
+== ADR-005: PDF/A-, PDF/UA- und WCAG-Zielniveau
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* Gespeicherte Schreiben sind **PDF/A-2b** (Archivierbarkeit, einfachstes gängiges
+  Niveau mit Transparenz- und OpenType-Unterstützung) **und PDF/UA-1** (getaggtes,
+  barrierefreies PDF). PDF/A-2b plus PDF/UA-1 deckt inhaltlich ab, was PDF/A-2a
+  zusätzlich fordern würde.
+* Die HTML-Vorschau erfüllt **WCAG 2.1 Level AA**, die Grundlage von EN 301 549 und
+  BITV 2.0.
+* Der **Build prüft** beides automatisch: **veraPDF** (Open Source) validiert jedes
+  Referenz-PDF gegen PDF/A-2b und PDF/UA-1, **axe-core** prüft die gerenderte Vorschau
+  in Komponententests und E2E-Tests.
+* Zur Laufzeit wird vor dem Speichern eine Konformitätsprüfung über den Port
+  `KonformitaetsPruefer` ausgeführt (Default: veraPDF als optionaler Adapter).
+
+=== Kontext
+
+Der Owner hat keine spezielle Vorgabe gemacht: mit dem einfachsten Niveau starten,
+aber im Build prüfen. Barrierefreiheit gilt für Vorschau und gespeichertes Dokument.
+Nur Stufe „a“ von PDF/A oder zusätzlich PDF/UA stellt Tagged PDF sicher; PDF/A-2b
+allein wäre nicht barrierefrei.
+
+=== Entscheidungstreiber
+
+* Einfachstes Niveau, das Archivierung und Barrierefreiheit zugleich erfüllt.
+* Automatisch prüfbar mit Open-Source-Werkzeugen.
+* Unterstützt von der Rendering-Bibliothek.
+
+=== Betrachtete Optionen
+
+==== Option 1: PDF/A-2b plus PDF/UA-1, WCAG 2.1 AA
+
+Gängige Kombination, von openhtmltopdf unterstützt, von veraPDF prüfbar.
+
+==== Option 2: Nur PDF/A-2b
+
+Am einfachsten, aber ohne Tagging nicht barrierefrei. Erfüllt die Anforderung aus
+dem Issue nicht.
+
+==== Option 3: PDF/A-3a plus PDF/UA-2, WCAG 2.2 AA
+
+Höchstes Niveau, erlaubt eingebettete Dateien. Mehr Aufwand, geringere
+Werkzeugunterstützung für PDF/UA-2.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Einfach und ausreichend | +1 | +1 | -1
+| Barrierefreiheit | +1 | -1 | +1
+| Automatisch prüfbar | +1 | +1 | 0
+| Von Rendering-Bibliothek unterstützt | +1 | +1 | ?
+s| Summe s| +4 s| +2 s| ?
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Konformität ist im CI messbar und regressionssicher.
+* Der Weg zu höheren Niveaus bleibt offen.
+
+==== Negativ
+
+* veraPDF als Laufzeitprüfung vergrößert den Host; daher optional.
+* Inhalte der Fachanwender (Alternativtexte, Überschriften) beeinflussen die Konformität (R-005).
+
+==== Neutral oder Folgearbeiten
+
+* veraPDF-Integration in Gradle/CI im ersten Build-Epic.
+
+=== Impact
+
+include::generated/adr-005-pdfa-und-barrierefreiheit-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-005-pdfa-und-barrierefreiheit-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-005-pdfa-und-barrierefreiheit-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Kein Ziel-Archiv verlangt PDF/A-3 oder ZUGFeRD-Anhänge.
+
+=== Open Questions
+
+* Gibt es eine Zielanwendung oder ein Archiv mit eigenen PDF/A-Vorgaben? (Q-PO-002)
+
+=== Review Notes
+
+Kann akzeptiert werden, sobald der Prototyp die Erzeugung mit openhtmltopdf und die Prüfung mit veraPDF gezeigt hat.

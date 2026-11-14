@@ -1,0 +1,69 @@
+---
+id: QS-012-erzeugungsdauer
+type: QualityScenario
+title: 'Erzeugungsdauer von Vorschau und PDF'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Vorschau und PDF eines zweiseitigen Schreibens stehen schnell genug zur Verfügung, um den Arbeitsfluss nicht zu stören.'
+tags:
+- quality
+- performance
+relations: []
+metadata_version: '1.0'
+---
+[[qs-012-erzeugungsdauer]]
+== QS-012: Erzeugungsdauer von Vorschau und PDF
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Benutzer
+| Stimulus | Öffnet die Vorschau und speichert danach.
+| Environment | Normalbetrieb, bis zu 10 gleichzeitige Erzeugungen je Host-Instanz.
+| Artifact | Zusammenführung, Paged.js-Vorschau, PDF-Renderer.
+| Response | Vorschau wird angezeigt, PDF wird gespeichert und der Download-Link bereitgestellt.
+| Response Measure | p95: Vorschau ≤ 2 s bis zur ersten paginierten Seite, Speichern ≤ 3 s bis zum Download-Link.
+|===
+
+=== Begründung
+
+Kein Mengengerüst vorhanden; Werte sind Annahmen für einen flüssigen Arbeitsablauf.
+
+=== Annahmen
+
+* Werte und Last sind Annahmen und mit dem Owner zu bestätigen.
+
+=== Impact
+
+include::generated/qs-012-erzeugungsdauer-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-012-erzeugungsdauer-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-012-erzeugungsdauer-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Gibt es Massenerzeugung (Serienbriefe)?
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

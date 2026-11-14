@@ -1,0 +1,70 @@
+---
+id: QS-005-din-5008-masshaltigkeit
+type: QualityScenario
+title: 'DIN-5008-Maßhaltigkeit des geschäftlichen Briefpapiers'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Anschriftfeld, Informationsblock und Falzmarken liegen bei Form A und B an den Normpositionen.'
+tags:
+- quality
+- din5008
+- layout
+relations: []
+metadata_version: '1.0'
+---
+[[qs-005-din-5008-masshaltigkeit]]
+== QS-005: DIN-5008-Maßhaltigkeit des geschäftlichen Briefpapiers
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Vorlagenverwalter
+| Stimulus | Legt ein geschäftliches Briefpapier in Form B (Default) oder Form A an.
+| Environment | Normalbetrieb.
+| Artifact | Briefpapier-Bausteine und erzeugtes PDF.
+| Response | Das Briefpapier hält die Maße der gewählten Form ein, auch wenn Logo und Texte geändert werden.
+| Response Measure | Abweichung der Anschriftfeld- und Falzmarkenpositionen im PDF ≤ 0,5 mm gegenüber DIN 5008, automatisiert geprüft.
+|===
+
+=== Begründung
+
+Fensterumschläge und Falzung verlangen exakte Positionen.
+
+=== Annahmen
+
+* Das private Briefpapier ist nicht normgebunden.
+
+=== Impact
+
+include::generated/qs-005-din-5008-masshaltigkeit-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-005-din-5008-masshaltigkeit-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-005-din-5008-masshaltigkeit-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

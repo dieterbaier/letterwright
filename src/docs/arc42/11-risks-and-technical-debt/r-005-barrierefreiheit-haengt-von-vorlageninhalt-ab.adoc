@@ -1,0 +1,82 @@
+---
+id: R-005-barrierefreiheit-haengt-von-vorlageninhalt-ab
+type: Risk
+title: 'Barrierefreiheit hängt vom Vorlageninhalt ab'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Fachanwender können Inhalte ohne Alternativtexte oder mit falscher Struktur erstellen.'
+tags:
+- risk
+- barrierefreiheit
+- vorlagen
+relations:
+- type: affects
+  target: QS-002-barrierefreies-pdf
+  status: proposed
+  rationale: 'Fehlende Alternativtexte oder Struktur verletzen PDF/UA.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab]]
+== R-005: Barrierefreiheit hängt vom Vorlageninhalt ab
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil Fachanwender Inhalte pflegen, können Logos ohne Alternativtext oder Überschriften als fetter Text entstehen, was zu nicht barrierefreien Schreiben führt.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | High.
+| Impact | Medium.
+| Priority | Medium.
+| Timeframe | Near-term.
+| Confidence | High.
+|===
+
+Typisches Problem redaktioneller Systeme.
+
+=== Mitigation Options
+
+* Editor erzwingt Alternativtexte für Bilder.
+* Prüfung der Vorlage beim Veröffentlichen mit axe-core und veraPDF.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

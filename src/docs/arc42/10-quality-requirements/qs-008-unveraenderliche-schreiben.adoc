@@ -1,0 +1,70 @@
+---
+id: QS-008-unveraenderliche-schreiben
+type: QualityScenario
+title: 'Unveränderlichkeit gespeicherter Schreiben'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Ein gespeichertes Schreiben bleibt byte-identisch, auch wenn Vorlagen oder Domänendaten später geändert werden.'
+tags:
+- quality
+- nachvollziehbarkeit
+- integritaet
+relations: []
+metadata_version: '1.0'
+---
+[[qs-008-unveraenderliche-schreiben]]
+== QS-008: Unveränderlichkeit gespeicherter Schreiben
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Vorlagenverwalter und Host-Anwendung
+| Stimulus | Ändern Briefpapier, Standardschreiben oder Domänendaten, nachdem ein Schreiben gespeichert wurde.
+| Environment | Normalbetrieb.
+| Artifact | Gespeichertes Schreiben und Dokumentablage.
+| Response | Der Download liefert das ursprüngliche PDF; die Metadaten nennen die verwendeten Vorlagenversionen.
+| Response Measure | SHA-256 des Downloads ist in 100 % der Fälle gleich der beim Speichern berechneten Prüfsumme.
+|===
+
+=== Begründung
+
+Der Owner hat bestätigt, dass gespeicherte PDFs unverändert bleiben.
+
+=== Annahmen
+
+* Die Dokumentablage verändert gespeicherte Bytes nicht.
+
+=== Impact
+
+include::generated/qs-008-unveraenderliche-schreiben-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-008-unveraenderliche-schreiben-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-008-unveraenderliche-schreiben-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

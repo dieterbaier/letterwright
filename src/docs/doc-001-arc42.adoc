@@ -1,0 +1,118 @@
+---
+id: DOC-001-arc42
+type: Document
+title: 'Standardschreiben arc42-Architektur'
+status: draft
+owner: 'Projekt-Maintainer'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Zusammengesetzte arc42-Architekturdokumentation der Bibliothek Standardschreiben (Entwurf).'
+tags:
+- arc42
+- standardschreiben
+relations:
+- type: documents
+  target: DOC-01000-introduction-and-goals
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Einführung und Ziele.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-02000-architecture-constraints
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Randbedingungen.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-03000-system-scope-and-context
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Kontextabgrenzung.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-04000-solution-strategy
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Lösungsstrategie.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-05000-building-block-view
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Bausteinsicht.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-06000-runtime-view
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Laufzeitsicht.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-07000-deployment-view
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Verteilungssicht.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-08000-crosscutting-concepts
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Querschnittliche Konzepte.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-09000-architecture-decisions
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Architekturentscheidungen.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-10000-quality-requirements
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Qualitätsanforderungen.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-11000-risks-and-technical-debt
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Risiken und technische Schulden.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-12000-glossary
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Glossar.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+- type: documents
+  target: DOC-13000-appendix
+  status: proposed
+  rationale: 'Die Gesamtdokumentation enthält das Kapitel Anhang.'
+  evidence: src/docs/doc-001-arc42.adoc
+  reviewed: false
+metadata_version: '1.0'
+---
+= [[standardschreiben-arc42]]Standardschreiben – Architekturdokumentation
+:toc:
+:toclevels: 2
+:sectnums:
+:skip-front-matter:
+:lang: de
+
+Entwurf der Architektur für die einbettbare Bibliothek *Standardschreiben*
+(siehe Issue #1). Alle Inhalte sind KI-gestützt erstellt und haben den Status
+`draft` oder `proposed`, bis der Owner sie geprüft hat.
+
+include::arc42/doc-01000-introduction-and-goals.adoc[leveloffset=+1]
+include::arc42/doc-02000-architecture-constraints.adoc[leveloffset=+1]
+include::arc42/doc-03000-system-scope-and-context.adoc[leveloffset=+1]
+include::arc42/doc-04000-solution-strategy.adoc[leveloffset=+1]
+include::arc42/doc-05000-building-block-view.adoc[leveloffset=+1]
+include::arc42/doc-06000-runtime-view.adoc[leveloffset=+1]
+include::arc42/doc-07000-deployment-view.adoc[leveloffset=+1]
+include::arc42/doc-08000-crosscutting-concepts.adoc[leveloffset=+1]
+include::arc42/doc-09000-architecture-decisions.adoc[leveloffset=+1]
+include::arc42/doc-10000-quality-requirements.adoc[leveloffset=+1]
+include::arc42/doc-11000-risks-and-technical-debt.adoc[leveloffset=+1]
+include::arc42/doc-12000-glossary.adoc[leveloffset=+1]
+include::arc42/doc-13000-appendix.adoc[leveloffset=+1]

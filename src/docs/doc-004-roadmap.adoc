@@ -1,0 +1,30 @@
+[[roadmap]]
+= Roadmap
+:id: DOC-004-roadmap
+
+== Phase 0: Architektur (dieses Inkrement)
+
+arc42-Entwurf, ADRs, Qualitätsszenarien, Risiken; Review durch den Owner.
+
+== Phase 1: Prototyp (Spike)
+
+Zwei reale DOCX-Vorlagen im Vorlagenmodell nachbauen, auf beiden Render-Wegen
+erzeugen, Wiedergabetreue (QS-004), PDF/A und PDF/UA (QS-001, QS-002) messen,
+Akzeptanz bei Fachanwendern prüfen. Ergebnis entscheidet ADR-003 und ADR-004.
+
+== Phase 2: MVP (Epic-Kandidaten)
+
+. Projektgerüst und Qualitätsgates (Monorepo, Gradle, Vite, CI, Abdeckung, ArchUnit, veraPDF).
+. Domänenmodell und Ports (Briefpapier, Standardschreiben, Versionen, Schreiben, SPIs).
+. Rendering-Pipeline (Zusammenführen, Paged.js-Vorschau, PDF/A- und PDF/UA-Erzeugung).
+. Briefpapier-Pflege (Editor, DIN 5008 Form A/B, privat).
+. Standardschreiben-Pflege (Richtext, Platzhalter, Blöcke, Defaults, Zuweisung Briefpapier).
+. Vorschau, Speichern, Übersicht, Download, Drucken, Löschen.
+. Persistenz (JDBC, Liquibase, PostgreSQL, MariaDB).
+. Beispielanwendung und Integrationsdokumentation.
+
+Die Epics werden nach dem Review dieser Architektur als GitHub-Issues angelegt.
+
+== Später
+
+Mehrsprachigkeit, Anlagen, DOCX-Import für Textinhalte, Objektspeicher-Adapter.

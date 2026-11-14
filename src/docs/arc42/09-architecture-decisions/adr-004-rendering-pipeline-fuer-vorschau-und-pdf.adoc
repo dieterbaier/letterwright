@@ -1,0 +1,186 @@
+---
+id: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
+type: ADR
+title: 'Rendering-Pipeline für Vorschau und PDF'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Vorlage und Daten werden im Backend zu einem HTML-Dokument zusammengeführt; die Vorschau paginiert es im Browser mit Paged.js, das PDF erzeugt openhtmltopdf aus demselben HTML. Ein Wiedergabetreue-Test sichert die Gleichheit.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- rendering
+- pdf
+- vorschau
+relations:
+- type: depends_on
+  target: ADR-003-vorlagenformat-fuer-fachanwender
+  status: proposed
+  rationale: 'Die Pipeline setzt HTML mit Paged-Media-CSS als Vorlagenformat voraus.'
+  reviewed: false
+- type: addresses
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: proposed
+  rationale: 'Beide Ausgaben entstehen aus demselben HTML.'
+  reviewed: false
+- type: addresses
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'Die Vorschau bleibt echtes HTML und damit für Hilfstechnologien zugänglich.'
+  reviewed: false
+- type: addresses
+  target: QS-012-erzeugungsdauer
+  status: proposed
+  rationale: 'Die PDF-Erzeugung läuft in der JVM ohne externen Prozess.'
+  reviewed: false
+- type: introduces_risk
+  target: R-002-abweichung-zweier-render-engines
+  status: proposed
+  rationale: 'Paged.js und openhtmltopdf sind zwei verschiedene Layout-Engines.'
+  reviewed: false
+- type: introduces_risk
+  target: R-003-reife-der-html-zu-pdf-bibliothek
+  status: proposed
+  rationale: 'openhtmltopdf ist ein Community-Projekt mit begrenzter Wartungskapazität.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-004-rendering-pipeline-fuer-vorschau-und-pdf]]
+== ADR-004: Rendering-Pipeline für Vorschau und PDF
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen eine zweistufige Pipeline vor:
+
+. **Zusammenführen** (Backend): Vorlagenversion (Briefpapier und Standardschreiben)
+  und Datenkontext werden mit der Platzhaltersprache (ADR-008) zu **einem
+  vollständigen HTML-Dokument** mit Paged-Media-CSS zusammengeführt.
+. **Ausgabe**:
+** **Vorschau**: Das HTML wird an das Frontend geliefert und dort mit
+   **Paged.js** (MIT) in Seiten umbrochen, inklusive Seitenzahlen. Paged.js hat der
+   Owner bereits erfolgreich eingesetzt.
+** **PDF**: Dasselbe HTML wird im Backend mit **openhtmltopdf** (LGPL, basiert auf
+   Apache PDFBox) gerendert, das CSS Paged Media, PDF/A und PDF/UA unterstützt.
+
+Ein automatisierter **Wiedergabetreue-Test** (QS-004) vergleicht Seitenanzahl und
+Umbruchpositionen beider Wege für alle Referenzvorlagen. Scheitert er dauerhaft,
+greift Option 2 als Rückfallebene.
+
+=== Kontext
+
+Vorschau und gespeichertes Dokument sollen gleich aussehen. Die Vorschau darf HTML
+sein. Kommerzielle Werkzeuge und iText (AGPL) sind ausgeschlossen. Thymeleaf und
+Apache FOP wären für den Owner in Ordnung, openhtmltopdf ist ihm unbekannt und soll
+per ADR bewertet werden.
+
+=== Entscheidungstreiber
+
+* Gleiches Aussehen von Vorschau und PDF.
+* PDF/A und PDF/UA ohne kommerzielle Werkzeuge.
+* Barrierefreie HTML-Vorschau.
+* Geringe Laufzeitabhängigkeiten im Host (keine externen Prozesse).
+
+=== Betrachtete Optionen
+
+==== Option 1: Paged.js für Vorschau, openhtmltopdf für PDF (gleiches HTML)
+
+Leichtgewichtig, rein JVM-basiert im Backend, PDF/A und PDF/UA eingebaut. Zwei
+Layout-Engines können sich in Details (Silbentrennung, Schriftmetriken,
+Umbruchregeln) unterscheiden.
+
+==== Option 2: Paged.js in Headless-Chromium für Vorschau und PDF, PDF/A-Nachbearbeitung mit PDFBox
+
+Eine Engine, höchste Wiedergabetreue. Erfordert Chromium als Laufzeitabhängigkeit
+im Host. Chromium erzeugt kein PDF/A; die Nachbearbeitung (XMP, OutputIntent,
+Schrifteinbettung) ist eigener, riskanter Aufwand.
+
+==== Option 3: Apache FOP (XSL-FO) für PDF, separate XSLT-Transformation für HTML-Vorschau
+
+Sehr ausgereift für PDF/A und Tagged PDF. Vorschau und PDF entstehen aus
+verschiedenen Transformationen, Abweichungen sind wahrscheinlich; passt nicht zu
+ADR-003.
+
+==== Option 4: Vorschau zeigt das erzeugte PDF (pdf.js)
+
+Exakte Gleichheit, aber die Vorschau ist für Hilfstechnologien schlechter
+zugänglich, und jede Vorschau kostet eine vollständige PDF-Erzeugung.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
+| Gleiches Aussehen | ? | +1 | -1 | +1
+| PDF/A und PDF/UA ohne kommerzielle Werkzeuge | +1 | ? | +1 | +1
+| Barrierefreie HTML-Vorschau | +1 | +1 | +1 | -1
+| Geringe Laufzeitabhängigkeiten | +1 | -1 | +1 | +1
+| Antwortzeit der Vorschau | +1 | 0 | 0 | -1
+s| Summe s| ? s| ? s| +2 s| +1
+|===
+
+Option 4 scheidet unabhängig von der Summe aus, weil sie die Muss-Anforderung einer
+barrierefreien Vorschau verletzt. Option 3 hat die beste sichere Summe, verfehlt aber
+das wichtigste Ziel, gleiches Aussehen, und passt nicht zum Vorlagenformat aus ADR-003.
+Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prototyp.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Keine externen Prozesse; das PDF entsteht in der JVM des Hosts.
+* Paged.js-Erfahrung des Owners wird genutzt.
+
+==== Negativ
+
+* Wiedergabetreue muss aktiv getestet werden (R-002).
+* Abhängigkeit von einem Community-Projekt (R-003); LGPL ist mit MIT als Abhängigkeit vereinbar, muss aber in der Lizenzdokumentation stehen.
+
+==== Neutral oder Folgearbeiten
+
+* Prototyp gemeinsam mit ADR-003: ein zweiseitiges DIN-5008-Schreiben auf beiden Wegen rendern und vergleichen.
+* Schriften als eingebettete, frei lizenzierte Webfonts festlegen (gleiche Metriken in beiden Engines).
+
+=== Impact
+
+include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* openhtmltopdf wird in einer aktiv gepflegten Community-Fork-Version weiterentwickelt; das ist vor Annahme zu prüfen.
+* Die Layout-Anforderungen von Briefen sind einfach genug (kein komplexer Spaltensatz), dass beide Engines gleich umbrechen.
+
+=== Open Questions
+
+* Soll beim Drucken aus der Vorschau das endgültige PDF gedruckt werden? Vorschlag: ja, Drucken öffnet das PDF. (Q-PO-002)
+
+=== Review Notes
+
+Erst nach dem Prototyp mit Messung von QS-004 akzeptieren.

@@ -1,0 +1,147 @@
+---
+id: ADR-011-qualitaetsgates-im-build
+type: ADR
+title: 'Qualitätsgates im Build'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'GitHub Actions erzwingt je Modul 80 Prozent Zeilen- und Zweigabdeckung (JaCoCo, Vitest), ArchUnit-Regeln, veraPDF- und axe-Prüfungen sowie die Validierung der Architekturdoku.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- build
+- ci
+- test
+- qualitaet
+relations:
+- type: addresses
+  target: QS-011-testabdeckung-als-build-gate
+  status: proposed
+  rationale: 'Setzt das Abdeckungsgate um.'
+  reviewed: false
+- type: addresses
+  target: QS-001-pdfa-konformitaet
+  status: proposed
+  rationale: 'veraPDF läuft im Build.'
+  reviewed: false
+- type: addresses
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'axe-Prüfungen laufen im Build.'
+  reviewed: false
+- type: depends_on
+  target: ADR-010-frontend-tests-mit-vitest
+  status: proposed
+  rationale: 'Die Frontend-Abdeckung kommt aus Vitest.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-011-qualitaetsgates-im-build]]
+== ADR-011: Qualitätsgates im Build
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen eine **GitHub-Actions-Pipeline** vor, die bei jedem Pull Request
+fehlschlägt, wenn eines dieser Gates verletzt ist:
+
+* **Abdeckung ≥ 80 % Zeilen *und* Zweige**, für **jedes** Backend-Modul (JaCoCo
+  `jacocoTestCoverageVerification`) und **jedes** Frontend-Paket (Vitest
+  `coverage.thresholds`). Generierter Code ist ausgenommen.
+* **ArchUnit**-Regeln für die hexagonale Struktur.
+* **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1).
+* **axe-core** ohne Verstöße der Stufen *serious* und *critical*.
+* **Architekturdoku**: `./build.sh validate` und `node scripts/check-agent-adapters.js`.
+
+=== Kontext
+
+Issue #1 fordert 80 % Testabdeckung. Der Owner präzisiert: gilt für beides (Zeilen und
+Zweige) und alles (Backend und Frontend) und soll überprüft werden.
+
+=== Entscheidungstreiber
+
+* Abdeckung messbar und nicht verhandelbar.
+* Frühes Feedback im PR.
+* Konformität dauerhaft sichern.
+
+=== Betrachtete Optionen
+
+==== Option 1: Gates pro Modul in GitHub Actions
+
+Lokale Ausreißer fallen sofort auf. Strenger, gelegentlich lästig für kleine Module.
+
+==== Option 2: Gates aggregiert über das Repository
+
+Toleranter; schwach getestete Module können sich hinter gut getesteten verstecken.
+
+==== Option 3: Nur Berichte, keine Gates
+
+Kein Blockieren, aber die Anforderung aus dem Issue ist nicht sichergestellt.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Anforderung sicher erfüllt | +1 | 0 | -1
+| Frühes Feedback | +1 | +1 | 0
+| Geringe Reibung | -1 | 0 | +1
+s| Summe s| +1 s| +1 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Qualitätsziele sind in jedem PR sichtbar und erzwungen.
+
+==== Negativ
+
+* Längere CI-Laufzeit durch Testcontainers und veraPDF.
+
+==== Neutral oder Folgearbeiten
+
+* Pipeline im ersten Build-Epic aufsetzen, bevor Fachcode entsteht.
+
+=== Impact
+
+include::generated/adr-011-qualitaetsgates-im-build-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-011-qualitaetsgates-im-build-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-011-qualitaetsgates-im-build-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* GitHub Actions steht für das Repository zur Verfügung.
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Vom Owner inhaltlich bestätigt; Details zur Ausnahme generierten Codes prüfen.

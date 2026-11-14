@@ -1,0 +1,164 @@
+---
+id: ADR-002-hexagonale-architektur-und-ports
+type: ADR
+title: 'Hexagonale Architektur mit Ports zur Host-Anwendung'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Der Kern ist frameworkfrei; Platzhalterdaten, Autorisierung, Dokumentablage und Rendering sind Ports, die Adapter oder der Host implementieren.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- architektur
+- ddd
+- hexagonal
+relations:
+- type: depends_on
+  target: ADR-001-einbettbare-bibliothek
+  status: proposed
+  rationale: 'Die Ports beschreiben die Grenze zwischen Bibliothek und Host.'
+  reviewed: false
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Klar definierte SPIs machen die Integration planbar.'
+  reviewed: false
+- type: addresses
+  target: QS-009-zugriffsschutz-beim-download
+  status: proposed
+  rationale: 'Ein Autorisierungs-Port erzwingt die Prüfung bei jedem Zugriff.'
+  reviewed: false
+- type: addresses
+  target: QS-011-testabdeckung-als-build-gate
+  status: proposed
+  rationale: 'Ports erlauben isolierte Tests des Kerns mit Mockito.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-002-hexagonale-architektur-und-ports]]
+== ADR-002: Hexagonale Architektur mit Ports zur Host-Anwendung
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen eine **hexagonale Architektur** (Ports and Adapters) nach DDD vor:
+
+* **Domäne** (ohne Spring): Briefpapier, Standardschreiben, Vorlagenversion, Schreiben,
+  Platzhalter, Bausteine.
+* **Anwendung**: Anwendungsfälle wie „Vorschau erzeugen“, „Schreiben speichern“,
+  „Schreiben herunterladen“, „Vorlage veröffentlichen“.
+* **Driven Ports (SPI)**, von der Host-Anwendung oder von Adaptern implementiert:
+** `PlatzhalterdatenAnbieter` (Host): liefert den Datenkontext für ein Standardschreiben
+   und einen fachlichen Bezug (z. B. Kunde 4711). Werte dürfen bereits formatiert sein.
+** `Berechtigungspruefung` (Host, Default-Adapter auf Spring Security): entscheidet über
+   Pflegen, Erzeugen, Ansehen, Herunterladen und Löschen.
+** `Loeschrichtlinie` (Host): entscheidet, ob und wie ein Schreiben gelöscht wird
+   (hart, logisch, gesperrt), siehe Aufbewahrungsfristen.
+** `DokumentAblage` (Adapter, Default JDBC/BLOB, später Objektspeicher).
+** `VorlagenRepository`, `SchreibenRepository` (Adapter JDBC).
+** `Renderer` und `KonformitaetsPruefer` (Adapter, siehe ADR-004 und ADR-005).
+* **Driving Adapter**: REST-Controller und Spring-Boot-Autokonfiguration.
+
+ArchUnit-Tests erzwingen die Abhängigkeitsrichtung.
+
+=== Kontext
+
+Issue #1 fordert DDD und hexagonale bzw. Clean Architecture. Der Owner hat den
+SPI-Ansatz für Domänendaten bestätigt, Autorisierung über die Spring Security des
+Hosts, keine Mandantenfähigkeit. Lösch- und Aufbewahrungsregeln entscheidet die
+Host-Anwendung.
+
+=== Entscheidungstreiber
+
+* Austauschbarkeit von Rendering, Ablage und Datenbank.
+* Testbarkeit des Kerns ohne Spring-Kontext.
+* Klare, stabile Integrationsgrenze zum Host.
+
+=== Betrachtete Optionen
+
+==== Option 1: Hexagonal mit SPI-Ports für Daten, Berechtigung und Löschung
+
+Der Host implementiert schmale Interfaces. Die Bibliothek ruft Daten selbst ab, wenn
+sie eine Vorschau erzeugt.
+
+==== Option 2: Hexagonal, Host übergibt Datenobjekt bei jedem Aufruf
+
+Weniger Kopplung an Host-Interfaces, aber jeder Aufrufer muss den passenden
+Datenkontext kennen und mitschicken; das React-Frontend bräuchte Domänenwissen.
+
+==== Option 3: Klassische Schichtenarchitektur mit Spring überall
+
+Weniger Struktur, schneller Start; verletzt die Vorgabe aus dem Issue und erschwert
+Austausch und isoliertes Testen.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Austauschbarkeit | +1 | +1 | -1
+| Testbarkeit des Kerns | +1 | +1 | -1
+| Klare Integrationsgrenze | +1 | 0 | -1
+| Integrationsaufwand für den Host | 0 | -1 | +1
+s| Summe s| +3 s| +1 s| -2
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Domäne und Anwendungsfälle lassen sich mit JUnit 5 und Mockito ohne Spring testen.
+* Host-spezifische Regeln (Berechtigung, Löschung) bleiben beim Host.
+
+==== Negativ
+
+* Mehr Module und Mapping-Code als bei einer Schichtenarchitektur.
+* Die SPIs sind öffentliche API; Änderungen brauchen Versionierung.
+
+==== Neutral oder Folgearbeiten
+
+* Modulschnitt in ADR-009 (Monorepo) festhalten.
+* SPI-Verträge mit Beispielimplementierung in der Beispielanwendung belegen.
+
+=== Impact
+
+include::generated/adr-002-hexagonale-architektur-und-ports-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-002-hexagonale-architektur-und-ports-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-002-hexagonale-architektur-und-ports-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Der fachliche Bezug eines Schreibens lässt sich als (Typ, ID) an die Bibliothek geben.
+
+=== Open Questions
+
+* Wessen Schreiben darf ein Anwender auflisten: alle, eigene oder die zu einem fachlichen Bezug? (Q-PO-003)
+
+=== Review Notes
+
+Vor `accepted` sind die SPI-Namen und der fachliche Bezug mit dem Owner abzustimmen.

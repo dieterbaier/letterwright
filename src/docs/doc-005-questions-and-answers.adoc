@@ -1,0 +1,100 @@
+[[questions-and-answers]]
+= Fragen und Antworten
+:id: DOC-005-questions-and-answers
+
+Beantwortete Fragen aus Issue #1 sind in die ADRs eingeflossen. Offen sind:
+
+== Open Questions For Product Owner
+
+[[q-po-001]]
+=== Q-PO-001: Mehrseitige Schreiben im MVP?
+
+Seitenzahlen sind gefordert, mehrseitige Schreiben aber als „später u. U.“ markiert.
+Annahme: Ein Schreiben darf im MVP auf Folgeseiten umbrechen (mit Seitenzahlen);
+„später“ bezieht sich auf Anlagen. Bitte bestätigen.
+
+Answer: Open.
+
+[[q-po-002]]
+=== Q-PO-002: Drucken und Zielarchiv
+
+Soll „Drucken“ aus der Vorschau das endgültige PDF drucken (Vorschlag) oder die
+HTML-Vorschau? Gibt es ein Zielarchiv mit eigenen PDF/A-Vorgaben?
+
+Answer: Open.
+
+[[q-po-003]]
+=== Q-PO-003: Sichtbarkeit in der Übersicht
+
+Wessen Schreiben darf ein Sachbearbeiter auflisten, herunterladen und löschen:
+alle, eigene oder die zu einem fachlichen Bezug? Vorschlag: Die Host-Anwendung
+entscheidet über den Port `Berechtigungspruefung`; die Übersicht filtert nach
+fachlichem Bezug.
+
+Answer: Open.
+
+[[q-po-004]]
+=== Q-PO-004: Beispielvorlagen für den Prototyp
+
+Können zwei oder drei typische DOCX-Vorlagen für den Prototyp
+bereitgestellt werden?
+
+Answer: Open.
+
+[[q-po-005]]
+=== Q-PO-005: Abschied von Word für Vorlagen
+
+Ist es akzeptabel, dass Fachanwender Vorlagen künftig in einem Editor statt in Word
+pflegen, wenn das Ergebnis exakt dem Druck entspricht?
+
+Answer: Open.
+
+[[q-po-006]]
+=== Q-PO-006: Manuelle Änderungen in der Vorschau
+
+Darf der Sachbearbeiter ein Schreiben vor dem Speichern noch individuell ändern
+(z. B. einen Satz ergänzen)?
+
+Answer: Open.
+
+[[q-po-007]]
+=== Q-PO-007: Speichern mit fehlenden Werten
+
+Darf ein Schreiben gespeichert werden, wenn Platzhalter ohne Wert und ohne Default
+sind? Vorschlag: konfigurierbar, Default „nicht erlaubt“.
+
+Answer: Open.
+
+[[q-po-008]]
+=== Q-PO-008: Begriff „Schreiben“
+
+Vorschlag für die Ubiquitous Language: *Standardschreiben* ist die Vorlage,
+*Schreiben* ist das erzeugte, gespeicherte Dokument. Passt das?
+
+Answer: Open.
+
+== Open Questions For Architect
+
+[[q-arch-001]]
+=== Q-ARCH-001: Zieldatenbanken
+
+Welche Datenbanken setzen die geplanten Host-Anwendungen ein? Vorschlag für das MVP:
+PostgreSQL und MariaDB/MySQL.
+
+Answer: Open.
+
+[[q-arch-002]]
+=== Q-ARCH-002: Bekannte Hosts
+
+Gibt es bereits Host-Anwendungen mit fester Spring-Boot- oder Java-Version?
+
+Answer: Open.
+
+== Beantwortete Fragen
+
+Siehe Kommentare in Issue #1: Toolkit als Submodule; Doku auf Deutsch; Bibliothek;
+Port (SPI); keine Mandantenfähigkeit; Pflege durch Nicht-Techniker, keine
+kommerziellen Werkzeuge; PDF/A einfach starten und im Build prüfen; HTML-Vorschau
+mit Paged.js; Platzhalter mit Schleifen, Blöcken und Defaults; Seitenzahlen; DIN 5008
+Form A/B wählbar, Default B; Vorlagen versioniert; Löschen entscheidet der Host;
+BLOB mit Port; Vitest; aktuelle Versionen; 80 % für alles; MIT; GitHub Packages.

@@ -1,0 +1,11 @@
+[[value-proposition-canvas]]
+= Value Proposition Canvas
+:id: CANVAS-002-value-proposition
+
+Entwurf, KI-gestützt erstellt, nicht reviewed.
+
+* *Jobs*: Schreiben erzeugen, prüfen, ablegen, versenden; Vorlagen aktuell halten.
+* *Pains*: Word-Vorlagen manuell befüllen; Layoutfehler; nicht barrierefreie PDFs; Entwickler für jede Textänderung.
+* *Gains*: Ein Klick zur Vorschau mit echten Daten; Fachanwender pflegen selbst; PDF/A automatisch.
+* *Pain Reliever*: Platzhalter aus Domänendaten; DIN-5008-Bausteine; Konformitätsprüfung.
+* *Gain Creator*: Versionierte Vorlagen; Wiedergabetreue Vorschau = PDF.

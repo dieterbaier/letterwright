@@ -1,0 +1,54 @@
+---
+id: DOC-03000-system-scope-and-context
+type: Document
+title: 'Kontextabgrenzung'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Fachlicher und technischer Kontext der Bibliothek innerhalb einer Host-Anwendung.'
+tags:
+- arc42
+- context
+relations: []
+metadata_version: '1.0'
+---
+[[system-scope-and-context]]
+= Kontextabgrenzung
+
+== Fachlicher Kontext
+
+[plantuml,kontext-fachlich,svg]
+----
+@startuml
+!include <C4/C4_Context>
+Person(sb, "Sachbearbeiter", "Erzeugt, speichert, lädt und löscht Schreiben")
+Person(vv, "Vorlagenverwalter", "Pflegt Briefpapier und Standardschreiben")
+Person_Ext(emp, "Empfänger", "Erhält das Schreiben")
+System_Boundary(host, "Host-Anwendung") {
+  System(ssw, "Standardschreiben", "Einbettbare Bibliothek")
+  System(dom, "Fachdomäne des Hosts", "Liefert Platzhalterdaten, Berechtigungen, Löschregeln")
+}
+Rel(sb, ssw, "Vorschau, Speichern, Download, Löschen")
+Rel(vv, ssw, "Pflegt Vorlagen")
+Rel(ssw, dom, "Fragt Daten und Berechtigungen an")
+Rel(sb, emp, "Versendet Schreiben (außerhalb des Systems)")
+@enduml
+----
+
+== Technischer Kontext
+
+[cols="1,2,2", options="header"]
+|===
+| Nachbar | Schnittstelle | Richtung
+| React-Frontend des Hosts | npm-Paket mit React-Komponenten | Host bettet Komponenten ein
+| Spring-Boot-Backend des Hosts | Spring-Boot-Starter, REST unter konfigurierbarem Pfad | In-Process
+| Fachdomäne des Hosts | SPIs `PlatzhalterdatenAnbieter`, `Berechtigungspruefung`, `Loeschrichtlinie` | Bibliothek ruft Host
+| Datenbank des Hosts | JDBC, Liquibase-Changelog | Bibliothek schreibt und liest eigene Tabellen
+| Spring Security des Hosts | Authentifizierter Benutzer, Rollen | Bibliothek liest
+|===
+
+Systemgrenze: Alles innerhalb von *Standardschreiben* liefert die Bibliothek;
+Domänendaten, Identitäten, Datenbank und Betrieb gehören dem Host. Dieselbe Grenze
+zeigt die xref:building-block-view[Bausteinsicht].

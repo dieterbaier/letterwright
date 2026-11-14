@@ -1,0 +1,31 @@
+---
+id: DOC-07000-deployment-view
+type: Document
+title: 'Verteilungssicht'
+status: draft
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+generated: false
+summary: 'Die Bibliothek wird mit der Host-Anwendung verteilt; Artefakte kommen aus GitHub Packages.'
+tags:
+- arc42
+- deployment
+relations: []
+metadata_version: '1.0'
+---
+[[deployment-view]]
+= Verteilungssicht
+
+Standardschreiben hat keine eigene Laufzeitumgebung. Das Backend-Artefakt läuft in
+der JVM der Host-Anwendung, das Frontend-Paket wird in das Frontend-Bundle des Hosts
+eingebaut. Tabellen liegen in der Datenbank des Hosts.
+
+[cols="1,3", options="header"]
+|===
+| Artefakt | Verteilung
+| Maven-Artefakte (Starter und Module) | GitHub Packages (xref:adr-012-distribution-ueber-github-packages[ADR-012])
+| npm-Paket | GitHub Packages
+| Liquibase-Changelog | Im Starter enthalten, vom Host eingebunden
+| Schriften | Im Rendering-Adapter und im npm-Paket eingebettet, frei lizenziert
+|===

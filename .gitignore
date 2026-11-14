@@ -19,3 +19,11 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Architekturdoku: erzeugte Fragmente und Build-Ausgaben (aus Quellen reproduzierbar)
+**/generated/
+build/
+
+# Symlinks auf Toolkit-Skills (lokal per install-skills.sh erzeugt)
+.claude/skills/
+.agents/skills/

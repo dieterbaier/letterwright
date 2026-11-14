@@ -1,0 +1,3 @@
+[submodule "tools/architecture-knowledge-toolkit"]
+	path = tools/architecture-knowledge-toolkit
+	url = https://github.com/docs-as-code-toolkit/architecture-knowledge-toolkit.git

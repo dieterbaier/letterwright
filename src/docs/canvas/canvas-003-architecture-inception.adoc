@@ -1,0 +1,12 @@
+[[architecture-inception-canvas]]
+= Architecture Inception Canvas
+:id: CANVAS-003-architecture-inception
+
+Entwurf, KI-gestützt erstellt, nicht reviewed.
+
+* *Wertversprechen*: siehe Value Proposition.
+* *Kernfunktionen*: Vorlagen pflegen, Vorschau, Speichern, Übersicht, Download, Löschen.
+* *Qualitätsziele*: Barrierefreiheit und Normkonformität, Wiedergabetreue, Pflegbarkeit, Integrierbarkeit, Nachvollziehbarkeit.
+* *Randbedingungen*: Spring Boot, React, Liquibase, MIT, keine kommerziellen Werkzeuge, 80 % Abdeckung.
+* *Kritische Entscheidungen*: Vorlagenformat (ADR-003), Rendering (ADR-004).
+* *Größte Unsicherheit*: Akzeptanz eines Editors statt Word; Gleichheit zweier Render-Engines.

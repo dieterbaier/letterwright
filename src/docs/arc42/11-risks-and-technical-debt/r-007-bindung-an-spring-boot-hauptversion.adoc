@@ -1,0 +1,82 @@
+---
+id: R-007-bindung-an-spring-boot-hauptversion
+type: Risk
+title: 'Bindung an die Spring-Boot-Hauptversion'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Hosts auf einer anderen Spring-Boot-Hauptversion können den Starter nicht nutzen.'
+tags:
+- risk
+- integration
+- versionen
+relations:
+- type: affects
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Versionskonflikte verhindern die Integration.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-007-bindung-an-spring-boot-hauptversion]]
+== R-007: Bindung an die Spring-Boot-Hauptversion
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil ein Spring-Boot-Starter an die Hauptversion von Spring Boot und Spring Framework gebunden ist, können Hosts auf älteren Versionen die Bibliothek nicht einbinden, was die Zielgruppe einschränkt.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | Medium.
+| Priority | Medium.
+| Timeframe | Medium-term.
+| Confidence | Medium.
+|===
+
+Hängt davon ab, welche Hosts tatsächlich integrieren.
+
+=== Mitigation Options
+
+* Domäne und Anwendung frei von Spring halten (ADR-002), damit eine zweite Starter-Linie günstig ist.
+* Unterstützte Versionen in der Doku klar nennen.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-007-bindung-an-spring-boot-hauptversion-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-007-bindung-an-spring-boot-hauptversion-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-007-bindung-an-spring-boot-hauptversion-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Gibt es bekannte Hosts mit fester Spring-Boot-Version? (Q-ARCH-002)
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

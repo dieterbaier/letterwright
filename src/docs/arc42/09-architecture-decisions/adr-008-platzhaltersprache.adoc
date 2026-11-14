@@ -1,0 +1,152 @@
+---
+id: ADR-008-platzhaltersprache
+type: ADR
+title: 'Platzhaltersprache mit Apache FreeMarker'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Platzhalter in der Form ${empfaenger.name} mit Schleifen, Bedingungen und Defaultwerten werden mit Apache FreeMarker in einer abgesicherten Konfiguration ausgewertet; fehlende Werte erscheinen sichtbar als Platzhalter.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- platzhalter
+- vorlagen
+- sicherheit
+relations:
+- type: depends_on
+  target: ADR-003-vorlagenformat-fuer-fachanwender
+  status: proposed
+  rationale: 'Der Editor erzeugt Platzhalter, Schleifen und Bedingungen als Bausteine.'
+  reviewed: false
+- type: addresses
+  target: QS-010-fehlende-platzhalter-sichtbar
+  status: proposed
+  rationale: 'Fehlende Werte werden sichtbar statt still leer.'
+  reviewed: false
+- type: introduces_risk
+  target: R-004-template-injection-durch-vorlagen
+  status: proposed
+  rationale: 'Eine mächtige Template-Sprache mit von Benutzern gepflegten Vorlagen eröffnet Template-Injection.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-008-platzhaltersprache]]
+== ADR-008: Platzhaltersprache mit Apache FreeMarker
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen **Apache FreeMarker** (Apache-2.0) als Auswertungssprache vor:
+
+* Syntax `${empfaenger.name}`, wie vom Owner angedacht; Defaultwerte
+  `${empfaenger.anrede!"Sehr geehrte Damen und Herren"}`; Schleifen `<#list>`;
+  Bedingungen `<#if>`.
+* Fachanwender schreiben diese Syntax nicht von Hand: Der Editor (ADR-003) fügt
+  Platzhalter, Wiederholungs- und Bedingungsblöcke als Bausteine ein.
+* **Fehlende Werte** ohne Default werden in Vorschau und PDF sichtbar als Platzhalter
+  (z. B. `[empfaenger.name]`) dargestellt, die Vorschau markiert sie zusätzlich.
+  Ob Speichern mit fehlenden Werten erlaubt ist, ist konfigurierbar.
+* Werte kommen bereits formatiert vom Host (Beträge, Datum); es gibt keine
+  Schema-Validierung.
+* **Abgesicherte Konfiguration**: `api_builtin_enabled=false`,
+  `TemplateClassResolver.ALLOWS_NOTHING_RESOLVER`, Datenmodell nur aus Maps, Listen
+  und Strings, HTML-Escaping als Standard.
+
+=== Kontext
+
+Der Owner braucht Schleifen und Blöcke, sichtbare fehlende Platzhalter, Defaultwerte
+und keine Validierung gegen ein Datenschema. Die Syntax ist nicht ausschlaggebend,
+`${...}` ist angedacht. Thymeleaf wäre in Ordnung.
+
+=== Entscheidungstreiber
+
+* Schleifen, Bedingungen und Defaults.
+* Fehlende Werte sichtbar machen.
+* Sicherheit bei von Benutzern gepflegten Vorlagen.
+* Nähe zur gewünschten Syntax.
+
+=== Betrachtete Optionen
+
+==== Option 1: Apache FreeMarker
+
+Syntax `${...}`, Defaults eingebaut, gut abzusichern. Erzeugt beliebigen Text, daher
+ist HTML-Escaping explizit zu konfigurieren.
+
+==== Option 2: Thymeleaf
+
+Natürliches HTML-Templating, in Spring verbreitet. Platzhalter stehen in Attributen
+(`th:text`) oder als `[[${...}]]`; SpEL-Ausdrücke sind schwerer abzusichern.
+
+==== Option 3: Mustache oder Handlebars
+
+Logikarm und damit sicherer. Defaults und das gewünschte Verhalten bei fehlenden
+Werten müssen selbst gebaut werden; Syntax `{{...}}`.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Schleifen, Bedingungen, Defaults | +1 | +1 | 0
+| Fehlende Werte sichtbar | +1 | 0 | 0
+| Absicherbarkeit | 0 | -1 | +1
+| Nähe zur Syntax ${...} | +1 | 0 | -1
+s| Summe s| +3 s| 0 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Gewünschte Ausdrucksmächtigkeit ohne eigene Template-Engine.
+
+==== Negativ
+
+* Sicherheitskonfiguration muss getestet und eingefroren werden (R-004).
+
+==== Neutral oder Folgearbeiten
+
+* Sicherheitstests für bekannte FreeMarker-SSTI-Payloads als Teil der Testsuite.
+
+=== Impact
+
+include::generated/adr-008-platzhaltersprache-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-008-platzhaltersprache-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-008-platzhaltersprache-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Der Editor kann FreeMarker-Konstrukte als Bausteine darstellen und zurücklesen.
+
+=== Open Questions
+
+* Darf ein Schreiben mit fehlenden Platzhalterwerten gespeichert werden? (Q-PO-007)
+
+=== Review Notes
+
+Vor `accepted` ist das Verhalten beim Speichern mit fehlenden Werten zu klären.

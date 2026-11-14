@@ -1,0 +1,188 @@
+---
+id: ADR-003-vorlagenformat-fuer-fachanwender
+type: ADR
+title: 'Vorlagenformat und Pflege durch Fachanwender'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Briefpapier und Standardschreiben werden in einem bausteinbasierten Editor gepflegt und intern als semantisches HTML mit Paged-Media-CSS gespeichert; DOCX bleibt Gestaltungsvorlage. Ein Prototyp muss das gegen DOCX-Vorlagen absichern.'
+derived_from:
+- type: external
+  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+tags:
+- decision
+- vorlagen
+- usability
+- barrierefreiheit
+relations:
+- type: addresses
+  target: QS-006-briefpapier-pflege-durch-fachanwender
+  status: proposed
+  rationale: 'Das Vorlagenformat bestimmt, ob Fachanwender ohne Entwickler pflegen können.'
+  reviewed: false
+- type: addresses
+  target: QS-002-barrierefreies-pdf
+  status: proposed
+  rationale: 'Semantisches HTML liefert die Struktur für getaggte PDFs.'
+  reviewed: false
+- type: addresses
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: proposed
+  rationale: 'Ein gemeinsames internes Format ist Voraussetzung für gleiche Darstellung.'
+  reviewed: false
+- type: introduces_risk
+  target: R-001-akzeptanz-editor-statt-word
+  status: proposed
+  rationale: 'Fachanwender arbeiten heute mit DOCX.'
+  reviewed: false
+- type: introduces_risk
+  target: R-005-barrierefreiheit-haengt-von-vorlageninhalt-ab
+  status: proposed
+  rationale: 'Fachanwender können unzugängliche Inhalte erstellen.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-003-vorlagenformat-fuer-fachanwender]]
+== ADR-003: Vorlagenformat und Pflege durch Fachanwender
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor (vorbehaltlich eines Prototyps, siehe Folgearbeiten):
+
+* **Internes Vorlagenformat** für Briefpapier und Standardschreiben ist **semantisches
+  HTML mit CSS Paged Media** (`@page`, A4, DIN-5008-Maße, laufende Kopf- und Fußzeilen,
+  Seitenzähler).
+* **Pflege durch Fachanwender** erfolgt in einem **bausteinbasierten Editor** in der UI:
+** Briefpapier: Formular für Typ (privat, geschäftlich Form A oder B), Logo, Slogan,
+   Absender, Fußzeile, Informationsblock, Schriftart, Schriftgrößen und Abstände.
+   Positionen nach DIN 5008 sind fest vorgegeben, nicht frei verschiebbar.
+** Standardschreiben: Richtext-Editor (z. B. auf Basis von ProseMirror/TipTap) mit
+   Einfügen von Platzhaltern, Wiederholungs- und Bedingungsblöcken als Bausteine.
+* **DOCX** bleibt die Gestaltungsvorgabe der Fachanwender. Ein **DOCX-Import** für
+  Textinhalte (nicht für das Layout) ist als spätere Erweiterung möglich.
+
+Option 4 (DOCX-Upload mit Umwandlung) lässt sich als Einstiegsweg mit Option 1
+kombinieren. Ob die Umwandlung ohne Nacharbeit trägt, ist offen und wird im
+Prototyp mitbewertet.
+
+=== Kontext
+
+Der Owner verlangt: Pflege durch Nicht-Techniker, Vorschau und endgültiges Dokument
+sehen gleich aus, keine kommerziellen Werkzeuge, PDF/A und Barrierefreiheit. Die
+Fachanwender arbeiten heute mit DOCX-Dateien, in denen auch die Gestaltungsvorgaben
+(Schrift, Größe, Abstände, Logo-Position) liegen. Ein Briefpapier ist ein Template,
+das ein Standardschreiben nutzt, und soll genauso pflegbar sein.
+
+Diese Ziele stehen in Spannung: DOCX ist für Fachanwender am vertrautesten, aber die
+Umwandlung von DOCX nach PDF/A plus barrierefreiem HTML ist ohne kommerzielle Werkzeuge
+verlustbehaftet, und eine HTML-Vorschau eines DOCX entspricht nicht exakt dem PDF.
+
+=== Entscheidungstreiber
+
+* Pflegbarkeit durch Fachanwender ohne Entwickler.
+* Gleiches Aussehen von Vorschau und PDF.
+* Barrierefreiheit (strukturierte Inhalte, getaggtes PDF).
+* Nur nicht kommerzielle Open-Source-Werkzeuge, MIT-kompatibel.
+* Nähe zur heutigen Arbeitsweise mit DOCX.
+* Verlässliches Ergebnis ohne unsichtbare Nacharbeit.
+
+=== Betrachtete Optionen
+
+==== Option 1: Bausteinbasierter Editor, intern HTML und Paged-Media-CSS
+
+Fachanwender pflegen strukturiert in der UI. Das interne Format ist dasselbe für
+Vorschau und PDF und trägt Semantik (Überschriften, Listen, Alternativtexte).
+Nachteil: neue Oberfläche statt Word; Gestaltungsfreiheit ist bewusst begrenzt.
+
+==== Option 2: DOCX-Vorlagen mit Platzhaltern, Konvertierung zur Laufzeit
+
+Fachanwender bleiben in Word. Laufzeit: DOCX-Templating (z. B. poi-tl, docx-stamper)
+und Umwandlung nach PDF, praktisch nur mit LibreOffice headless in guter Qualität.
+Die HTML-Vorschau entsteht separat und weicht ab, oder die Vorschau zeigt das PDF.
+Schwere Laufzeitabhängigkeit (LibreOffice) im Host.
+
+==== Option 3: XSL-FO-Vorlagen mit Apache FOP
+
+Ausgereifte PDF/A- und Tagged-PDF-Erzeugung. Für Fachanwender nicht pflegbar; die
+HTML-Vorschau bräuchte eine zweite Transformation.
+
+==== Option 4: DOCX-Upload mit automatischer Umwandlung in HTML-Vorlagen
+
+Fachanwender laden DOCX hoch, die Anwendung wandelt in das interne HTML-Format um
+(z. B. mit mammoth). Vertrauter Einstieg, aber Layout-Treue (Positionen, Abstände)
+geht verloren, und Nacharbeit wird unsichtbar.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
+| Pflegbarkeit durch Fachanwender | ? | +1 | -1 | ?
+| Gleiches Aussehen Vorschau und PDF | +1 | -1 | 0 | +1
+| Barrierefreiheit | +1 | ? | +1 | 0
+| Nur Open Source, MIT-kompatibel | +1 | 0 | +1 | +1
+| Nähe zur Arbeitsweise mit DOCX | -1 | +1 | -1 | +1
+| Verlässliches Ergebnis ohne Nacharbeit | +1 | 0 | +1 | -1
+s| Summe s| ? s| ? s| +1 s| ?
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Ein einziges internes Format für Vorschau und PDF.
+* Strukturierte Inhalte als Basis für Barrierefreiheit und DIN-5008-Maßhaltigkeit.
+
+==== Negativ
+
+* Ein Editor muss gebaut werden; er ist ein wesentlicher Teil des MVP-Aufwands.
+* Fachanwender müssen sich auf eine neue Oberfläche einlassen (R-001).
+
+==== Neutral oder Folgearbeiten
+
+* Prototyp (Spike) mit zwei realen DOCX-Vorlagen des Owners: Nachbau im Editor-Modell, Vergleich mit Option 2.
+* Das Ergebnis entscheidet zwischen Option 1 und Option 2; erst danach kann der ADR akzeptiert werden.
+
+=== Impact
+
+include::generated/adr-003-vorlagenformat-fuer-fachanwender-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-003-vorlagenformat-fuer-fachanwender-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-003-vorlagenformat-fuer-fachanwender-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Die heutigen DOCX-Vorlagen nutzen kein Freiform-Layout, das über die DIN-5008-Bausteine hinausgeht.
+* Fachanwender akzeptieren eine geführte Pflege, wenn das Ergebnis exakt dem Druck entspricht.
+
+=== Open Questions
+
+* Kann der Owner zwei oder drei typische DOCX-Vorlagen für den Prototyp bereitstellen? (Q-PO-004)
+* Ist es akzeptabel, dass Fachanwender Word für Vorlagen nicht mehr nutzen? (Q-PO-005)
+
+=== Review Notes
+
+Kritischste Entscheidung des Projekts. Nicht akzeptieren, bevor der Prototyp die Pugh-Felder mit `?` beantwortet hat.

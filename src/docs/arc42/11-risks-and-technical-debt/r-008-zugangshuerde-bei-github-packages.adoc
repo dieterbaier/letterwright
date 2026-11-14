@@ -1,0 +1,81 @@
+---
+id: R-008-zugangshuerde-bei-github-packages
+type: Risk
+title: 'Zugangshürde bei GitHub Packages'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Konsumenten brauchen für GitHub Packages auch bei öffentlichen Paketen ein Token.'
+tags:
+- risk
+- distribution
+relations:
+- type: affects
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Zusätzliche Token-Konfiguration erhöht den Integrationsaufwand.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-008-zugangshuerde-bei-github-packages]]
+== R-008: Zugangshürde bei GitHub Packages
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil GitHub Packages auch für öffentliche Maven- und npm-Pakete eine Authentifizierung verlangt, müssen Konsumenten Tokens konfigurieren, was die Integration erschwert und externe Nutzung bremst.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | High.
+| Impact | Low.
+| Priority | Low.
+| Timeframe | Medium-term.
+| Confidence | High.
+|===
+
+Bekanntes Verhalten von GitHub Packages; Auswirkung gering, solange Konsumenten intern sind.
+
+=== Mitigation Options
+
+* Konfiguration in der Integrationsdoku beschreiben.
+* Bei externer Nutzung Maven Central und npmjs.org bewerten.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-008-zugangshuerde-bei-github-packages-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-008-zugangshuerde-bei-github-packages-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-008-zugangshuerde-bei-github-packages-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

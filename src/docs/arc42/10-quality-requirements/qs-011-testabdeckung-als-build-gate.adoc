@@ -1,0 +1,70 @@
+---
+id: QS-011-testabdeckung-als-build-gate
+type: QualityScenario
+title: 'Testabdeckung als Build-Gate'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Ein Pull Request, der die Zeilen- oder Zweigabdeckung eines Moduls unter 80 Prozent senkt, schlägt im CI fehl.'
+tags:
+- quality
+- test
+- ci
+relations: []
+metadata_version: '1.0'
+---
+[[qs-011-testabdeckung-als-build-gate]]
+== QS-011: Testabdeckung als Build-Gate
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Entwickler oder KI-Agent
+| Stimulus | Öffnet einen Pull Request mit ungetestetem Code.
+| Environment | CI in GitHub Actions.
+| Artifact | Build-Pipeline.
+| Response | Die Pipeline schlägt fehl und nennt Modul und unterschrittene Metrik.
+| Response Measure | Gate greift in 100 % der Fälle bei < 80 % Zeilen- oder Zweigabdeckung in einem Backend-Modul oder Frontend-Paket.
+|===
+
+=== Begründung
+
+Issue #1 fordert 80 % Abdeckung, der Owner verlangt Prüfung für Zeilen und Zweige in Backend und Frontend.
+
+=== Annahmen
+
+* Generierter Code ist ausgenommen.
+
+=== Impact
+
+include::generated/qs-011-testabdeckung-als-build-gate-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-011-testabdeckung-als-build-gate-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-011-testabdeckung-als-build-gate-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.
