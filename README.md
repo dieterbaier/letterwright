@@ -5,9 +5,11 @@ Standardschreiben: Vorlagen für Briefpapier und Schreiben, die Fachanwender
 pflegen, eine barrierefreie Vorschau mit aktuellen Domänendaten und
 gespeicherte PDF/A-Dokumente zum Download. Hintergrund: Issue #1.
 
+**Architekturdokumentation:** https://dieterbaier.github.io/standardschreiben/
+
 ## Status
 
-Architekturentwurf. Es gibt noch keinen Anwendungscode.
+Architekturentwurf, Projektgerüst im Aufbau (#4). Es gibt noch keinen fachlichen Code.
 
 ## Architekturdokumentation
 
@@ -29,6 +31,15 @@ Pipeline `.github/workflows/architekturdoku.yml` auf GitHub Pages veröffentlich
 `src/docs/arc42/11-risks-and-technical-debt/`.
 
 Hinweise für KI-Agenten stehen in `AGENTS.md`.
+
+## Backend bauen
+
+```sh
+./gradlew build   # kompiliert, testet, prüft Abdeckung (≥ 80 % Zeilen und Zweige je Modul) und ArchUnit-Regeln
+```
+
+Die Module liegen unter `backend/`, die gemeinsamen Konventionen in der
+Root-`build.gradle.kts`, die Versionen in `gradle/libs.versions.toml`.
 
 ## Lizenz
 

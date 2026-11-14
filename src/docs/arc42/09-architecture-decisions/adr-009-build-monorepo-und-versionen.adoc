@@ -63,6 +63,12 @@ Wir schlagen vor:
 * **ArchUnit** prüft die hexagonalen Abhängigkeitsregeln, **Testcontainers** die
   Persistenz gegen echte Datenbanken.
 
+Stand beim Anlegen des Gerüsts (#12): Gradle 9.9.1 (Wrapper), Spring Boot 4.1.2
+(BOM; 4.2 war nur als Release Candidate verfügbar), ArchUnit 1.5.1, JaCoCo 0.8.16.
+Die gemeinsamen Konventionen stehen in der Root-`build.gradle.kts`, nicht in einem
+Convention-Plugin, damit der Build ohne zusätzlichen Kotlin-Compiler auskommt.
+Die CI testet auf Java 21 (Baseline) und Java 25 (#14).
+
 Antwort auf die Frage des Owners „Warum nicht die neueste Spring-Boot-Version?“:
 Der ursprüngliche Vorschlag 3.x war Vorsicht wegen der Kompatibilität mit Hosts.
 Ein Starter ist an die Spring-Boot-Hauptversion des Hosts gebunden. Da noch keine
