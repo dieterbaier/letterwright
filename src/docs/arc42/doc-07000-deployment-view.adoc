@@ -27,5 +27,5 @@ eingebaut. Tabellen liegen in der Datenbank des Hosts.
 | Maven-Artefakte (Starter und Module) | GitHub Packages (xref:adr-012-distribution-ueber-github-packages[ADR-012])
 | npm-Paket | GitHub Packages
 | Liquibase-Changelog | Im Starter enthalten, vom Host eingebunden
-| Schriften | Im Rendering-Adapter und im npm-Paket eingebettet, frei lizenziert
+| Schriften | Schriften der DOCX-Vorgabe gehören zum Briefpapier (hochgeladen, in der Host-Datenbank); Vorschau und PDF nutzen dieselbe Datei. Die Bibliothek bringt nur eine frei lizenzierte Standardschrift mit.
 |===

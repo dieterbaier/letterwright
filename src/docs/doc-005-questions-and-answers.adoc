@@ -82,6 +82,15 @@ mitgeführt, damit Abweichungen erkennbar sind?
 
 Answer: Open.
 
+[[q-po-010]]
+=== Q-PO-010: Schriften der zentralen Vorgabe
+
+Welche Schriften verwendet die zentrale DOCX-Vorgabe, und erlaubt ihre Lizenz die
+Einbettung in PDFs und die Auslieferung als Webfont für die Vorschau? Falls nicht:
+Welche Ersatzschrift bestätigt die zentrale Abteilung?
+
+Answer: Open.
+
 == Open Questions For Architect
 
 [[q-arch-001]]

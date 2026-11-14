@@ -8,9 +8,17 @@ arc42-Entwurf, ADRs, Qualitätsszenarien, Risiken; Review durch den Owner.
 
 == Phase 1: Prototyp (Spike)
 
-Zwei reale DOCX-Vorlagen im Vorlagenmodell nachbauen, auf beiden Render-Wegen
-erzeugen, Wiedergabetreue (QS-004), PDF/A und PDF/UA (QS-001, QS-002) messen,
-Akzeptanz bei Fachanwendern prüfen. Ergebnis entscheidet ADR-003 und ADR-004.
+Voraussetzung: die nachgelieferten DOCX-Referenzen (Q-PO-004).
+
+. **Zuerst Schriften klären:** Lassen sich die Schriften der Vorgabe in beiden
+  Renderern verwenden und im PDF einbetten? Falls nicht, Ersatzvorgabe der zentralen
+  Abteilung einholen (Q-PO-010).
+. Reale DOCX-Vorlagen im Vorlagenmodell nachbauen (ein- und mehrseitig).
+. Gegen die Abnahmekriterien aus ADR-004 messen: PDF/A (QS-001), PDF/UA (QS-002),
+  Wiedergabetreue (QS-004) und **Stiltreue zur DOCX-Vorgabe (QS-013)**.
+. Akzeptanz bei Fachanwendern prüfen.
+
+Das Ergebnis entscheidet über die Annahme von ADR-003, ADR-004 und ADR-005.
 
 == Phase 2: MVP (Epic-Kandidaten)
 

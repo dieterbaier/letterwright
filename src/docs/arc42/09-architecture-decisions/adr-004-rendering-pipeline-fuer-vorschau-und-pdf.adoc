@@ -184,7 +184,7 @@ Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prot
 ==== Neutral oder Folgearbeiten
 
 * Prototyp gemeinsam mit ADR-003: Referenzschreiben auf Option 1 rendern und gegen die Abnahmekriterien prüfen; Option 2 nur bei Scheitern von Option 1 gegen dieselben Kriterien prüfen.
-* Schriften als eingebettete, frei lizenzierte Webfonts festlegen (gleiche Metriken in beiden Engines).
+* Schriften: Maßgeblich ist die Schrift der zentralen DOCX-Vorgabe (QS-013). Schriftdateien gehören zum Briefpapier und werden vom Vorlagenverwalter hochgeladen; beide Engines laden **dieselbe Datei** (openhtmltopdf eingebettet ins PDF, Paged.js per `@font-face` aus dem Backend). Die Bibliothek bringt nur eine frei lizenzierte Standardschrift mit. Der Spike prüft **früh** an den Referenzdateien, ob sich die vorgegebenen Schriften in beiden Renderern verwenden und im PDF einbetten lassen (Lizenz erlaubt Einbettung, OpenType-Unterstützung). Muss eine Schrift ersetzt werden, braucht der Spike eine bestätigte Ersatzvorgabe der zentralen Abteilung (Q-PO-010).
 
 === Impact
 

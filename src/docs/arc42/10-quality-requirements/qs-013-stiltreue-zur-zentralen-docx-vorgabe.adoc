@@ -35,7 +35,7 @@ bis sie bestätigt sind.
 | Environment | Briefpapier wurde einmalig vom Vorlagenverwalter im Editor nach der Vorgabe angelegt.
 | Artifact | Stilvorgaben des Briefpapiers, Rendering, erzeugtes PDF.
 | Response | Schriftart, Schriftgrößen, Zeilenabstände, Absatzabstände und die Positionen von Logo, Absender, Anschriftfeld und Fußzeile stimmen mit der Vorgabe überein.
-| Response Measure | Für die nachgelieferten Beispiel-DOCX: gleiche Schriftart und Schriftgröße je Stil; Abweichung von Positionen und Abständen ≤ 1 mm; Abnahme durch die zentrale Abteilung im Prototyp.
+| Response Measure | Für die nachgelieferten Beispiel-DOCX: gleiche Schriftart (oder die von der zentralen Abteilung bestätigte Ersatzschrift) und Schriftgröße je Stil, im PDF eingebettet; Abweichung von Positionen und Abständen ≤ 1 mm; Abnahme durch die zentrale Abteilung im Prototyp.
 |===
 
 === Begründung
@@ -65,7 +65,7 @@ include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-traceability.adoc
 === Open Questions
 
 * Wer nimmt die Stiltreue fachlich ab?
-* Sind die Schriften der Vorgabe frei lizenziert oder muss eine Ersatzschrift gewählt werden?
+* Dürfen die Schriften der Vorgabe eingebettet werden, oder braucht es eine bestätigte Ersatzschrift? (Q-PO-010)
 
 === Review Notes
 
