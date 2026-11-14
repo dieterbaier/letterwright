@@ -153,3 +153,8 @@ thin routing wrappers instead of hand-writing them:
   pro Tag, nach Abschluss des Tages nicht mehr geändert. Pro Thema gibt es eine
   Fortschrittsdatei `progress/<thema>.adoc` nach der Vorlage des Toolkits.
   Langlebige offene Fragen stehen in `src/docs/doc-005-questions-and-answers.adoc`.
+- Tagebuch- und Fortschrittscommits des Clock-outs gehören auf den Branch
+  `session-diary`, nie auf einen Issue-Branch. Sonst landet der Eintrag in einem
+  Pull Request zu einem anderen Thema und wartet auf dessen Review. Der Clock-out
+  integriert `session-diary` per Fast-Forward in `main` und lässt den Branch für
+  die nächste Sitzung stehen.
