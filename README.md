@@ -22,7 +22,8 @@ git submodule update --init
 ./build.sh build         # HTML unter build/architecture
 ```
 
-Einstieg: `src/docs/doc-001-arc42.adoc`. ADRs liegen unter
+Einstieg: `src/docs/doc-001-arc42.adoc`. Der Stand von `main` wird von der
+Pipeline `.github/workflows/architekturdoku.yml` auf GitHub Pages veröffentlicht. ADRs liegen unter
 `src/docs/arc42/09-architecture-decisions/`, Qualitätsszenarien unter
 `src/docs/arc42/10-quality-requirements/`, Risiken unter
 `src/docs/arc42/11-risks-and-technical-debt/`.

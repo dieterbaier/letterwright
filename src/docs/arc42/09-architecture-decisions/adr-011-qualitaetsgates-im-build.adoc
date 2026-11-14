@@ -61,7 +61,10 @@ fehlschlägt, wenn eines dieser Gates verletzt ist:
 * **ArchUnit**-Regeln für die hexagonale Struktur.
 * **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1).
 * **axe-core** ohne Verstöße der Stufen *serious* und *critical*.
-* **Architekturdoku**: `./build.sh validate` und `node scripts/check-agent-adapters.js`.
+* **Architekturdoku**: `./build.sh check-adapters` und `./build.sh build` (validiert,
+  generiert und rendert inklusive PlantUML) im Workflow
+  `.github/workflows/architekturdoku.yml`. Veröffentlicht auf **GitHub Pages** wird
+  nur der Stand von `main`; Pull Requests bauen nur.
 
 === Kontext
 

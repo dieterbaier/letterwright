@@ -142,3 +142,9 @@ thin routing wrappers instead of hand-writing them:
   `./build.sh build` geprüft und gebaut. Ohne Container-Engine geht es mit
   `DOCS_TOOLBOX_LOCAL=1`. Alles unter `generated/` und `build/` wird erzeugt
   und nicht eingecheckt.
+- Die Pipeline `.github/workflows/architekturdoku.yml` prüft und baut die
+  Architekturdoku bei jedem Pull Request. Auf GitHub Pages veröffentlicht wird
+  nur der Stand von `main`.
+- Commit-Nachrichten, Pull Requests, Issue- und Review-Kommentare enthalten
+  **keine Links auf KI-Sessions** (z. B. `claude.ai/code/session_...`) und
+  keinen `Claude-Session:`-Trailer.

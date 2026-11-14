@@ -1,0 +1,72 @@
+name: Architekturdoku
+
+# Prüft und baut die Architekturdokumentation bei jedem Pull Request auf main.
+# Veröffentlicht auf GitHub Pages wird ausschließlich der Stand von main.
+# Alle Schritte laufen über build.sh im gepinnten docs-toolbox-Image
+# (Ruby, Node.js, Asciidoctor, PlantUML), wie lokal.
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: architekturdoku-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Prüfen und bauen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Agenten-Adapter aktuell?
+        run: ./build.sh check-adapters
+
+      # build validiert die Metadaten, erzeugt die Fragmente und rendert HTML
+      # einschließlich der PlantUML-Diagramme nach build/architecture.
+      - name: Validieren, generieren und HTML bauen
+        run: ./build.sh build
+
+      - name: GitHub Pages konfigurieren
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v6
+
+      - name: Pages-Artefakt hochladen
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/architecture
+
+  deploy:
+    name: Auf GitHub Pages veröffentlichen
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
