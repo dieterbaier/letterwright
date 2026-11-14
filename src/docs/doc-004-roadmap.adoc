@@ -16,6 +16,8 @@ Voraussetzung: die nachgelieferten DOCX-Referenzen (Q-PO-004).
 . Reale DOCX-Vorlagen im Vorlagenmodell nachbauen (ein- und mehrseitig).
 . Gegen die Abnahmekriterien aus ADR-004 messen: PDF/A (QS-001), PDF/UA (QS-002),
   Wiedergabetreue (QS-004) und **Stiltreue zur DOCX-Vorgabe (QS-013)**.
+. Die gerenderte, paginierte Vorschau am mehrseitigen Referenzschreiben nach QS-003
+  prüfen (automatisch und mit Screenreader).
 . Akzeptanz bei Fachanwendern prüfen.
 
 Das Ergebnis entscheidet über die Annahme von ADR-003, ADR-004 und ADR-005.

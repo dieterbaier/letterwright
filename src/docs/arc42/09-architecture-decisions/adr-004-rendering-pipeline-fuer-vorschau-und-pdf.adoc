@@ -97,6 +97,10 @@ belegen:
 * PDF/A-2b ohne veraPDF-Fehler (xref:qs-001-pdfa-konformitaet[QS-001]).
 * PDF/UA-1 ohne veraPDF-Fehler und bestandene manuelle Stichprobe
   (xref:qs-002-barrierefreies-pdf[QS-002]).
+* Barrierefreie paginierte Vorschau: Prüfung der gerenderten Vorschau am mehrseitigen
+  Referenzschreiben nach xref:qs-003-barrierefreie-vorschau[QS-003], automatisch (axe-core,
+  Tastatur) und manuell mit Screenreader (Lesereihenfolge, wiederholte Kopf- und
+  Fußzeilen, Fokus, Statusmeldungen). Das Ergebnis geht in die Entscheidung ein.
 * Wiedergabetreue zwischen Vorschau und PDF (xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]).
 * Stiltreue zur zentralen DOCX-Vorgabe (xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]).
 

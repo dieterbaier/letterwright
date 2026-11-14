@@ -43,7 +43,7 @@ Archivierbarkeit ist eine Kernanforderung aus Issue #1.
 
 === Annahmen
 
-* veraPDF kann im CI und optional zur Laufzeit ausgeführt werden.
+* veraPDF läuft im CI und zur Laufzeit. Der Starter verwendet standardmäßig veraPDF als `KonformitaetsPruefer`; ein konfigurierter Prüfer ist für jede Persistierung erforderlich (ADR-005).
 
 === Impact
 
