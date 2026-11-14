@@ -32,6 +32,16 @@ relations:
   status: proposed
   rationale: 'Ein gemeinsames internes Format ist Voraussetzung für gleiche Darstellung.'
   reviewed: false
+- type: addresses
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: proposed
+  rationale: 'Benannte Stilvorgaben im Briefpapier bilden die zentrale DOCX-Vorgabe ab.'
+  reviewed: false
+- type: introduces_risk
+  target: R-009-abweichung-von-der-zentralen-vorgabe
+  status: proposed
+  rationale: 'Die Vorgabe wird manuell übertragen und kann veralten.'
+  reviewed: false
 - type: introduces_risk
   target: R-001-akzeptanz-editor-statt-word
   status: proposed
@@ -65,6 +75,11 @@ Wir schlagen vor (vorbehaltlich eines Prototyps, siehe Folgearbeiten):
 ** Briefpapier: Formular für Typ (privat, geschäftlich Form A oder B), Logo, Slogan,
    Absender, Fußzeile, Informationsblock, Schriftart, Schriftgrößen und Abstände.
    Positionen nach DIN 5008 sind fest vorgegeben, nicht frei verschiebbar.
+** **Stilvorgaben** des Briefpapiers (benannte Stile wie Fließtext, Betreff,
+   Absenderzeile mit Schriftart, Größe, Zeilenabstand, Abständen und Farbe) werden
+   einmalig aus der zentralen DOCX-Vorgabe übertragen und gelten für alle
+   Standardschreiben, die dieses Briefpapier nutzen. Fachanwender wählen im Text nur
+   benannte Stile, keine freien Formatierungen.
 ** Standardschreiben: Richtext-Editor (z. B. auf Basis von ProseMirror/TipTap) mit
    Einfügen von Platzhaltern, Wiederholungs- und Bedingungsblöcken als Bausteine.
 * **DOCX** bleibt die Gestaltungsvorgabe der Fachanwender. Ein **DOCX-Import** für
@@ -81,6 +96,11 @@ sehen gleich aus, keine kommerziellen Werkzeuge, PDF/A und Barrierefreiheit. Die
 Fachanwender arbeiten heute mit DOCX-Dateien, in denen auch die Gestaltungsvorgaben
 (Schrift, Größe, Abstände, Logo-Position) liegen. Ein Briefpapier ist ein Template,
 das ein Standardschreiben nutzt, und soll genauso pflegbar sein.
+
+Ergänzung des Owners (2026-11-14): Die DOCX-Dateien kommen als Vorgabe von einer
+zentralen Abteilung. Ein Editor statt Word ist in Ordnung; die Bestandteile in den
+Editor zu übertragen ist kein Problem. Im Ergebnis müssen die Styles der Vorgabe
+stimmen (Schriftart, Schriftgrößen, Abstände, Positionen).
 
 Diese Ziele stehen in Spannung: DOCX ist für Fachanwender am vertrautesten, aber die
 Umwandlung von DOCX nach PDF/A plus barrierefreiem HTML ist ohne kommerzielle Werkzeuge
@@ -131,13 +151,13 @@ einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `
 [cols="2,1,1,1,1", options="header"]
 |===
 | Kriterium | Option 1 | Option 2 | Option 3 | Option 4
-| Pflegbarkeit durch Fachanwender | ? | +1 | -1 | ?
+| Pflegbarkeit durch Fachanwender | +1 | +1 | -1 | ?
 | Gleiches Aussehen Vorschau und PDF | +1 | -1 | 0 | +1
 | Barrierefreiheit | +1 | ? | +1 | 0
 | Nur Open Source, MIT-kompatibel | +1 | 0 | +1 | +1
 | Nähe zur Arbeitsweise mit DOCX | -1 | +1 | -1 | +1
 | Verlässliches Ergebnis ohne Nacharbeit | +1 | 0 | +1 | -1
-s| Summe s| ? s| ? s| +1 s| ?
+s| Summe s| +4 s| ? s| +1 s| ?
 |===
 
 === Konsequenzen
@@ -150,11 +170,12 @@ s| Summe s| ? s| ? s| +1 s| ?
 ==== Negativ
 
 * Ein Editor muss gebaut werden; er ist ein wesentlicher Teil des MVP-Aufwands.
-* Fachanwender müssen sich auf eine neue Oberfläche einlassen (R-001).
+* Fachanwender müssen sich auf eine neue Oberfläche einlassen (R-001); der Owner hält das für akzeptabel.
+* Änderungen der zentralen DOCX-Vorgabe müssen manuell nachgezogen werden (R-009).
 
 ==== Neutral oder Folgearbeiten
 
-* Prototyp (Spike) mit zwei realen DOCX-Vorlagen des Owners: Nachbau im Editor-Modell, Vergleich mit Option 2.
+* Prototyp (Spike) mit realen DOCX-Vorlagen des Owners (werden nachgeliefert): Nachbau im Editor-Modell, Messung der Stiltreue (QS-013), Vergleich mit Option 2.
 * Das Ergebnis entscheidet zwischen Option 1 und Option 2; erst danach kann der ADR akzeptiert werden.
 
 === Impact
@@ -181,8 +202,8 @@ include::generated/adr-003-vorlagenformat-fuer-fachanwender-traceability.adoc[le
 === Open Questions
 
 * Kann der Owner zwei oder drei typische DOCX-Vorlagen für den Prototyp bereitstellen? (Q-PO-004)
-* Ist es akzeptabel, dass Fachanwender Word für Vorlagen nicht mehr nutzen? (Q-PO-005)
+* Wie oft ändert die zentrale Abteilung ihre DOCX-Vorgabe, und wer zieht Änderungen nach? (Q-PO-009)
 
 === Review Notes
 
-Kritischste Entscheidung des Projekts. Nicht akzeptieren, bevor der Prototyp die Pugh-Felder mit `?` beantwortet hat.
+Kritischste Entscheidung des Projekts. Der Owner hat den Editor-Ansatz grundsätzlich bestätigt (Q-PO-005). Akzeptieren, sobald der Prototyp die Stiltreue (QS-013) an den nachgelieferten DOCX gezeigt hat.

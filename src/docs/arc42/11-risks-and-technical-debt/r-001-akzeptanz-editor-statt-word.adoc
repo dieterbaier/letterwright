@@ -38,14 +38,14 @@ Weil die Fachanwender heute mit DOCX-Dateien arbeiten, kann ein neuer, bausteinb
 [cols="1,3", options="header"]
 |===
 | Field | Value
-| Likelihood | Medium.
+| Likelihood | Low.
 | Impact | High.
-| Priority | High.
+| Priority | Medium.
 | Timeframe | Near-term.
 | Confidence | Medium.
 |===
 
-Gewohnheit ist stark; gleichzeitig ist die Gestaltungsfreiheit bei Briefen ohnehin durch DIN 5008 begrenzt.
+Der Owner hat bestätigt, dass ein Editor statt Word in Ordnung ist (Q-PO-005). Restrisiko: Akzeptanz bei den tatsächlichen Fachanwendern ist noch nicht getestet.
 
 === Mitigation Options
 

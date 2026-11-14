@@ -24,10 +24,12 @@ Quelle: Issue #1 und die Antworten des Owners im Issue.
 * Übersicht der gespeicherten Schreiben.
 * Gespeicherte Schreiben herunterladen oder drucken.
 * Gespeicherte Schreiben löschen (Regeln bestimmt die Host-Anwendung).
+* Mehrseitige Schreiben mit automatischem Seitenumbruch und Seitenzahlen (MVP).
+* Rollen und Sichtbarkeit bestimmt die Host-Anwendung.
 
 .Vorlagenverwalter (Fachanwender)
 * Briefpapier definieren: Typ privat oder geschäftlich (DIN 5008 Form A oder B,
-  Default B), Header mit Slogan und Logo, Absender, Empfängeranschrift, Betreff,
+  Default B), Stilvorgaben aus der zentralen DOCX-Vorgabe, Header mit Slogan und Logo, Absender, Empfängeranschrift, Betreff,
   Informationsblöcke auf der ersten Seite, Fußzeile, Seitenzahlen.
 * Standardschreiben definieren, mit Platzhaltern, Wiederholungs- und
   Bedingungsblöcken sowie Defaultwerten.

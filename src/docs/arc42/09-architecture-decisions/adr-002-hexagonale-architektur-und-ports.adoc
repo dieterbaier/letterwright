@@ -157,7 +157,7 @@ include::generated/adr-002-hexagonale-architektur-und-ports-traceability.adoc[le
 
 === Open Questions
 
-* Wessen Schreiben darf ein Anwender auflisten: alle, eigene oder die zu einem fachlichen Bezug? (Q-PO-003)
+* Keine zur Sichtbarkeit: Rollen und Sichtbarkeit bestimmt die Host-Anwendung über `Berechtigungspruefung` (Q-PO-003). Die Übersicht fragt den Port je Schreiben bzw. per Filterkriterium ab.
 
 === Review Notes
 

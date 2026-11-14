@@ -1,0 +1,83 @@
+---
+id: R-009-abweichung-von-der-zentralen-vorgabe
+type: Risk
+title: 'Abweichung von der zentralen DOCX-Vorgabe'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Ändert die zentrale Abteilung ihre DOCX-Vorgabe, veraltet das manuell übertragene Briefpapier unbemerkt.'
+tags:
+- risk
+- vorlagen
+- governance
+relations:
+- type: affects
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: proposed
+  rationale: 'Veraltete Stilvorgaben verletzen die Stiltreue.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[r-009-abweichung-von-der-zentralen-vorgabe]]
+== R-009: Abweichung von der zentralen DOCX-Vorgabe
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
+und entscheidet nicht über die Risikoakzeptanz.
+
+=== Risk Statement
+
+Weil die Stilvorgaben aus der zentralen DOCX-Vorgabe manuell in das Briefpapier übertragen werden, können spätere Änderungen der Vorgabe unbemerkt bleiben, was zu Schreiben führt, die nicht mehr dem aktuellen Erscheinungsbild entsprechen.
+
+=== Assessment
+
+[cols="1,3", options="header"]
+|===
+| Field | Value
+| Likelihood | Medium.
+| Impact | Medium.
+| Priority | Medium.
+| Timeframe | Medium-term.
+| Confidence | Low.
+|===
+
+Änderungshäufigkeit der Vorgabe ist unbekannt (Q-PO-009).
+
+=== Mitigation Options
+
+* Stand oder Kennung der Vorgabe als Attribut am Briefpapier führen.
+* Prozess: Die zentrale Abteilung meldet Änderungen an die Vorlagenverwalter.
+* Später: Import der Stilwerte aus DOCX-Formatvorlagen, um Übertragungsfehler zu vermeiden.
+
+=== Decision or Acceptance
+
+Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
+Mitigation bestätigt.
+
+=== Impact
+
+include::generated/r-009-abweichung-von-der-zentralen-vorgabe-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/r-009-abweichung-von-der-zentralen-vorgabe-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/r-009-abweichung-von-der-zentralen-vorgabe-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Wie oft ändert sich die Vorgabe? (Q-PO-009)
+
+=== Review Notes
+
+Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
+Mitigationspfad mit dem Owner abzustimmen.

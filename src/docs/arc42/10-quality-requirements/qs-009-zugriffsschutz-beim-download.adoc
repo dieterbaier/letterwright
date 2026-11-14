@@ -62,7 +62,7 @@ include::generated/qs-009-zugriffsschutz-beim-download-traceability.adoc[levelof
 
 === Open Questions
 
-* Wessen Schreiben darf ein Benutzer in der Übersicht sehen? (Q-PO-003)
+* Keine. Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Q-PO-003).
 
 === Review Notes
 

@@ -1,0 +1,73 @@
+---
+id: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+type: QualityScenario
+title: 'Stiltreue zur zentralen DOCX-Vorgabe'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-14'
+reviewed: false
+summary: 'Schreiben auf einem Briefpapier entsprechen in Schriftart, Schriftgrößen, Abständen und Positionen der zentralen DOCX-Vorgabe.'
+tags:
+- quality
+- vorlagen
+- layout
+- wiedergabetreue
+relations: []
+metadata_version: '1.0'
+---
+[[qs-013-stiltreue-zur-zentralen-docx-vorgabe]]
+== QS-013: Stiltreue zur zentralen DOCX-Vorgabe
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
+bis sie bestätigt sind.
+
+=== Szenario
+
+[cols="1,3", options="header"]
+|===
+| Element | Beschreibung
+| Source | Zentrale Abteilung, die die DOCX-Vorgabe herausgibt
+| Stimulus | Vergleicht ein aus der Bibliothek erzeugtes PDF mit dem PDF-Export der DOCX-Vorgabe.
+| Environment | Briefpapier wurde einmalig vom Vorlagenverwalter im Editor nach der Vorgabe angelegt.
+| Artifact | Stilvorgaben des Briefpapiers, Rendering, erzeugtes PDF.
+| Response | Schriftart, Schriftgrößen, Zeilenabstände, Absatzabstände und die Positionen von Logo, Absender, Anschriftfeld und Fußzeile stimmen mit der Vorgabe überein.
+| Response Measure | Für die nachgelieferten Beispiel-DOCX: gleiche Schriftart und Schriftgröße je Stil; Abweichung von Positionen und Abständen ≤ 1 mm; Abnahme durch die zentrale Abteilung im Prototyp.
+|===
+
+=== Begründung
+
+Der Owner verlangt, dass die Styles der zentralen Vorgabe im Ergebnis stimmen, auch wenn sie im Editor statt in Word gepflegt werden.
+
+=== Annahmen
+
+* Die in der Vorgabe verwendeten Schriften dürfen eingebettet werden (Lizenz).
+* Die Vorgabe nutzt benannte Word-Formatvorlagen und nicht überwiegend direkte Formatierung.
+
+=== Impact
+
+include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Wer nimmt die Stiltreue fachlich ab?
+* Sind die Schriften der Vorgabe frei lizenziert oder muss eine Ersatzschrift gewählt werden?
+
+=== Review Notes
+
+Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
+Stakeholder-Nutzen als reviewed markiert.

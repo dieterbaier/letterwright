@@ -26,6 +26,7 @@ metadata_version: '1.0'
 * Wiedergabetreue
 ** Vorschau gleich PDF (QS-004)
 ** DIN 5008 (QS-005)
+** Stiltreue zur zentralen DOCX-Vorgabe (QS-013)
 * Pflegbarkeit durch Fachanwender (QS-006)
 * Integrierbarkeit (QS-007)
 * Nachvollziehbarkeit (QS-008)

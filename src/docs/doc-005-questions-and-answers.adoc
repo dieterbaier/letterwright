@@ -13,7 +13,7 @@ Seitenzahlen sind gefordert, mehrseitige Schreiben aber als „später u. U.“ 
 Annahme: Ein Schreiben darf im MVP auf Folgeseiten umbrechen (mit Seitenzahlen);
 „später“ bezieht sich auf Anlagen. Bitte bestätigen.
 
-Answer: Open.
+Answer: Ja, Seitenumbruch auf Folgeseiten gehört in das MVP (Owner, 2026-11-14). Anlagen und Mehrsprachigkeit folgen später.
 
 [[q-po-002]]
 === Q-PO-002: Drucken und Zielarchiv
@@ -31,7 +31,7 @@ alle, eigene oder die zu einem fachlichen Bezug? Vorschlag: Die Host-Anwendung
 entscheidet über den Port `Berechtigungspruefung`; die Übersicht filtert nach
 fachlichem Bezug.
 
-Answer: Open.
+Answer: Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Owner, 2026-11-14). Umsetzung über den Port `Berechtigungspruefung` (ADR-002).
 
 [[q-po-004]]
 === Q-PO-004: Beispielvorlagen für den Prototyp
@@ -39,7 +39,7 @@ Answer: Open.
 Können zwei oder drei typische DOCX-Vorlagen für den Prototyp
 bereitgestellt werden?
 
-Answer: Open.
+Answer: Ja, der Owner liefert Beispiel-DOCX nach (2026-11-14). Der Prototyp startet, sobald sie vorliegen.
 
 [[q-po-005]]
 === Q-PO-005: Abschied von Word für Vorlagen
@@ -47,7 +47,7 @@ Answer: Open.
 Ist es akzeptabel, dass Fachanwender Vorlagen künftig in einem Editor statt in Word
 pflegen, wenn das Ergebnis exakt dem Druck entspricht?
 
-Answer: Open.
+Answer: Ein Editor statt Word ist in Ordnung (Owner, 2026-11-14). Die DOCX kommen als Vorgabe von einer zentralen Abteilung; ihre Bestandteile in den Editor zu übertragen ist kein Problem, die Styles müssen aber im Ergebnis stimmen (QS-013).
 
 [[q-po-006]]
 === Q-PO-006: Manuelle Änderungen in der Vorschau
@@ -70,6 +70,15 @@ Answer: Open.
 
 Vorschlag für die Ubiquitous Language: *Standardschreiben* ist die Vorlage,
 *Schreiben* ist das erzeugte, gespeicherte Dokument. Passt das?
+
+Answer: Open.
+
+[[q-po-009]]
+=== Q-PO-009: Änderungen der zentralen DOCX-Vorgabe
+
+Wie oft ändert die zentrale Abteilung ihre DOCX-Vorgabe, und wer überträgt
+Änderungen in das Briefpapier? Wird eine Kennung oder ein Stand der Vorgabe
+mitgeführt, damit Abweichungen erkennbar sind?
 
 Answer: Open.
 
