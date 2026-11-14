@@ -37,6 +37,21 @@ relations:
   status: proposed
   rationale: 'Die PDF-Erzeugung läuft in der JVM ohne externen Prozess.'
   reviewed: false
+- type: addresses
+  target: QS-001-pdfa-konformitaet
+  status: proposed
+  rationale: 'Die Rendering-Bibliothek muss PDF/A-2b erzeugen; Abnahmekriterium des Prototyps.'
+  reviewed: false
+- type: addresses
+  target: QS-002-barrierefreies-pdf
+  status: proposed
+  rationale: 'Die Rendering-Bibliothek muss getaggtes PDF/UA-1 erzeugen; Abnahmekriterium des Prototyps.'
+  reviewed: false
+- type: addresses
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: proposed
+  rationale: 'Die Rendering-Bibliothek muss die Stilvorgaben exakt umsetzen; Abnahmekriterium des Prototyps.'
+  reviewed: false
 - type: introduces_risk
   target: R-002-abweichung-zweier-render-engines
   status: proposed
@@ -73,9 +88,22 @@ Wir schlagen eine zweistufige Pipeline vor:
 ** **PDF**: Dasselbe HTML wird im Backend mit **openhtmltopdf** (LGPL, basiert auf
    Apache PDFBox) gerendert, das CSS Paged Media, PDF/A und PDF/UA unterstützt.
 
-Ein automatisierter **Wiedergabetreue-Test** (QS-004) vergleicht Seitenanzahl und
-Umbruchpositionen beider Wege für alle Referenzvorlagen. Scheitert er dauerhaft,
-greift Option 2 als Rückfallebene.
+=== Abnahmekriterien für den Prototyp
+
+Jede Option, die gewählt werden soll, muss für **dieselben Referenzschreiben**
+(nachgelieferte DOCX-Vorgaben, ein- und mehrseitig) alle folgenden Kriterien
+belegen:
+
+* PDF/A-2b ohne veraPDF-Fehler (xref:qs-001-pdfa-konformitaet[QS-001]).
+* PDF/UA-1 ohne veraPDF-Fehler und bestandene manuelle Stichprobe
+  (xref:qs-002-barrierefreies-pdf[QS-002]).
+* Wiedergabetreue zwischen Vorschau und PDF (xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]).
+* Stiltreue zur zentralen DOCX-Vorgabe (xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]).
+
+Option 1 wird nur angenommen, wenn sie alle Kriterien erfüllt. **Option 2 ist keine
+gesicherte Rückfallebene**, sondern ein Kandidat: Sie wird im Spike gegen dieselben
+Kriterien geprüft, falls Option 1 scheitert. Insbesondere ist offen, ob ein von
+Chromium erzeugtes, mit PDFBox nachbearbeitetes PDF PDF/UA-1 erfüllt.
 
 === Kontext
 
@@ -103,7 +131,9 @@ Umbruchregeln) unterscheiden.
 
 Eine Engine, höchste Wiedergabetreue. Erfordert Chromium als Laufzeitabhängigkeit
 im Host. Chromium erzeugt kein PDF/A; die Nachbearbeitung (XMP, OutputIntent,
-Schrifteinbettung) ist eigener, riskanter Aufwand.
+Schrifteinbettung) ist eigener, riskanter Aufwand. Ob das Ergebnis zusätzlich
+PDF/UA-1 erfüllt (Tagging aus Chromium, nach der Nachbearbeitung erhalten), ist
+unbelegt. Kandidat bis zum Nachweis der Abnahmekriterien.
 
 ==== Option 3: Apache FOP (XSL-FO) für PDF, separate XSLT-Transformation für HTML-Vorschau
 
@@ -153,7 +183,7 @@ Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prot
 
 ==== Neutral oder Folgearbeiten
 
-* Prototyp gemeinsam mit ADR-003: ein zweiseitiges DIN-5008-Schreiben auf beiden Wegen rendern und vergleichen.
+* Prototyp gemeinsam mit ADR-003: Referenzschreiben auf Option 1 rendern und gegen die Abnahmekriterien prüfen; Option 2 nur bei Scheitern von Option 1 gegen dieselben Kriterien prüfen.
 * Schriften als eingebettete, frei lizenzierte Webfonts festlegen (gleiche Metriken in beiden Engines).
 
 === Impact

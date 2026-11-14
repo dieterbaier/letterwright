@@ -35,7 +35,7 @@ bis sie bestätigt sind.
 | Environment | Normalbetrieb in aktuellen Browsern.
 | Artifact | React-Komponenten Vorschau und Übersicht.
 | Response | Alle Inhalte sind lesbar, alle Aktionen per Tastatur erreichbar, Fokus und Statusmeldungen werden angesagt.
-| Response Measure | 0 axe-core-Verstöße der Stufen serious und critical in Komponenten- und E2E-Tests; alle Aktionen per Tastatur in einem E2E-Test ausführbar.
+| Response Measure | Automatisch: 0 axe-core-Verstöße der Stufen serious und critical in Komponenten- und E2E-Tests; alle Aktionen per Tastatur in einem E2E-Test ausführbar. Manuell je Release an einem mehrseitigen Referenzschreiben im tatsächlich paginierten DOM mit NVDA/Firefox und VoiceOver/Safari: Lesereihenfolge entspricht der logischen Briefreihenfolge; wiederholte Kopf- und Fußzeilen sowie Seitenzahlen werden nicht als Fließtext vorgelesen; Fokus springt nach Speichern auf die Statusmeldung; Statusmeldungen (gespeichert, Fehler, fehlende Platzhalter) werden angesagt. 0 offene Befunde der Checkliste.
 |===
 
 === Begründung
@@ -45,6 +45,8 @@ Issue #1 fordert eine barrierefreie Vorschau.
 === Annahmen
 
 * WCAG 2.1 AA ist ausreichend (keine spezielle Vorgabe des Owners).
+* Automatische Prüfungen (axe-core) erkennen nur einen Teil der Barrieren; Lesereihenfolge und Ansagen im paginierten DOM brauchen eine manuelle Prüfung.
+* Paged.js vervielfältigt laufende Kopf- und Fußzeilen je Seite; sie müssen für Hilfstechnologien ausgeblendet oder als Wiederholung gekennzeichnet werden.
 
 === Impact
 
@@ -63,7 +65,7 @@ include::generated/qs-003-barrierefreie-vorschau-traceability.adoc[leveloffset=+
 
 === Open Questions
 
-* Keine.
+* Wer führt die manuelle Screenreader-Abnahme durch?
 
 === Review Notes
 

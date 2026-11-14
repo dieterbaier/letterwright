@@ -35,7 +35,7 @@ App -> Host: Berechtigung und Datenkontext anfragen
 Host --> App: Datenkontext (formatiert)
 App -> Ren: Vorlagenversion + Daten zusammenführen
 Ren --> App: HTML
-App -> App: Snapshot speichern (befristet)
+App -> App: Snapshot speichern (befristet; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version)
 App --> Web: HTML, Snapshot-ID
 Web --> UI: 200
 UI -> UI: Paged.js paginiert
@@ -50,11 +50,15 @@ UI -> UI: Paged.js paginiert
 actor Sachbearbeiter as SB
 participant "Vorschau (React)" as UI
 participant "anwendung" as App
+participant "Host: Berechtigungspruefung" as Host
 participant "adapter-rendering" as Ren
 participant "adapter-persistenz-jdbc" as Per
 SB -> UI: Speichern
 UI -> App: POST /schreiben (Snapshot-ID)
-App -> Ren: PDF aus Snapshot erzeugen
+App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?
+App -> Host: Darf Benutzer für diesen Bezug erzeugen? (erneut)
+Host --> App: erlaubt
+App -> Ren: PDF aus Snapshot erzeugen\n(mit den im Snapshot fixierten Vorlagenversionen)
 Ren --> App: PDF
 App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
 Ren --> App: konform
@@ -67,13 +71,33 @@ App --> UI: PDF (unverändert)
 @enduml
 ----
 
-== Fehlerfall: PDF nicht konform oder Rendering schlägt fehl
+Der Snapshot ist an den angemeldeten Benutzer, den fachlichen Bezug und beide
+Vorlagenversionen (Briefpapier und Standardschreiben) gebunden. Beim Speichern prüft
+die Bibliothek die Erzeugungsberechtigung **erneut** über den Host. Wurde die
+Berechtigung nach der Vorschau entzogen, wird nicht gespeichert. Ein Snapshot eines
+anderen Benutzers wird wie ein nicht vorhandener behandelt (404).
 
-Schlägt die PDF-Erzeugung oder die Konformitätsprüfung fehl, wird **nichts
-persistiert**. Der Benutzer erhält eine verständliche Meldung, der Snapshot bleibt
-bis zu seinem Ablauf erhalten, sodass Speichern nach Behebung (z. B. Korrektur der
-Vorlage) wiederholt werden kann. Der Fehler wird mit Vorlagenversion und
-Korrelations-ID protokolliert, ohne personenbezogene Inhalte.
+== Fehlerfall: Berechtigung beim Speichern entzogen
+
+Lehnt der Host beim Speichern ab, wird nichts erzeugt und nichts persistiert. Der
+Snapshot wird verworfen. Die Antwort verrät keine Inhalte des Snapshots.
+
+== Fehlerfall: PDF nicht konform, Rendering schlägt fehl oder Prüfung nicht ausführbar
+
+Schlägt die PDF-Erzeugung fehl, ist das PDF nicht konform oder lässt sich die
+Konformitätsprüfung nicht ausführen (Fehler, Zeitüberschreitung), wird **nichts
+persistiert** (fail-closed, siehe
+xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). Der Benutzer erhält eine
+verständliche Meldung. Der Fehler wird mit Vorlagenversionen und Korrelations-ID
+protokolliert, ohne personenbezogene Inhalte.
+
+* Liegt die Ursache in der Vorlage, muss der Vorlagenverwalter eine **neue
+  Vorlagenversion** veröffentlichen. Der alte Snapshot bleibt an die fehlerhafte
+  Version gebunden; der Benutzer braucht eine **neue Vorschau** mit der korrigierten
+  Version.
+* Bei einem vorübergehenden technischen Fehler (z. B. Zeitüberschreitung) kann der
+  Benutzer das Speichern mit demselben Snapshot wiederholen, solange er nicht
+  abgelaufen ist.
 
 == Fehlerfall: Snapshot abgelaufen
 

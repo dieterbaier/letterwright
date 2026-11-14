@@ -30,11 +30,11 @@ bis sie bestätigt sind.
 |===
 | Element | Beschreibung
 | Source | Angemeldeter Benutzer ohne Berechtigung für ein bestimmtes Schreiben
-| Stimulus | Ruft Download, Übersicht oder Löschen mit der ID eines fremden Schreibens auf.
+| Stimulus | (a) Ruft Download oder Löschen mit der ID eines fremden Schreibens auf. (b) Ruft die Übersicht auf, während in der Datenbank sichtbare und fremde Schreiben liegen.
 | Environment | Normalbetrieb; Angreifer kennt oder errät IDs.
 | Artifact | REST-Endpunkte und Anwendungsfälle.
-| Response | Die Anfrage wird abgelehnt; die Antwort unterscheidet nicht zwischen nicht vorhanden und nicht berechtigt.
-| Response Measure | 100 % der Zugriffsversuche in automatisierten Tests liefern 404 ohne Dokumentinhalt, Dateinamen, Empfänger oder Betreff.
+| Response | (a) Die Anfrage wird abgelehnt; die Antwort unterscheidet nicht zwischen nicht vorhanden und nicht berechtigt. (b) Die Übersicht enthält nur Schreiben, die der Host freigibt; Filterung erfolgt vor Paginierung und Zählung.
+| Response Measure | (a) 100 % der Zugriffsversuche per ID liefern 404 ohne Dokumentinhalt, Dateinamen, Empfänger oder Betreff. (b) In einem Testfall mit sichtbaren und fremden Schreiben erscheinen 0 fremde Schreiben als Eintrag oder Metadaten; Gesamtzahl, Seitenzahl und Paginierungs-Cursor entsprechen ausschließlich den sichtbaren Schreiben.
 |===
 
 === Begründung

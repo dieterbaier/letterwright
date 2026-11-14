@@ -62,8 +62,20 @@ Wir schlagen vor:
 * Der **Build prüft** beides automatisch: **veraPDF** (Open Source) validiert jedes
   Referenz-PDF gegen PDF/A-2b und PDF/UA-1, **axe-core** prüft die gerenderte Vorschau
   in Komponententests und E2E-Tests.
-* Zur Laufzeit wird vor dem Speichern eine Konformitätsprüfung über den Port
-  `KonformitaetsPruefer` ausgeführt (Default: veraPDF als optionaler Adapter).
+* Zur Laufzeit wird **vor jedem Speichern** eine Konformitätsprüfung über den Port
+  `KonformitaetsPruefer` ausgeführt. Der Starter **setzt einen Prüfer voraus**:
+** Default ist ein veraPDF-Adapter (veraPDF ist unter MPL 2.0 nutzbar und damit mit
+   MIT vereinbar), den der Starter mitbringt und automatisch konfiguriert.
+** **Kein Prüfer konfiguriert**: Der Anwendungskontext startet nicht (fail-fast mit
+   klarer Fehlermeldung). Ein Abschalten ist nicht vorgesehen.
+** **Prüfung schlägt fehl** (nicht konform): Es wird nichts persistiert; der Benutzer
+   erhält eine Meldung (fail-closed).
+** **Prüfung nicht ausführbar** (Fehler, Zeitüberschreitung): wie „nicht konform“,
+   es wird nichts persistiert. Ein Wiederholen ist möglich.
+* Zusätzlich wird beim **Veröffentlichen einer Vorlagenversion** ein Probe-PDF mit
+  Beispieldaten erzeugt und geprüft, damit Fehler aus neu gepflegten Vorlagen vor dem
+  ersten Speichern auffallen. Die Referenzfälle im CI sichern nur die Bibliothek ab,
+  nicht jede gepflegte Vorlage.
 
 === Kontext
 
@@ -120,7 +132,9 @@ s| Summe s| +4 s| +2 s| ?
 
 ==== Negativ
 
-* veraPDF als Laufzeitprüfung vergrößert den Host; daher optional.
+* veraPDF als Pflicht-Laufzeitprüfung vergrößert das Host-Artefakt und verlängert
+  das Speichern (geht in QS-012 ein).
+* Ein Ausfall der Prüfung verhindert das Speichern; das ist gewollt (fail-closed).
 * Inhalte der Fachanwender (Alternativtexte, Überschriften) beeinflussen die Konformität (R-005).
 
 ==== Neutral oder Folgearbeiten

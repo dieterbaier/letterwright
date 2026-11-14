@@ -55,6 +55,10 @@ Wir schlagen vor:
 * Die **Vorschau** erzeugt einen kurzlebigen **Datenstand (Snapshot)**. Speichern
   rendert das PDF aus genau diesem Snapshot, damit das Gespeicherte der Vorschau
   entspricht, auch wenn sich Domänendaten zwischenzeitlich geändert haben.
+* Der Snapshot ist an den **Benutzer**, den **fachlichen Bezug** und **beide
+  Vorlagenversionen** (Briefpapier und Standardschreiben) gebunden. Beim Speichern
+  wird die Erzeugungsberechtigung erneut über den Host geprüft. Eine korrigierte
+  Vorlage erfordert eine neue Vorschau.
 * Das Löschen eines Schreibens entscheidet die `Loeschrichtlinie` des Hosts (ADR-002).
 
 === Kontext

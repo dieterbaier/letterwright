@@ -34,7 +34,7 @@ bis sie bestätigt sind.
 | Environment | Normalbetrieb; Referenzvorlagen im CI.
 | Artifact | Erzeugtes PDF.
 | Response | Lesereihenfolge, Überschriften, Absender- und Empfängerblock, Tabellen und Bilder mit Alternativtext sind korrekt getaggt; Dokumentsprache und Titel sind gesetzt.
-| Response Measure | 0 veraPDF-Fehler gegen PDF/UA-1 für alle Referenz-PDFs; Logo hat Alternativtext oder ist als Artefakt markiert.
+| Response Measure | Automatisch: 0 veraPDF-Fehler gegen PDF/UA-1 für alle Referenz-PDFs. Manuelle Stichprobe je Release an mindestens einem ein- und einem mehrseitigen Referenz-PDF (z. B. mit NVDA und dem PDF Accessibility Checker PAC): Lesereihenfolge entspricht der logischen Briefreihenfolge (Absender, Anschrift, Informationsblock, Betreff, Text, Grußformel); Alternativtexte sind inhaltlich sinnvoll (kein Dateiname, kein „Bild“); dekorative Elemente, Kopf- und Fußzeilen sowie Falzmarken sind als Artefakt markiert; Dokumenttitel und Sprache werden angesagt. 0 offene Befunde.
 |===
 
 === Begründung
@@ -62,7 +62,7 @@ include::generated/qs-002-barrierefreies-pdf-traceability.adoc[leveloffset=+2]
 
 === Open Questions
 
-* Wer führt die manuelle Screenreader-Stichprobe durch?
+* Wer führt die manuelle Stichprobe durch?
 
 === Review Notes
 

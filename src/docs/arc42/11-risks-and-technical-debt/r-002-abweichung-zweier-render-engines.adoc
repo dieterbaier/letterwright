@@ -51,7 +51,7 @@ Ohne Prototyp ist das Ausmaß nicht abschätzbar; einfache Brieflayouts senken d
 
 * Wiedergabetreue-Test aus QS-004 für alle Referenzvorlagen.
 * Gleiche eingebettete Schriften, keine automatische Silbentrennung.
-* Rückfallebene: Chromium für beide Wege (ADR-004, Option 2).
+* Kandidat Chromium für beide Wege (ADR-004, Option 2), nur nach Nachweis derselben Abnahmekriterien.
 
 === Decision or Acceptance
 
