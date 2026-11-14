@@ -1,0 +1,93 @@
+= Projekttagebuch 2026-11-14
+
+Erster Arbeitstag. Er reicht von der Projektidee (#1) bis zum Backend-Gerüst
+(#12, PR #15). Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **Analyse und Rückfragen in #1:** 21 Fragen. Die Antworten des Owners
+  bestimmen die ADRs.
+* **Architekturentwurf (PR #2, gemergt per Rebase, `8ceeac1` bis `cfbb6a2`):**
+  Toolkit als Submodule, arc42 auf Deutsch, 12 ADRs, 13 Qualitätsszenarien,
+  9 Risiken. Fünf Review-Runden des Owners führten zu Snapshot-Bindung mit
+  erneuter Berechtigungsprüfung, Pflicht-Konformitätsprüfer (fail-closed),
+  gemeinsamen Abnahmekriterien für alle Rendering-Optionen,
+  Screenreader-Abnahme und Stiltreue zur zentralen DOCX-Vorgabe (QS-013).
+* **Doku-Pipeline:** `architekturdoku.yml` baut bei jedem PR. Veröffentlicht
+  wird nur `main` auf https://dieterbaier.github.io/standardschreiben/.
+* **Session-Links:** Der Owner will keine Links auf KI-Sessions in Commits und
+  PRs. Die Historie von PR #2 wurde vor dem Merge umgeschrieben. Die Regel steht
+  in `AGENTS.md`.
+* **Backlog:** Epics #3 bis #11 als Sub-Issues von #1 (Label `type:epic`, `phase-1`
+  oder `phase-2`). #4 ist in die Tasks #12, #13 und #14 geschnitten (nativer Typ Task).
+* **Backend-Gerüst (#12, PR #15, offen):** Gradle-Wrapper 9.9.1, Spring Boot 4.1.2,
+  JaCoCo-Gate mit 80 % Zeilen und Zweigen je Modul, ArchUnit-Regeln. Der Workflow
+  `backend.yml` (Java 21) ist grün auf `d0d7b2b`.
+
+== Entscheidungen des Owners
+
+* Ein Editor statt Word ist in Ordnung. Die Styles der zentralen DOCX-Vorgabe
+  müssen im Ergebnis stimmen.
+* Seitenumbruch gehört in das MVP. Rollen und Sichtbarkeit bestimmt der Host.
+* Eine eigene Umgebung mit Zugriff auf `downloads.gradle.org` hat der Owner
+  abgelehnt. Builds werden über die CI nachgewiesen.
+
+== Gelernt
+
+* **Die Entwicklungsumgebung sperrt `downloads.gradle.org` und `api.foojay.io`.**
+  Maven Central antwortet dort zeitweise mit 429 oder 404. Lokale Gradle-Läufe
+  brauchen Wiederholungen, der Wrapper läuft lokal nicht. Der verbindliche
+  Nachweis ist die CI.
+* **Die Gradle-Wrapper-JAR von 9.9.1 ist bytegleich zu der von 9.9.0** (SHA-256
+  `621008af…`, laut gradle.org/release-checksums). Echte Wrapper-Dateien lassen
+  sich vom Tag im Repository `gradle/gradle` holen und gegen die offizielle
+  Prüfsumme verifizieren.
+* **Das Werkzeug zum Anlegen von PRs hängt einen Footer mit Session-Link an.**
+  Die Beschreibung muss direkt nach dem Anlegen überschrieben werden.
+* **Reviews haben zwei Teile:** Inline-Threads und den Review-Text. In der ersten
+  Runde von PR #2 blieben drei Hinweise aus dem Review-Text zunächst liegen.
+* Das Repository kennt die nativen Issue-Typen Task, Bug und Feature, aber kein
+  Epic. Epics tragen deshalb das Label `type:epic`.
+* Das Docs-Toolbox-Image verarbeitet Umlaute korrekt. Lokal braucht der
+  Validator `LANG=C.UTF-8`.
+
+== Offen
+
+* PR #15: Review und Merge durch den Owner. Bestätigung von Root-Build statt
+  Convention-Plugin.
+* #13 und #14 (Frontend-Gerüst, CI-Matrix) als nächste Tasks von #4.
+* Prototyp #3 ruht, bis die Beispiel-DOCX (Q-PO-004) und die Schriftfrage
+  (Q-PO-010) geklärt sind.
+* Labels: Statt der Familie `area:*` wurde ein Label mit dem wörtlichen Namen
+  `area:*` angelegt. Einzelne Bereichslabels fehlen noch.
+* Langlebige offene Fragen stehen in
+  `src/docs/doc-005-questions-and-answers.adoc`.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Issue #1 mit allen Kommentaren. Die Issues #3 bis #14 wurden angelegt und
+  danach als Liste abgefragt (`GET /repos/dieterbaier/standardschreiben/issues?state=open`).
+* PR #2: Reviews 5903978412, 5903992461, 5904311733, 5904372249, alle
+  Review-Threads, Check-Runs, Workflow-Runs 43595166405 und 43596126047.
+* PR #15: Review 5905720861, Review-Threads, Check-Runs, Job 132507001885
+  (`GET /repos/dieterbaier/standardschreiben/actions/jobs/132507001885`).
+* Toolkit `tools/architecture-knowledge-toolkit` @ `209607d`: Skills
+  `bootstrap-project`, `adr` (Ausschnitt), `commit-message`, `slice-issues`,
+  `references/issue-labels.md`, `implement-issue-workflow`, `convergence-check`
+  (Ausschnitt), `clock-in` und `clock-out`, außerdem `templates/`, `metamodel/`,
+  das Beispiel `example/` und `.github/workflows/`.
+* https://gradle.org/release-checksums/ (Prüfsummen für 9.9.1),
+  `raw.githubusercontent.com/gradle/gradle/v9.9.1/…` (Wrapper-Dateien),
+  Maven-Metadaten für Spring Boot, ArchUnit und JaCoCo.
+* Labels des Repositorys (`GET /repos/dieterbaier/standardschreiben/labels`).
+
+Fehlgeschlagen:
+
+* `downloads.gradle.org` und `api.foojay.io`: Der Proxy hat den Zugriff abgelehnt.
+* `https://dieterbaier.github.io/standardschreiben/`: von hier nicht abrufbar.
+  Die URL stammt aus dem Status des Pages-Deployments.
+* Maven Central: wiederholt 429 oder 404, erst im fünften Versuch vollständig
+  geladen.
+* Private Journal: keine Bindung hinterlegt (`journal-config.sh get` endet mit Exit 3).

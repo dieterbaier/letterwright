@@ -1,0 +1,48 @@
+= Projektgerüst und Qualitätsgates
+
+Ein leeres, aber vollständig gebautes und geprüftes Gerüst für Backend, Frontend
+und CI, bevor Fachcode entsteht (Epic #4).
+
+*Status:* in flight
+
+== The plan
+
+Erst das Backend, weil die Gates (Abdeckung, ArchUnit) für alle folgenden Epics
+gelten. Dann das Frontend. Die gemeinsame CI zuletzt, weil sie beide Gerüste
+voraussetzt.
+
+[options="checklist"]
+* [ ] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15 wartet auf Review und Merge
+* [ ] Frontend-Gerüst mit Vite, UnoCSS, Vitest-Abdeckungsgate und axe: #13
+* [ ] CI für Backend und Frontend, Java-Matrix 21 und 25: #14 (der Java-21-Teil ist mit PR #15 vorgezogen)
+
+Danach beginnt Epic #5 (Domänenmodell und Ports). Ein Haken bei #12 kommt erst
+nach dem Merge von PR #15. Bis dahin ist er nicht durch eine Prüfung auf `main`
+bestätigt.
+
+== Where we are
+
+Das Backend-Gerüst liegt in PR #15: Gradle-Wrapper 9.9.1, Spring Boot 4.1.2 als
+BOM, sechs Module plus `architekturtests`. Die gemeinsamen Regeln stehen in der
+Root-`build.gradle.kts` statt in einem Convention-Plugin. Ob das so bleibt, muss
+der Owner im Review bestätigen.
+
+Die Entwicklungsumgebung sperrt `downloads.gradle.org`, und Maven Central drosselt
+dort. Lokal lief der Build deshalb nur mit dem installierten Gradle 8.14.3. Der
+verbindliche Nachweis mit dem Wrapper kommt aus dem Workflow `backend.yml`.
+
+== Open in this topic
+
+* Owner-Bestätigung: Root-`build.gradle.kts` statt Convention-Plugin (PR #15,
+  Convergence Check, Frage 4).
+* Eine eigene Umgebung mit Zugriff auf `downloads.gradle.org` hat der Owner
+  abgelehnt. Lokal ist `./gradlew` deshalb nicht ausführbar, der Nachweis läuft
+  über die CI.
+
+== Checks
+
+[source,sh]
+----
+./gradlew build                                 # oder lokal: gradle build
+LANG=C.UTF-8 ruby scripts/validate-metamodel.rb # Architekturdoku
+----

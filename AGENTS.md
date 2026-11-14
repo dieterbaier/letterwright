@@ -148,3 +148,8 @@ thin routing wrappers instead of hand-writing them:
 - Commit-Nachrichten, Pull Requests, Issue- und Review-Kommentare enthalten
   **keine Links auf KI-Sessions** (z. B. `claude.ai/code/session_...`) und
   keinen `Claude-Session:`-Trailer.
+- Sitzungen beginnen und enden mit den Toolkit-Skills `clock-in` und
+  `clock-out`. Das Projekttagebuch liegt in `diary/<JJJJ-MM-TT>.adoc`. Ein Eintrag
+  pro Tag, nach Abschluss des Tages nicht mehr geändert. Pro Thema gibt es eine
+  Fortschrittsdatei `progress/<thema>.adoc` nach der Vorlage des Toolkits.
+  Langlebige offene Fragen stehen in `src/docs/doc-005-questions-and-answers.adoc`.

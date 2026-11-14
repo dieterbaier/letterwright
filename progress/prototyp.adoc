@@ -1,0 +1,37 @@
+= Prototyp: Vorlagenformat und Rendering absichern
+
+Wegwerf-Prototyp, der ADR-003 bis ADR-005 an realen DOCX-Vorgaben belegt oder
+widerlegt (Epic #3).
+
+*Status:* on ice since 2026-11-14 — Die Beispiel-DOCX der zentralen Abteilung
+liegen noch nicht vor (Q-PO-004), die Schriftfrage ist offen (Q-PO-010). Der Topic
+wird wieder aufgenommen, sobald der Owner die DOCX liefert.
+
+== The plan
+
+Die Schriften kommen zuerst. Lassen sie sich nicht in beiden Renderern verwenden
+und einbetten, sind alle weiteren Messungen der Stiltreue wertlos.
+
+[options="checklist"]
+* [ ] Schriften der Vorgabe auf Verwendbarkeit und Einbettung prüfen, sonst eine bestätigte Ersatzvorgabe einholen: Q-PO-010
+* [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
+* [ ] Messen gegen QS-001, QS-002, QS-003, QS-004 und QS-013 mit Option 1 (Paged.js und openhtmltopdf): #3
+* [ ] Nur wenn Option 1 scheitert: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
+* [ ] Ergebnisse in ADR-003 bis ADR-005 eintragen, Entscheidung des Owners einholen: #3
+
+== Where we are
+
+Noch nichts gebaut. Die Abnahmekriterien stehen in ADR-004 im Abschnitt
+„Abnahmekriterien für den Prototyp“.
+
+== Open in this topic
+
+* Q-PO-004: Beispiel-DOCX (vom Owner zugesagt, noch nicht geliefert).
+* Q-PO-010: Schriften der zentralen Vorgabe und ihre Lizenz zur Einbettung.
+
+== Checks
+
+[source,sh]
+----
+# entsteht mit dem Prototyp
+----
