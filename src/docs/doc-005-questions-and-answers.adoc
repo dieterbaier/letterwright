@@ -229,7 +229,7 @@ Mögliche Ansätze für die Bedienoberfläche:
 Zu klären: Welche Komponentenbibliotheken oder Designsysteme setzen die bekannten
 Hosts ein (siehe Q-ARCH-002)? Welcher Ansatz gilt?
 
-Answer: Teilweise beantwortet (Owner, 2026-11-15): Die Komponenten bringen eigene
+Answer: Beantwortet (Owner, 2026-11-15): Die Komponenten bringen eigene
 Styles mit, die der Host überschreiben kann. Die bisher bekannte primäre
 Host-Anwendung ist eine React-Anwendung mit UnoCSS. Design-Tokens über CSS Custom
 Properties sind für die Admin-Oberfläche und die Anzeigekomponente in Ordnung.
@@ -250,8 +250,9 @@ xref:adr-013-styling-der-frontend-komponenten[ADR-013] festgehalten:
   Schreiben herum, etwa Hinweis und „Aktualisieren“. Das Schreiben selbst bleibt
   isoliert und folgt nur der DOCX-Vorgabe (QS-013).
 
-Noch offen: Art der Isolation der Vorschau (`iframe` oder Shadow DOM), zu
-entscheiden vor der Vorschau-Komponente.
+Isolation der Vorschau: `iframe` (Owner, 2026-11-15), festgehalten als
+xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]. Damit ist die Frage
+beantwortet.
 
 == Beantwortete Fragen
 

@@ -58,8 +58,8 @@ Wir schlagen vor:
   Admin-Oberfläche und für die Bedienelemente der Anzeigekomponente, etwa den
   Hinweis und die Schaltfläche „Aktualisieren“.
 * Das **Schreiben in der Vorschau** ist ausgenommen. Es folgt nur der zentralen
-  DOCX-Vorgabe (QS-013) und ist von Host-Styles und Tokens isoliert. Wie es
-  isoliert wird (`iframe` oder Shadow DOM), ist noch offen (Q-ARCH-003).
+  DOCX-Vorgabe (QS-013) und ist von Host-Styles und Tokens isoliert, in einem
+  `iframe` (xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]).
 * **Render-Props** für einzelne Bausteine, etwa Schaltfläche oder Eingabefeld,
   sind eine spätere Erweiterung. Sie kommen erst, wenn ein Host eigene
   Komponenten einsetzen will.
@@ -135,8 +135,8 @@ s| Summe s| +4 s| +1 s| 0
   `@layer` ein.
 * Die Custom Properties werden mit der ersten Komponente der Bedienoberfläche
   festgelegt und dokumentiert.
-* Die Isolation der Vorschau wird vor der Vorschau-Komponente entschieden
-  (Q-ARCH-003).
+* Die Isolation der Vorschau regelt
+  xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014].
 
 === Impact
 
@@ -160,7 +160,7 @@ include::generated/adr-013-styling-der-frontend-komponenten-traceability.adoc[le
 
 === Open Questions
 
-* Wie wird das Schreiben in der Vorschau isoliert? (Q-ARCH-003)
+* Keine.
 
 === Review Notes
 

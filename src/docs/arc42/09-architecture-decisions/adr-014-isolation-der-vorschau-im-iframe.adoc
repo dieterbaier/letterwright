@@ -1,0 +1,181 @@
+---
+id: ADR-014-isolation-der-vorschau-im-iframe
+type: ADR
+title: 'Isolation der Vorschau in einem iframe'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-15'
+reviewed: false
+summary: 'Das Schreiben in der Vorschau wird in einem iframe dargestellt und dort mit Paged.js paginiert, damit weder Host-Styles noch Styles der Bibliothek es verändern; Bedienelemente und Statusmeldungen bleiben außerhalb des iframe.'
+derived_from:
+- type: external
+  description: 'Q-ARCH-003 in doc-005, Antwort des Owners vom 2026-11-15'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/16
+tags:
+- decision
+- frontend
+- vorschau
+relations:
+- type: addresses
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: proposed
+  rationale: 'Das iframe hat ein eigenes Dokument; Host-CSS und vererbte Eigenschaften erreichen das Schreiben nicht.'
+  reviewed: false
+- type: addresses
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: proposed
+  rationale: 'Paged.js arbeitet auf einem vollständigen Dokument mit eigenen @page-Regeln, wie das HTML für die PDF-Erzeugung.'
+  reviewed: false
+- type: relates_to
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'Das iframe braucht einen Titel; Fokus und Statusmeldungen liegen außerhalb und sind im Prototyp zu prüfen.'
+  reviewed: false
+- type: depends_on
+  target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
+  status: proposed
+  rationale: 'Die Vorschau paginiert das HTML aus der Rendering-Pipeline mit Paged.js.'
+  reviewed: false
+- type: relates_to
+  target: ADR-013-styling-der-frontend-komponenten
+  status: proposed
+  rationale: 'ADR-013 nimmt das Schreiben in der Vorschau vom Host-Styling aus; dieser ADR legt fest, wie.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-014-isolation-der-vorschau-im-iframe]]
+== ADR-014: Isolation der Vorschau in einem iframe
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* Die Vorschau-Komponente stellt das Schreiben in einem **`iframe`** dar. Das HTML
+  aus der Rendering-Pipeline (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004])
+  wird als eigenes Dokument geladen und **im iframe mit Paged.js paginiert**.
+* Im iframe gelten nur die Styles des Schreibens, also die der DOCX-Vorgabe
+  (QS-013). Weder CSS des Hosts noch die Styles und Tokens der Bibliothek
+  (xref:adr-013-styling-der-frontend-komponenten[ADR-013]) wirken hinein.
+* **Bedienelemente und Statusmeldungen** (Hinweis, „Aktualisieren“, Speichern,
+  Meldungen) liegen **außerhalb** des iframe in der React-Komponente. Sie folgen
+  ADR-013.
+* Das iframe trägt einen sprechenden **Titel** (`title`) für Hilfstechnologien.
+  Seine Höhe passt die Komponente an die paginierten Seiten an.
+* Das iframe wird mit `sandbox` so weit eingeschränkt, wie Paged.js es zulässt.
+  Inhalte aus Vorlagen und Daten führen kein eigenes JavaScript aus. Die genaue
+  `sandbox`-Konfiguration wird im Prototyp festgelegt.
+
+=== Kontext
+
+ADR-013 legt fest, dass die Bedienoberfläche sich dem Host anpasst, das Schreiben
+in der Vorschau dagegen nur der zentralen DOCX-Vorgabe folgt. Offen war, wie es
+isoliert wird (Q-ARCH-003). Der Owner bevorzugt ein `iframe`, weil er mit Shadow
+DOM wenig Erfahrung hat (2026-11-15).
+
+=== Entscheidungstreiber
+
+* Kein Host-CSS und keine vererbten Eigenschaften (Schrift, Farbe, Zeilenhöhe)
+  verändern das Schreiben (QS-013).
+* Paged.js paginiert so, wie die PDF-Erzeugung das HTML sieht (QS-004).
+* Die paginierte Vorschau bleibt barrierefrei (QS-003).
+* Das Team kann die Lösung warten.
+
+=== Betrachtete Optionen
+
+==== Option 1: iframe
+
+Eigenes Dokument mit eigenem CSS-Kontext. Paged.js arbeitet wie in einer
+eigenständigen Seite, `@page`-Regeln und `@font-face` gelten nur dort. Kosten:
+Höhe synchronisieren, Kommunikation über die Grenze des iframe, Fokusübergang für
+Tastatur und Screenreader prüfen.
+
+==== Option 2: Shadow DOM
+
+Bleibt im Dokument des Hosts. Host-Selektoren wirken nicht hinein, vererbte
+Eigenschaften aber schon, solange sie nicht zurückgesetzt werden. `@page`-Regeln
+und `@font-face` wirken in einem Shadow Root nicht. Ob Paged.js in einem Shadow
+Root zuverlässig paginiert, ist unbelegt.
+
+==== Option 3: Keine Isolation, nur ein Präfix für die Styles des Schreibens
+
+Am einfachsten einzubetten. Host-CSS mit höherer Spezifität und vererbte
+Eigenschaften verändern das Schreiben, `@page`-Regeln kollidieren mit dem Host.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Schutz vor Host-Styles (QS-013) | +1 | 0 | -1
+| Paginierung mit Paged.js wie im PDF (QS-004) | +1 | ? | -1
+| Barrierefreiheit der Vorschau (QS-003) | ? | ? | +1
+| Einbettungsaufwand | -1 | 0 | +1
+| Erfahrung im Team | +1 | -1 | +1
+s| Summe s| ? s| ? s| +1
+|===
+
+Option 3 erfüllt den Schutz vor Host-Styles nicht und scheidet deshalb trotz der
+Summe aus. Ohne das Kriterium Barrierefreiheit hätte Option 1 die Summe +3. Die
+Barrierefreiheit belegt der Prototyp.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Das Schreiben sieht in jedem Host gleich aus.
+* Paged.js läuft in einem eigenen Dokument, wie vom Owner bereits erprobt.
+
+==== Negativ
+
+* Die Komponente muss die Höhe des iframe an die Seiten anpassen.
+* Fokus und Lesereihenfolge über die Grenze des iframe hinweg müssen eigens geprüft
+  werden.
+
+==== Neutral oder Folgearbeiten
+
+* Der Prototyp (#3) prüft die Vorschau im iframe gegen die Abnahmekriterien aus
+  ADR-004, insbesondere QS-003 mit Screenreader.
+* Die `sandbox`-Konfiguration wird im Prototyp festgelegt und dokumentiert.
+
+=== Impact
+
+include::generated/adr-014-isolation-der-vorschau-im-iframe-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-014-isolation-der-vorschau-im-iframe-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-014-isolation-der-vorschau-im-iframe-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Paged.js läuft im iframe mit einer `sandbox`, die Skripte der Bibliothek
+  erlaubt, Skripte aus Vorlageninhalten aber nicht ausführt.
+* Die eingebetteten Schriften lassen sich im iframe genauso laden wie bei der
+  PDF-Erzeugung.
+
+=== Open Questions
+
+* Welche `sandbox`-Konfiguration braucht Paged.js? (im Prototyp zu klären)
+
+=== Review Notes
+
+Der Owner hat die Wahl des iframe am 2026-11-15 getroffen (Q-ARCH-003).
