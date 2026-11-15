@@ -130,7 +130,34 @@ Zu klären:
   Bereinigung oder spätestens beim nächsten Zugriff? Der Snapshot enthält
   personenbezogene Daten aus dem Host.
 
-Answer: Open.
+Answer: Teilweise beantwortet (Owner, 2026-11-15):
+
+* *Ausbaustufe:* Das gespeicherte Schreiben entspricht genau der Vorschau.
+* *MVP:* Es genügt, wenn das endgültige Schreiben mit geänderten Daten
+  gespeichert wird und ein Hinweis den Benutzer darüber informiert. Ist es ohne
+  großen Aufwand möglich, meldet schon das MVP Datenänderungen zurück und
+  erzwingt ein Aktualisieren der Vorschau.
+* *Löschen:* Ein abgelaufener oder durch „Aktualisieren“ ersetzter Snapshot wird
+  sofort gelöscht.
+
+Einschätzung der Architektur (Vorschlag, noch zu bestätigen): Die Erkennung von
+Datenänderungen ist mit wenig Aufwand schon im MVP möglich. Der Snapshot speichert
+zusätzlich einen Hash (SHA-256) des formatierten Datenkontexts. Beim Speichern
+fragt die Bibliothek den Host ohnehin erneut nach der Berechtigung. Dabei liest
+sie auch den Datenkontext neu und vergleicht den Hash. Weicht er ab, wird nicht
+gespeichert. Die Oberfläche meldet die Änderung und verlangt „Aktualisieren“.
+Gerendert wird weiter aus dem Snapshot. Damit gilt die Snapshot-Treue der
+Ausbaustufe schon im MVP, und die Variante „mit geänderten Daten speichern“
+entfällt. ADR-007 bleibt gültig und wird nur um den Hash-Vergleich ergänzt, die
+Laufzeitsicht um den Fehlerfall „Daten geändert“.
+
+Zum Löschen: Ein durch „Aktualisieren“ ersetzter Snapshot wird im selben Schritt
+gelöscht, in dem der neue entsteht. Bei Ablauf löscht eine Bereinigung in kurzem
+Abstand (zum Beispiel jede Minute). Bis dahin behandelt die Bibliothek einen
+abgelaufenen Snapshot wie einen nicht vorhandenen.
+
+Noch offen: Bestätigung dieses Vorschlags und die Ablaufzeit (Annahme
+30 Minuten).
 
 == Open Questions For Architect
 
@@ -186,14 +213,42 @@ Mögliche Ansätze für die Bedienoberfläche:
   setzt.
 . *Ungestylte Komponenten (headless):* Die Bibliothek liefert Verhalten und
   Barrierefreiheit, der Host stylt vollständig selbst.
-. *Komponentenbibliothek des Hosts:* Die Bibliothek nutzt die
-  UI-Komponenten des Hosts als Peer-Abhängigkeit oder über Render-Props. Das
-  bindet sie an genau diese Bibliothek.
+. *Komponentenbibliothek des Hosts als Peer-Abhängigkeit:* Die Bibliothek
+  importiert die UI-Komponenten einer bestimmten Komponentenbibliothek. Das
+  bindet sie an genau diese Bibliothek und deren Versionen.
+. *Render-Props (Slots):* Die Bibliothek legt für einzelne Bausteine, etwa
+  Schaltfläche oder Eingabefeld, eine eigene Schnittstelle fest (welche Props
+  sie übergibt). Der Host kann dafür eigene Komponenten übergeben, sonst greift
+  die Standarddarstellung der Bibliothek. Die Bibliothek hängt dabei von keiner
+  fremden Bibliothek ab, nur von ihrer eigenen Schnittstelle. Der Preis: Diese
+  Schnittstelle ist Teil des öffentlichen Vertrags und muss stabil bleiben. Für
+  übergebene Komponenten ist der Host bei der Barrierefreiheit (QS-003)
+  mitverantwortlich.
 
 Zu klären: Welche Komponentenbibliotheken oder Designsysteme setzen die bekannten
 Hosts ein (siehe Q-ARCH-002)? Welcher Ansatz gilt?
 
-Answer: Open.
+Answer: Teilweise beantwortet (Owner, 2026-11-15): Die Komponenten bringen eigene
+Styles mit, die der Host überschreiben kann. Die bisher bekannte primäre
+Host-Anwendung ist eine React-Anwendung mit UnoCSS. Design-Tokens über CSS Custom
+Properties sind für die Admin-Oberfläche und die Anzeigekomponente in Ordnung.
+Render-Props sind interessant, wenn die Abhängigkeit überschaubar bleibt.
+
+Einschätzung der Architektur (Vorschlag, noch zu bestätigen, Entscheidung als ADR):
+
+* Die Bibliothek bringt Standard-Styles mit, erzeugt mit UnoCSS, mit eigenem
+  Klassenpräfix und ohne globales Reset. Sie liegen in einer eigenen CSS-Ebene
+  (`@layer`). Styles des Hosts haben dadurch Vorrang, ohne `!important`.
+* Farben, Schriften und Abstände kommen aus CSS Custom Properties mit eigenem
+  Präfix. Der Host setzt sie, sonst gelten Standardwerte.
+* Render-Props sind eine spätere Erweiterung für einzelne Bausteine, wenn ein
+  Host eigene Komponenten einsetzen will. Sie erzeugen keine Abhängigkeit zu einer
+  fremden Bibliothek.
+* Bei der Anzeigekomponente gelten Tokens nur für die Bedienelemente um das
+  Schreiben herum, etwa Hinweis und „Aktualisieren“. Das Schreiben selbst bleibt
+  isoliert und folgt nur der DOCX-Vorgabe (QS-013).
+
+Noch offen: Bestätigung des Vorschlags, Art der Isolation der Vorschau.
 
 == Beantwortete Fragen
 
