@@ -3,9 +3,11 @@
 Wegwerf-Prototyp, der ADR-003 bis ADR-005 an realen DOCX-Vorgaben belegt oder
 widerlegt (Epic #3).
 
-*Status:* on ice since 2026-11-14 — Die Beispiel-DOCX der zentralen Abteilung
-liegen noch nicht vor (Q-PO-004), die Schriftfrage ist offen (Q-PO-010). Der Topic
-wird wieder aufgenommen, sobald der Owner die DOCX liefert.
+*Status:* on ice since 2026-11-14 — Der Fokus liegt auf dem Projektgerüst. Die
+Beispiel-DOCX (Q-PO-004) liegen inzwischen vor: `src/examples/Geschaeftsbrief.docx`
+und `src/examples/Formular_intern.docx`, bisher nur auf dem Branch von PR #15.
+Damit ist der erste Schritt (Schriften prüfen, Q-PO-010) möglich. Der Topic wird
+wieder aufgenommen, sobald der Owner ihn als Fokus wählt.
 
 == The plan
 
@@ -26,7 +28,8 @@ Noch nichts gebaut. Die Abnahmekriterien stehen in ADR-004 im Abschnitt
 
 == Open in this topic
 
-* Q-PO-004: Beispiel-DOCX (vom Owner zugesagt, noch nicht geliefert).
+* Q-PO-004: Beispiel-DOCX geliefert (Branch von PR #15). Die Antwort in
+  `doc-005` sagt noch „liefert nach“ und wird mit dem Merge nachgezogen.
 * Q-PO-010: Schriften der zentralen Vorgabe und ihre Lizenz zur Einbettung.
 
 == Checks

@@ -35,6 +35,9 @@ verbindliche Nachweis mit dem Wrapper kommt aus dem Workflow `backend.yml`.
 
 * Owner-Bestätigung: Root-`build.gradle.kts` statt Convention-Plugin (PR #15,
   Convergence Check, Frage 4).
+* PR #15 enthält seit dem 14./15.11. die Beispiel-DOCX unter `src/examples/`. Sie
+  gehören zum Prototyp (#3), nicht zu #12. Klären, ob sie mit PR #15 nach `main`
+  gehen oder getrennt.
 * Eine eigene Umgebung mit Zugriff auf `downloads.gradle.org` hat der Owner
   abgelehnt. Lokal ist `./gradlew` deshalb nicht ausführbar, der Nachweis läuft
   über die CI.
