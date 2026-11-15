@@ -1,0 +1,117 @@
+= Projekttagebuch 2026-11-15
+
+Zweiter Arbeitstag, Thema Projektgerüst. Das Backend-Gerüst (#12) ist gemergt.
+Aus den Fragen des Owners in PR #15 entstanden zwei Doku-PRs mit drei
+ADR-Änderungen. Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **Backend-Gerüst (#12, PR #15, per Rebase gemergt):** Nach dem Review des Owners
+  vom 14.11. liegen die Quellen unter `src/application/backend/`.
+** Die Use Cases sind in drei Gradle-Module geschnitten: `usecases/in`,
+   `usecases/out` und `usecases/service`.
+** `adapter-rendering` liegt unter `adapter/out`, weil `Renderer` ein Driven Port
+   ist.
+** Ein Convention-Plugin unter `gradle/build-logic` ersetzt `subprojects {}`.
+** ArchUnit prüft sieben Regeln, jede mit einer Fixture, die einen Verstoß
+   nachstellt.
+** Das Basispaket heißt `dieterbaier.standardschreiben`.
+** Im Laufzeitdiagramm zum Speichern gehen die REST-Aufrufe jetzt über
+   `adapter-web`.
+* **Beispiel-DOCX:** `Geschaeftsbrief.docx` und `Formular_intern.docx` liegen
+  mit PR #15 unter `src/examples/`.
+* **Fragen aus PR #15 (PR #16, per Rebase gemergt):**
+** Q-PO-011 (Lebensdauer der Vorschau) ist beantwortet. ADR-007 ist um
+   Hash-Vergleich, Ablaufzeit und Löschen ergänzt.
+** Die Laufzeitsicht hat den neuen Fehlerfall „Daten seit der Vorschau
+   geändert“.
+** Q-ARCH-003 (Styling durch den Host) führte zu ADR-013.
+* **Isolation der Vorschau (PR #17, per Rebase gemergt):**
+** ADR-014 legt ein iframe fest.
+** Nach dem Review: Sandbox ohne `allow-same-origin`, Bereinigung nach
+   Allowlist, CSP und geprüftes `postMessage`.
+** Dazu kommen Prüfkriterien für die Barrierefreiheit.
+** Issue #3 trägt diese Kriterien jetzt als Akzeptanzkriterien.
+* **Issues:** #12 ist mit dem Merge von PR #15 geschlossen. #13 nennt den neuen
+  Pfad und ADR-013. #3 nennt ADR-014.
+
+== Entscheidungen des Owners
+
+* **Modulgrenzen:** Grenzen werden über eigene Module erzwungen, mit zusätzlichen
+  ArchUnit-Regeln („fail fast“). Gemeinsame Build-Regeln stehen im
+  Convention-Plugin.
+* **Ablage und Namen:** Bestätigt sind `adapter-rendering` unter `adapter/out`
+  und der Modulname `usecases/service`. Die Maven-Gruppe bleibt
+  `io.github.dieterbaier.standardschreiben`.
+* **Beispiel-DOCX:** Die Beispiel-DOCX kommen mit PR #15. Die Architekturdoku
+  dazu wird mit #3 angepasst.
+* **Vorschau:**
+** Das gespeicherte Schreiben entspricht genau der Vorschau.
+** Datenänderungen werden erkannt und erzwingen ein Aktualisieren.
+** Ein Snapshot läuft nach 30 Minuten ab. Abgelaufene und ersetzte Snapshots
+   werden sofort gelöscht.
+* **Styling:**
+** Die Komponenten bringen eigene Styles mit, die der Host überschreiben kann.
+** Für die Bedienoberfläche gibt es Design-Tokens als CSS Custom Properties.
+** Render-Props kommen später.
+** Die Vorschau läuft in einem iframe.
+* **ADR-014** bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt.
+
+== Gelernt
+
+* **Gradle-Configuration-Cache:** Ein `doLast`-Block in einem vorkompilierten
+  Skript-Plugin lässt sich nicht serialisieren. Eine eigene Task-Klasse löst das.
+* **`.gitignore`:** Die Ausnahme `!**/src/**/build/` schließt Build-Ausgaben
+  wieder ein, sobald Module unter `src/` liegen.
+* **Sandbox im iframe:** `sandbox="allow-scripts"` erlaubt jedes Skript im Frame.
+  Den Schutz vor Inhalten liefern erst Bereinigung und CSP. axe-core sieht von
+  der Host-Seite nicht in einen Frame mit opaker Origin hinein.
+* **Arbeitsumgebung:**
+** Die Shell hat `noclobber` und interaktive Aliase für `rm` und `cp`.
+   Überschreiben geht mit `>|`, `/bin/rm -f` und `/bin/cp -f`.
+** Ein Pre-Push-Hook verbietet Pushes aus Pfaden mit `/private/`. Gepusht wird
+   aus dem normalen Checkout.
+* **Reviews unter dem eigenen Konto:** Das Konto des Reviewers ist zugleich
+  Autor der PRs. GitHub lässt deshalb nur `COMMENTED` zu, kein `APPROVE`.
+
+== Offen
+
+* #13 (Frontend-Gerüst) ist der nächste Schritt im Projektgerüst, danach #14.
+* Q-PO-004 in `doc-005` sagt noch „liefert nach“, wird mit #3 nachgezogen.
+* ADR-014: Korrelationswert je Vorschau-Instanz für `postMessage`
+  (Hinweis aus dem Re-Review, nicht blockierend), mit dem Prototyp.
+* ADR-007, ADR-013 und ADR-014 sind `proposed` und `reviewed: false`.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Branch-Sweep beim Clock-in und beim Clock-out (`origin/main`),
+  `gh pr list --state open`, `gh issue list --state open`.
+* `progress/projektgeruest.adoc` und `progress/prototyp.adoc` von
+  `origin/session-diary`, `diary/2026-11-14.adoc`, `AGENTS.md`.
+* PR #15:
+** Reviews 5906173421 und 5910986119, Review-Kommentar 4578608875.
+** Issue-Kommentare 6892823976 und 6895230487, Beschreibung, Check-Runs.
+** Workflow-Läufe 43720406658 und 43720406621.
+* PR #16: Review mit den Inline-Kommentaren 4578608914 und 4578608920,
+  Workflow-Lauf 43745641027.
+* PR #17: Reviews 5912287435 und 5912334235, Workflow-Lauf 43750242832.
+* Issues #3, #12 und #13 (Beschreibungen).
+* Labels des Repositorys.
+* Die Beispiel-DOCX unter `src/examples/`.
+* ADR-004, ADR-007, ADR-008 (Ausschnitt), ADR-010, QS-003, QS-004, QS-013,
+  `doc-005`, `doc-06000-runtime-view.adoc`.
+* Toolkit `tools/architecture-knowledge-toolkit`:
+** Skills `clock-in`, `clock-out`, `post-merge-sync`, `adr` (Ausschnitt),
+   `references/adr-writing-guide.md` (Ausschnitt Pugh-Matrix).
+** `clock-in/templates/progress.adoc`.
+** `adapters/shared/journal-config.sh get`.
+* Privates Journal über die GitHub-API: PR #102, PR #103,
+  `diary/2026/2026-11-15.adoc` auf `agent/diary-2026-11-15`.
+
+Fehlgeschlagen:
+
+* SSH-Agent im Checkout des privaten Journals. Ausweichweg: GitHub-API.
+* Push aus einem Worktree unter `/private/`: Der Pre-Push-Hook hat abgelehnt.
+  Ausweichweg: der normale Checkout.

@@ -12,40 +12,36 @@ gelten. Dann das Frontend. Die gemeinsame CI zuletzt, weil sie beide Gerüste
 voraussetzt.
 
 [options="checklist"]
-* [ ] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15 wartet auf Review und Merge
-* [ ] Frontend-Gerüst mit Vite, UnoCSS, Vitest-Abdeckungsgate und axe: #13
-* [ ] CI für Backend und Frontend, Java-Matrix 21 und 25: #14 (der Java-21-Teil ist mit PR #15 vorgezogen)
+* [x] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15 per Rebase gemergt, Workflow `Backend` auf `main` grün
+* [ ] Frontend-Gerüst unter `src/application/frontend/` mit Vite, UnoCSS nach ADR-013, Vitest-Abdeckungsgate und axe: #13
+* [ ] CI für Backend und Frontend, Java-Matrix 21 und 25: #14 (der Java-21-Teil läuft schon in `backend.yml`)
 
-Danach beginnt Epic #5 (Domänenmodell und Ports). Ein Haken bei #12 kommt erst
-nach dem Merge von PR #15. Bis dahin ist er nicht durch eine Prüfung auf `main`
-bestätigt.
+Danach beginnt Epic #5 (Domänenmodell und Ports). #13 ist nicht mehr durch die
+Styling-Frage blockiert: ADR-013 legt fest, wie das Paket CSS ausliefert
+(Präfix, kein globales Reset, eigene `@layer`).
 
 == Where we are
 
-Das Backend-Gerüst liegt in PR #15: Gradle-Wrapper 9.9.1, Spring Boot 4.1.2 als
-BOM, sechs Module plus `architekturtests`. Die gemeinsamen Regeln stehen in der
-Root-`build.gradle.kts` statt in einem Convention-Plugin. Ob das so bleibt, muss
-der Owner im Review bestätigen.
+Das Backend liegt unter `src/application/backend/`. Die Use Cases sind in
+`usecases/in`, `usecases/out` und `usecases/service` getrennt, damit falsche
+Abhängigkeiten schon am Compiler scheitern. ArchUnit prüft dieselben Regeln
+zusätzlich. Gemeinsame Build-Regeln stehen im Convention-Plugin
+`standardschreiben.java-modul` unter `gradle/build-logic`. Das Basispaket ist
+`dieterbaier.standardschreiben`, die Maven-Gruppe bleibt
+`io.github.dieterbaier.standardschreiben`.
 
-Die Entwicklungsumgebung sperrt `downloads.gradle.org`, und Maven Central drosselt
-dort. Lokal lief der Build deshalb nur mit dem installierten Gradle 8.14.3. Der
-verbindliche Nachweis mit dem Wrapper kommt aus dem Workflow `backend.yml`.
+`./gradlew` läuft lokal mit dem eingecheckten Wrapper.
 
 == Open in this topic
 
-* Owner-Bestätigung: Root-`build.gradle.kts` statt Convention-Plugin (PR #15,
-  Convergence Check, Frage 4).
-* PR #15 enthält seit dem 14./15.11. die Beispiel-DOCX unter `src/examples/`. Sie
-  gehören zum Prototyp (#3), nicht zu #12. Klären, ob sie mit PR #15 nach `main`
-  gehen oder getrennt.
-* Eine eigene Umgebung mit Zugriff auf `downloads.gradle.org` hat der Owner
-  abgelehnt. Lokal ist `./gradlew` deshalb nicht ausführbar, der Nachweis läuft
-  über die CI.
+* #13 als nächster Schritt. Der Pfad `src/application/frontend/` entsteht erst
+  damit.
 
 == Checks
 
 [source,sh]
 ----
-./gradlew build                                 # oder lokal: gradle build
-LANG=C.UTF-8 ruby scripts/validate-metamodel.rb # Architekturdoku
+./gradlew build
+DOCS_TOOLBOX_LOCAL=1 ./build.sh validate && DOCS_TOOLBOX_LOCAL=1 ./build.sh build
+gh run list --branch main --limit 4
 ----

@@ -1,13 +1,12 @@
 = Prototyp: Vorlagenformat und Rendering absichern
 
-Wegwerf-Prototyp, der ADR-003 bis ADR-005 an realen DOCX-Vorgaben belegt oder
-widerlegt (Epic #3).
+Wegwerf-Prototyp, der ADR-003 bis ADR-005 und ADR-014 an realen DOCX-Vorgaben
+belegt oder widerlegt (Epic #3).
 
 *Status:* on ice since 2026-11-14 — Der Fokus liegt auf dem Projektgerüst. Die
-Beispiel-DOCX (Q-PO-004) liegen inzwischen vor: `src/examples/Geschaeftsbrief.docx`
-und `src/examples/Formular_intern.docx`, bisher nur auf dem Branch von PR #15.
-Damit ist der erste Schritt (Schriften prüfen, Q-PO-010) möglich. Der Topic wird
-wieder aufgenommen, sobald der Owner ihn als Fokus wählt.
+Beispiel-DOCX liegen auf `main` (`src/examples/`). Damit ist der erste
+Schritt (Schriften, Q-PO-010) möglich. Der Topic wird wieder aufgenommen, sobald
+der Owner ihn als Fokus wählt.
 
 == The plan
 
@@ -17,20 +16,30 @@ und einbetten, sind alle weiteren Messungen der Stiltreue wertlos.
 [options="checklist"]
 * [ ] Schriften der Vorgabe auf Verwendbarkeit und Einbettung prüfen, sonst eine bestätigte Ersatzvorgabe einholen: Q-PO-010
 * [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
-* [ ] Messen gegen QS-001, QS-002, QS-003, QS-004 und QS-013 mit Option 1 (Paged.js und openhtmltopdf): #3
+* [ ] Vorschau im sandboxed iframe mit CSP aufbauen und Sandbox, CSP und HTML-Allowlist festlegen: #3, ADR-014
+* [ ] Messen gegen QS-001 bis QS-004, QS-013 und die Prüfkriterien aus ADR-014 mit Option 1 (Paged.js und openhtmltopdf): #3
 * [ ] Nur wenn Option 1 scheitert: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
-* [ ] Ergebnisse in ADR-003 bis ADR-005 eintragen, Entscheidung des Owners einholen: #3
+* [ ] Ergebnisse in ADR-003 bis ADR-005 und ADR-014 eintragen, Entscheidung des Owners einholen: #3
+
+ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
+(Owner, 2026-11-15).
 
 == Where we are
 
-Noch nichts gebaut. Die Abnahmekriterien stehen in ADR-004 im Abschnitt
-„Abnahmekriterien für den Prototyp“.
+Noch nichts gebaut. Die Abnahmekriterien stehen in ADR-004 und ADR-014 und als
+Akzeptanzkriterien in #3.
 
 == Open in this topic
 
-* Q-PO-004: Beispiel-DOCX geliefert (Branch von PR #15). Die Antwort in
-  `doc-005` sagt noch „liefert nach“ und wird mit dem Merge nachgezogen.
+* Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“. Die Beispiel-DOCX
+  liegen inzwischen auf `main`. Mit #3 nachziehen, zusammen mit der
+  Architekturdoku dazu (Entscheidung des Owners).
 * Q-PO-010: Schriften der zentralen Vorgabe und ihre Lizenz zur Einbettung.
+* Hinweis aus dem Re-Review von PR #17 (nicht blockierend): Nachrichten aus dem
+  iframe per `postMessage` zusätzlich mit einem Korrelationswert je
+  Vorschau-Instanz absichern, besonders bei parallelen oder neu geladenen
+  Vorschauen, und auf den vorgesehenen Zweck begrenzen. In ADR-014 aufnehmen,
+  wenn der Prototyp die Kommunikation festlegt.
 
 == Checks
 
