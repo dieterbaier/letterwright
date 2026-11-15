@@ -91,6 +91,32 @@ Welche Ersatzschrift bestätigt die zentrale Abteilung?
 
 Answer: Open.
 
+[[q-po-011]]
+=== Q-PO-011: Lebensdauer der Vorschau und geänderte Daten
+
+Wie lange bleibt eine Vorschau gespeichert, wenn der Sachbearbeiter das Schreiben
+nicht speichert? Und was gilt, wenn sich die Domänendaten zwischen Vorschau und
+Speichern ändern?
+
+Stand der Architektur: Nach
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] erzeugt die Vorschau
+einen befristeten Snapshot. Gespeichert wird genau dieser Datenstand, spätere
+Datenänderungen fließen also nicht ein. Die Ablaufzeit ist eine Annahme
+(30 Minuten). Ist der Snapshot abgelaufen, lehnt die Bibliothek das Speichern ab
+und verlangt eine neue Vorschau (Laufzeitsicht, Fehlerfall „Snapshot abgelaufen“).
+
+Vorschlag des Owners für das MVP (Kommentar in PR #15, 2026-11-15): Auf
+Datenänderungen wird nicht eingegangen. Die Vorschau zeigt einen Hinweis, dass
+sie nur eine Vorschau ist, und bietet eine Schaltfläche „Aktualisieren“, die sie
+neu erzeugt. Mit dem Snapshot hieße der Hinweis: Das Schreiben zeigt den
+Datenstand zum Zeitpunkt der Vorschau. „Aktualisieren“ erzeugt einen neuen
+Snapshot.
+
+Zu klären: Ablaufzeit bestätigen oder festlegen; Hinweis und „Aktualisieren“ in
+das MVP aufnehmen.
+
+Answer: Open.
+
 == Open Questions For Architect
 
 [[q-arch-001]]
@@ -105,6 +131,40 @@ Answer: Open.
 === Q-ARCH-002: Bekannte Hosts
 
 Gibt es bereits Host-Anwendungen mit fester Spring-Boot- oder Java-Version?
+
+Answer: Open.
+
+[[q-arch-003]]
+=== Q-ARCH-003: Styling der Frontend-Komponenten durch die Host-Anwendung
+
+Wie ist gewährleistet, dass die React-Komponenten so aussehen, wie die
+Host-Anwendung es vorgibt (Kommentar des Owners in PR #15, 2026-11-15)?
+
+Die Frage prägt die Frontend-Architektur und den Integrationsvertrag des
+npm-Pakets (xref:adr-001-einbettbare-bibliothek[ADR-001]). Sie ist vor dem
+Frontend-Gerüst (#13) zu entscheiden, voraussichtlich als eigener ADR.
+
+Zwei Bereiche brauchen gegensätzliche Regeln:
+
+* *Bedienoberfläche* (Formulare, Listen, Schaltflächen): Sie soll das Aussehen
+  des Hosts übernehmen.
+* *Schreiben in der Vorschau*: Es muss der zentralen DOCX-Vorgabe folgen (QS-013)
+  und darf von den Styles des Hosts nicht verändert werden. Es braucht also eine
+  Isolation, zum Beispiel ein `iframe` oder Shadow DOM.
+
+Mögliche Ansätze für die Bedienoberfläche:
+
+. *Design-Tokens über CSS Custom Properties:* Die Bibliothek stylt selbst
+  (UnoCSS), liest Farben, Schriften und Abstände aber aus Variablen, die der Host
+  setzt.
+. *Ungestylte Komponenten (headless):* Die Bibliothek liefert Verhalten und
+  Barrierefreiheit, der Host stylt vollständig selbst.
+. *Komponentenbibliothek des Hosts:* Die Bibliothek nutzt die
+  UI-Komponenten des Hosts als Peer-Abhängigkeit oder über Render-Props. Das
+  bindet sie an genau diese Bibliothek.
+
+Zu klären: Welche Komponentenbibliotheken oder Designsysteme setzen die bekannten
+Hosts ein (siehe Q-ARCH-002)? Welcher Ansatz gilt?
 
 Answer: Open.
 
