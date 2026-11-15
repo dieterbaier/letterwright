@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
-summary: 'Vorlagen sind versioniert; ein gespeichertes Schreiben verweist auf die verwendeten Vorlagenversionen und speichert das PDF mit Prüfsumme unverändert; Speichern verwendet den Datenstand der Vorschau.'
+summary: 'Vorlagen sind versioniert; ein gespeichertes Schreiben verweist auf die verwendeten Vorlagenversionen und speichert das PDF mit Prüfsumme unverändert; Speichern verwendet den Datenstand der Vorschau und lehnt ab, wenn sich die Daten seither geändert haben; Snapshots laufen nach 30 Minuten ab und werden dann gelöscht.'
 derived_from:
 - type: external
   description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
@@ -59,12 +59,27 @@ Wir schlagen vor:
   Vorlagenversionen** (Briefpapier und Standardschreiben) gebunden. Beim Speichern
   wird die Erzeugungsberechtigung erneut über den Host geprüft. Eine korrigierte
   Vorlage erfordert eine neue Vorschau.
+* Der Snapshot speichert einen **Hash (SHA-256) des formatierten
+  Datenkontexts**. Beim Speichern liest die Bibliothek den Datenkontext zusammen
+  mit der Berechtigungsprüfung neu und vergleicht den Hash. Weicht er ab, wird
+  **nicht gespeichert**. Die Oberfläche meldet die Datenänderung und verlangt
+  „Aktualisieren“. Gerendert wird immer aus dem Snapshot.
+* Ein Snapshot **läuft nach 30 Minuten ab**. Ein abgelaufener Snapshot wird
+  gelöscht. Eine Bereinigung läuft dazu in kurzem Abstand (zum Beispiel jede
+  Minute). Bis dahin wird er wie ein nicht vorhandener behandelt. „Aktualisieren“
+  oder ein Neuladen erzeugt eine neue Vorschau mit neuem Snapshot. Der ersetzte
+  Snapshot wird im selben Schritt gelöscht.
 * Das Löschen eines Schreibens entscheidet die `Loeschrichtlinie` des Hosts (ADR-002).
 
 === Kontext
 
 Der Owner hat bestätigt: Vorlagen werden versioniert, das gespeicherte PDF bleibt
 unverändert. Lösch- und Aufbewahrungsregeln entscheidet die Host-Anwendung.
+
+Zu Snapshot und Datenänderungen hat der Owner am 2026-11-15 bestätigt
+(Q-PO-011): Das gespeicherte Schreiben entspricht genau der Vorschau. Geänderte
+Daten werden erkannt und erzwingen ein Aktualisieren. Die Ablaufzeit beträgt
+30 Minuten. Abgelaufene und ersetzte Snapshots werden sofort gelöscht.
 
 === Entscheidungstreiber
 
@@ -111,11 +126,13 @@ s| Summe s| +2 s| +1 s| -1
 
 ==== Negativ
 
-* Snapshot-Verwaltung (Ablaufzeit, Speicherort) ist zusätzlicher Aufwand.
+* Snapshot-Verwaltung (Ablaufzeit, Speicherort, Bereinigung) ist zusätzlicher Aufwand.
+* Beim Speichern ist ein zusätzlicher Aufruf beim Host nötig, um den Datenkontext neu zu lesen.
+* Ändern sich Daten häufig, muss der Benutzer öfter aktualisieren.
 
 ==== Neutral oder Folgearbeiten
 
-* Ablaufzeit des Snapshots festlegen (Annahme: 30 Minuten).
+* Laufzeitsicht um den Fehlerfall „Daten geändert“ ergänzen (erledigt).
 
 === Impact
 
@@ -143,4 +160,6 @@ include::generated/adr-007-versionierung-und-unveraenderlichkeit-traceability.ad
 
 === Review Notes
 
-Kernaussagen hat der Owner bestätigt; Snapshot-Mechanik ist neu und zu prüfen.
+Kernaussagen hat der Owner bestätigt. Snapshot-Treue, Hash-Vergleich, Ablaufzeit
+von 30 Minuten und sofortiges Löschen hat der Owner am 2026-11-15 bestätigt
+(Q-PO-011).

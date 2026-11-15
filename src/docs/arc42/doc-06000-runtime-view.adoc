@@ -7,7 +7,7 @@ owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Laufzeitszenarien Vorschau, Speichern, Download und Fehlerfall beim Speichern.'
+summary: 'Laufzeitszenarien Vorschau, Speichern, Download und Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
 tags:
 - arc42
 - runtime
@@ -35,7 +35,7 @@ App -> Host: Berechtigung und Datenkontext anfragen
 Host --> App: Datenkontext (formatiert)
 App -> Ren: Vorlagenversion + Daten zusammenführen
 Ren --> App: HTML
-App -> App: Snapshot speichern (befristet; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version)
+App -> App: Snapshot speichern (läuft nach 30 Minuten ab; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version;\nmit Hash des Datenkontexts). Ersetzter Snapshot wird gelöscht
 App --> Web: HTML, Snapshot-ID
 Web --> UI: 200
 UI -> UI: Paged.js paginiert
@@ -60,6 +60,9 @@ Web -> App: Schreiben speichern (Snapshot-ID)
 App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?
 App -> Host: Darf Benutzer für diesen Bezug erzeugen? (erneut)
 Host --> App: erlaubt
+App -> Host: Datenkontext anfragen (erneut)
+Host --> App: Datenkontext (formatiert)
+App -> App: Hash vergleichen: unverändert
 App -> Ren: PDF aus Snapshot erzeugen\n(mit den im Snapshot fixierten Vorlagenversionen)
 Ren --> App: PDF
 App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
@@ -104,8 +107,18 @@ protokolliert, ohne personenbezogene Inhalte.
   Benutzer das Speichern mit demselben Snapshot wiederholen, solange er nicht
   abgelaufen ist.
 
+== Fehlerfall: Daten seit der Vorschau geändert
+
+Weicht der Hash des neu gelesenen Datenkontexts vom Hash im Snapshot ab, wird
+nichts erzeugt und nichts persistiert. Die Oberfläche meldet, dass sich die Daten
+geändert haben, und verlangt „Aktualisieren“. Das erzeugt eine neue Vorschau mit
+neuem Snapshot. Der alte Snapshot wird dabei gelöscht
+(xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
+
 == Fehlerfall: Snapshot abgelaufen
 
-Ist der Snapshot beim Speichern abgelaufen, lehnt die Bibliothek das Speichern ab
-und fordert eine neue Vorschau an, statt mit neu gelesenen Daten zu speichern
+Ein Snapshot läuft 30 Minuten nach der Vorschau ab und wird gelöscht. Ist er beim
+Speichern abgelaufen, lehnt die Bibliothek das Speichern ab und fordert eine neue
+Vorschau an, statt mit neu gelesenen Daten zu speichern. Ein Neuladen der Vorschau
+erzeugt einen neuen Snapshot
 (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
