@@ -25,7 +25,7 @@ metadata_version: '1.0'
 actor Sachbearbeiter as SB
 participant "Vorschau (React)" as UI
 participant "adapter-web" as Web
-participant "anwendung" as App
+participant "usecases-service" as App
 participant "Host: PlatzhalterdatenAnbieter" as Host
 participant "adapter-rendering" as Ren
 SB -> UI: Standardschreiben für Bezug wählen
@@ -49,7 +49,7 @@ UI -> UI: Paged.js paginiert
 @startuml
 actor Sachbearbeiter as SB
 participant "Vorschau (React)" as UI
-participant "anwendung" as App
+participant "usecases-service" as App
 participant "Host: Berechtigungspruefung" as Host
 participant "adapter-rendering" as Ren
 participant "adapter-persistenz-jdbc" as Per

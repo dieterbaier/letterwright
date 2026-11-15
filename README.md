@@ -38,8 +38,9 @@ Hinweise für KI-Agenten stehen in `AGENTS.md`.
 ./gradlew build   # kompiliert, testet, prüft Abdeckung (≥ 80 % Zeilen und Zweige je Modul) und ArchUnit-Regeln
 ```
 
-Die Module liegen unter `backend/`, die gemeinsamen Konventionen in der
-Root-`build.gradle.kts`, die Versionen in `gradle/libs.versions.toml`.
+Die Module liegen unter `src/application/backend/`, die gemeinsamen Konventionen im
+Convention-Plugin unter `gradle/build-logic/`, die Versionen in
+`gradle/libs.versions.toml`.
 
 ## Lizenz
 

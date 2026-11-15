@@ -56,8 +56,11 @@ Wir schlagen eine **hexagonale Architektur** (Ports and Adapters) nach DDD vor:
 * **Domäne** (ohne Spring): Briefpapier, Standardschreiben, Vorlagenversion, Schreiben,
   Platzhalter, Bausteine.
 * **Anwendung**: Anwendungsfälle wie „Vorschau erzeugen“, „Schreiben speichern“,
-  „Schreiben herunterladen“, „Vorlage veröffentlichen“.
-* **Driven Ports (SPI)**, von der Host-Anwendung oder von Adaptern implementiert:
+  „Schreiben herunterladen“, „Vorlage veröffentlichen“. Ihre Schnittstellen sind die
+  **Driving Ports** (Modul `usecases-in`), ihre Implementierung liegt getrennt davon
+  (Modul `usecases-service`).
+* **Driven Ports (SPI)** im Modul `usecases-out`, von der Host-Anwendung oder von
+  Adaptern implementiert:
 ** `PlatzhalterdatenAnbieter` (Host): liefert den Datenkontext für ein Standardschreiben
    und einen fachlichen Bezug (z. B. Kunde 4711). Werte dürfen bereits formatiert sein.
 ** `Berechtigungspruefung` (Host, Default-Adapter auf Spring Security): entscheidet über
@@ -69,7 +72,9 @@ Wir schlagen eine **hexagonale Architektur** (Ports and Adapters) nach DDD vor:
 ** `Renderer` und `KonformitaetsPruefer` (Adapter, siehe ADR-004 und ADR-005).
 * **Driving Adapter**: REST-Controller und Spring-Boot-Autokonfiguration.
 
-ArchUnit-Tests erzwingen die Abhängigkeitsrichtung.
+Die Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren: Driving
+Adapter kennen nur `usecases-in`, Driven Adapter nur `usecases-out` (ADR-009).
+ArchUnit-Tests prüfen dieselben Regeln zusätzlich auf Paketebene.
 
 === Kontext
 

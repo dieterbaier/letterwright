@@ -31,7 +31,9 @@ System_Boundary(host, "Host-Anwendung") {
   }
   Container_Boundary(be, "Backend (Spring-Boot-Starter)") {
     Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
-    Component(app, "anwendung", "Java", "Anwendungsfälle")
+    Component(uin, "usecases-in", "Java, ohne Spring", "Eingehende Ports: Anwendungsfälle")
+    Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
+    Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (SPI)")
     Component(dom, "domaene", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
     Component(ren, "adapter-rendering", "FreeMarker, openhtmltopdf, veraPDF", "Zusammenführen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
@@ -42,11 +44,13 @@ System_Boundary(host, "Host-Anwendung") {
 Rel(ui_vorschau, web, "REST/JSON, HTML")
 Rel(ui_uebersicht, web, "REST/JSON, PDF")
 Rel(ui_editor, web, "REST/JSON")
-Rel(web, app, "ruft")
+Rel(web, uin, "ruft")
+Rel(app, uin, "implementiert")
+Rel(app, uout, "nutzt")
 Rel(app, dom, "nutzt")
-Rel(app, ren, "Port Renderer")
-Rel(app, per, "Ports Repository, DokumentAblage")
-Rel(app, spi, "SPIs")
+Rel(ren, uout, "implementiert Renderer")
+Rel(per, uout, "implementiert Repository, DokumentAblage")
+Rel(spi, uout, "implementiert SPIs")
 Rel(per, db, "JDBC")
 @enduml
 ----
@@ -54,13 +58,15 @@ Rel(per, db, "JDBC")
 [cols="1,3,2", options="header"]
 |===
 | Baustein | Verantwortung | Ablage im Repository
-| domaene | Fachmodell und Regeln, frei von Frameworks | `backend/domaene`
-| anwendung | Anwendungsfälle, Ports (SPI) | `backend/anwendung`
-| adapter-web | REST-Endpunkte, Fehlerabbildung | `backend/adapter-web`
-| adapter-rendering | Zusammenführen (FreeMarker), PDF (openhtmltopdf), Konformität (veraPDF) | `backend/adapter-rendering`
-| adapter-persistenz-jdbc | Repositories, DokumentAblage, Liquibase-Changelog | `backend/adapter-persistenz-jdbc`
-| spring-boot-starter | Autokonfiguration, Default-Adapter | `backend/spring-boot-starter`
-| Frontend-Paket | Vorschau, Übersicht, Editor | `frontend/`
+| domaene | Fachmodell und Regeln, frei von Frameworks | `src/application/backend/domaene`
+| usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | `src/application/backend/usecases/in`
+| usecases-out | Ausgehende Ports (SPI) zum Host und zu den ausgehenden Adaptern | `src/application/backend/usecases/out`
+| usecases-service | Implementierung der Anwendungsfälle | `src/application/backend/usecases/service`
+| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | `src/application/backend/adapter/in/adapter-web`
+| adapter-rendering | Ausgehender Adapter: Zusammenführen (FreeMarker), PDF (openhtmltopdf), Konformität (veraPDF) | `src/application/backend/adapter/out/adapter-rendering`
+| adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
+| spring-boot-starter | Autokonfiguration, Default-Adapter | `src/application/backend/spring-boot-starter`
+| Frontend-Paket | Vorschau, Übersicht, Editor | `src/application/frontend`
 |===
 
 Die Grenze entspricht der xref:system-scope-and-context[Kontextabgrenzung].

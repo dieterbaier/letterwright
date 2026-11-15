@@ -48,14 +48,28 @@ wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
 
 Wir schlagen vor:
 
-* **Monorepo** mit
-** `backend/` – Gradle-Multiprojekt (Kotlin DSL): `domaene`, `anwendung`,
-   `adapter-persistenz-jdbc`, `adapter-rendering`, `adapter-web`,
-   `spring-boot-starter`.
-** `frontend/` – npm-Workspace mit dem Paket der React-Komponenten (TypeScript, Vite,
-   UnoCSS).
-** `beispiel/` – Beispiel-Host-Anwendung (Spring Boot und React), sobald
+* **Monorepo**. Alle Quellen liegen unter `src/`, getrennt nach Art:
+** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
+   ADR-002:
+*** `domaene`
+*** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports, SPI) und
+    `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
+*** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,
+    `adapter/out/adapter-persistenz-jdbc`
+*** `spring-boot-starter` und das Testmodul `architekturtests`
+** `src/application/frontend/` – npm-Workspace mit dem Paket der React-Komponenten
+   (TypeScript, Vite, UnoCSS).
+** `src/docs/` – Architekturdokumentation, `src/examples/` – Beispielvorlagen (DOCX).
+** `src/beispiel/` – Beispiel-Host-Anwendung (Spring Boot und React), sobald
    Anwendungsfälle gefunden sind.
+* **Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren.** Ein
+  eingehender Adapter hängt nur an `usecases/in`, ein ausgehender nur an
+  `usecases/out`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
+  ArchUnit prüft dieselben Regeln zusätzlich auf Paketebene. Der Host braucht für
+  seine SPI-Implementierungen nur das kleine Artefakt `usecases-out`.
+* Die Gradle-Projekte sind flach benannt (`usecases-in`, `adapter-web`, …) und
+  zeigen auf ihr Verzeichnis. Die Gruppenordner `adapter/in`, `adapter/out` und
+  `usecases` sind keine eigenen Gradle-Projekte.
 * **Versionen**: die **aktuelle stabile Spring-Boot-Version (4.x)**, entwickelt und
   getestet mit **Java 25 (LTS)**, kompiliert mit `--release 21`, damit Hosts auf
   Java 21 die Bibliothek nutzen können. Die genauen Patch-Versionen werden beim
@@ -65,8 +79,10 @@ Wir schlagen vor:
 
 Stand beim Anlegen des Gerüsts (#12): Gradle 9.9.1 (Wrapper), Spring Boot 4.1.2
 (BOM; 4.2 war nur als Release Candidate verfügbar), ArchUnit 1.5.1, JaCoCo 0.8.16.
-Die gemeinsamen Konventionen stehen in der Root-`build.gradle.kts`, nicht in einem
-Convention-Plugin, damit der Build ohne zusätzlichen Kotlin-Compiler auskommt.
+Die gemeinsamen Konventionen stehen im Convention-Plugin `standardschreiben.java-modul`
+(`gradle/build-logic`). Jedes Modul bindet es ausdrücklich ein; es gibt keine
+Konfiguration über `subprojects {}`. So bekommt nur ein Modul die Java-Regeln, das sie
+anfordert, und die Konfiguration bleibt mit dem Configuration-Cache verträglich.
 Der Workflow `backend.yml` baut mit dem Wrapper auf Java 21 (Baseline). Die
 Matrix mit Java 21 und Java 25 wird mit #14 eingerichtet.
 
