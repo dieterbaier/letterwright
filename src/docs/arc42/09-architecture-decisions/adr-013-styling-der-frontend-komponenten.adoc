@@ -1,0 +1,168 @@
+---
+id: ADR-013-styling-der-frontend-komponenten
+type: ADR
+title: 'Styling der Frontend-Komponenten: eigene Styles, vom Host überschreibbar'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-15'
+reviewed: false
+summary: 'Die React-Komponenten bringen eigene Standard-Styles in einer CSS-Ebene mit, beziehen Farben, Schriften und Abstände aus CSS Custom Properties und lassen sich vom Host ohne !important überschreiben; das Schreiben in der Vorschau bleibt davon ausgenommen.'
+derived_from:
+- type: external
+  description: 'Q-ARCH-003 in doc-005, Antworten des Owners in PR #16 (2026-11-15)'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/16
+tags:
+- decision
+- frontend
+- styling
+relations:
+- type: depends_on
+  target: ADR-001-einbettbare-bibliothek
+  status: proposed
+  rationale: 'Das Styling ist Teil des Integrationsvertrags des eingebetteten npm-Pakets.'
+  reviewed: false
+- type: addresses
+  target: QS-003-barrierefreie-vorschau
+  status: proposed
+  rationale: 'Die Standard-Styles der Bibliothek erfüllen die Barrierefreiheit auch ohne Anpassung durch den Host.'
+  reviewed: false
+- type: relates_to
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: proposed
+  rationale: 'Das Schreiben in der Vorschau ist vom Host-Styling ausgenommen, damit es der DOCX-Vorgabe folgt.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-013-styling-der-frontend-komponenten]]
+== ADR-013: Styling der Frontend-Komponenten: eigene Styles, vom Host überschreibbar
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* Die React-Komponenten bringen **eigene Standard-Styles** mit, erzeugt mit
+  UnoCSS. Die Klassen tragen ein **eigenes Präfix**, und es gibt **kein globales
+  Reset**. Das CSS des Pakets verändert nichts außerhalb seiner Komponenten.
+* Die Styles liegen in einer **eigenen CSS-Ebene** (`@layer`). Styles des Hosts,
+  die außerhalb dieser Ebene stehen, haben dadurch Vorrang. Der Host kann
+  überschreiben, ohne `!important` zu verwenden.
+* Farben, Schriften und Abstände kommen aus **CSS Custom Properties** mit eigenem
+  Präfix. Der Host setzt sie, sonst gelten Standardwerte. Das gilt für die
+  Admin-Oberfläche und für die Bedienelemente der Anzeigekomponente, etwa den
+  Hinweis und die Schaltfläche „Aktualisieren“.
+* Das **Schreiben in der Vorschau** ist ausgenommen. Es folgt nur der zentralen
+  DOCX-Vorgabe (QS-013) und ist von Host-Styles und Tokens isoliert. Wie es
+  isoliert wird (`iframe` oder Shadow DOM), ist noch offen (Q-ARCH-003).
+* **Render-Props** für einzelne Bausteine, etwa Schaltfläche oder Eingabefeld,
+  sind eine spätere Erweiterung. Sie kommen erst, wenn ein Host eigene
+  Komponenten einsetzen will.
+
+=== Kontext
+
+Die Komponenten laufen eingebettet in Host-Anwendungen
+(xref:adr-001-einbettbare-bibliothek[ADR-001]) und sollen sich deren Aussehen
+anpassen. Die bisher bekannte primäre Host-Anwendung ist eine React-Anwendung mit
+UnoCSS. Der Owner wünscht eigene Styles, die der Host überschreiben kann, und hält
+CSS Custom Properties für die Admin-Oberfläche und die Anzeigekomponente für
+geeignet (Q-ARCH-003, 2026-11-15).
+
+=== Entscheidungstreiber
+
+* Die Komponenten sind ohne Aufwand beim Host sofort nutzbar und barrierefrei.
+* Der Host kann das Aussehen an sein Designsystem anpassen.
+* Das Paket hängt von keiner fremden Komponentenbibliothek ab.
+* Das CSS des Pakets verändert die Host-Anwendung nicht.
+
+=== Betrachtete Optionen
+
+==== Option 1: Eigene Styles in einer CSS-Ebene mit Design-Tokens
+
+Die Bibliothek stylt selbst, liest Tokens aus CSS Custom Properties und gibt den
+Styles des Hosts über `@layer` Vorrang. Render-Props können später ergänzt werden.
+
+==== Option 2: Ungestylte Komponenten (headless)
+
+Die Bibliothek liefert nur Verhalten und Barrierefreiheit, der Host stylt alles
+selbst. Ohne Aufwand beim Host sehen die Komponenten unfertig aus.
+
+==== Option 3: Komponentenbibliothek des Hosts als Peer-Abhängigkeit
+
+Die Bibliothek verwendet die UI-Komponenten einer bestimmten
+Komponentenbibliothek. Das passt genau zu Hosts mit dieser Bibliothek und bindet
+das Paket an deren Versionen.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Ohne Host-Aufwand nutzbar | +1 | -1 | 0
+| Anpassbar an den Host | +1 | +1 | +1
+| Keine fremde Komponentenbibliothek | +1 | +1 | -1
+| Barrierefreiheit in eigener Hand | +1 | 0 | 0
+s| Summe s| +4 s| +1 s| 0
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Die Komponenten funktionieren sofort und lassen sich schrittweise anpassen.
+* Die primäre Host-Anwendung kann mit ihrem eigenen UnoCSS überschreiben.
+
+==== Negativ
+
+* Die Namen der Custom Properties und das Klassenpräfix gehören zum öffentlichen
+  Vertrag des Pakets und müssen stabil bleiben.
+* Überschreibt ein Host Farben, kann er Kontraste verschlechtern. Die
+  Barrierefreiheit der Standarddarstellung sichert nur die Bibliothek.
+
+==== Neutral oder Folgearbeiten
+
+* Das Frontend-Gerüst (#13) richtet UnoCSS mit Präfix, ohne Reset und mit
+  `@layer` ein.
+* Die Custom Properties werden mit der ersten Komponente der Bedienoberfläche
+  festgelegt und dokumentiert.
+* Die Isolation der Vorschau wird vor der Vorschau-Komponente entschieden
+  (Q-ARCH-003).
+
+=== Impact
+
+include::generated/adr-013-styling-der-frontend-komponenten-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-013-styling-der-frontend-komponenten-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-013-styling-der-frontend-komponenten-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Die Hosts unterstützen CSS Cascade Layers, was alle aktuellen Browser tun.
+
+=== Open Questions
+
+* Wie wird das Schreiben in der Vorschau isoliert? (Q-ARCH-003)
+
+=== Review Notes
+
+Der Owner hat die Richtung am 2026-11-15 bestätigt: eigene Styles, vom Host
+überschreibbar, CSS Custom Properties, Render-Props als spätere Erweiterung.

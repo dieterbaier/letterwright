@@ -130,7 +130,7 @@ Zu klären:
   Bereinigung oder spätestens beim nächsten Zugriff? Der Snapshot enthält
   personenbezogene Daten aus dem Host.
 
-Answer: Teilweise beantwortet (Owner, 2026-11-15):
+Answer: Beantwortet (Owner, 2026-11-15):
 
 * *Ausbaustufe:* Das gespeicherte Schreiben entspricht genau der Vorschau.
 * *MVP:* Es genügt, wenn das endgültige Schreiben mit geänderten Daten
@@ -140,7 +140,7 @@ Answer: Teilweise beantwortet (Owner, 2026-11-15):
 * *Löschen:* Ein abgelaufener oder durch „Aktualisieren“ ersetzter Snapshot wird
   sofort gelöscht.
 
-Einschätzung der Architektur (Vorschlag, noch zu bestätigen): Die Erkennung von
+Vorschlag der Architektur, vom Owner am 2026-11-15 bestätigt: Die Erkennung von
 Datenänderungen ist mit wenig Aufwand schon im MVP möglich. Der Snapshot speichert
 zusätzlich einen Hash (SHA-256) des formatierten Datenkontexts. Beim Speichern
 fragt die Bibliothek den Host ohnehin erneut nach der Berechtigung. Dabei liest
@@ -156,8 +156,9 @@ gelöscht, in dem der neue entsteht. Bei Ablauf löscht eine Bereinigung in kurz
 Abstand (zum Beispiel jede Minute). Bis dahin behandelt die Bibliothek einen
 abgelaufenen Snapshot wie einen nicht vorhandenen.
 
-Noch offen: Bestätigung dieses Vorschlags und die Ablaufzeit (Annahme
-30 Minuten).
+Die Ablaufzeit beträgt 30 Minuten (Owner, 2026-11-15). Danach wird die Vorschau
+gelöscht. Ein Neuladen erzeugt eine neue Vorschau. Umgesetzt in
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und der Laufzeitsicht.
 
 == Open Questions For Architect
 
@@ -234,7 +235,8 @@ Host-Anwendung ist eine React-Anwendung mit UnoCSS. Design-Tokens über CSS Cust
 Properties sind für die Admin-Oberfläche und die Anzeigekomponente in Ordnung.
 Render-Props sind interessant, wenn die Abhängigkeit überschaubar bleibt.
 
-Einschätzung der Architektur (Vorschlag, noch zu bestätigen, Entscheidung als ADR):
+Vorschlag der Architektur, vom Owner am 2026-11-15 bestätigt und als
+xref:adr-013-styling-der-frontend-komponenten[ADR-013] festgehalten:
 
 * Die Bibliothek bringt Standard-Styles mit, erzeugt mit UnoCSS, mit eigenem
   Klassenpräfix und ohne globales Reset. Sie liegen in einer eigenen CSS-Ebene
@@ -248,7 +250,8 @@ Einschätzung der Architektur (Vorschlag, noch zu bestätigen, Entscheidung als 
   Schreiben herum, etwa Hinweis und „Aktualisieren“. Das Schreiben selbst bleibt
   isoliert und folgt nur der DOCX-Vorgabe (QS-013).
 
-Noch offen: Bestätigung des Vorschlags, Art der Isolation der Vorschau.
+Noch offen: Art der Isolation der Vorschau (`iframe` oder Shadow DOM), zu
+entscheiden vor der Vorschau-Komponente.
 
 == Beantwortete Fragen
 
