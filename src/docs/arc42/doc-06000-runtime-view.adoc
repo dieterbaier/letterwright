@@ -49,12 +49,14 @@ UI -> UI: Paged.js paginiert
 @startuml
 actor Sachbearbeiter as SB
 participant "Vorschau (React)" as UI
+participant "adapter-web" as Web
 participant "usecases-service" as App
 participant "Host: Berechtigungspruefung" as Host
 participant "adapter-rendering" as Ren
 participant "adapter-persistenz-jdbc" as Per
 SB -> UI: Speichern
-UI -> App: POST /schreiben (Snapshot-ID)
+UI -> Web: POST /schreiben (Snapshot-ID)
+Web -> App: Schreiben speichern (Snapshot-ID)
 App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?
 App -> Host: Darf Benutzer für diesen Bezug erzeugen? (erneut)
 Host --> App: erlaubt
@@ -63,11 +65,14 @@ Ren --> App: PDF
 App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
 Ren --> App: konform
 App -> Per: PDF, SHA-256, Vorlagenversionen speichern
-App --> UI: 201, Download-Link
+App --> Web: Schreiben-ID
+Web --> UI: 201, Download-Link
 SB -> UI: Download
-UI -> App: GET /schreiben/{id}/pdf
+UI -> Web: GET /schreiben/{id}/pdf
+Web -> App: Schreiben abrufen ({id})
 App -> App: Berechtigung prüfen (Host)
-App --> UI: PDF (unverändert)
+App --> Web: PDF (unverändert)
+Web --> UI: 200, PDF
 @enduml
 ----
 
