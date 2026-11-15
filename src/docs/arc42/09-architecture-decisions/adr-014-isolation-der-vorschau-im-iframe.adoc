@@ -6,15 +6,16 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-15'
 reviewed: false
-summary: 'Das Schreiben in der Vorschau wird in einem iframe dargestellt und dort mit Paged.js paginiert, damit weder Host-Styles noch Styles der Bibliothek es verändern; Bedienelemente und Statusmeldungen bleiben außerhalb des iframe.'
+summary: 'Das Schreiben in der Vorschau wird in einem sandboxed iframe ohne allow-same-origin dargestellt und dort mit Paged.js paginiert; das HTML wird serverseitig nach einer Allowlist bereinigt und durch eine restriktive CSP geschützt; Bedienelemente und Statusmeldungen bleiben außerhalb des iframe.'
 derived_from:
 - type: external
-  description: 'Q-ARCH-003 in doc-005, Antwort des Owners vom 2026-11-15'
-  uri: https://github.com/dieterbaier/standardschreiben/pull/16
+  description: 'Q-ARCH-003 in doc-005, Antwort des Owners vom 2026-11-15, Review in PR #17'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/17
 tags:
 - decision
 - frontend
 - vorschau
+- sicherheit
 relations:
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
@@ -29,12 +30,17 @@ relations:
 - type: relates_to
   target: QS-003-barrierefreie-vorschau
   status: proposed
-  rationale: 'Das iframe braucht einen Titel; Fokus und Statusmeldungen liegen außerhalb und sind im Prototyp zu prüfen.'
+  rationale: 'Frame-Titel, Dokumentsemantik und die von Paged.js erzeugte DOM-Struktur sind im Prototyp nachzuweisen.'
   reviewed: false
 - type: depends_on
   target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
   status: proposed
   rationale: 'Die Vorschau paginiert das HTML aus der Rendering-Pipeline mit Paged.js.'
+  reviewed: false
+- type: depends_on
+  target: ADR-008-platzhaltersprache
+  status: proposed
+  rationale: 'Das HTML-Escaping der Platzhalter ist die erste Schutzschicht vor aktiven Inhalten aus Daten.'
   reviewed: false
 - type: relates_to
   target: ADR-013-styling-der-frontend-komponenten
@@ -51,7 +57,8 @@ metadata_version: '1.0'
 Vorgeschlagen (proposed).
 
 Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat. Voraussetzung für
+die Annahme ist, dass der Prototyp (#3) die Prüfkriterien unten erfüllt.
 
 === Entscheidung
 
@@ -66,68 +73,145 @@ Wir schlagen vor:
 * **Bedienelemente und Statusmeldungen** (Hinweis, „Aktualisieren“, Speichern,
   Meldungen) liegen **außerhalb** des iframe in der React-Komponente. Sie folgen
   ADR-013.
-* Das iframe trägt einen sprechenden **Titel** (`title`) für Hilfstechnologien.
-  Seine Höhe passt die Komponente an die paginierten Seiten an.
-* Das iframe wird mit `sandbox` so weit eingeschränkt, wie Paged.js es zulässt.
-  Inhalte aus Vorlagen und Daten führen kein eigenes JavaScript aus. Die genaue
-  `sandbox`-Konfiguration wird im Prototyp festgelegt.
+
+==== Sicherheit
+
+Das `sandbox`-Attribut allein verhindert keine Skripte aus Vorlageninhalten:
+`allow-scripts` erlaubt alle Skripte im Frame. Der Schutz besteht deshalb aus
+mehreren Schichten:
+
+* **Sandbox ohne gleiche Origin:** Ausgangspunkt für den Prototyp ist
+  `sandbox="allow-scripts"` **ohne** `allow-same-origin`. Das Dokument im iframe
+  bekommt eine eigene, opake Origin und hat keinen Zugriff auf DOM, Cookies und
+  Speicher des Hosts. Die Kombination `allow-scripts allow-same-origin` bei
+  gleicher Origin ist ausgeschlossen, weil der Frame damit seine Sandbox
+  aufheben könnte.
+* **Bereinigung im Backend:** Platzhalterwerte werden beim Zusammenführen
+  HTML-escaped (xref:adr-008-platzhaltersprache[ADR-008]). Zusätzlich wird das
+  fertige HTML serverseitig nach einer **Allowlist** von Elementen und Attributen
+  bereinigt, die ein Schreiben braucht. Entfernt werden Skripte, Eventhandler,
+  `javascript:`-URLs, eingebettete Objekte und Frames sowie Verweise auf externe
+  Ressourcen.
+* **Content Security Policy im iframe:** Das Dokument bringt eine restriktive CSP
+  mit, insbesondere `script-src` nur für den vertrauenswürdigen Code von Paged.js
+  und den Start der Paginierung (über Hash oder Nonce). Schriften und Bilder kommen
+  nur aus erlaubten Quellen, etwa eingebettet oder vom Ressourcen-Endpunkt der
+  Bibliothek.
+* **Kommunikation über `postMessage`:** Höhe und Fertigmeldung der Paginierung
+  meldet das iframe per `postMessage`. Die Komponente nimmt nur Nachrichten an,
+  deren Quelle das eigene iframe ist (`event.source`) und die einem festen Schema
+  entsprechen. Die Origin hilft dabei nicht, weil sie im Sandbox-Frame `null` ist.
+
+==== Barrierefreiheit
+
+* Das iframe trägt einen aussagekräftigen **`title`** (WCAG-Technik H64). Das
+  Dokument im iframe hat ein eigenes `<title>`, `lang="de"` und eine korrekte
+  Semantik (Überschriften, Absätze, Anschrift).
+* Statusmeldungen stehen außerhalb des iframe in einer `aria-live`-Region.
+  „Aktualisieren“ ersetzt den Inhalt, ohne dass der Fokus verloren geht.
+* Die größeren Risiken liegen in der **DOM-Struktur, die Paged.js erzeugt**:
+  Lesereihenfolge, möglicherweise doppelter Text, wiederholte Kopf- und
+  Fußzeilen und Seitenzahlen. Wiederholte Layoutteile werden für Hilfstechnologien
+  sinnvoll versteckt oder angesagt.
+* Die automatische Prüfung mit axe-core muss den **Inhalt des iframe** einschließen.
+  Weil der Frame eine eigene Origin hat, kann ein Scan der Host-Seite nicht
+  hineinsehen. axe läuft deshalb im Test auch im Dokument des iframe.
+
+==== Prüfkriterien für den Prototyp
+
+* Tastaturnavigation durch Host-Seite und Vorschau ohne Fokusfalle.
+* Screenreader liest das Schreiben einmal, vollständig und in logischer
+  Reihenfolge. Wiederholte Layoutteile stören nicht.
+* Zoom bis 200 % und Reflow ohne Informationsverlust.
+* Asynchrone Aktualisierung ohne Fokusverlust; Statusmeldung wird über
+  `aria-live` außerhalb des Frames angesagt.
+* Geprüft mit NVDA mit Firefox oder Chrome **und** VoiceOver mit Safari.
+* 0 axe-core-Verstöße der Stufen serious und critical im Inhalt des iframe.
+* Höhe des iframe passt sich den Seiten an. Schriften und Bilder laden unter
+  Sandbox und CSP. Paged.js paginiert unter Sandbox und CSP.
+* Ein Testschreiben mit Skript, Eventhandler und `javascript:`-URL in Vorlage und
+  Daten führt keinen Code aus.
 
 === Kontext
 
 ADR-013 legt fest, dass die Bedienoberfläche sich dem Host anpasst, das Schreiben
 in der Vorschau dagegen nur der zentralen DOCX-Vorgabe folgt. Offen war, wie es
 isoliert wird (Q-ARCH-003). Der Owner bevorzugt ein `iframe`, weil er mit Shadow
-DOM wenig Erfahrung hat (2026-11-15).
+DOM wenig Erfahrung hat (2026-11-15). Das Review in PR #17 hat Sicherheit und
+Barrierefreiheit präzisiert.
 
 === Entscheidungstreiber
 
+Muss-Anforderungen:
+
 * Kein Host-CSS und keine vererbten Eigenschaften (Schrift, Farbe, Zeilenhöhe)
   verändern das Schreiben (QS-013).
-* Paged.js paginiert so, wie die PDF-Erzeugung das HTML sieht (QS-004).
-* Die paginierte Vorschau bleibt barrierefrei (QS-003).
-* Das Team kann die Lösung warten.
+* Paged.js paginiert mit den eigenen `@page`-Regeln und Schriften des Schreibens,
+  wie die PDF-Erzeugung das HTML sieht (QS-004).
+* Die paginierte Vorschau ist barrierefrei (QS-003).
+* Inhalte aus Vorlagen und Daten führen im Host keinen Code aus.
+
+Weitere Kriterien: Einbettungsaufwand und Erfahrung im Team.
 
 === Betrachtete Optionen
 
-==== Option 1: iframe
+==== Option 1: iframe mit Sandbox
 
-Eigenes Dokument mit eigenem CSS-Kontext. Paged.js arbeitet wie in einer
-eigenständigen Seite, `@page`-Regeln und `@font-face` gelten nur dort. Kosten:
-Höhe synchronisieren, Kommunikation über die Grenze des iframe, Fokusübergang für
-Tastatur und Screenreader prüfen.
+Eigenes Dokument mit eigenem CSS-Kontext und eigener Origin. Paged.js arbeitet wie
+in einer eigenständigen Seite, `@page`-Regeln und `@font-face` gelten nur dort.
+Kosten: Höhe synchronisieren, Kommunikation über `postMessage`, axe-Prüfung im
+Frame, Fokusübergang prüfen.
 
 ==== Option 2: Shadow DOM
 
 Bleibt im Dokument des Hosts. Host-Selektoren wirken nicht hinein, vererbte
 Eigenschaften aber schon, solange sie nicht zurückgesetzt werden. `@page`-Regeln
-und `@font-face` wirken in einem Shadow Root nicht. Ob Paged.js in einem Shadow
-Root zuverlässig paginiert, ist unbelegt.
+gelten nur auf Dokumentebene. `@font-face`-Regeln innerhalb eines Shadow Root
+werden nicht in allen Browsern angewendet; sicher ist nur die Deklaration im
+Dokument des Hosts, wo sie mit Host-Schriften gleichen Namens kollidieren können.
+Paged.js liest die Stylesheets des Dokuments; eine Unterstützung für Shadow Roots
+ist nicht dokumentiert. Skripte laufen im Kontext des Hosts, eine
+Sicherheitsgrenze gibt es nicht.
 
 ==== Option 3: Keine Isolation, nur ein Präfix für die Styles des Schreibens
 
 Am einfachsten einzubetten. Host-CSS mit höherer Spezifität und vererbte
 Eigenschaften verändern das Schreiben, `@page`-Regeln kollidieren mit dem Host.
 
-=== Pugh-Matrix
+=== Bewertung
+
+Zuerst die Muss-Anforderungen:
+
+[cols="2,1,1,1", options="header"]
+|===
+| Muss-Anforderung | Option 1 | Option 2 | Option 3
+| Schutz vor Host-Styles (QS-013) | erfüllt | nur mit Reset aller vererbten Eigenschaften | nicht erfüllt
+| Paginierung mit eigenen `@page`-Regeln (QS-004) | erfüllt | unbelegt | nicht erfüllt
+| Barrierefreiheit (QS-003) | Nachweis im Prototyp | Nachweis im Prototyp | Nachweis im Prototyp
+| Kein Code aus Inhalten im Host | erfüllt mit Sandbox, Bereinigung, CSP | nur mit Bereinigung | nur mit Bereinigung
+|===
+
+Option 3 erfüllt zwei Muss-Anforderungen nicht und scheidet aus. Für die
+verbleibenden Optionen gilt die Pugh-Matrix mit **Option 2 als Referenz**.
 
 `+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
 Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
 einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
 
 [.pugh-matrix]
-[cols="2,1,1,1", options="header"]
+[cols="2,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Schutz vor Host-Styles (QS-013) | +1 | 0 | -1
-| Paginierung mit Paged.js wie im PDF (QS-004) | +1 | ? | -1
-| Barrierefreiheit der Vorschau (QS-003) | ? | ? | +1
-| Einbettungsaufwand | -1 | 0 | +1
-| Erfahrung im Team | +1 | -1 | +1
-s| Summe s| ? s| ? s| +1
+| Kriterium | Option 1 | Option 2 (Referenz)
+| Schutz vor Host-Styles | +1 | 0
+| Paginierung wie im PDF | +1 | 0
+| Barrierefreiheit | ? | 0
+| Sicherheitsgrenze | +1 | 0
+| Einbettungsaufwand | -1 | 0
+| Erfahrung im Team | +1 | 0
+s| Summe s| ? s| 0
 |===
 
-Option 3 erfüllt den Schutz vor Host-Styles nicht und scheidet deshalb trotz der
-Summe aus. Ohne das Kriterium Barrierefreiheit hätte Option 1 die Summe +3. Die
+Ohne das Kriterium Barrierefreiheit hätte Option 1 die Summe +3. Die
 Barrierefreiheit belegt der Prototyp.
 
 === Konsequenzen
@@ -136,18 +220,23 @@ Barrierefreiheit belegt der Prototyp.
 
 * Das Schreiben sieht in jedem Host gleich aus.
 * Paged.js läuft in einem eigenen Dokument, wie vom Owner bereits erprobt.
+* Inhalte aus Vorlagen und Daten haben keinen Zugriff auf den Host.
 
 ==== Negativ
 
-* Die Komponente muss die Höhe des iframe an die Seiten anpassen.
-* Fokus und Lesereihenfolge über die Grenze des iframe hinweg müssen eigens geprüft
-  werden.
+* Die Komponente muss die Höhe des iframe über `postMessage` anpassen.
+* Das Backend braucht eine HTML-Bereinigung nach Allowlist, die zum Vorlagenmodell
+  passen muss.
+* axe-core muss im Test zusätzlich im Frame laufen.
+* Schriften und Bilder müssen unter Sandbox und CSP erreichbar sein, etwa
+  eingebettet oder mit passenden CORS-Kopfzeilen.
 
 ==== Neutral oder Folgearbeiten
 
-* Der Prototyp (#3) prüft die Vorschau im iframe gegen die Abnahmekriterien aus
-  ADR-004, insbesondere QS-003 mit Screenreader.
-* Die `sandbox`-Konfiguration wird im Prototyp festgelegt und dokumentiert.
+* Der Prototyp (#3) prüft die Vorschau im iframe gegen die Prüfkriterien oben und
+  die Abnahmekriterien aus ADR-004.
+* Die genaue `sandbox`- und CSP-Konfiguration wird im Prototyp festgelegt und hier
+  ergänzt.
 
 === Impact
 
@@ -167,15 +256,19 @@ include::generated/adr-014-isolation-der-vorschau-im-iframe-traceability.adoc[le
 
 === Annahmen
 
-* Paged.js läuft im iframe mit einer `sandbox`, die Skripte der Bibliothek
-  erlaubt, Skripte aus Vorlageninhalten aber nicht ausführt.
+* Paged.js läuft in einem iframe mit `sandbox="allow-scripts"` ohne
+  `allow-same-origin` und unter einer CSP, die nur seinen Code erlaubt.
 * Die eingebetteten Schriften lassen sich im iframe genauso laden wie bei der
   PDF-Erzeugung.
 
 === Open Questions
 
-* Welche `sandbox`-Konfiguration braucht Paged.js? (im Prototyp zu klären)
+* Welche `sandbox`- und CSP-Konfiguration braucht Paged.js genau? (Prototyp)
+* Welche Allowlist für Elemente und Attribute deckt das Vorlagenmodell ab?
+  (Prototyp, zusammen mit ADR-003)
 
 === Review Notes
 
-Der Owner hat die Wahl des iframe am 2026-11-15 getroffen (Q-ARCH-003).
+Der Owner hat die Wahl des iframe am 2026-11-15 getroffen (Q-ARCH-003). Das Review
+in PR #17 hat die Sicherheitsannahme korrigiert (Sandbox allein verhindert keine
+Skripte aus Inhalten) und die Prüfkriterien für Barrierefreiheit ergänzt.
