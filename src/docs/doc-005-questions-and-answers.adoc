@@ -108,12 +108,27 @@ und verlangt eine neue Vorschau (Laufzeitsicht, Fehlerfall „Snapshot abgelaufe
 Vorschlag des Owners für das MVP (Kommentar in PR #15, 2026-11-15): Auf
 Datenänderungen wird nicht eingegangen. Die Vorschau zeigt einen Hinweis, dass
 sie nur eine Vorschau ist, und bietet eine Schaltfläche „Aktualisieren“, die sie
-neu erzeugt. Mit dem Snapshot hieße der Hinweis: Das Schreiben zeigt den
-Datenstand zum Zeitpunkt der Vorschau. „Aktualisieren“ erzeugt einen neuen
-Snapshot.
+neu erzeugt. Dieser Vorschlag lässt zu, dass das gespeicherte Schreiben von der
+Vorschau abweicht, wenn beim Speichern neu gelesene Daten verwendet werden. Das
+widerspricht ADR-007, das aus dem Snapshot der Vorschau rendert.
 
-Zu klären: Ablaufzeit bestätigen oder festlegen; Hinweis und „Aktualisieren“ in
-das MVP aufnehmen.
+Zu klären:
+
+. *Snapshot-Treue oder zulässige Abweichung:* Gilt für das MVP, dass das
+  gespeicherte Schreiben genau der Vorschau entspricht (Snapshot nach ADR-007)?
+  Oder darf es abweichen, weil beim Speichern die aktuellen Daten gelesen werden?
+  Im zweiten Fall sind
+  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und QS-004
+  (Wiedergabetreue zwischen Vorschau und PDF) zu überarbeiten.
+. *Hinweis und „Aktualisieren“:* Gehören sie in beiden Varianten in das MVP?
+  Mit Snapshot lautet der Hinweis: Das Schreiben zeigt den Datenstand zum
+  Zeitpunkt der Vorschau, „Aktualisieren“ erzeugt einen neuen Snapshot.
+. *Ablaufzeit:* Die angenommenen 30 Minuten bestätigen oder eine andere Dauer
+  festlegen.
+. *Löschen:* Wann wird ein abgelaufener oder durch „Aktualisieren“ ersetzter
+  Snapshot tatsächlich gelöscht? Sofort beim Ablauf, durch eine regelmäßige
+  Bereinigung oder spätestens beim nächsten Zugriff? Der Snapshot enthält
+  personenbezogene Daten aus dem Host.
 
 Answer: Open.
 
@@ -141,8 +156,20 @@ Wie ist gewährleistet, dass die React-Komponenten so aussehen, wie die
 Host-Anwendung es vorgibt (Kommentar des Owners in PR #15, 2026-11-15)?
 
 Die Frage prägt die Frontend-Architektur und den Integrationsvertrag des
-npm-Pakets (xref:adr-001-einbettbare-bibliothek[ADR-001]). Sie ist vor dem
-Frontend-Gerüst (#13) zu entscheiden, voraussichtlich als eigener ADR.
+npm-Pakets (xref:adr-001-einbettbare-bibliothek[ADR-001]). Voraussichtlich wird
+sie als eigener ADR entschieden. Nicht alle Teile müssen gleich früh feststehen:
+
+* *Für das Frontend-Gerüst (#13):* Nur die Art, wie das Paket CSS ausliefert.
+  #13 sieht UnoCSS vor. Zu entscheiden ist, ob das Paket eigenes CSS mitbringt
+  und wie es verhindert, dass dieses CSS den Host verändert (kein globales Reset,
+  Klassen mit eigenem Präfix oder in einer CSS-Ebene). Das passt zu allen drei
+  Ansätzen unten und blockiert das Gerüst nicht.
+* *Vor der ersten Komponente der Bedienoberfläche:* Welcher der drei Ansätze gilt.
+* *Vor der Vorschau-Komponente:* Wie die Vorschau isoliert wird. Neben der
+  Stiltreue (QS-013) zählen hier QS-003 (barrierefreie Vorschau, etwa Fokus und
+  Screenreader über die Grenze eines `iframe` hinweg) und QS-004
+  (Wiedergabetreue zwischen Vorschau und PDF, also dieselben Styles und
+  Schriften in Vorschau und Rendering).
 
 Zwei Bereiche brauchen gegensätzliche Regeln:
 
