@@ -49,6 +49,6 @@ jobs:
         with:
           name: backend-berichte-java21
           path: |
-            backend/*/build/reports/
-            backend/*/build/test-results/
+            src/application/backend/**/build/reports/
+            src/application/backend/**/build/test-results/
           if-no-files-found: ignore

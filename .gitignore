@@ -1,6 +1,8 @@
 .gradle
 **/build/
-!**/src/**/build/
+# Pakete namens build in Quellen nicht ignorieren, Build-Ausgaben der Module unter src/application aber schon
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
