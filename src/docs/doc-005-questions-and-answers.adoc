@@ -21,6 +21,14 @@ Answer: Ja, Seitenumbruch auf Folgeseiten gehört in das MVP (Owner, 2026-11-14)
 Soll „Drucken“ aus der Vorschau das endgültige PDF drucken (Vorschlag) oder die
 HTML-Vorschau? Gibt es ein Zielarchiv mit eigenen PDF/A-Vorgaben?
 
+Präzisierung aus dem Convergence Check gegen Issue #1 (2026-11-16): Kann schon
+aus einer ungespeicherten Vorschau gedruckt werden? Falls ja: Welches Artefakt
+wird gedruckt, und entsteht dabei ein gespeichertes Schreiben? Falls Speichern
+Voraussetzung ist: Der Ablauf bis zum Druck des gespeicherten PDFs wird
+festgehalten. Die Antwort bestimmt die Aktionen der Vorschau und ist ein
+Akzeptanzkriterium von #10. Danach wird die Laufzeitsicht um den Druckablauf
+ergänzt.
+
 Answer: Open.
 
 [[q-po-003]]
@@ -39,7 +47,10 @@ Answer: Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Owner, 2026-11-14).
 Können zwei oder drei typische DOCX-Vorlagen für den Prototyp
 bereitgestellt werden?
 
-Answer: Ja, der Owner liefert Beispiel-DOCX nach (2026-11-14). Der Prototyp startet, sobald sie vorliegen.
+Answer: Ja, der Owner liefert Beispiel-DOCX nach (2026-11-14). Geliefert in
+`src/examples/` (`Geschaeftsbrief.docx`, `Formular_intern.docx`,
+2026-11-15). Der nächste Schritt des Prototyps (#3) ist die Schriftprüfung
+(Q-PO-010).
 
 [[q-po-005]]
 === Q-PO-005: Abschied von Word für Vorlagen
@@ -175,6 +186,10 @@ Answer: Open.
 
 Gibt es bereits Host-Anwendungen mit fester Spring-Boot- oder Java-Version?
 
+Die Frage wird spätestens mit dem Referenzfall für die zwei Einstiegspunkte des
+Beispiel-Hosts beantwortet (#11). Dabei wird die Version des ersten Zielhosts mit
+der Baseline aus xref:adr-009-build-monorepo-und-versionen[ADR-009] abgeglichen.
+
 Answer: Open.
 
 [[q-arch-003]]
@@ -253,6 +268,29 @@ xref:adr-013-styling-der-frontend-komponenten[ADR-013] festgehalten:
 Isolation der Vorschau: `iframe` (Owner, 2026-11-15), festgehalten als
 xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]. Damit ist die Frage
 beantwortet.
+
+[[q-arch-004]]
+=== Q-ARCH-004: Wiederholtes Speichern derselben Vorschau
+
+Was passiert, wenn das Speichern mit derselben Snapshot-ID mehrfach ankommt? Das
+geschieht bei einem Doppelklick, bei parallelen Anfragen oder bei einer
+Wiederholung, nachdem die Antwort auf ein erfolgreiches Speichern verloren ging
+(Timeout). Ein unbeabsichtigtes zweites Schreiben soll dabei nicht entstehen
+(Convergence Check gegen Issue #1, 2026-11-16).
+
+Zu klären:
+
+* Welche Antwort erhält eine Wiederholung, nachdem das Speichern schon gelungen
+  ist? Zum Beispiel dasselbe Schreiben statt eines Fehlers.
+* Wie wird eine Wiederholung desselben Speichervorgangs von einer bewusst neuen
+  Dokumenterzeugung unterschieden?
+* Wie verhalten sich zwei gleichzeitige Anfragen?
+
+Die Regel wird mit #5 und #10 festgelegt, bevor der Persistenzentwurf (#6)
+beginnt. Sie ergänzt
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und die Laufzeitsicht.
+
+Answer: Open.
 
 == Beantwortete Fragen
 
