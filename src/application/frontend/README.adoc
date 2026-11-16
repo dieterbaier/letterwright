@@ -1,0 +1,43 @@
+= Frontend von Standardschreiben
+
+npm-Workspace mit dem Paket der React-Komponenten (ADR-001, ADR-009).
+
+== Pakete
+
+`packages/komponenten`:: `@dieterbaier/standardschreiben`, die React-Komponenten zum
+Einbetten in eine Host-Anwendung. React ist Peer-Abhängigkeit. Das Stylesheet
+importiert der Host getrennt: `@dieterbaier/standardschreiben/styles.css`.
+
+== Befehle
+
+Im Verzeichnis `src/application/frontend/`, Node.js ab 22.12:
+
+[source,sh]
+----
+npm ci          # Abhängigkeiten nach package-lock.json installieren
+npm run lint    # ESLint und Typprüfung
+npm run build   # Bibliothek und Typdeklarationen nach dist/
+npm test        # Vitest mit Abdeckungs-Gate
+----
+
+== Styling (ADR-013)
+
+* UnoCSS mit dem Klassenpräfix `ssw-`. Klassen ohne Präfix erzeugen kein CSS.
+* Kein globales Reset (keine Preflights).
+* Alle Styles liegen in der CSS-Ebene `standardschreiben`. Host-Styles außerhalb
+  dieser Ebene haben Vorrang, ohne `!important`.
+
+`src/test/styling.test.ts` prüft diese drei Regeln gegen die UnoCSS-Konfiguration.
+
+== Testkonventionen (ADR-010, ADR-011)
+
+* Tests liegen neben dem Code als `*.test.ts` oder `*.test.tsx` und laufen mit
+  Vitest, React Testing Library und jsdom.
+* Abdeckung mit dem V8-Provider: mindestens 80 % Zeilen und Zweige. Darunter
+  schlägt `npm test` fehl. Testhilfen unter `src/test/` zählen nicht mit.
+* Jeder Komponententest prüft das gerenderte Markup mit
+  `pruefeBarrierefreiheit(container)` aus `src/test/axe.ts`. Verstöße der Stufen
+  „serious“ und „critical“ lassen den Test scheitern.
+* Farbkontraste kann axe in jsdom nicht auswerten. Sie brauchen eine Prüfung im
+  echten Browser. Der Hinweis „HTMLCanvasElement's getContext()“ in der
+  Testausgabe stammt daher und ist kein Fehler.

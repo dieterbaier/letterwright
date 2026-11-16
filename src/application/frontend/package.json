@@ -1,0 +1,17 @@
+{
+  "name": "standardschreiben-frontend",
+  "private": true,
+  "description": "npm-Workspace für das Frontend von Standardschreiben (ADR-009)",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "lint": "npm run lint --workspaces",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
+  }
+}

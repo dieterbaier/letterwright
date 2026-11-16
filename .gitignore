@@ -29,3 +29,8 @@ build/
 # Symlinks auf Toolkit-Skills (lokal per install-skills.sh erzeugt)
 .claude/skills/
 .agents/skills/
+
+# Frontend: Abhängigkeiten, Build-Ausgaben und Abdeckungsberichte
+node_modules/
+src/application/frontend/**/dist/
+src/application/frontend/**/coverage/
