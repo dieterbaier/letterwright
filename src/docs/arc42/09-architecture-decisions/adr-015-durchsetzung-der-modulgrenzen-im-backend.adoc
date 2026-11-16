@@ -1,0 +1,265 @@
+---
+id: ADR-015-durchsetzung-der-modulgrenzen-im-backend
+type: ADR
+title: 'Durchsetzung der Architekturgrenzen im Backend'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-16'
+reviewed: false
+summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft dieselben Regeln zusätzlich.'
+derived_from:
+- type: external
+  description: 'Entscheidung des Owners im Review von PR #15 (Backend-Gerüst, Issue #12): Grenzen über eigene Module erzwingen, ArchUnit zusätzlich („fail fast“)'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/15
+tags:
+- decision
+- architektur
+- build
+- hexagonal
+relations:
+- type: depends_on
+  target: ADR-002-hexagonale-architektur-und-ports
+  status: proposed
+  rationale: 'Die Module bilden die Ports und Adapter aus ADR-002 ab; ohne diesen Schnitt gäbe es keine Grenzen durchzusetzen.'
+  reviewed: false
+- type: refines
+  target: ADR-009-build-monorepo-und-versionen
+  status: proposed
+  rationale: 'ADR-009 legt den Modulschnitt fest; dieser ADR begründet, warum die Grenzen als Module und nicht als Paketkonvention umgesetzt sind.'
+  reviewed: false
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Der Host hängt für seine SPI-Implementierungen nur am kleinen Artefakt usecases-out und sieht weder Anwendungsfälle noch Adapter.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-015-durchsetzung-der-modulgrenzen-im-backend]]
+== ADR-015: Durchsetzung der Architekturgrenzen im Backend
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
+wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+
+=== Entscheidung
+
+Wir schlagen vor, die Grenzen der hexagonalen Architektur
+(xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) über **eigene
+Gradle-Module** zu erzwingen und nicht nur über eine Paketkonvention:
+
+* Jede Grenze, über die eine Abhängigkeit nur in eine Richtung laufen darf, ist
+  eine Modulgrenze: `domaene`, `usecases-in`, `usecases-out`, `usecases-service`
+  und je Adapter ein Modul (Schnitt in
+  xref:adr-009-build-monorepo-und-versionen[ADR-009]).
+* Die erlaubten Richtungen stehen als Projektabhängigkeiten in den
+  `build.gradle.kts`-Dateien. Ein eingehender Adapter sieht nur `usecases-in`,
+  ein ausgehender nur `usecases-out`. Eine falsche Abhängigkeit scheitert damit
+  beim Kompilieren („fail fast“) und nicht erst im Testlauf.
+* **ArchUnit bleibt zusätzlich bestehen** (Modul `architekturtests`). Es prüft
+  dieselben Regeln auf Paketebene und fängt ab, was der Compiler nicht sieht:
+  etwa Spring-Abhängigkeiten in der Domäne oder eine neue Projektabhängigkeit,
+  die eine Grenze aufweicht.
+* Gemeinsame Build-Regeln stehen im Convention-Plugin
+  `standardschreiben.java-modul`, damit die Zahl der Module den Pflegeaufwand
+  nicht vervielfacht.
+
+Die Pugh-Matrix ungewichtet ergibt keinen klaren Sieger (siehe unten). Den
+Ausschlag geben die beiden Treiber, die der Owner höher gewichtet: früher
+Fehlernachweis und die schmale Abhängigkeit des Hosts.
+
+=== Kontext
+
+Das Backend-Gerüst (Issue #12, PR #15) hat die Anwendungsfälle in drei Module
+`usecases/in`, `usecases/out` und `usecases/service` geschnitten. ADR-002 und
+ADR-009 halten dieses Ergebnis fest, begründen aber nicht, warum Module statt
+einer Paketkonvention in einem Modul. Diese Begründung liefert dieser ADR.
+
+Geprüfte Belege im Repository:
+
+* `src/application/backend/**/build.gradle.kts`: `adapter-web` hängt nur an
+  `usecases-in`, `adapter-rendering` und `adapter-persistenz-jdbc` nur an
+  `usecases-out`; `usecases-service` exportiert `usecases-in` per `api` und
+  nutzt `usecases-out` per `implementation`; nur `spring-boot-starter` kennt
+  alle Module.
+* `src/application/backend/architekturtests/`: die ArchUnit-Regeln, jede mit
+  einer Fixture, die einen Verstoß nachstellt.
+
+Zwei Eigenschaften des Projekts machen die Frage schärfer als in einer
+gewöhnlichen Anwendung:
+
+* **Es ist eine Bibliothek** (xref:adr-001-einbettbare-bibliothek[ADR-001]).
+  Die Driven Ports sind öffentliche API, die der Host implementiert. Was in
+  welchem Artefakt liegt, ist damit Teil des Vertrags mit dem Host.
+* **Ports und ihre Implementierungen müssen `public` sein.** Driving Adapter
+  rufen Ports aus anderen Paketen auf, und die Autokonfiguration im Starter
+  muss die Service-Klassen instanziieren. Innerhalb eines Moduls kann der
+  Compiler daher nicht verhindern, dass ein Adapter direkt eine Service-Klasse
+  oder einen fremden Port benutzt.
+
+=== Entscheidungstreiber
+
+* **Früher Fehlernachweis:** Eine falsche Abhängigkeit soll so früh wie möglich
+  scheitern, idealerweise schon in der IDE und beim Kompilieren.
+* **Schmale Abhängigkeit des Hosts:** Der Host soll für seine
+  SPI-Implementierungen nur die Ports brauchen, nicht die Anwendungsfälle und
+  Adapter.
+* **Geringer Build-Aufwand:** Wenige Module, einfache Konfiguration.
+* **Grenzen später verschieben:** Wie leicht lässt sich der Schnitt ändern, wenn
+  sich Grenzen als falsch erweisen.
+* **Verträglichkeit mit Spring-Hosts:** Keine Zusatzhürden für Hosts, die auf
+  dem Klassenpfad laufen.
+
+=== Betrachtete Optionen
+
+==== Option 1: Ein Modul, Paketkonvention und ArchUnit
+
+Alle Kernklassen liegen in einem Modul, die Grenzen sind Pakete. ArchUnit prüft
+die Abhängigkeitsregeln nach dem Kompilieren im Testlauf.
+
+Einfachster Build, Grenzen lassen sich mit einem Refactoring verschieben. Ein
+Verstoß fällt aber erst im Test auf, und die IDE bietet die falsche Klasse
+weiter per Autovervollständigung an. Der Host bekommt ein einziges Artefakt
+mit allen Klassen.
+
+==== Option 2: Ein Modul, Sichtbarkeit (package-private) und ArchUnit
+
+Wie Option 1, aber alles, was eine Grenze nicht überschreiten muss, ist
+package-private. Der Compiler setzt so einen Teil der Regeln durch.
+
+Das hilft innerhalb einer Komponente. An den Grenzen des Hexagons trägt es
+nicht: Ports und Service-Klassen müssen `public` sein (siehe Kontext), und
+genau dort verlaufen die wichtigen Regeln. Der Host bekommt weiterhin ein
+einziges Artefakt.
+
+==== Option 3: Eigene Gradle-Module je Grenze und ArchUnit (gewählt)
+
+Die Grenzen sind Module, die erlaubten Richtungen Projektabhängigkeiten.
+ArchUnit prüft zusätzlich.
+
+Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
+nicht erst an. Der Host hängt nur an `usecases-out`. Kosten: mehr
+Build-Dateien, ein Convention-Plugin, und das Verschieben einer Grenze ist eine
+Änderung am Build und an den veröffentlichten Artefakten.
+
+==== Option 4: Java-Module (JPMS) mit `module-info.java`
+
+Jedes Gradle-Modul bekommt zusätzlich einen Moduldeskriptor, der nur die
+Port-Pakete exportiert.
+
+Stärkste Kapselung, auch innerhalb eines Artefakts. Sie setzt aber dieselbe
+Aufteilung in Artefakte wie Option 3 voraus und kommt nur auf dem Modulpfad zur
+Wirkung. Spring-Boot-Hosts laufen üblicherweise auf dem Klassenpfad; der
+Aufwand für Reflection-Freigaben in Tests und Autokonfiguration ist nicht
+bewertet.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
+| Früher Fehlernachweis | -1 | 0 | +1 | +1
+| Schmale Abhängigkeit des Hosts | -1 | -1 | +1 | +1
+| Geringer Build-Aufwand | +1 | +1 | -1 | -1
+| Grenzen später verschieben | +1 | +1 | -1 | -1
+| Verträglichkeit mit Spring-Hosts | 0 | 0 | 0 | ?
+s| Summe s| 0 s| +1 s| 0 s| ?
+|===
+
+Ungewichtet liegt Option 2 vorn. Sie verfehlt aber genau die beiden Treiber,
+die der Owner höher gewichtet: An den Grenzen des Hexagons setzt sie nichts
+durch, und der Host bekommt alle Klassen. Option 3 erfüllt beide. Option 4
+bringt darüber hinaus nur Kapselung innerhalb eines Artefakts, um den Preis
+einer unbewerteten Hürde auf dem Modulpfad.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
+  nicht erst angeboten.
+* Der Host hängt für seine SPI-Implementierungen nur an `usecases-out`; die
+  Anwendungsfälle und Adapter bleiben für ihn unsichtbar.
+* ArchUnit und Modulgrenzen prüfen dieselben Regeln auf zwei Wegen; fällt einer
+  weg, bleibt der andere.
+
+==== Negativ
+
+* Mehr Gradle-Projekte und Build-Dateien; das Convention-Plugin ist Pflicht,
+  damit die Regeln nicht auseinanderlaufen.
+* Eine Grenze zu verschieben ändert den Build und die veröffentlichten Artefakte
+  (xref:adr-012-distribution-ueber-github-packages[ADR-012]) und ist damit für
+  Hosts sichtbar.
+* Die Modulabhängigkeiten selbst sind Code, der falsch sein kann. Eine
+  zusätzliche Projektabhängigkeit hebt eine Grenze still auf; das fängt nur
+  ArchUnit.
+
+==== Neutral oder Folgearbeiten
+
+* JPMS (Option 4) neu bewerten, falls ein Host auf dem Modulpfad läuft oder
+  Kapselung innerhalb eines Artefakts nötig wird.
+* Innerhalb eines Moduls bleibt package-private die Voreinstellung für alles,
+  was keine Grenze überschreiten muss.
+
+=== Impact
+
+include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-traceability.adoc[leveloffset=+2]
+
+=== Weiterführende Literatur
+
+Der Owner hat diese Stimmen im Gespräch zur Entscheidung genannt. Sie sind
+bibliografisch angegeben; ihr Inhalt ist in diesem ADR nicht zitiert und nicht
+an der Originalquelle geprüft (siehe Review Notes).
+
+* Tom Hombergs: _Get Your Hands Dirty on Clean Architecture_. Packt, 1. Auflage
+  2019 (ISBN 978-1-83921-196-6), Kapitel 10 „Enforcing Architecture
+  Boundaries“; 2. Auflage 2023 (ISBN 978-1-80512-837-3), Kapitel 12. Das Kapitel
+  behandelt Mittel, Architekturgrenzen durchzusetzen, darunter Sichtbarkeit,
+  Prüfungen nach dem Kompilieren und eigene Build-Artefakte.
+* Simon Brown: „The Missing Chapter“, Kapitel 34 in Robert C. Martin: _Clean
+  Architecture_. Prentice Hall, 2017. Brown vertritt dort „Package by
+  Component“ und einen „architecturally-evident coding style“, der Grenzen eher
+  über die Sichtbarkeit im Compiler als über viele Build-Module ausdrückt. Er
+  ist damit die Gegenstimme, die Option 2 stützt.
+
+=== Annahmen
+
+* Die Hosts laufen auf dem Klassenpfad (Spring Boot im Standardbetrieb).
+* Der Modulschnitt aus ADR-009 ist für den MVP stabil genug, dass die Kosten
+  eines Verschiebens selten anfallen.
+
+=== Open Questions
+
+* Soll `usecases-out` als eigenständiges SPI-Artefakt mit eigener
+  Kompatibilitätszusage versioniert werden, getrennt vom Starter?
+
+=== Review Notes
+
+* Die Einordnung der beiden Literaturangaben ist nicht an der Originalquelle
+  geprüft: Die Verlagsvorschauen von Packt und die zugänglichen Texte von Simon
+  Brown waren beim Anlegen nicht abrufbar. Vor `accepted` gegen die Bücher
+  prüfen, insbesondere Kapitelnummern und ob Brown separate Build-Module
+  ausdrücklich als Alternative mit Kosten diskutiert.
+* Gewichtung der Treiber bestätigen; die ungewichtete Matrix spricht für
+  Option 2.
+* Bewertung von Option 4 beim Kriterium „Verträglichkeit mit Spring-Hosts“ offen.

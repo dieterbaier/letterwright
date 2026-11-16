@@ -66,7 +66,9 @@ Wir schlagen vor:
   eingehender Adapter hängt nur an `usecases/in`, ein ausgehender nur an
   `usecases/out`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
   ArchUnit prüft dieselben Regeln zusätzlich auf Paketebene. Der Host braucht für
-  seine SPI-Implementierungen nur das kleine Artefakt `usecases-out`.
+  seine SPI-Implementierungen nur das kleine Artefakt `usecases-out`. Die
+  Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
+  xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
 * Die Gradle-Projekte sind flach benannt (`usecases-in`, `adapter-web`, …) und
   zeigen auf ihr Verzeichnis. Die Gruppenordner `adapter/in`, `adapter/out` und
   `usecases` sind keine eigenen Gradle-Projekte.

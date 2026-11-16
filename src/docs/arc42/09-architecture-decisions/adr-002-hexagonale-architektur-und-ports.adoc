@@ -74,7 +74,9 @@ Wir schlagen eine **hexagonale Architektur** (Ports and Adapters) nach DDD vor:
 
 Die Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren: Driving
 Adapter kennen nur `usecases-in`, Driven Adapter nur `usecases-out` (ADR-009).
-ArchUnit-Tests prüfen dieselben Regeln zusätzlich auf Paketebene.
+ArchUnit-Tests prüfen dieselben Regeln zusätzlich auf Paketebene. Warum Module
+statt einer Paketkonvention, begründet
+xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
 
 === Kontext
 
