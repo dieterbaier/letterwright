@@ -213,7 +213,9 @@ include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability
 
 === Open Questions
 
-* Soll beim Drucken aus der Vorschau das endgültige PDF gedruckt werden? Vorschlag: ja, Drucken öffnet das PDF. (Q-PO-002)
+* Keine. Zum Drucken hat der Owner am 2026-11-16 entschieden (Q-PO-002): Die
+  Vorschau wird nicht gedruckt. „Drucken“ gibt es nur beim gespeicherten
+  Schreiben, und gedruckt wird dessen PDF über die Druckfunktion des Browsers.
 
 === Review Notes
 

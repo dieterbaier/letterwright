@@ -85,6 +85,33 @@ die Bibliothek die Erzeugungsberechtigung **erneut** über den Host. Wurde die
 Berechtigung nach der Vorschau entzogen, wird nicht gespeichert. Ein Snapshot eines
 anderen Benutzers wird wie ein nicht vorhandener behandelt (404).
 
+== Gespeichertes Schreiben drucken
+
+Gedruckt wird nur ein gespeichertes Schreiben (Q-PO-002). Die Vorschau bietet
+kein „Drucken“ an.
+
+[plantuml,laufzeit-drucken,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Übersicht (React)" as UI
+participant "adapter-web" as Web
+participant "usecases-service" as App
+participant "Browser: Druckfunktion" as Druck
+SB -> UI: Drucken (gespeichertes Schreiben)
+UI -> Web: GET /schreiben/{id}/pdf
+Web -> App: Schreiben abrufen ({id})
+App -> App: Berechtigung prüfen (Host)
+App --> Web: PDF (unverändert)
+Web --> UI: 200, PDF
+UI -> Druck: PDF an die Druckfunktion des Browsers übergeben
+@enduml
+----
+
+Gedruckt wird dasselbe unveränderte PDF wie beim Download. Druckt ein Benutzer
+die Vorschau über die Druckfunktion des Browsers, verhindert die Bibliothek das
+nicht. Für dieses Ergebnis ist sie aber nicht verantwortlich.
+
 == Fehlerfall: Berechtigung beim Speichern entzogen
 
 Lehnt der Host beim Speichern ab, wird nichts erzeugt und nichts persistiert. Der

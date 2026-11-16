@@ -74,7 +74,8 @@ include::generated/r-007-bindung-an-spring-boot-hauptversion-traceability.adoc[l
 
 === Open Questions
 
-* Gibt es bekannte Hosts mit fester Spring-Boot-Version? (Q-ARCH-002)
+* Keine. Der bekannte Host läuft auf Spring Boot 4.2.x und Java 21 und liegt damit
+  in der unterstützten Hauptversion (Q-ARCH-002, 2026-11-16).
 
 === Review Notes
 

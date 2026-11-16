@@ -31,7 +31,7 @@ bis sie bestätigt sind.
 |===
 | Element | Beschreibung
 | Source | Benutzer mit Screenreader oder ohne Maus
-| Stimulus | Öffnet die Vorschau, liest sie und löst Speichern, Drucken oder Download aus.
+| Stimulus | Öffnet die Vorschau, liest sie und löst Speichern aus. Löst beim gespeicherten Schreiben Drucken oder Download aus.
 | Environment | Normalbetrieb in aktuellen Browsern.
 | Artifact | React-Komponenten Vorschau und Übersicht.
 | Response | Alle Inhalte sind lesbar, alle Aktionen per Tastatur erreichbar, Fokus und Statusmeldungen werden angesagt.

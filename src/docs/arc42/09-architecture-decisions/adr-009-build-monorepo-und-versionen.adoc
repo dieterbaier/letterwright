@@ -185,7 +185,9 @@ include::generated/adr-009-build-monorepo-und-versionen-traceability.adoc[levelo
 
 === Open Questions
 
-* Gibt es bereits bekannte Host-Anwendungen mit fester Spring-Boot- oder Java-Version? (Q-ARCH-002)
+* Keine. Zu bekannten Hosts (Q-ARCH-002) hat der Owner am 2026-11-16 geantwortet:
+  Eine bestehende Host-Anwendung verwendet Java 21 und Spring Boot 4.2.x. Das
+  passt zur Baseline. Sobald 4.2.0 erscheint, wird die BOM angehoben.
 
 === Review Notes
 

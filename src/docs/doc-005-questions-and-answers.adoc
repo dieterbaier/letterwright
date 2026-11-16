@@ -29,7 +29,20 @@ festgehalten. Die Antwort bestimmt die Aktionen der Vorschau und ist ein
 Akzeptanzkriterium von #10. Danach wird die Laufzeitsicht um den Druckablauf
 ergänzt.
 
-Answer: Open.
+Answer: Drucken beantwortet (Owner, PR #21, 2026-11-16):
+
+* Eine Vorschau kann nicht gedruckt werden. „Drucken“ meint das gezielte Drucken
+  des Dokuments.
+* Die Schaltfläche „Drucken“ gibt es nur beim endgültig gespeicherten Schreiben,
+  nicht in der Vorschau. Sie nutzt die Druckfunktion des Browsers mit dem Inhalt
+  des gespeicherten Dokuments.
+* Druckt jemand die Vorschau über die Druckfunktion des Browsers, verhindert die
+  Anwendung das nicht aktiv. Für das Ergebnis ist die Anwendung aber nicht
+  verantwortlich.
+
+Umgesetzt in der Laufzeitsicht („Gespeichertes Schreiben drucken“), in QS-003
+und in ADR-004. Noch offen ist das Zielarchiv: Gibt es eines mit eigenen
+PDF/A-Vorgaben (ADR-005)?
 
 [[q-po-003]]
 === Q-PO-003: Sichtbarkeit in der Übersicht
@@ -190,7 +203,15 @@ Die Frage wird spätestens mit dem Referenzfall für die zwei Einstiegspunkte de
 Beispiel-Hosts beantwortet (#11). Dabei wird die Version des ersten Zielhosts mit
 der Baseline aus xref:adr-009-build-monorepo-und-versionen[ADR-009] abgeglichen.
 
-Answer: Open.
+Answer: Eine bestehende Host-Anwendung verwendet Java 21 und Spring Boot 4.2.x
+(Owner, PR #21, 2026-11-16).
+
+Abgleich mit ADR-009: Java 21 ist genau die Bytecode-Baseline (`--release 21`) und
+läuft in der CI-Matrix mit. Spring Boot 4.2 liegt in derselben Hauptversion wie
+der Starter, R-007 trifft diesen Host also nicht. Der Build verwendet derzeit die
+BOM 4.1.2. Am 2026-11-16 ist 4.2.0 auf Maven Central erst als Release Candidate
+(RC2) verfügbar. Folgearbeit: Sobald 4.2.0 erscheint, die BOM anheben und die
+Integration in einem Host auf 4.2 prüfen (Beispiel-Host in #11).
 
 [[q-arch-003]]
 === Q-ARCH-003: Styling der Frontend-Komponenten durch die Host-Anwendung
@@ -290,7 +311,54 @@ Die Regel wird mit #5 und #10 festgelegt, bevor der Persistenzentwurf (#6)
 beginnt. Sie ergänzt
 xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und die Laufzeitsicht.
 
-Answer: Open.
+Answer: Beantwortet im Grundsatz (Owner, PR #21, 2026-11-16). Die Idempotenz hängt
+nicht an der Snapshot-ID, sondern an einem **fachlichen Schlüssel**:
+
+* Jede Vorschau und jedes endgültige Dokument gehört zu einer fachlich
+  getriebenen Situation mit einem fachlichen Schlüssel, zum Beispiel einer
+  Vorgangs-ID. Der Schlüssel ist in der Host-Anwendung eindeutig und wird
+  voraussichtlich Teil des Dateinamens.
+* Eine Vorschau mit demselben fachlichen Schlüssel liefert immer dasselbe
+  Ergebnis. Gibt es schon einen Snapshot, wird er ausgeliefert. Sonst wird er
+  gespeichert und ausgeliefert.
+* Für das endgültige Dokument gilt dasselbe: Ist es schon gespeichert, wird es
+  ausgeliefert. Sonst wird es erzeugt, gespeichert und ausgeliefert.
+* Dasselbe Dokument wird nie wiederholt erzeugt. Ein neues Dokument hätte einen
+  neuen fachlichen Schlüssel.
+* Den Schlüssel gibt die Host-Anwendung vor. Das SPI wird dafür voraussichtlich
+  um eine Anfrage nach dem eindeutigen Identifier erweitert.
+
+Dahinter steht ein Szenario, das die ursprüngliche Anforderung präzisiert oder
+erweitert: Im Laufe eines Geschäftsprozesses der Host-Anwendung fallen Aufgaben
+an, bei denen Standardschreiben erzeugt werden. Prozess und Aufgabe sind
+eindeutig identifizierbar, etwa als
+`prozessname.instanzid.aufgabenName.aufgabenInstanz`. Jede Prozessinstanz gehört
+zu einem konkreten Fall, in Camunda etwa dem Business Key.
+
+Folgefragen, bevor die Regel als ADR festgehalten wird:
+
+. *Aktualisieren und Ablauf:* Nach
+  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] erzeugen
+  „Aktualisieren“, ein abgelaufener Snapshot (30 Minuten) und geänderte Daten
+  einen neuen Snapshot. Vorschlag: Der Schlüssel benennt den jeweils aktuellen
+  Snapshot. Diese drei Auslöser ersetzen ihn unter demselben Schlüssel. Eine
+  bloße Wiederholung liefert den bestehenden.
+. *Benutzerbindung:* Der Snapshot ist bisher an den Benutzer gebunden. Was gilt,
+  wenn ein anderer Benutzer dieselbe Aufgabe öffnet, etwa nach einer
+  Neuzuweisung?
+. *Begriffe:* Wie verhalten sich fachlicher Schlüssel (Aufgabeninstanz), Fall
+  (Business Key) und der bisherige fachliche Bezug (Typ und ID, Glossar)
+  zueinander? Ist der Fall der Bezug, nach dem die Übersicht filtert (Q-PO-003)?
+. *Ein Schlüssel, ein Schreiben:* Erzeugt eine Aufgabe immer genau ein Schreiben,
+  oder können zu einer Aufgabe mehrere Standardschreiben gehören, etwa an
+  verschiedene Empfänger?
+. *Löschen:* Darf nach dem Löschen eines Schreibens über die `Loeschrichtlinie`
+  unter demselben Schlüssel ein neues entstehen?
+. *Dateiname:* Wie wird der Dateiname gebildet? Das Thema ist neu.
+
+Betroffen sind voraussichtlich ADR-002 (SPI), ADR-007 (Snapshot), die
+Laufzeitsicht, das Glossar sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des
+Beispiel-Hosts in #11 lassen sich als zwei Aufgaben eines Prozesses abbilden.
 
 == Beantwortete Fragen
 
