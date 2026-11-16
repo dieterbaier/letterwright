@@ -65,8 +65,10 @@ Wir schlagen vor:
 * **Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren.** Ein
   eingehender Adapter hängt nur an `usecases/in`, ein ausgehender nur an
   `usecases/out`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
-  ArchUnit prüft dieselben Regeln zusätzlich auf Paketebene. Der Host braucht für
-  seine SPI-Implementierungen nur das kleine Artefakt `usecases-out`. Die
+  ArchUnit prüft zusätzlich Paketregeln aus ADR-002. Ein Host-Modul, das
+  ausschließlich SPIs implementiert, kann direkt an `usecases-out` hängen und
+  bekommt zum Kompilieren nur die Ports und transitiv die Domäne. Wer den Starter
+  einbindet, bekommt auch `usecases-in` und zur Laufzeit Service und Adapter. Die
   Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
   xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
 * Die Gradle-Projekte sind flach benannt (`usecases-in`, `adapter-web`, …) und
