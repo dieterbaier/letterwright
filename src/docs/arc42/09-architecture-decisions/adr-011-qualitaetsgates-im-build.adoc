@@ -66,6 +66,21 @@ fehlschlägt, wenn eines dieser Gates verletzt ist:
   `.github/workflows/architekturdoku.yml`. Veröffentlicht auf **GitHub Pages** wird
   nur der Stand von `main`; Pull Requests bauen nur.
 
+Umsetzung (#14): Der Workflow `.github/workflows/build.yml` läuft bei jedem Pull
+Request auf `main` und bei jedem Push auf `main`, mit zwei Jobs:
+
+* *Backend:* `./gradlew build` mit dem validierten Wrapper auf Java 21 (Baseline)
+  und Java 25. Der Build umfasst Tests, das JaCoCo-Gate je Modul und ArchUnit.
+  Test- und Abdeckungsberichte werden als Artefakt gesichert.
+* *Frontend:* `npm ci`, `npm run lint`, `npm run build` und `npm test` auf
+  Node 22.22.2 (Untergrenze aus `engines.node`) sowie den neuesten Versionen der
+  Linien 24 und 26. `npm test` enthält das Vitest-Gate und die axe-Prüfung. Der
+  Abdeckungsbericht wird als Artefakt gesichert.
+
+Der Workflow baut immer beides. Ein Filter nach geänderten Pfaden lohnt sich bei
+etwa einer Minute Laufzeit je Job nicht. veraPDF kommt mit der Rendering-Pipeline
+(#7) dazu.
+
 === Kontext
 
 Issue #1 fordert 80 % Testabdeckung. Der Owner präzisiert: gilt für beides (Zeilen und

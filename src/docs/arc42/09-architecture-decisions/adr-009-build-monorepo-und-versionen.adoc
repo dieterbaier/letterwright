@@ -87,8 +87,8 @@ Die gemeinsamen Konventionen stehen im Convention-Plugin `standardschreiben.java
 (`gradle/build-logic`). Jedes Modul bindet es ausdrücklich ein; es gibt keine
 Konfiguration über `subprojects {}`. So bekommt nur ein Modul die Java-Regeln, das sie
 anfordert, und die Konfiguration bleibt mit dem Configuration-Cache verträglich.
-Der Workflow `backend.yml` baut mit dem Wrapper auf Java 21 (Baseline). Die
-Matrix mit Java 21 und Java 25 wird mit #14 eingerichtet.
+Der Workflow `build.yml` baut das Backend mit dem Wrapper auf Java 21 (Baseline)
+und Java 25 (#14).
 
 Stand beim Anlegen des Frontend-Gerüsts (#13): Node.js `^22.22.2 || ^24.15.0 ||
 >=26.0.0`, die Schnittmenge der Bereiche von jsdom und Vitest. `engine-strict`
