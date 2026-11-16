@@ -5,7 +5,8 @@ plugins {
 description = "ArchUnit-Regeln für die hexagonale Abhängigkeitsrichtung (ADR-002). Nur Tests, wird nicht veröffentlicht."
 
 dependencies {
-    testImplementation(project(":domaene"))
+    testImplementation(project(":domaene-modell"))
+    testImplementation(project(":domaene-service"))
     testImplementation(project(":usecases-in"))
     testImplementation(project(":usecases-out"))
     testImplementation(project(":usecases-service"))

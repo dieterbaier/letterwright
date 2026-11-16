@@ -15,7 +15,8 @@ rootProject.name = "standardschreiben"
 // Projektname (zugleich Artefakt-ID) -> Verzeichnis. Die Projekte sind flach benannt,
 // damit die Gruppenordner (adapter/in, adapter/out, usecases) keine eigenen Gradle-Projekte werden.
 val backendModule = mapOf(
-    "domaene" to "domaene",
+    "domaene-modell" to "domaene/modell",
+    "domaene-service" to "domaene/service",
     "usecases-in" to "usecases/in",
     "usecases-out" to "usecases/out",
     "usecases-service" to "usecases/service",

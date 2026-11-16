@@ -54,4 +54,14 @@ class HexagonaleArchitekturTest {
     void adapterHaengenNichtVomStarterAb() {
         ArchitekturRegeln.adapterHaengenNichtVomStarterAb(BASIS).check(produktionsCode);
     }
+
+    @Test
+    void domaenenmodellKenntKeineDomaenenservices() {
+        ArchitekturRegeln.domaenenmodellKenntKeineDomaenenservices(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void nurDieAnwendungsfaelleKennenDomaenenservices() {
+        ArchitekturRegeln.nurDieAnwendungsfaelleKennenDomaenenservices(BASIS).check(produktionsCode);
+    }
 }

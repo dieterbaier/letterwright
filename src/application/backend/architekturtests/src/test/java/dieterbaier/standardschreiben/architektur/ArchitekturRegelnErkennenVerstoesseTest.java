@@ -70,4 +70,23 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     void adapterMitStarterAbhaengigkeitVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.adapterHaengenNichtVomStarterAb(FIXTURE), "RenderingAdapterMitStarter");
     }
+
+    @Test
+    void modellMitDomaenenserviceVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.domaenenmodellKenntKeineDomaenenservices(FIXTURE), "ModellMitDomaenenservice");
+    }
+
+    @Test
+    void portMitDomaenenserviceVerletztDieRegel() {
+        erkenntVerstoss(
+                ArchitekturRegeln.nurDieAnwendungsfaelleKennenDomaenenservices(FIXTURE),
+                "AusgehenderPortMitDomaenenservice");
+    }
+
+    @Test
+    void adapterMitDomaenenserviceVerletztDieRegel() {
+        erkenntVerstoss(
+                ArchitekturRegeln.nurDieAnwendungsfaelleKennenDomaenenservices(FIXTURE),
+                "WebAdapterMitDomaenenservice");
+    }
 }

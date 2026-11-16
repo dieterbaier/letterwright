@@ -102,4 +102,25 @@ final class ArchitekturRegeln {
                 .because("nur der Starter verdrahtet Adapter (ADR-002)")
                 .allowEmptyShould(true);
     }
+
+    /** Das Domänenmodell kennt keine Domänenservices; die Abhängigkeit läuft nur vom Service zum Modell. */
+    static ArchRule domaenenmodellKenntKeineDomaenenservices(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + ".domaene.modell..")
+                .should().dependOnClassesThat().resideInAPackage(basis + ".domaene.service..")
+                .because("Domänenservices arbeiten auf dem Modell, nicht umgekehrt (ADR-015)")
+                .allowEmptyShould(true);
+    }
+
+    /** Ports und Adapter kennen keine Domänenservices; nur die Implementierung der Anwendungsfälle nutzt sie. */
+    static ArchRule nurDieAnwendungsfaelleKennenDomaenenservices(String basis) {
+        return noClasses()
+                .that().resideInAnyPackage(
+                        basis + ".usecases.in..",
+                        basis + ".usecases.out..",
+                        basis + ".adapter..")
+                .should().dependOnClassesThat().resideInAPackage(basis + ".domaene.service..")
+                .because("Domänenservices sind nur über die Anwendungsfälle erreichbar (ADR-015)")
+                .allowEmptyShould(true);
+    }
 }
