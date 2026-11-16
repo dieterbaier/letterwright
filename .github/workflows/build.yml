@@ -1,0 +1,105 @@
+name: Build
+
+# Prüft Backend und Frontend bei jedem Pull Request mit denselben Gates wie lokal (ADR-011):
+# - Backend: Kompilieren, Tests, Abdeckungs-Gate (≥ 80 % Zeilen und Zweige je Modul) und ArchUnit,
+#   auf Java 21 (Baseline, ADR-009) und Java 25 (Entwicklungsstand).
+# - Frontend: npm ci, Lint, Build und Tests mit Abdeckungs-Gate und axe-Prüfung,
+#   auf der niedrigsten zugesagten Node-Version und den neuesten Versionen der Linien 24 und 26.
+# Es wird immer alles gebaut. Beide Jobs laufen parallel in etwa einer Minute,
+# ein Filter nach geänderten Pfaden würde kaum Zeit sparen.
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  backend:
+    name: Backend (Java ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['21', '25']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Wrapper-JAR gegen offizielle Prüfsummen validieren
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Java ${{ matrix.java }} einrichten
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Gradle einrichten
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Bauen und prüfen
+        run: ./gradlew build --stacktrace
+
+      - name: Test- und Abdeckungsberichte sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-berichte-java${{ matrix.java }}
+          path: |
+            src/application/backend/**/build/reports/
+            src/application/backend/**/build/test-results/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22.22.2 ist die Untergrenze aus engines.node, 24 und 26 die neuesten Versionen ihrer Linie.
+        node: ['22.22.2', '24', '26']
+    defaults:
+      run:
+        working-directory: src/application/frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Node ${{ matrix.node }} einrichten
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: src/application/frontend/package-lock.json
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Lint und Typprüfung
+        run: npm run lint
+
+      - name: Bauen
+        run: npm run build
+
+      - name: Testen mit Abdeckungs-Gate
+        run: npm test
+
+      - name: Abdeckungsbericht sichern
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-abdeckung-node${{ matrix.node }}
+          path: src/application/frontend/packages/*/coverage/
+          if-no-files-found: ignore
