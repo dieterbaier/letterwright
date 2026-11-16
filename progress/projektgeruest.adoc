@@ -8,40 +8,49 @@ und CI, bevor Fachcode entsteht (Epic #4).
 == The plan
 
 Erst das Backend, weil die Gates (Abdeckung, ArchUnit) für alle folgenden Epics
-gelten. Dann das Frontend. Die gemeinsame CI zuletzt, weil sie beide Gerüste
-voraussetzt.
+gelten. Dann das Frontend. Die gemeinsame CI danach, weil sie beide Gerüste
+voraussetzt. Zuletzt schließen wir die Lücken der ArchUnit-Prüfung, bevor mit
+#5 echter Fachcode die Regeln zum ersten Mal mit Inhalt füllt.
 
 [options="checklist"]
-* [x] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15 per Rebase gemergt, Workflow `Backend` auf `main` grün
-* [ ] Frontend-Gerüst unter `src/application/frontend/` mit Vite, UnoCSS nach ADR-013, Vitest-Abdeckungsgate und axe: #13
-* [ ] CI für Backend und Frontend, Java-Matrix 21 und 25: #14 (der Java-21-Teil läuft schon in `backend.yml`)
+* [x] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15
+* [x] Begründung der Modulgrenzen als ADR-015 (accepted): PR #18
+* [x] Frontend-Gerüst mit Vite, UnoCSS nach ADR-013, Vitest-Abdeckungsgate und axe: #13, PR #20
+* [x] CI für Backend (Java 21 und 25) und Frontend (Node 22.22.2, 24, 26) in `build.yml`, Gegenproben für Abdeckung und ArchUnit rot: #14, PR #22
+* [x] Domänenmodell und Domänenservices als getrennte Module, ADR-015 ergänzt: #25, PR #26
+* [ ] ArchUnit: Isolation der Adapter prüfen und leere Selektoren verbieten: #19
 
-Danach beginnt Epic #5 (Domänenmodell und Ports). #13 ist nicht mehr durch die
-Styling-Frage blockiert: ADR-013 legt fest, wie das Paket CSS ausliefert
-(Präfix, kein globales Reset, eigene `@layer`).
+Danach beginnt Epic #5 (Domänenmodell und Ports). #19 sollte vorher kommen:
+Solange alle Regeln `allowEmptyShould(true)` setzen, bleibt eine Regel grün, deren
+Selektor nach einem Umbenennen nichts mehr trifft.
 
 == Where we are
 
-Das Backend liegt unter `src/application/backend/`. Die Use Cases sind in
-`usecases/in`, `usecases/out` und `usecases/service` getrennt, damit falsche
-Abhängigkeiten schon am Compiler scheitern. ArchUnit prüft dieselben Regeln
-zusätzlich. Gemeinsame Build-Regeln stehen im Convention-Plugin
-`standardschreiben.java-modul` unter `gradle/build-logic`. Das Basispaket ist
-`dieterbaier.standardschreiben`, die Maven-Gruppe bleibt
-`io.github.dieterbaier.standardschreiben`.
+Das Backend liegt unter `src/application/backend/` mit den Modulen
+`domaene-modell`, `domaene-service`, `usecases-in`, `usecases-out`,
+`usecases-service`, je einem Modul pro Adapter, dem Starter und
+`architekturtests`. Ports exportieren nur das Domänenmodell. Domänenservices sieht
+beim Kompilieren nur `usecases-service` (ADR-015).
 
-`./gradlew` läuft lokal mit dem eingecheckten Wrapper.
+Das Frontend-Paket `@dieterbaier/standardschreiben` liegt unter
+`src/application/frontend/packages/komponenten`. `.npmrc` setzt `engine-strict`,
+lokal braucht `npm ci` mindestens Node 22.22.2.
+
+Der Workflow `build.yml` prüft beides bei jedem Pull Request, `architekturdoku.yml`
+die Doku. Branch-Schutz für `main` ist nicht eingerichtet.
 
 == Open in this topic
 
-* #13 als nächster Schritt. Der Pfad `src/application/frontend/` entsteht erst
-  damit.
+* #19 als letzter Schritt des Epics.
+* Spring Boot 4.2.0 ist noch nicht erschienen (Stand 2026-11-16: RC2). Danach die
+  BOM anheben (Q-ARCH-002 in `doc-005`).
 
 == Checks
 
 [source,sh]
 ----
 ./gradlew build
+(cd src/application/frontend && npm ci && npm run lint && npm run build && npm test)
 DOCS_TOOLBOX_LOCAL=1 ./build.sh validate && DOCS_TOOLBOX_LOCAL=1 ./build.sh build
 gh run list --branch main --limit 4
 ----

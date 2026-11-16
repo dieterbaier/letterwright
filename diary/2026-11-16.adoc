@@ -1,0 +1,142 @@
+= Projekttagebuch 2026-11-16
+
+Dritter Arbeitstag, Thema Projektgerüst. Das Gerüst ist bis auf #19 fertig:
+ADR-015, Frontend-Gerüst, gemeinsame CI und die Trennung der Domänenservices sind
+gemergt. Dazu kam ein Doku-PR aus dem Convergence Check des Owners gegen die
+Projektidee. Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **ADR-015 (PR #18, per Rebase gemergt, accepted):** Begründet, warum die
+  Grenzen im Backend über Gradle-Module statt über eine Paketkonvention erzwungen
+  werden.
+** Die Zitate von Hombergs (2. Auflage, Kapitel 12) und Brown (Kapitel 34 in
+   _Clean Architecture_) sind am Originaltext geprüft.
+** Im Review präzisiert: Die Isolation der Adapter hängt allein an den
+   Gradle-Abhängigkeiten. Die Fixtures belegen nur, dass jede Regel ihren
+   Verstoß erkennt. Die schmale Host-Abhängigkeit gilt nur für den
+   Compile-Classpath eines reinen SPI-Moduls.
+** Die Lücken stehen in #19. ADR-009 verweist auf ADR-015.
+* **Frontend-Gerüst (#13, PR #20, per Rebase gemergt):**
+** npm-Workspace mit dem Paket `@dieterbaier/standardschreiben`: Vite im
+   Library-Modus, UnoCSS mit Präfix `ssw-`, ohne Reset, in der CSS-Ebene
+   `standardschreiben`.
+** Vitest mit Abdeckungs-Gate (80 % Zeilen und Zweige) und axe-core direkt statt
+   `vitest-axe`. ESLint mit typescript-eslint `strictTypeChecked`.
+** Review-Befund P1: Die Node-Untergrenze `>=22.12.0` passte nicht zu jsdom 31.
+   Jetzt `^22.22.2 || ^24.15.0 || >=26.0.0` mit `engine-strict`.
+** ADR-013 hält `ssw-` und die Ebene als öffentlichen Vertrag fest.
+* **Convergence Check auf #1 (PR #21, per Rebase gemergt):**
+** `doc-005`: Q-PO-002 (Drucken) beantwortet, Q-PO-004 als geliefert markiert,
+   Q-ARCH-002 beantwortet, Q-ARCH-004 (wiederholtes Speichern) neu und im
+   Grundsatz beantwortet.
+** Laufzeitsicht um „Gespeichertes Schreiben drucken“ ergänzt. QS-003, ADR-004,
+   ADR-009 und R-007 angeglichen.
+** Epic #10 auf die Druckentscheidung angepasst.
+* **CI (#14, PR #22, per Rebase gemergt):** `build.yml` ersetzt `backend.yml`.
+** Backend auf Java 21 und 25, Frontend auf Node 22.22.2, 24 und 26. Kein
+   Pfadfilter, jeder Job läuft etwa eine Minute.
+** Gegenproben als Wegwerf-PRs, ohne Merge geschlossen: #23 (Abdeckung) und #24
+   (ArchUnit) wurden rot.
+** ADR-011 beschreibt die Pipeline.
+* **Domänenservices (#25, PR #26, per Rebase gemergt):** Auf Hinweis des Owners
+   ist `domaene` in `domaene-modell` und `domaene-service` geteilt.
+** Ports exportieren nur das Modell. Nur `usecases-service` bindet
+   `domaene-service` ein, als `implementation`.
+** Zwei neue ArchUnit-Regeln mit Fixtures. ADR-015 ist ergänzt, ADR-009 und die
+   Bausteinsicht sind angeglichen.
+** Review-Befund P3: Der Starter sieht `domaene-service` nur zur Laufzeit. Die
+   Doku unterscheidet jetzt Compile- und Laufzeitsicht.
+* **Issues:** #19 und #25 neu als Unter-Issues von #4. #13, #14 und #25 sind
+   geschlossen.
+
+== Entscheidungen des Owners
+
+* **ADR-015** angenommen. Treiber „Isolierte Adapter“ bleibt, Gewichtung
+  bestätigt: früher Fehlernachweis und schmale Host-Abhängigkeit vor
+  Build-Aufwand und Verschiebbarkeit. JPMS bei Spring-Verträglichkeit `0`, ohne
+  eigene Erfahrung. `usecases-out` wird vorerst nicht getrennt versioniert.
+* **Frontend:** Paketname `@dieterbaier/standardschreiben` und Präfix `ssw-`
+  übernommen. Die 7 `npm audit`-Funde (nur Entwicklungsabhängigkeiten) als
+  Restrisiko akzeptiert.
+* **Drucken:** Nur das gespeicherte Schreiben, über die Druckfunktion des
+  Browsers. Die Vorschau bietet kein „Drucken“ an.
+* **Bekannter Host:** Java 21 und Spring Boot 4.2.x.
+* **Fachlicher Schlüssel:** Die Idempotenz hängt an einem fachlichen Schlüssel
+  des Hosts, nicht an der Snapshot-ID. Eine Aufgabe ist wie ein Human Task
+  gesperrt, solange jemand sie bearbeitet. Nach dem Löschen darf unter demselben
+  Schlüssel ein neues Schreiben entstehen. Den Dateinamen gibt der Host vor, die
+  Bibliothek macht ihn eindeutig und meldet Dateiname und technischen Schlüssel
+  zurück. Die übrigen Folgefragen werden beantwortet, wenn sie gebraucht werden.
+* **Domänenservices:** Eigenes Modul, beide Module unter `domaene`.
+
+== Gelernt
+
+* **typescript-eslint und TypeScript 7:** typescript-eslint 8.72 unterstützt nur
+  TypeScript `<6.1`. TypeScript bleibt deshalb bei 6.0.
+* **Node-Bereiche aus dem Lockfile ableiten:** Die Untergrenze ergibt sich aus der
+  Schnittmenge aller `engines.node` im Lockfile, nicht aus der des eigenen
+  Pakets. Ohne `engine-strict` fällt ein Widerspruch nicht auf.
+* **Gegenproben isolieren:** Der erste ArchUnit-Gegenbeweis scheiterte an
+  `pruefeTestsVorhanden`, nicht an ArchUnit. Eine Gegenprobe braucht genau eine
+  Ursache, sonst belegt sie nichts.
+* **`api` gibt alles weiter:** Ein Modul, das per `api` exportiert wird, ist für
+  jeden Nutzer vollständig sichtbar. Was nur ein Modul sehen soll, braucht ein
+  eigenes Modul, das nur dort als `implementation` hängt.
+* **Arbeitsumgebung (zsh):**
+** `$p:c` ist ein Modifikator und schneidet den Text ab. In Gradle-Pfaden
+   `${p}` schreiben.
+** Mit `noclobber` scheitert `>` auf eine vorhandene Datei. In einer Kette mit
+   `&&` bricht dann nur diese Zeile ab, die nächste Zeile läuft trotzdem.
+   Dadurch wurde PR #21 vor dem Eintragen des Convergence Checks gemergt. Der
+   Check wurde danach in der Beschreibung nachgetragen.
+** Branch-Sweep und andere Skripte mit Wortaufteilung unter `bash` ausführen.
+
+== Offen
+
+* #19 (ArchUnit-Lücken) ist der letzte Schritt im Projektgerüst, danach Epic #5.
+* Q-ARCH-004 in `doc-005`: fünf Folgepunkte zum fachlichen Schlüssel. Danach ein
+  ADR und das Akzeptanzkriterium zum wiederholten Speichern in #10.
+* Q-PO-002: Zielarchiv mit eigenen PDF/A-Vorgaben ist offen (ADR-005).
+* Spring Boot 4.2.0 abwarten, dann die BOM anheben.
+* ADR-007, ADR-013 und ADR-014 sind `proposed` und `reviewed: false`.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Branch-Sweep beim Clock-in (erst unter zsh blockiert, dann unter bash) und beim
+  Clock-out (`SWEEP: CLEAR`), `gh pr list --state open`, `gh issue list`.
+* `progress/projektgeruest.adoc`, `diary/2026-11-15.adoc`, `AGENTS.md`.
+* PR #18: Reviews und Kommentare, Check-Runs.
+* PR #20: Review 5917892660 mit Kommentar 4584119296, Folgereview, Check-Runs.
+* PR #21: Inline-Kommentare 4585458678, 4585468285, 4585578791, 4588906840,
+  4588950728, 4588956455, 4588985595, Check-Runs.
+* PR #22: Check-Runs, Workflow-Läufe 43861280753, 43861294439 (PR #23) und
+  43861724989 (PR #24) mit ihren Fehlerprotokollen.
+* PR #26: Review mit Inline-Kommentar 4589612332, Check-Runs.
+* Issues #1 (Kommentare), #3, #5, #7, #10, #11, #13, #14 (Beschreibungen).
+* `package-lock.json` (alle `engines.node`), `https://nodejs.org/dist/index.json`,
+  Node 22.22.2 von nodejs.org mit `SHASUMS256.txt` geprüft.
+* Maven-Central-Metadaten von `org.springframework.boot:spring-boot`.
+* Release-Stände von `actions/checkout`, `actions/setup-java`,
+  `actions/setup-node`, `actions/upload-artifact` und `gradle/actions`.
+* Hombergs, _Get Your Hands Dirty on Clean Architecture_, 2. Auflage (EPUB, lokale
+  Kopie des Owners), und Brown, Kapitel 34 aus _Clean Architecture_ (PDF-Scan,
+  lokale Kopie des Owners).
+* ADR-002, ADR-006, ADR-007, ADR-009, ADR-011, ADR-013, ADR-015, ADR-004
+  (Ausschnitt), ADR-005 (Ausschnitt), QS-003, R-007, `doc-005`,
+  `doc-05000-building-block-view.adoc`, `doc-06000-runtime-view.adoc`.
+* Toolkit `tools/architecture-knowledge-toolkit`:
+** Skills `clock-in`, `clock-out`, `adr`, `implement-issue-workflow`,
+   `post-merge-sync`, `convergence-check`.
+** `clock-in/templates/progress.adoc`, `adapters/shared/journal-config.sh get`.
+* Privates Journal: Skill `daily-clock-out`, Invariantenprüfung aus
+  `daily-clock-in`.
+
+Fehlgeschlagen:
+
+* Webseiten von Packt und DZone (403), ein InformIT-Artikel war der falsche.
+  Ausweichweg: die lokalen Kopien des Owners.
+* Die erste Gegenprobe zu ArchUnit (Lauf 43861301994) scheiterte an
+  `pruefeTestsVorhanden` statt an ArchUnit.
