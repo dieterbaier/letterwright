@@ -172,9 +172,9 @@ Stärkste Kapselung, auch innerhalb eines Artefakts: Brown beschreibt das als
 Unterscheidung zwischen Typen, die `public`, und Typen, die „published“ sind.
 Sie setzt aber dieselbe
 Aufteilung in Artefakte wie Option 3 voraus und kommt nur auf dem Modulpfad zur
-Wirkung. Spring-Boot-Hosts laufen üblicherweise auf dem Klassenpfad; der
-Aufwand für Reflection-Freigaben in Tests und Autokonfiguration ist nicht
-bewertet.
+Wirkung. Spring-Boot-Hosts laufen üblicherweise auf dem Klassenpfad, wo die
+Deskriptoren ignoriert werden. Der Aufwand für Reflection-Freigaben (`opens`)
+in Tests und Autokonfiguration ist nicht erprobt.
 
 === Pugh-Matrix
 
@@ -192,16 +192,24 @@ Die Matrix ist ungewichtet.
 | Isolierte Adapter | -1 | 0 | +1 | +1
 | Geringer Build-Aufwand | +1 | +1 | -1 | -1
 | Grenzen später verschieben | +1 | +1 | -1 | -1
-| Verträglichkeit mit Spring-Hosts | 0 | 0 | 0 | ?
-s| Summe s| -1 s| +1 s| +1 s| ?
+| Verträglichkeit mit Spring-Hosts | 0 | 0 | 0 | 0
+s| Summe s| -1 s| +1 s| +1 s| +1
 |===
 
-Ungewichtet liegen Option 2 und Option 3 gleichauf. Ohne den nachträglich
-ergänzten Treiber „Isolierte Adapter“ läge Option 2 vorn. Option 2 verfehlt
-aber genau die beiden Treiber, die der Owner höher gewichtet: An den Grenzen
-des Hexagons setzt sie nichts durch, und der Host bekommt alle Klassen.
-Option 3 erfüllt beide. Option 4 bringt darüber hinaus nur Kapselung innerhalb
-eines Artefakts, um den Preis einer unbewerteten Hürde auf dem Modulpfad.
+Die `0` für Option 4 bei „Verträglichkeit mit Spring-Hosts“ ist eine
+Einschätzung des Owners ohne eigene Erfahrung mit JPMS, keine erprobte
+Bewertung (siehe Annahmen).
+
+Ungewichtet liegen Option 2, Option 3 und Option 4 gleichauf. Ohne den
+nachträglich ergänzten Treiber „Isolierte Adapter“ läge Option 2 vorn.
+Option 2 verfehlt aber genau die beiden Treiber, die der Owner höher gewichtet:
+An den Grenzen des Hexagons setzt sie nichts durch, und der Host bekommt alle
+Klassen. Option 3 und Option 4 erfüllen beide. Die Matrix trennt sie nicht,
+weil Option 4 Option 3 voraussetzt und auf einer Drei-Punkte-Skala beim
+Build-Aufwand ebenfalls `-1` erhält. Option 4 kostet zusätzlich die
+Moduldeskriptoren und die Freigaben für Spring. Ihr Mehrwert, Kapselung
+innerhalb eines Artefakts, wirkt nur auf dem Modulpfad und damit nicht in den
+erwarteten Hosts. Deshalb fällt die Wahl auf Option 3.
 
 === Konsequenzen
 
@@ -314,15 +322,18 @@ ist.
 * Die Hosts laufen auf dem Klassenpfad (Spring Boot im Standardbetrieb).
 * Der Modulschnitt aus ADR-009 ist für den MVP stabil genug, dass die Kosten
   eines Verschiebens selten anfallen.
+* JPMS (Option 4) behindert Spring-Hosts auf dem Klassenpfad nicht. Das ist die
+  Einschätzung des Owners ohne eigene Erfahrung, nicht erprobt.
 
 === Open Questions
 
-* Soll `usecases-out` als eigenständiges SPI-Artefakt mit eigener
-  Kompatibilitätszusage versioniert werden, getrennt vom Starter?
+* Keine. Ob `usecases-out` getrennt vom Starter versioniert wird, hat der Owner
+  im Review von PR #18 beantwortet: vorerst nicht. Alle Module erscheinen mit
+  derselben Version.
 
 === Review Notes
 
-* Gewichtung der Treiber bestätigen. Ungewichtet liegen Option 2 und Option 3
-  gleichauf, und das nur dank des nachträglich ergänzten Treibers „Isolierte
-  Adapter“.
-* Bewertung von Option 4 beim Kriterium „Verträglichkeit mit Spring-Hosts“ offen.
+* Der Owner hat im Review von PR #18 den Treiber „Isolierte Adapter“
+  bestätigt. Ungewichtet liegen damit Option 2, 3 und 4 gleichauf.
+* Vor `accepted` die Gewichtung der Treiber bestätigen: früher Fehlernachweis
+  und schmale Host-Abhängigkeit vor Build-Aufwand und Verschiebbarkeit.
