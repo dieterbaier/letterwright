@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-16'
 reviewed: false
-summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft dieselben Regeln zusätzlich.'
+summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft zusätzlich die Paketregeln aus ADR-002.'
 derived_from:
 - type: external
   description: 'Entscheidung des Owners im Review von PR #15 (Backend-Gerüst, Issue #12): Grenzen über eigene Module erzwingen, ArchUnit zusätzlich („fail fast“)'
@@ -30,7 +30,7 @@ relations:
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: proposed
-  rationale: 'Der Host hängt für seine SPI-Implementierungen nur am kleinen Artefakt usecases-out und sieht weder Anwendungsfälle noch Adapter.'
+  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv die Domäne, nicht Anwendungsfälle, Service oder Adapter.'
   reviewed: false
 metadata_version: '1.0'
 ---
@@ -59,9 +59,13 @@ Gradle-Module** zu erzwingen und nicht nur über eine Paketkonvention:
   ein ausgehender nur `usecases-out`. Eine falsche Abhängigkeit scheitert damit
   beim Kompilieren („fail fast“) und nicht erst im Testlauf.
 * **ArchUnit bleibt zusätzlich bestehen** (Modul `architekturtests`). Es prüft
-  dieselben Regeln auf Paketebene und fängt ab, was der Compiler nicht sieht:
-  etwa Spring-Abhängigkeiten in der Domäne oder eine neue Projektabhängigkeit,
-  die eine Grenze aufweicht.
+  auf Paketebene einen Teil derselben Regeln und dazu, was die
+  Modulabhängigkeiten nicht ausdrücken: Die Domäne und die Ports sind frei von
+  Spring, eingehende und ausgehende Ports kennen einander nicht, der Service
+  kennt keine Adapter, eingehende Adapter kennen nur eingehende Ports,
+  ausgehende Adapter nur ausgehende, und kein Adapter hängt am Starter.
+  Die Isolation der Adapter untereinander prüft ArchUnit derzeit nicht. Sie
+  hängt allein an den Gradle-Abhängigkeiten.
 * Gemeinsame Build-Regeln stehen im Convention-Plugin
   `standardschreiben.java-modul`, damit die Zahl der Module den Pflegeaufwand
   nicht vervielfacht.
@@ -103,9 +107,10 @@ gewöhnlichen Anwendung:
 
 * **Früher Fehlernachweis:** Eine falsche Abhängigkeit soll so früh wie möglich
   scheitern, idealerweise schon in der IDE und beim Kompilieren.
-* **Schmale Abhängigkeit des Hosts:** Der Host soll für seine
-  SPI-Implementierungen nur die Ports brauchen, nicht die Anwendungsfälle und
-  Adapter.
+* **Schmale Abhängigkeit des Hosts:** Ein Host-Modul, das nur SPIs
+  implementiert, soll zum Kompilieren nur die Ports und die Domäne brauchen,
+  nicht die Anwendungsfälle, den Service und die Adapter. Zur Laufzeit bindet
+  der Host über den Starter ohnehin alles ein.
 * **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
   können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
   vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
@@ -150,7 +155,8 @@ Die Grenzen sind Module, die erlaubten Richtungen Projektabhängigkeiten.
 ArchUnit prüft zusätzlich.
 
 Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
-nicht erst an. Der Host hängt nur an `usecases-out`. Der Schnitt entspricht der
+nicht erst an. Ein Host-Modul, das nur SPIs implementiert, kann direkt an
+`usecases-out` hängen. Der Schnitt entspricht der
 feinsten Variante, die Hombergs beschreibt: eingehende und ausgehende Ports als
 getrennte Module, damit jeder Adapter schon an seiner Abhängigkeit als
 eingehend oder ausgehend erkennbar ist. Ein Modul je Adapter vermeidet zudem
@@ -217,15 +223,24 @@ erwarteten Hosts. Deshalb fällt die Wahl auf Option 3.
 
 * Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
   nicht erst angeboten.
-* Der Host hängt für seine SPI-Implementierungen nur an `usecases-out`; die
-  Anwendungsfälle und Adapter bleiben für ihn unsichtbar.
-* ArchUnit und Modulgrenzen prüfen dieselben Regeln auf zwei Wegen; fällt einer
-  weg, bleibt der andere. Hombergs empfiehlt genau diese Kombination.
+* Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an
+  `usecases-out` hängen. Auf seinem Compile-Classpath liegen dann nur die Ports
+  und, weil `usecases-out` die Domäne per `api` exportiert, transitiv die
+  Domänentypen. Anwendungsfälle, Service und Adapter sieht es beim Kompilieren
+  nicht. Das gilt nicht für das Modul, das den Starter einbindet: Der Starter
+  exportiert zusätzlich `usecases-in` und bringt Service und Adapter zur
+  Laufzeit mit.
+* Für die Regeln, die beide abdecken, prüfen ArchUnit und Modulgrenzen auf zwei
+  Wegen; fällt einer weg, bleibt der andere. Hombergs empfiehlt diese
+  Kombination.
 * Jede neue Modulabhängigkeit steht im Build-Skript und ist damit eine bewusste,
   im Review sichtbare Entscheidung.
-* Die ArchUnit-Fixtures, die je Regel einen Verstoß nachstellen, beheben die
-  Schwäche, die Hombergs nennt: Eine Regel, die nach einem Umbenennen nichts
-  mehr findet, schlägt fehl, statt still zu bestehen.
+* Die ArchUnit-Fixtures im Paket `archfixture` belegen, dass jede Regel den
+  nachgestellten Verstoß erkennt. Mehr belegen sie nicht. Nach einer Umbenennung
+  im Produktionscode bleiben sie grün, weil sie ihr eigenes Basispaket haben.
+  Die Produktivprüfung bleibt ebenfalls grün, weil alle Regeln
+  `allowEmptyShould(true)` setzen und ein leer laufender Selektor deshalb nicht
+  auffällt. Die Schwäche, die Hombergs nennt, ist damit nicht behoben.
 
 ==== Negativ
 
@@ -236,11 +251,17 @@ erwarteten Hosts. Deshalb fällt die Wahl auf Option 3.
   Hosts sichtbar. Hombergs warnt, dass Build-Module „less supple to change over
   time“ sind und ein falscher Schnitt deshalb eher bestehen bleibt.
 * Die Modulabhängigkeiten selbst sind Code, der falsch sein kann. Eine
-  zusätzliche Projektabhängigkeit hebt eine Grenze still auf; das fängt nur
-  ArchUnit.
+  zusätzliche Projektabhängigkeit hebt eine Grenze still auf. ArchUnit fängt
+  das nur für die Regeln ab, die es prüft. Eine Abhängigkeit von
+  `adapter-web` nach `adapter-persistenz-jdbc` würde nach Ergänzen im
+  Build-Skript kompilieren und alle heutigen Regeln bestehen.
 
 ==== Neutral oder Folgearbeiten
 
+* Vorschlag, nicht entschieden: eine ArchUnit-Regel für die Isolation der
+  Adapter untereinander, mit Fixture.
+* Vorschlag, nicht entschieden: leere Selektoren in der Produktivprüfung
+  fehlschlagen lassen, statt sie mit `allowEmptyShould(true)` zuzulassen.
 * JPMS (Option 4) neu bewerten, falls ein Host auf dem Modulpfad läuft oder
   Kapselung innerhalb eines Artefakts nötig wird.
 * Innerhalb eines Moduls bleibt package-private die Voreinstellung für alles,
@@ -335,5 +356,9 @@ ist.
 
 * Der Owner hat im Review von PR #18 den Treiber „Isolierte Adapter“
   bestätigt. Ungewichtet liegen damit Option 2, 3 und 4 gleichauf.
-* Vor `accepted` die Gewichtung der Treiber bestätigen: früher Fehlernachweis
-  und schmale Host-Abhängigkeit vor Build-Aufwand und Verschiebbarkeit.
+* Der Owner hat die Gewichtung der Treiber bestätigt: früher Fehlernachweis und
+  schmale Host-Abhängigkeit vor Build-Aufwand und Verschiebbarkeit.
+* Präzisiert nach dem Review von PR #18: Die Isolation der Adapter beruht derzeit
+  allein auf den Gradle-Abhängigkeiten. Die Fixtures belegen nur, dass jede
+  Regel ihren Verstoß erkennt. Die schmale Host-Abhängigkeit gilt nur für den
+  Compile-Classpath eines Moduls, das ausschließlich SPIs implementiert.
