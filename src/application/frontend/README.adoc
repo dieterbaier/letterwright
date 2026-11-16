@@ -10,7 +10,10 @@ importiert der Host getrennt: `@dieterbaier/standardschreiben/styles.css`.
 
 == Befehle
 
-Im Verzeichnis `src/application/frontend/`, Node.js ab 22.12:
+Im Verzeichnis `src/application/frontend/`, mit Node.js 22.22.2 oder neuer auf der
+22er-Linie, 24.15 oder neuer auf der 24er-Linie oder ab 26. Diese Bereiche
+verlangen jsdom und Vitest. `.npmrc` setzt `engine-strict`, damit `npm ci` mit
+einer anderen Version sofort abbricht.
 
 [source,sh]
 ----
