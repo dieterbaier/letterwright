@@ -51,7 +51,8 @@ Wir schlagen vor:
 * **Monorepo**. Alle Quellen liegen unter `src/`, getrennt nach Art:
 ** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
    ADR-002:
-*** `domaene`
+*** `domaene/modell` (Domänenmodell) und `domaene/service` (Domänenservices) als
+    zwei Module; Domänenservices sieht nur `usecases/service`
 *** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports, SPI) und
     `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
 *** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,
@@ -67,13 +68,13 @@ Wir schlagen vor:
   `usecases/out`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
   ArchUnit prüft zusätzlich Paketregeln aus ADR-002. Ein Host-Modul, das
   ausschließlich SPIs implementiert, kann direkt an `usecases-out` hängen und
-  bekommt zum Kompilieren nur die Ports und transitiv die Domäne. Wer den Starter
+  bekommt zum Kompilieren nur die Ports und transitiv das Domänenmodell. Wer den Starter
   einbindet, bekommt auch `usecases-in` und zur Laufzeit Service und Adapter. Die
   Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
   xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
-* Die Gradle-Projekte sind flach benannt (`usecases-in`, `adapter-web`, …) und
-  zeigen auf ihr Verzeichnis. Die Gruppenordner `adapter/in`, `adapter/out` und
-  `usecases` sind keine eigenen Gradle-Projekte.
+* Die Gradle-Projekte sind flach benannt (`domaene-modell`, `usecases-in`,
+  `adapter-web`, …) und zeigen auf ihr Verzeichnis. Die Gruppenordner `domaene`,
+  `adapter/in`, `adapter/out` und `usecases` sind keine eigenen Gradle-Projekte.
 * **Versionen**: die **aktuelle stabile Spring-Boot-Version (4.x)**, entwickelt und
   getestet mit **Java 25 (LTS)**, kompiliert mit `--release 21`, damit Hosts auf
   Java 21 die Bibliothek nutzen können. Die genauen Patch-Versionen werden beim

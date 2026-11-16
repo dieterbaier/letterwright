@@ -30,7 +30,7 @@ relations:
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv die Domäne, nicht Anwendungsfälle, Service oder Adapter.'
+  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv das Domänenmodell, nicht Domänenservices, Anwendungsfälle, Service oder Adapter.'
   reviewed: true
 metadata_version: '1.0'
 ---
@@ -44,6 +44,10 @@ Angenommen (accepted) am 2026-11-16.
 Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #18
 geprüft und angenommen.
 
+Ergänzt am 2026-11-16 um die Trennung von Domänenmodell und Domänenservices
+(<<adr-015-domaenenservices>>, Issue #25). Diese Ergänzung hat der Owner
+entschieden: Option 1 aus drei Varianten, beide Module unter `domaene`.
+
 === Entscheidung
 
 Wir erzwingen die Grenzen der hexagonalen Architektur
@@ -51,9 +55,13 @@ Wir erzwingen die Grenzen der hexagonalen Architektur
 Gradle-Module** und nicht nur über eine Paketkonvention:
 
 * Jede Grenze, über die eine Abhängigkeit nur in eine Richtung laufen darf, ist
-  eine Modulgrenze: `domaene`, `usecases-in`, `usecases-out`, `usecases-service`
-  und je Adapter ein Modul (Schnitt in
+  eine Modulgrenze: `domaene-modell`, `domaene-service`, `usecases-in`,
+  `usecases-out`, `usecases-service` und je Adapter ein Modul (Schnitt in
   xref:adr-009-build-monorepo-und-versionen[ADR-009]).
+* Domänenmodell und Domänenservices sind getrennte Module unter `domaene`. Nur
+  `usecases-service` bindet `domaene-service` ein, als `implementation`. Ports
+  und Adapter sehen beim Kompilieren nur das Modell
+  (<<adr-015-domaenenservices>>).
 * Die erlaubten Richtungen stehen als Projektabhängigkeiten in den
   `build.gradle.kts`-Dateien. Ein eingehender Adapter sieht nur `usecases-in`,
   ein ausgehender nur `usecases-out`. Eine falsche Abhängigkeit scheitert damit
@@ -63,8 +71,9 @@ Gradle-Module** und nicht nur über eine Paketkonvention:
   Modulabhängigkeiten nicht ausdrücken: Die Domäne und die Ports sind frei von
   Spring, eingehende und ausgehende Ports kennen einander nicht, der Service
   kennt keine Adapter, eingehende Adapter kennen nur eingehende Ports,
-  ausgehende Adapter nur ausgehende, und kein Adapter hängt am Starter.
-  Die Isolation der Adapter untereinander prüft ArchUnit derzeit nicht. Sie
+  ausgehende Adapter nur ausgehende, und kein Adapter hängt am Starter. Das
+  Domänenmodell kennt keine Domänenservices, und weder Ports noch Adapter kennen
+  sie. Die Isolation der Adapter untereinander prüft ArchUnit derzeit nicht. Sie
   hängt allein an den Gradle-Abhängigkeiten.
 * Gemeinsame Build-Regeln stehen im Convention-Plugin
   `standardschreiben.java-modul`, damit die Zahl der Module den Pflegeaufwand
@@ -217,16 +226,58 @@ Moduldeskriptoren und die Freigaben für Spring. Ihr Mehrwert, Kapselung
 innerhalb eines Artefakts, wirkt nur auf dem Modulpfad und damit nicht in den
 erwarteten Hosts. Deshalb fällt die Wahl auf Option 3.
 
+[[adr-015-domaenenservices]]
+=== Ergänzung: Domänenmodell und Domänenservices
+
+Der Owner hat am 2026-11-16 auf eine Lücke im Schnitt hingewiesen. Beide
+Port-Module geben die Domäne per `api` weiter. Läge ein Domänenservice im selben
+Modul wie das Modell, sähen ihn die Ports und transitiv alle Adapter. Ein Adapter
+könnte ihn dann am Anwendungsfall vorbei aufrufen. Die Modulgrenzen verhinderten
+das nicht, und ArchUnit prüfte es nicht.
+
+Betrachtet wurden drei Varianten:
+
+. *Eigenes Modul für Domänenservices* (gewählt). Nur `usecases-service` bindet
+  es ein. Ports und Adapter sehen es beim Kompilieren nicht.
+. *Domänenservices im Modul `usecases-service`.* Sie wären ebenso unsichtbar,
+  aber Domänenlogik läge in der Anwendungsschicht.
+. *Domänenservices in der Domäne lassen und nur per ArchUnit absichern.* Das ist am
+  einfachsten, scheitert aber erst im Test und widerspricht damit dem früheren
+  Fehlernachweis dieses ADR.
+
+Der Schnitt:
+
+[cols="1,2,2", options="header"]
+|===
+| Modul | Verzeichnis | Hängt an
+| `domaene-modell` | `domaene/modell` | nichts
+| `domaene-service` | `domaene/service` | `domaene-modell` (`api`)
+| `usecases-in`, `usecases-out` | `usecases/in`, `usecases/out` | `domaene-modell` (`api`)
+| `usecases-service` | `usecases/service` | `usecases-in` (`api`), `usecases-out` und `domaene-service` (`implementation`)
+|===
+
+Ob ein Domänenservice sichtbar ist, legt damit der Build fest und nicht eine
+Konvention. Zwei ArchUnit-Regeln prüfen das zusätzlich auf Paketebene, jede mit
+Fixture: Das Modell (`domaene.modell`) kennt keine Domänenservices
+(`domaene.service`), und Ports und Adapter kennen sie nicht. Der Starter bindet
+`usecases-service` als `implementation` ein. Beim Kompilieren sieht er die
+Domänenservices deshalb nicht, und auch ein Host über den Starter bekommt sie
+nur zur Laufzeit. Braucht die Autokonfiguration sie später als Beans, muss der
+Starter `domaene-service` ausdrücklich einbinden.
+
 === Konsequenzen
 
 ==== Positiv
+
+* Ein Domänenservice ist beim Kompilieren nur in `usecases-service` sichtbar.
+  Ein Port oder Adapter, der ihn importiert, kompiliert nicht.
 
 * Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
   nicht erst angeboten.
 * Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an
   `usecases-out` hängen. Auf seinem Compile-Classpath liegen dann nur die Ports
-  und, weil `usecases-out` die Domäne per `api` exportiert, transitiv die
-  Domänentypen. Anwendungsfälle, Service und Adapter sieht es beim Kompilieren
+  und, weil `usecases-out` das Domänenmodell per `api` exportiert, transitiv
+  die Modelltypen. Domänenservices, Anwendungsfälle, Service und Adapter sieht es beim Kompilieren
   nicht. Das gilt nicht für das Modul, das den Starter einbindet: Der Starter
   exportiert zusätzlich `usecases-in` und bringt Service und Adapter zur
   Laufzeit mit.
@@ -361,3 +412,7 @@ ist.
   allein auf den Gradle-Abhängigkeiten. Die Fixtures belegen nur, dass jede
   Regel ihren Verstoß erkennt. Die schmale Host-Abhängigkeit gilt nur für den
   Compile-Classpath eines Moduls, das ausschließlich SPIs implementiert.
+* Ergänzt am 2026-11-16 auf Entscheidung des Owners (Issue #25): Domänenmodell und
+  Domänenservices als getrennte Module unter `domaene`. Der Owner hatte darauf
+  hingewiesen, dass ein Domänenservice im Modul der Domäne für Ports und Adapter
+  sichtbar wäre.

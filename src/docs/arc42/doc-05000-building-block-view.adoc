@@ -34,7 +34,8 @@ System_Boundary(host, "Host-Anwendung") {
     Component(uin, "usecases-in", "Java, ohne Spring", "Eingehende Ports: Anwendungsfälle")
     Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
     Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (SPI)")
-    Component(dom, "domaene", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
+    Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
+    Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
     Component(ren, "adapter-rendering", "FreeMarker, openhtmltopdf, veraPDF", "Zusammenführen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
   }
@@ -48,6 +49,8 @@ Rel(web, uin, "ruft")
 Rel(app, uin, "implementiert")
 Rel(app, uout, "nutzt")
 Rel(app, dom, "nutzt")
+Rel(app, dsvc, "nutzt")
+Rel(dsvc, dom, "arbeitet auf")
 Rel(ren, uout, "implementiert Renderer")
 Rel(per, uout, "implementiert Repository, DokumentAblage")
 Rel(spi, uout, "implementiert SPIs")
@@ -58,7 +61,8 @@ Rel(per, db, "JDBC")
 [cols="1,3,2", options="header"]
 |===
 | Baustein | Verantwortung | Ablage im Repository
-| domaene | Fachmodell und Regeln, frei von Frameworks | `src/application/backend/domaene`
+| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | `src/application/backend/domaene/modell`
+| domaene-service | Domänenservices, frei von Frameworks; nur für `usecases-service` sichtbar (ADR-015) | `src/application/backend/domaene/service`
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | `src/application/backend/usecases/in`
 | usecases-out | Ausgehende Ports (SPI) zum Host und zu den ausgehenden Adaptern | `src/application/backend/usecases/out`
 | usecases-service | Implementierung der Anwendungsfälle | `src/application/backend/usecases/service`
