@@ -346,19 +346,67 @@ Folgefragen, bevor die Regel als ADR festgehalten wird:
 . *Benutzerbindung:* Der Snapshot ist bisher an den Benutzer gebunden. Was gilt,
   wenn ein anderer Benutzer dieselbe Aufgabe öffnet, etwa nach einer
   Neuzuweisung?
++
+Antwort (Owner, 2026-11-16): Der Snapshot bleibt an einen Benutzer gebunden. Es
+soll unterbunden werden, dass zwei verschiedene Benutzer zum selben fachlichen
+Schlüssel einen Snapshot erzeugen.
 . *Begriffe:* Wie verhalten sich fachlicher Schlüssel (Aufgabeninstanz), Fall
   (Business Key) und der bisherige fachliche Bezug (Typ und ID, Glossar)
   zueinander? Ist der Fall der Bezug, nach dem die Übersicht filtert (Q-PO-003)?
 . *Ein Schlüssel, ein Schreiben:* Erzeugt eine Aufgabe immer genau ein Schreiben,
   oder können zu einer Aufgabe mehrere Standardschreiben gehören, etwa an
   verschiedene Empfänger?
++
+Antwort (Owner, 2026-11-16): Entstehen aus einer Aufgabe mehrere
+Standardschreiben, kann das trotzdem als ein Fall gelten. Ein Fall ist ähnlich
+einem Human Task in BPMN zu verstehen: Jemand hat die Aufgabe, ein
+Standardschreiben zu erzeugen. Bearbeitet ein Benutzer diese Aufgabe, kann kein
+anderer Benutzer sie und damit dieses Standardschreiben erzeugen. Die Aufgabe
+bleibt blockiert, bis sie wieder freigegeben ist. Ist das Standardschreiben schon
+erzeugt, kann ein anderer Benutzer es nicht noch einmal erzeugen. Er bekommt das
+gespeicherte Standardschreiben angezeigt.
 . *Löschen:* Darf nach dem Löschen eines Schreibens über die `Loeschrichtlinie`
   unter demselben Schlüssel ein neues entstehen?
++
+Antwort (Owner, 2026-11-16): Ja.
 . *Dateiname:* Wie wird der Dateiname gebildet? Das Thema ist neu.
++
+Antwort (Owner, 2026-11-16): Die Host-Anwendung gibt den Dateinamen vor. Für die
+Eindeutigkeit sorgt die Bibliothek: Gibt es schon eine Datei mit diesem Namen,
+hängt sie am Ende einen hochgezählten Index an. Nach dem Speichern des
+endgültigen Schreibens informiert die Bibliothek die Host-Anwendung über den
+endgültigen Dateinamen und den technischen Schlüssel des Dokuments. So kann der
+Host eine Beziehung zwischen Fachdaten und Dokument herstellen. Dafür ist die
+Host-Anwendung verantwortlich.
 
-Betroffen sind voraussichtlich ADR-002 (SPI), ADR-007 (Snapshot), die
-Laufzeitsicht, das Glossar sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des
-Beispiel-Hosts in #11 lassen sich als zwei Aufgaben eines Prozesses abbilden.
+Noch offen, bevor die Regel als ADR festgehalten wird:
+
+* *Aktualisieren und Ablauf (Frage 1):* Gilt der Vorschlag, dass „Aktualisieren“,
+  Ablauf und geänderte Daten den Snapshot unter demselben Schlüssel ersetzen?
+* *Ein Schlüssel, mehrere Schreiben:* Gehören zu einer Aufgabe mehrere
+  Standardschreiben, braucht jedes einen eigenen Schlüssel, sonst liefert der
+  zweite Aufruf das erste Schreiben aus. Vorschlag: Der Host gibt je
+  Standardschreiben einen eigenen fachlichen Schlüssel vor, etwa die
+  Aufgabeninstanz mit einem Zusatz. Mehrere Schlüssel können zum selben Fall
+  gehören.
+* *Begriffe (Frage 3):* Bisher war der Fall der Business Key der Prozessinstanz.
+  Die Antwort zu Frage 4 beschreibt ihn wie einen Human Task. Was ist der Fall, und
+  wie verhält er sich zum fachlichen Bezug (Typ und ID) und zur Übersicht
+  (Q-PO-003)?
+* *Sperre und Freigabe:* Wer sperrt die Aufgabe, und wodurch wird sie wieder frei?
+  Vorschlag: Ein nicht abgelaufener Snapshot eines Benutzers sperrt den Schlüssel
+  für andere Benutzer. Die Sperre endet mit dem Speichern, mit dem Ablauf nach
+  30 Minuten oder mit einem ausdrücklichen Abbruch. Alternativ übernimmt die
+  Sperre der Host, etwa über das Claim eines Human Task in der Process Engine.
+* *Benachrichtigung des Hosts:* Was gilt, wenn die Benachrichtigung über
+  Dateiname und technischen Schlüssel fehlschlägt? Vorschlag: Das Schreiben bleibt
+  gespeichert, und die Benachrichtigung wird wiederholt. Alternativ läuft sie in
+  derselben Transaktion, und ein Fehler verhindert das Speichern.
+
+Betroffen sind voraussichtlich ADR-002 (SPI für Schlüssel, Dateiname und
+Benachrichtigung), ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
+sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
+lassen sich als zwei Aufgaben eines Prozesses abbilden.
 
 == Beantwortete Fragen
 
