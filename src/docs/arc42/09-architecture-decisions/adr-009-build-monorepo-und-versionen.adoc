@@ -90,6 +90,14 @@ anfordert, und die Konfiguration bleibt mit dem Configuration-Cache verträglich
 Der Workflow `backend.yml` baut mit dem Wrapper auf Java 21 (Baseline). Die
 Matrix mit Java 21 und Java 25 wird mit #14 eingerichtet.
 
+Stand beim Anlegen des Frontend-Gerüsts (#13): Node.js ab 22.12, Vite 8.3,
+Vitest 5.1 mit V8-Abdeckung, React 19.3 (Peer-Abhängigkeit), UnoCSS 66.13,
+axe-core 4.14, ESLint 10 mit typescript-eslint 8.72. TypeScript bleibt bei 6.0,
+weil typescript-eslint TypeScript 7 noch nicht unterstützt. Das Paket heißt
+`@dieterbaier/standardschreiben` und liegt unter
+`src/application/frontend/packages/komponenten`. Die exakten Versionen stehen in
+`package-lock.json`.
+
 Antwort auf die Frage des Owners „Warum nicht die neueste Spring-Boot-Version?“:
 Der ursprüngliche Vorschlag 3.x war Vorsicht wegen der Kompatibilität mit Hosts.
 Ein Starter ist an die Spring-Boot-Hauptversion des Hosts gebunden. Da noch keine
