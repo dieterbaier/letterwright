@@ -106,6 +106,9 @@ gewöhnlichen Anwendung:
 * **Schmale Abhängigkeit des Hosts:** Der Host soll für seine
   SPI-Implementierungen nur die Ports brauchen, nicht die Anwendungsfälle und
   Adapter.
+* **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
+  können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
+  vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
 * **Geringer Build-Aufwand:** Wenige Module, einfache Konfiguration.
 * **Grenzen später verschieben:** Wie leicht lässt sich der Schnitt ändern, wenn
   sich Grenzen als falsch erweisen.
@@ -122,17 +125,24 @@ die Abhängigkeitsregeln nach dem Kompilieren im Testlauf.
 Einfachster Build, Grenzen lassen sich mit einem Refactoring verschieben. Ein
 Verstoß fällt aber erst im Test auf, und die IDE bietet die falsche Klasse
 weiter per Autovervollständigung an. Der Host bekommt ein einziges Artefakt
-mit allen Klassen.
+mit allen Klassen. Beide Quellen halten Prüfungen nach dem Kompilieren allein
+für zu schwach: Hombergs nennt sie „not fail-safe“, weil schon ein umbenanntes
+Paket eine Regel leer laufen lässt. Brown nennt sie „fallible“ mit einem zu
+langen Feedback-Zyklus (siehe <<adr-015-literatur>>).
 
 ==== Option 2: Ein Modul, Sichtbarkeit (package-private) und ArchUnit
 
 Wie Option 1, aber alles, was eine Grenze nicht überschreiten muss, ist
 package-private. Der Compiler setzt so einen Teil der Regeln durch.
 
-Das hilft innerhalb einer Komponente. An den Grenzen des Hexagons trägt es
+Das ist Browns bevorzugter Weg für einen Monolithen („package by component“):
+Je weniger Typen `public` sind, desto mehr Regeln setzt der Compiler durch.
+Innerhalb einer Komponente hilft das. An den Grenzen des Hexagons trägt es
 nicht: Ports und Service-Klassen müssen `public` sein (siehe Kontext), und
-genau dort verlaufen die wichtigen Regeln. Der Host bekommt weiterhin ein
-einziges Artefakt.
+genau dort verlaufen die wichtigen Regeln. Hombergs nennt zwei weitere
+Grenzen. Package-private reicht nicht über Unterpakete hinweg. Mit Spring
+funktioniert es nur, wenn die Klassen per Classpath-Scanning erzeugt werden.
+Der Host bekommt weiterhin ein einziges Artefakt.
 
 ==== Option 3: Eigene Gradle-Module je Grenze und ArchUnit (gewählt)
 
@@ -140,16 +150,27 @@ Die Grenzen sind Module, die erlaubten Richtungen Projektabhängigkeiten.
 ArchUnit prüft zusätzlich.
 
 Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
-nicht erst an. Der Host hängt nur an `usecases-out`. Kosten: mehr
-Build-Dateien, ein Convention-Plugin, und das Verschieben einer Grenze ist eine
-Änderung am Build und an den veröffentlichten Artefakten.
+nicht erst an. Der Host hängt nur an `usecases-out`. Der Schnitt entspricht der
+feinsten Variante, die Hombergs beschreibt: eingehende und ausgehende Ports als
+getrennte Module, damit jeder Adapter schon an seiner Abhängigkeit als
+eingehend oder ausgehend erkennbar ist. Ein Modul je Adapter vermeidet zudem
+Browns „Périphérique anti-pattern“. Gemeint ist damit Infrastrukturcode in einem
+gemeinsamen Quellbaum, über den ein Web-Controller an der Domäne vorbei direkt
+ein Repository aufrufen kann.
+
+Kosten: mehr Build-Dateien, ein Convention-Plugin, und das Verschieben einer
+Grenze ist eine Änderung am Build und an den veröffentlichten Artefakten.
+Brown nennt einen eigenen Quellbaum je Komponente „very much an idealistic
+solution“ mit Kosten für Performance, Komplexität und Wartung.
 
 ==== Option 4: Java-Module (JPMS) mit `module-info.java`
 
 Jedes Gradle-Modul bekommt zusätzlich einen Moduldeskriptor, der nur die
 Port-Pakete exportiert.
 
-Stärkste Kapselung, auch innerhalb eines Artefakts. Sie setzt aber dieselbe
+Stärkste Kapselung, auch innerhalb eines Artefakts: Brown beschreibt das als
+Unterscheidung zwischen Typen, die `public`, und Typen, die „published“ sind.
+Sie setzt aber dieselbe
 Aufteilung in Artefakte wie Option 3 voraus und kommt nur auf dem Modulpfad zur
 Wirkung. Spring-Boot-Hosts laufen üblicherweise auf dem Klassenpfad; der
 Aufwand für Reflection-Freigaben in Tests und Autokonfiguration ist nicht
@@ -168,17 +189,19 @@ Die Matrix ist ungewichtet.
 | Kriterium | Option 1 | Option 2 | Option 3 | Option 4
 | Früher Fehlernachweis | -1 | 0 | +1 | +1
 | Schmale Abhängigkeit des Hosts | -1 | -1 | +1 | +1
+| Isolierte Adapter | -1 | 0 | +1 | +1
 | Geringer Build-Aufwand | +1 | +1 | -1 | -1
 | Grenzen später verschieben | +1 | +1 | -1 | -1
 | Verträglichkeit mit Spring-Hosts | 0 | 0 | 0 | ?
-s| Summe s| 0 s| +1 s| 0 s| ?
+s| Summe s| -1 s| +1 s| +1 s| ?
 |===
 
-Ungewichtet liegt Option 2 vorn. Sie verfehlt aber genau die beiden Treiber,
-die der Owner höher gewichtet: An den Grenzen des Hexagons setzt sie nichts
-durch, und der Host bekommt alle Klassen. Option 3 erfüllt beide. Option 4
-bringt darüber hinaus nur Kapselung innerhalb eines Artefakts, um den Preis
-einer unbewerteten Hürde auf dem Modulpfad.
+Ungewichtet liegen Option 2 und Option 3 gleichauf. Ohne den nachträglich
+ergänzten Treiber „Isolierte Adapter“ läge Option 2 vorn. Option 2 verfehlt
+aber genau die beiden Treiber, die der Owner höher gewichtet: An den Grenzen
+des Hexagons setzt sie nichts durch, und der Host bekommt alle Klassen.
+Option 3 erfüllt beide. Option 4 bringt darüber hinaus nur Kapselung innerhalb
+eines Artefakts, um den Preis einer unbewerteten Hürde auf dem Modulpfad.
 
 === Konsequenzen
 
@@ -189,7 +212,12 @@ einer unbewerteten Hürde auf dem Modulpfad.
 * Der Host hängt für seine SPI-Implementierungen nur an `usecases-out`; die
   Anwendungsfälle und Adapter bleiben für ihn unsichtbar.
 * ArchUnit und Modulgrenzen prüfen dieselben Regeln auf zwei Wegen; fällt einer
-  weg, bleibt der andere.
+  weg, bleibt der andere. Hombergs empfiehlt genau diese Kombination.
+* Jede neue Modulabhängigkeit steht im Build-Skript und ist damit eine bewusste,
+  im Review sichtbare Entscheidung.
+* Die ArchUnit-Fixtures, die je Regel einen Verstoß nachstellen, beheben die
+  Schwäche, die Hombergs nennt: Eine Regel, die nach einem Umbenennen nichts
+  mehr findet, schlägt fehl, statt still zu bestehen.
 
 ==== Negativ
 
@@ -197,7 +225,8 @@ einer unbewerteten Hürde auf dem Modulpfad.
   damit die Regeln nicht auseinanderlaufen.
 * Eine Grenze zu verschieben ändert den Build und die veröffentlichten Artefakte
   (xref:adr-012-distribution-ueber-github-packages[ADR-012]) und ist damit für
-  Hosts sichtbar.
+  Hosts sichtbar. Hombergs warnt, dass Build-Module „less supple to change over
+  time“ sind und ein falscher Schnitt deshalb eher bestehen bleibt.
 * Die Modulabhängigkeiten selbst sind Code, der falsch sein kann. Eine
   zusätzliche Projektabhängigkeit hebt eine Grenze still auf; das fängt nur
   ArchUnit.
@@ -225,22 +254,60 @@ endif::[]
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-traceability.adoc[leveloffset=+2]
 
-=== Weiterführende Literatur
+[[adr-015-literatur]]
+=== Literatur
 
-Der Owner hat diese Stimmen im Gespräch zur Entscheidung genannt. Sie sind
-bibliografisch angegeben; ihr Inhalt ist in diesem ADR nicht zitiert und nicht
-an der Originalquelle geprüft (siehe Review Notes).
+Beide Quellen sind am Originaltext geprüft. Zitate stehen im englischen
+Original.
 
-* Tom Hombergs: _Get Your Hands Dirty on Clean Architecture_. Packt, 1. Auflage
-  2019 (ISBN 978-1-83921-196-6), Kapitel 10 „Enforcing Architecture
-  Boundaries“; 2. Auflage 2023 (ISBN 978-1-80512-837-3), Kapitel 12. Das Kapitel
-  behandelt Mittel, Architekturgrenzen durchzusetzen, darunter Sichtbarkeit,
-  Prüfungen nach dem Kompilieren und eigene Build-Artefakte.
-* Simon Brown: „The Missing Chapter“, Kapitel 34 in Robert C. Martin: _Clean
-  Architecture_. Prentice Hall, 2017. Brown vertritt dort „Package by
-  Component“ und einen „architecturally-evident coding style“, der Grenzen eher
-  über die Sichtbarkeit im Compiler als über viele Build-Module ausdrückt. Er
-  ist damit die Gegenstimme, die Option 2 stützt.
+*Tom Hombergs: _Get Your Hands Dirty on Clean Architecture_, 2. Auflage. Packt,
+2023, ISBN 978-1-80512-837-3, Kapitel 12 „Enforcing Architecture Boundaries“.*
+Das Kapitel stellt drei Mittel nebeneinander, jeweils mit eigenem Abschnitt:
+„Visibility modifiers“, „Post-compile fitness function“ und „Build artifacts“.
+
+* Zu Build-Modulen: „Developers can no longer inadvertently create illegal
+  dependencies because the classes are not even available on the classpath and
+  they would run into compile errors.“ Als weitere Vorteile nennt er, dass
+  Build-Werkzeuge keine zyklischen Abhängigkeiten zulassen, dass Module isoliert
+  geändert werden können und dass eine neue Abhängigkeit „a conscious act
+  instead of an accident“ wird.
+* Zu den Kosten: Die Architektur „should be somewhat stable before splitting it
+  into different build modules“, und Build-Module „tend to be less supple to
+  change over time“. Je feiner der Schnitt, desto mehr Mapping zwischen den
+  Modulen.
+* Zu ArchUnit: Prüfungen nach dem Kompilieren „are not fail-safe“; ein Tippfehler
+  oder ein umbenanntes Paket kann eine Regel wirkungslos machen.
+* Fazit des Kapitels: „All three approaches can be combined to enforce
+  architecture boundaries“.
+
+*Simon Brown: „The Missing Chapter“. Kapitel 34 in Robert C. Martin: _Clean
+Architecture. A Craftsman's Guide to Software Structure and Design_. Prentice
+Hall, © 2018 Pearson Education, ISBN 978-0-13-449416-6, S. 303–321.*
+
+* Zu Prüfungen nach dem Kompilieren (S. 313): „The problem with both approaches
+  is that they are fallible, and the feedback loop is longer than it should be.“
+  und „I'd personally like to use the compiler to enforce my architecture if at
+  all possible.“
+* Zur Sichtbarkeit (S. 318): Bei „package by component“ ist nur die
+  Komponentenschnittstelle `public`, „so we can rely on the compiler to enforce
+  this architectural principle.“ Für Ports and Adapters hält er fest, dass die
+  Port-Interfaces `public` sein müssen.
+* Zu getrennten Quellbäumen (S. 319–320): Abhängigkeiten lassen sich „at the
+  source code level“ entkoppeln, „by configuring separate modules or projects in
+  your build tool (e.g., Maven, Gradle, MSBuild)“, idealerweise mit einem
+  eigenen Quellbaum je Komponente. Er nennt das „very much an idealistic
+  solution“ wegen „real-world performance, complexity, and maintenance issues“.
+* Zu nur zwei Quellbäumen, Domäne und Infrastruktur (S. 320–321): das
+  „Périphérique anti-pattern of ports and adapters“. Infrastrukturcode kann dort
+  an der Domäne vorbei anderen Infrastrukturcode aufrufen.
+* Zu Modulsystemen (S. 319): Mit OSGi oder dem Java-9-Modulsystem lässt sich
+  zwischen „public“ und „published“ unterscheiden.
+
+Beide Autoren ziehen also den Compiler der Prüfung nach dem Kompilieren vor. Sie
+unterscheiden sich im Mittel. Brown setzt in einem Monolithen zuerst auf
+Sichtbarkeit innerhalb eines Quellbaums und hält eigene Module je Komponente für
+teuer. Hombergs empfiehlt Build-Module, sobald die Architektur stabil genug
+ist.
 
 === Annahmen
 
@@ -255,11 +322,7 @@ an der Originalquelle geprüft (siehe Review Notes).
 
 === Review Notes
 
-* Die Einordnung der beiden Literaturangaben ist nicht an der Originalquelle
-  geprüft: Die Verlagsvorschauen von Packt und die zugänglichen Texte von Simon
-  Brown waren beim Anlegen nicht abrufbar. Vor `accepted` gegen die Bücher
-  prüfen, insbesondere Kapitelnummern und ob Brown separate Build-Module
-  ausdrücklich als Alternative mit Kosten diskutiert.
-* Gewichtung der Treiber bestätigen; die ungewichtete Matrix spricht für
-  Option 2.
+* Gewichtung der Treiber bestätigen. Ungewichtet liegen Option 2 und Option 3
+  gleichauf, und das nur dank des nachträglich ergänzten Treibers „Isolierte
+  Adapter“.
 * Bewertung von Option 4 beim Kriterium „Verträglichkeit mit Spring-Hosts“ offen.
