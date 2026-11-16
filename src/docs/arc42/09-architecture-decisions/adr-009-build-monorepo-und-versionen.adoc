@@ -52,7 +52,7 @@ Wir schlagen vor:
 ** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
    ADR-002:
 *** `domaene/modell` (Domänenmodell) und `domaene/service` (Domänenservices) als
-    zwei Module; Domänenservices sieht nur `usecases/service`
+    zwei Module; Domänenservices sieht beim Kompilieren nur `usecases/service`
 *** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports, SPI) und
     `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
 *** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,

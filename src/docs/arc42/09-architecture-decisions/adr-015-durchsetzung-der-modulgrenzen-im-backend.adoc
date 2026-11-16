@@ -95,8 +95,10 @@ Geprüfte Belege im Repository:
 * `src/application/backend/**/build.gradle.kts`: `adapter-web` hängt nur an
   `usecases-in`, `adapter-rendering` und `adapter-persistenz-jdbc` nur an
   `usecases-out`; `usecases-service` exportiert `usecases-in` per `api` und
-  nutzt `usecases-out` per `implementation`; nur `spring-boot-starter` kennt
-  alle Module.
+  nutzt `usecases-out` und `domaene-service` per `implementation`;
+  `spring-boot-starter` bindet Ports, Service und Adapter direkt ein, sieht
+  `domaene-service` beim Kompilieren aber nicht. Er bringt es nur transitiv zur
+  Laufzeit mit.
 * `src/application/backend/architekturtests/`: die ArchUnit-Regeln, jede mit
   einer Fixture, die einen Verstoß nachstellt.
 

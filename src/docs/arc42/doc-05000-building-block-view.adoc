@@ -62,7 +62,7 @@ Rel(per, db, "JDBC")
 |===
 | Baustein | Verantwortung | Ablage im Repository
 | domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | `src/application/backend/domaene/modell`
-| domaene-service | Domänenservices, frei von Frameworks; nur für `usecases-service` sichtbar (ADR-015) | `src/application/backend/domaene/service`
+| domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | `src/application/backend/domaene/service`
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | `src/application/backend/usecases/in`
 | usecases-out | Ausgehende Ports (SPI) zum Host und zu den ausgehenden Adaptern | `src/application/backend/usecases/out`
 | usecases-service | Implementierung der Anwendungsfälle | `src/application/backend/usecases/service`
