@@ -33,11 +33,13 @@ System_Boundary(host, "Host-Anwendung") {
     Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
     Component(uin, "usecases-in", "Java, ohne Spring", "Eingehende Ports: Anwendungsfälle")
     Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
-    Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (SPI)")
+    Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
+    Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
     Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
     Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
     Component(ren, "adapter-rendering", "FreeMarker, openhtmltopdf, veraPDF", "Zusammenführen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
+    Component(ahost, "adapter-host", "Java", "Bildet interne Ports auf das SPI ab")
   }
   Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie")
   ContainerDb_Ext(db, "Host-Datenbank", "SQL")
@@ -53,7 +55,9 @@ Rel(app, dsvc, "nutzt")
 Rel(dsvc, dom, "arbeitet auf")
 Rel(ren, uout, "implementiert Renderer")
 Rel(per, uout, "implementiert Repository, DokumentAblage")
-Rel(spi, uout, "implementiert SPIs")
+Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie")
+Rel(ahost, spiapi, "ruft, bildet ab")
+Rel(spi, spiapi, "implementiert")
 Rel(per, db, "JDBC")
 @enduml
 ----
@@ -64,12 +68,14 @@ Rel(per, db, "JDBC")
 | domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | `src/application/backend/domaene/modell`
 | domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | `src/application/backend/domaene/service`
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | `src/application/backend/usecases/in`
-| usecases-out | Ausgehende Ports (SPI) zum Host und zu den ausgehenden Adaptern | `src/application/backend/usecases/out`
+| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert | `src/application/backend/usecases/out`
+| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; einziges Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]) | `src/application/backend/spi`
 | usecases-service | Implementierung der Anwendungsfälle | `src/application/backend/usecases/service`
 | adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | `src/application/backend/adapter/in/adapter-web`
 | adapter-rendering | Ausgehender Adapter: Zusammenführen (FreeMarker), PDF (openhtmltopdf), Konformität (veraPDF) | `src/application/backend/adapter/out/adapter-rendering`
 | adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
-| spring-boot-starter | Autokonfiguration, Default-Adapter | `src/application/backend/spring-boot-starter`
+| adapter-host | Ausgehender Adapter: ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab | `src/application/backend/adapter/out/adapter-host`
+| spring-boot-starter | Autokonfiguration, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security; exportiert nur `spi` | `src/application/backend/spring-boot-starter`
 | Frontend-Paket | Vorschau, Übersicht, Editor | `src/application/frontend`
 |===
 

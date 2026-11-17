@@ -53,10 +53,11 @@ Wir schlagen vor:
    ADR-002:
 *** `domaene/modell` (Domänenmodell) und `domaene/service` (Domänenservices) als
     zwei Module; Domänenservices sieht beim Kompilieren nur `usecases/service`
-*** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports, SPI) und
+*** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports) und
     `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
+*** `spi` (Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ADR-016)
 *** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,
-    `adapter/out/adapter-persistenz-jdbc`
+    `adapter/out/adapter-persistenz-jdbc`, `adapter/out/adapter-host`
 *** `spring-boot-starter` und das Testmodul `architekturtests`
 ** `src/application/frontend/` – npm-Workspace mit dem Paket der React-Komponenten
    (TypeScript, Vite, UnoCSS).
@@ -65,11 +66,11 @@ Wir schlagen vor:
    Anwendungsfälle gefunden sind.
 * **Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren.** Ein
   eingehender Adapter hängt nur an `usecases/in`, ein ausgehender nur an
-  `usecases/out`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
-  ArchUnit prüft zusätzlich Paketregeln aus ADR-002. Ein Host-Modul, das
-  ausschließlich SPIs implementiert, kann direkt an `usecases-out` hängen und
-  bekommt zum Kompilieren nur die Ports und transitiv das Domänenmodell. Wer den Starter
-  einbindet, bekommt auch `usecases-in` und zur Laufzeit Service und Adapter. Die
+  `usecases/out`; `adapter-host` zusätzlich an `spi`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
+  ArchUnit prüft zusätzlich Paketregeln aus ADR-002. Der Host bekommt zum
+  Kompilieren nur `spi`, auch wenn er den Starter einbindet. Ports,
+  Anwendungsfälle, Domäne und Adapter bringt der Starter nur zur Laufzeit mit
+  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Die
   Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
   xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
 * Die Gradle-Projekte sind flach benannt (`domaene-modell`, `usecases-in`,

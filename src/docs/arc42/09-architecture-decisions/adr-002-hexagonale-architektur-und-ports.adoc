@@ -59,21 +59,29 @@ Wir schlagen eine **hexagonale Architektur** (Ports and Adapters) nach DDD vor:
   „Schreiben herunterladen“, „Vorlage veröffentlichen“. Ihre Schnittstellen sind die
   **Driving Ports** (Modul `usecases-in`), ihre Implementierung liegt getrennt davon
   (Modul `usecases-service`).
-* **Driven Ports (SPI)** im Modul `usecases-out`, von der Host-Anwendung oder von
-  Adaptern implementiert:
-** `PlatzhalterdatenAnbieter` (Host): liefert den Datenkontext für ein Standardschreiben
+* **SPI zur Host-Anwendung** im eigenen Modul `spi`, mit eigenen Datentypen und
+  ohne Abhängigkeit zum Domänenmodell. Der Host implementiert:
+** `PlatzhalterdatenAnbieter`: liefert den Datenkontext für ein Standardschreiben
    und einen fachlichen Bezug (z. B. Kunde 4711). Werte dürfen bereits formatiert sein.
-** `Berechtigungspruefung` (Host, Default-Adapter auf Spring Security): entscheidet über
-   Pflegen, Erzeugen, Ansehen, Herunterladen und Löschen.
-** `Loeschrichtlinie` (Host): entscheidet, ob und wie ein Schreiben gelöscht wird
+** `Berechtigungspruefung` (Default-Implementierung auf Spring Security im Starter):
+   entscheidet über Pflegen, Erzeugen, Ansehen, Herunterladen und Löschen.
+** `Loeschrichtlinie`: entscheidet, ob und wie ein Schreiben gelöscht wird
    (hart, logisch, gesperrt), siehe Aufbewahrungsfristen.
+* **Driven Ports** im Modul `usecases-out`, nur von Adaptern der Bibliothek
+  implementiert:
+** Ports für Platzhalterdaten, Berechtigung und Löschrichtlinie in Domänenbegriffen
+   (Adapter `adapter-host`, bildet auf das SPI ab).
 ** `DokumentAblage` (Adapter, Default JDBC/BLOB, später Objektspeicher).
 ** `VorlagenRepository`, `SchreibenRepository` (Adapter JDBC).
 ** `Renderer` und `KonformitaetsPruefer` (Adapter, siehe ADR-004 und ADR-005).
 * **Driving Adapter**: REST-Controller und Spring-Boot-Autokonfiguration.
 
+Schnitt und Datentypen des SPI begründet
+xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016].
+
 Die Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren: Driving
 Adapter kennen nur `usecases-in`, Driven Adapter nur `usecases-out` (ADR-009).
+`adapter-host` kennt zusätzlich `spi`, der Kern kennt `spi` nicht.
 ArchUnit-Tests prüfen dieselben Regeln zusätzlich auf Paketebene. Warum Module
 statt einer Paketkonvention, begründet
 xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].

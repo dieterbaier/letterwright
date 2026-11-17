@@ -31,6 +31,7 @@ metadata_version: '1.0'
 | Vorschau | Paginierte HTML-Darstellung eines befüllten Standardschreibens vor dem Speichern.
 | Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird.
 | Host-Anwendung | Die Spring-Boot-/React-Anwendung, in die Standardschreiben eingebettet ist.
+| SPI | Service Provider Interface: die Schnittstellen und Datentypen im Modul `spi`, die die Host-Anwendung implementiert bzw. liefert (Platzhalterdaten, Berechtigung, Löschrichtlinie). Einziger Teil der Bibliothek, gegen den der Host kompiliert.
 | Sachbearbeiter | Benutzer, der Schreiben erzeugt, speichert, herunterlädt und löscht.
 | Vorlagenverwalter | Fachanwender, der Briefpapier und Standardschreiben pflegt.
 | Form A / Form B | Varianten des DIN-5008-Geschäftsbriefs mit unterschiedlicher Höhe des Anschriftfelds; Default Form B.
