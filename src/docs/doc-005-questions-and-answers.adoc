@@ -403,8 +403,11 @@ Noch offen, bevor die Regel als ADR festgehalten wird:
   gespeichert, und die Benachrichtigung wird wiederholt. Alternativ läuft sie in
   derselben Transaktion, und ein Fehler verhindert das Speichern.
 
-Betroffen sind voraussichtlich ADR-002 (SPI für Schlüssel, Dateiname und
-Benachrichtigung, im Modul `spi` nach ADR-016), ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
+Betroffen sind voraussichtlich ADR-002 und ADR-016: Schlüssel und Dateiname
+übergibt der Host nach der Annahme in ADR-016 über die React-Komponenten und
+REST, nicht über das SPI. Die Benachrichtigung nach dem Speichern ist ein
+eigener Rückkanal zum Host; über welchen Mechanismus sie läuft, ist offen.
+Ebenfalls betroffen sind ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
 sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
 lassen sich als zwei Aufgaben eines Prozesses abbilden.
 

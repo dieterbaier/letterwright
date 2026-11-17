@@ -30,7 +30,7 @@ relations:
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv das Domänenmodell, nicht Domänenservices, Anwendungsfälle, Service oder Adapter.'
+  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv das Domänenmodell, nicht Domänenservices, Anwendungsfälle, Service oder Adapter. Historischer Stand: Seit ADR-016 kompiliert der Host nur gegen das Modul spi.'
   reviewed: true
 metadata_version: '1.0'
 ---
@@ -47,6 +47,13 @@ geprüft und angenommen.
 Ergänzt am 2026-11-16 um die Trennung von Domänenmodell und Domänenservices
 (<<adr-015-domaenenservices>>, Issue #25). Diese Ergänzung hat der Owner
 entschieden: Option 1 aus drei Varianten, beide Module unter `domaene`.
+
+Verfeinert am 2026-11-17 durch xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28). Die Aussagen
+dieses ADR, nach denen ein Host-Modul direkt an `usecases-out` hängt und das
+Domänenmodell transitiv sieht, beschreiben den Stand davor und sind als
+historisch gekennzeichnet. `usecases-out` ist seitdem ein internes Modul; der
+Host kompiliert nur gegen das Modul `spi`, auch über den Starter. Die
+Überarbeitung der Modulregeln folgt mit Issue #19.
 
 === Entscheidung
 
@@ -121,7 +128,8 @@ gewöhnlichen Anwendung:
 * **Schmale Abhängigkeit des Hosts:** Ein Host-Modul, das nur SPIs
   implementiert, soll zum Kompilieren nur die Ports und die Domäne brauchen,
   nicht die Anwendungsfälle, den Service und die Adapter. Zur Laufzeit bindet
-  der Host über den Starter ohnehin alles ein.
+  der Host über den Starter ohnehin alles ein. _Historischer Stand: Seit
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] braucht der Host zum Kompilieren nur `spi`._
 * **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
   können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
   vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
@@ -167,7 +175,8 @@ ArchUnit prüft zusätzlich.
 
 Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
 nicht erst an. Ein Host-Modul, das nur SPIs implementiert, kann direkt an
-`usecases-out` hängen. Der Schnitt entspricht der
+`usecases-out` hängen (historischer Stand, seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] hängt der
+Host an `spi`). Der Schnitt entspricht der
 feinsten Variante, die Hombergs beschreibt: eingehende und ausgehende Ports als
 getrennte Module, damit jeder Adapter schon an seiner Abhängigkeit als
 eingehend oder ausgehend erkennbar ist. Ein Modul je Adapter vermeidet zudem
@@ -282,7 +291,9 @@ Starter `domaene-service` ausdrücklich einbinden.
   die Modelltypen. Domänenservices, Anwendungsfälle, Service und Adapter sieht es beim Kompilieren
   nicht. Das gilt nicht für das Modul, das den Starter einbindet: Der Starter
   exportiert zusätzlich `usecases-in` und bringt Service und Adapter zur
-  Laufzeit mit.
+  Laufzeit mit. _Historischer Stand: Seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] hängt
+  ein Host-Modul an `spi` und sieht beim Kompilieren weder Ports noch
+  Domänenmodell; der Starter exportiert nur `spi`._
 * Für die Regeln, die beide abdecken, prüfen ArchUnit und Modulgrenzen auf zwei
   Wegen; fällt einer weg, bleibt der andere. Hombergs empfiehlt diese
   Kombination.
