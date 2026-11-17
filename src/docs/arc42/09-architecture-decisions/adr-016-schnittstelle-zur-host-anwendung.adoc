@@ -2,10 +2,10 @@
 id: ADR-016-schnittstelle-zur-host-anwendung
 type: ADR
 title: 'Schnitt und Datentypen der Schnittstelle zur Host-Anwendung'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-17'
-reviewed: false
+reviewed: true
 summary: 'Die Host-Anwendung kompiliert nur gegen ein eigenes Modul spi mit eigenen Datentypen; ein ausgehender Adapter adapter-host bildet zwischen SPI-Typen und Domänenmodell ab, und der Starter exportiert nur spi.'
 derived_from:
 - type: conversation
@@ -21,19 +21,19 @@ tags:
 relations:
 - type: refines
   target: ADR-002-hexagonale-architektur-und-ports
-  status: proposed
+  status: accepted
   rationale: 'ADR-002 legt fest, welche Ports der Host implementiert; dieser ADR legt fest, in welchem Modul sie liegen und mit welchen Datentypen sie arbeiten.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-015-durchsetzung-der-modulgrenzen-im-backend
-  status: proposed
+  status: accepted
   rationale: 'ADR-015 begründet die Modulgrenzen und nennt als Treiber eine schmale Host-Abhängigkeit aus Ports und Domänenmodell; dieser ADR verengt sie auf das Modul spi.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Der Host implementiert dieselben drei Schnittstellen wie bisher, kompiliert aber nur gegen spi; Änderungen am Domänenmodell brechen seine Implementierungen nicht.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-016-schnittstelle-zur-host-anwendung]]
@@ -41,15 +41,15 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-17.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #28
+geprüft und angenommen.
 
 === Entscheidung
 
-Wir schlagen vor, die Schnittstelle zur Host-Anwendung als eigenes Modul `spi`
-mit eigenen Datentypen zu schneiden (Option 3):
+Die Schnittstelle zur Host-Anwendung ist ein eigenes Modul `spi` mit eigenen
+Datentypen (Option 3):
 
 * **`spi`** (Verzeichnis `src/application/backend/spi`) enthält die Schnittstellen,
   die der Host implementiert: `PlatzhalterdatenAnbieter`, `Berechtigungspruefung`
@@ -255,19 +255,17 @@ include::generated/adr-016-schnittstelle-zur-host-anwendung-traceability.adoc[le
 
 === Open Questions
 
-* Wird `spi` getrennt von den übrigen Modulen versioniert? ADR-015 hält für
-  `usecases-out` fest: vorerst nicht, alle Module erscheinen mit derselben
-  Version. Vorschlag: dabei bleiben, aber jede inkompatible Änderung an `spi`
-  erhöht die Hauptversion.
-* Bekommt die Default-Implementierung von `Berechtigungspruefung` auf Spring
-  Security ein eigenes Modul, damit `spi` und Starter frei von ihr bleiben, oder
-  reicht der Starter?
+* Keine. Beide Fragen hat der Owner im Review von PR #28 beantwortet:
+** *Versionierung von `spi`:* Wir starten mit einer Version für das gesamte
+   Paket. Eine getrennte Versionierung von `spi` ist vorerst nicht nötig.
+** *Ort der Default-`Berechtigungspruefung`:* Vorerst reicht der Starter, ein
+   eigenes Modul ist nicht nötig.
 
 === Review Notes
 
-* Der Owner bestätigt die Annahme, dass der Host keine eingehende Java-API
-  braucht, auch mit Blick auf Q-ARCH-004.
-* Der Owner bestätigt die Bewertung der Optionen, insbesondere `-1` für
-  Option 3 beim Aufwand gegenüber `+1` bei der stabilen Host-API.
-* Beim Annehmen bleibt ADR-015 unverändert; die Verfeinerung steht als Relation
-  in diesem ADR.
+* Der Owner hat den ADR im Review von PR #28 am 2026-11-17 angenommen, die drei
+  Relationen zu ADR-002, ADR-015 und QS-007 ebenso.
+* Die Annahme, dass der Host keine eingehende Java-API braucht, bleibt eine
+  Annahme. Zeigt Q-ARCH-004 das Gegenteil, kommt eine eingehende API nach dem
+  Muster dieses ADR hinzu.
+* ADR-015 bleibt unverändert; die Verfeinerung steht als Relation in diesem ADR.
