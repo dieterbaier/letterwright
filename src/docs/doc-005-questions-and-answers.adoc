@@ -404,7 +404,7 @@ Noch offen, bevor die Regel als ADR festgehalten wird:
   derselben Transaktion, und ein Fehler verhindert das Speichern.
 
 Betroffen sind voraussichtlich ADR-002 (SPI für Schlüssel, Dateiname und
-Benachrichtigung), ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
+Benachrichtigung, im Modul `spi` nach ADR-016), ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
 sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
 lassen sich als zwei Aufgaben eines Prozesses abbilden.
 

@@ -216,8 +216,8 @@ in allen dreien dieselben drei Schnittstellen.
 
 * Issue #27 setzt den Schnitt um, vor #19. Die Regel zur Isolation der Adapter
   aus #19 deckt `adapter-host` dann von Anfang an ab.
-* ADR-002 und ADR-009 beschreiben, wo die Host-Ports liegen. Beide sind
-  `proposed` und werden in diesem PR angeglichen, die Bausteinsicht ebenfalls.
+* ADR-002 und ADR-009 beschreiben, wo die Host-Ports liegen. Beide sind mit
+  PR #28 angeglichen und angenommen, die Bausteinsicht ebenfalls angeglichen.
 * ADR-015 bleibt unverändert. Seine Aussagen zur schmalen Host-Abhängigkeit
   („Ports und transitiv das Domänenmodell“) verfeinert dieser ADR. Mit #19 wird
   ADR-015 ohnehin nachgezogen; dabei werden die Verweise auf `usecases-out` als

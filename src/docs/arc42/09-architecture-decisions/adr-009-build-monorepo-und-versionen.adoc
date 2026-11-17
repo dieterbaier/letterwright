@@ -2,10 +2,10 @@
 id: ADR-009-build-monorepo-und-versionen
 type: ADR
 title: 'Monorepo, Gradle und aktuelle Plattformversionen'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Monorepo mit Gradle (Kotlin DSL) für das Backend und npm-Workspaces für das Frontend; aktuelle stabile Spring-Boot-Version (4.x) auf Java 25 mit Bytecode-Ziel 21; ArchUnit und Testcontainers.'
 derived_from:
 - type: external
@@ -19,19 +19,19 @@ tags:
 relations:
 - type: depends_on
   target: ADR-001-einbettbare-bibliothek
-  status: proposed
+  status: accepted
   rationale: 'Die unterstützten Versionen bestimmen, welche Hosts die Bibliothek nutzen können.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Aktuelle, unterstützte Versionen erleichtern die Integration in neue Hosts.'
-  reviewed: false
+  reviewed: true
 - type: introduces_risk
   target: R-007-bindung-an-spring-boot-hauptversion
-  status: proposed
+  status: accepted
   rationale: 'Hosts auf älteren Spring-Boot-Hauptversionen können den Starter nicht nutzen.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-009-build-monorepo-und-versionen]]
@@ -39,14 +39,14 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-17.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #28
+geprüft und angenommen.
 
 === Entscheidung
 
-Wir schlagen vor:
+Wir legen fest:
 
 * **Monorepo**. Alle Quellen liegen unter `src/`, getrennt nach Art:
 ** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
@@ -193,4 +193,5 @@ include::generated/adr-009-build-monorepo-und-versionen-traceability.adoc[levelo
 
 === Review Notes
 
-Versionen beim Anlegen des Builds gegen die dann aktuellen Releases prüfen.
+* Versionen beim Anlegen des Builds gegen die dann aktuellen Releases prüfen.
+* Der Owner hat den ADR im Review von PR #28 am 2026-11-17 angenommen.
