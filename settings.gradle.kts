@@ -20,9 +20,11 @@ val backendModule = mapOf(
     "usecases-in" to "usecases/in",
     "usecases-out" to "usecases/out",
     "usecases-service" to "usecases/service",
+    "spi" to "spi",
     "adapter-web" to "adapter/in/adapter-web",
     "adapter-rendering" to "adapter/out/adapter-rendering",
     "adapter-persistenz-jdbc" to "adapter/out/adapter-persistenz-jdbc",
+    "adapter-host" to "adapter/out/adapter-host",
     "spring-boot-starter" to "spring-boot-starter",
     "architekturtests" to "architekturtests",
 )

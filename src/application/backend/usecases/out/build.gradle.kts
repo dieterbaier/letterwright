@@ -2,7 +2,7 @@ plugins {
     id("standardschreiben.java-modul")
 }
 
-description = "Ausgehende Ports (SPI): implementiert von der Host-Anwendung oder von ausgehenden Adaptern (ADR-002)."
+description = "Ausgehende Ports: nur von Adaptern der Bibliothek implementiert, kein Vertrag mit dem Host (ADR-002, ADR-016)."
 
 dependencies {
     api(project(":domaene-modell"))
