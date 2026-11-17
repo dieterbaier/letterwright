@@ -64,4 +64,19 @@ class HexagonaleArchitekturTest {
     void nurDieAnwendungsfaelleKennenDomaenenservices() {
         ArchitekturRegeln.nurDieAnwendungsfaelleKennenDomaenenservices(BASIS).check(produktionsCode);
     }
+
+    @Test
+    void spiIstEigenstaendig() {
+        ArchitekturRegeln.spiIstEigenstaendig(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void kernKenntDasSpiNicht() {
+        ArchitekturRegeln.kernKenntDasSpiNicht(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void nurAdapterHostUndStarterKennenDasSpi() {
+        ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(BASIS).check(produktionsCode);
+    }
 }

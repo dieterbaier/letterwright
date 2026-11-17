@@ -10,6 +10,8 @@ dependencies {
     testImplementation(project(":usecases-in"))
     testImplementation(project(":usecases-out"))
     testImplementation(project(":usecases-service"))
+    testImplementation(project(":spi"))
+    testImplementation(project(":adapter-host"))
     testImplementation(project(":adapter-persistenz-jdbc"))
     testImplementation(project(":adapter-rendering"))
     testImplementation(project(":adapter-web"))

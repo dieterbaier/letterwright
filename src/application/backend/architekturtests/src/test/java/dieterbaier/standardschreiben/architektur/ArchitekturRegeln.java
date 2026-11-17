@@ -123,4 +123,40 @@ final class ArchitekturRegeln {
                 .because("Domänenservices sind nur über die Anwendungsfälle erreichbar (ADR-015)")
                 .allowEmptyShould(true);
     }
+
+    /** Das SPI ist reines Java und hängt an keinem anderen Paket der Bibliothek. */
+    static ArchRule spiIstEigenstaendig(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + ".spi..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "org.springframework..",
+                        basis + ".domaene..",
+                        basis + ".usecases..",
+                        basis + ".adapter..",
+                        basis + ".starter..")
+                .because("das SPI ist der einzige Vertrag mit dem Host und hat eigene Datentypen (ADR-016)")
+                .allowEmptyShould(true);
+    }
+
+    /** Domäne, Ports und Anwendungsfälle kennen das SPI nicht. */
+    static ArchRule kernKenntDasSpiNicht(String basis) {
+        return noClasses()
+                .that().resideInAnyPackage(basis + ".domaene..", basis + ".usecases..")
+                .should().dependOnClassesThat().resideInAPackage(basis + ".spi..")
+                .because("der Kern fragt den Host über ausgehende Ports in Domänenbegriffen an (ADR-016)")
+                .allowEmptyShould(true);
+    }
+
+    /** Außer dem SPI selbst benutzen nur adapter-host und der Starter das SPI. */
+    static ArchRule nurAdapterHostUndStarterKennenDasSpi(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + "..")
+                .and().resideOutsideOfPackages(
+                        basis + ".spi..",
+                        basis + ".adapter.out.host..",
+                        basis + ".starter..")
+                .should().dependOnClassesThat().resideInAPackage(basis + ".spi..")
+                .because("nur adapter-host bildet zwischen SPI und Domäne ab, nur der Starter verdrahtet (ADR-016)")
+                .allowEmptyShould(true);
+    }
 }

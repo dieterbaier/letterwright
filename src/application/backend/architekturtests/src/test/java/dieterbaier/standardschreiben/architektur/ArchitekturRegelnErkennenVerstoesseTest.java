@@ -1,5 +1,6 @@
 package dieterbaier.standardschreiben.architektur;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -88,5 +89,32 @@ class ArchitekturRegelnErkennenVerstoesseTest {
         erkenntVerstoss(
                 ArchitekturRegeln.nurDieAnwendungsfaelleKennenDomaenenservices(FIXTURE),
                 "WebAdapterMitDomaenenservice");
+    }
+
+    @Test
+    void spiMitDomaenenabhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.spiIstEigenstaendig(FIXTURE), "SpiMitDomaene");
+    }
+
+    @Test
+    void portMitSpiVerletztDieRegelFuerDenKern() {
+        erkenntVerstoss(ArchitekturRegeln.kernKenntDasSpiNicht(FIXTURE), "AusgehenderPortMitSpi");
+    }
+
+    @Test
+    void andererAdapterMitSpiVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE), "RenderingAdapterMitSpi");
+    }
+
+    @Test
+    void portMitSpiVerletztDieRegelFuerDieSpiNutzer() {
+        erkenntVerstoss(ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE), "AusgehenderPortMitSpi");
+    }
+
+    @Test
+    void adapterHostDarfDasSpiBenutzen() {
+        assertThatThrownBy(() -> ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE).check(fixtures))
+                .isInstanceOf(AssertionError.class)
+                .satisfies(fehler -> assertThat(fehler.getMessage()).doesNotContain("HostAdapter"));
     }
 }
