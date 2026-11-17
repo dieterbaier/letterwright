@@ -1,11 +1,14 @@
 package dieterbaier.standardschreiben.architektur;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
+import dieterbaier.standardschreiben.archfixture.adapter.out.host.HostAdapter;
+import dieterbaier.standardschreiben.archfixture.spi.HostSchnittstelle;
+import dieterbaier.standardschreiben.archfixture.usecases.out.AusgehenderPort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -113,8 +116,10 @@ class ArchitekturRegelnErkennenVerstoesseTest {
 
     @Test
     void adapterHostDarfDasSpiBenutzen() {
-        assertThatThrownBy(() -> ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE).check(fixtures))
-                .isInstanceOf(AssertionError.class)
-                .satisfies(fehler -> assertThat(fehler.getMessage()).doesNotContain("HostAdapter"));
+        JavaClasses erlaubt = new ClassFileImporter()
+                .importClasses(HostAdapter.class, HostSchnittstelle.class, AusgehenderPort.class);
+
+        assertThatCode(() -> ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE).check(erlaubt))
+                .doesNotThrowAnyException();
     }
 }
