@@ -1,9 +1,9 @@
 = Projekttagebuch 2026-11-18
 
-Fünfter Arbeitstag, Thema Projektgerüst. PR #29 (#27), PR #33 (#19) und
-PR #35 (#34) sind gemergt. Epic #4 hat damit alle Akzeptanzkriterien erfüllt,
-konvergierte aber noch nicht. PR #38 (#37) schließt das ab und ist im Review.
-Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+Fünfter Arbeitstag, Thema Projektgerüst. PR #29 (#27), PR #33 (#19), PR #35
+(#34) und am Abend PR #38 (#37) sind gemergt. Epic #4 ist konvergiert und
+geschlossen, das Thema Projektgerüst ist beendet. Rekonstruiert aus
+Commit-Historie, Issues und Pull Requests.
 
 == Was geschah
 
@@ -45,6 +45,22 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
   `../standardschreiben-beispielanwendung` auf Branch `issue_31`. Der Owner hat
   dort `6a45b09` mit einer pen.dev-Datei und einem SVG committet, noch ohne PR.
 
+* **Abend, nach dem ersten Clock-out:** Dieter hat PR #38 geprüft und #4
+  erneut auf Konvergenz geprüft. Offen waren noch:
+** die Annahme der sieben ausgehenden Relationen von ADR-010, ADR-011 und R-007
+   (im Review entschieden),
+** Lifecycle-Texte, die dem neuen Status widersprachen,
+** der Satz „Alle ADRs sind vorgeschlagen“ in `doc-09000`,
+** ein isolierter Nachweis für „Zweige allein unter 80 %“.
+* Behoben in `deddaf1` und `1cfdb2d` (auf `main` `7b3e15e`, `1367ae4`). Die
+  Übersicht verweist für den Status jetzt auf den generierten Index.
+* Gegenproben in einem Wegwerf-Worktree: JaCoCo `domaene-modell` mit
+  `LINE 4/4`, `BRANCH 1/2` scheitert nur an der Zweigregel. Vitest `komponenten`
+  mit Lines 100 %, Branches 50 % scheitert mit Exit 1. Ohne Probe sind beide
+  grün. Protokoll als Kommentar in #4.
+* PR #38 per Rebase gemergt, CI auf `1367ae4` grün, #37 und #4 geschlossen.
+  `progress/projektgeruest.adoc` gelöscht.
+
 == Entscheidungen des Owners
 
 * PR #29, #33, #35 mergen.
@@ -59,6 +75,8 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
 * ADR-015, ADR-016 und ADR-009 angenommen.
 * ADR-010, ADR-011, QS-011 und R-007 auf `accepted`. Für veraPDF genügt der
   Verweis auf #7, kein Platzhalter in `build.yml`.
+* Alle sieben ausgehenden Relationen dieser Artefakte angenommen (Review von
+  PR #38).
 
 == Gelernt
 
@@ -80,13 +98,20 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
   in einem eigenen Worktree experimentieren.
 * **Prüfung eines Epics:** Nur die Akzeptanzkriterien abzuhaken reicht nicht.
   Status der verwiesenen Artefakte und der Text des Umfangs gehören dazu.
+* **Gegenproben müssen den Fall isolieren, den das Kriterium nennt.** „Zeilen
+  oder Zweige“ braucht je einen Lauf, in dem nur eine Metrik unterschritten
+  ist. Ein Lauf mit beiden zu niedrig belegt das nicht (Befund des Owners).
+* **Status und Lifecycle-Text gehören zusammen.** Wer `status` auf `accepted`
+  setzt, muss auch „Review Notes“, „Entscheidung“ und Akzeptanztexte
+  nachziehen. Eine Übersicht, die Status aufzählt, veraltet; besser auf den
+  generierten Index verweisen.
+* **`gh issue comment` kennt kein `--jq`.** Mit unterdrückter Ausgabe scheitert
+  der Aufruf still. Erst die Kontrolle der Kommentarliste zeigte es.
 * **zsh:** Der Branch-Sweep des Clock-ins blockierte wie gestern, weil zsh
   `$names` nicht aufteilt. Unter bash lief er durch.
 
 == Offen
 
-* PR #38: Ob die ausgehenden Relationen von ADR-010, ADR-011 und R-007 mit
-  angenommen werden. Danach Merge, #37 schließen, #4 schließen.
 * #31: PR für das Wireframe, offene Fragen zum Ablageort und zur Einbindung in
   die Doku. Die Datei liegt auf `issue_31` unter `wireframes/exampleApp/`.
 * Danach Epic #5 mit #30, später #32.
@@ -131,7 +156,15 @@ Was diese Sitzung tatsächlich abgerufen hat:
   `CHECK: CLEAR`), Sweep der eigenen Branches, Mobile Inbox und
   `open-threads.adoc`, Tagesdatei vom 18. auf `agent/diary-2026-11-18`.
 
+* Abend: Review von PR #38 (5962686450), Kommentare in #4 vom 18:00 und
+  18:29, ADR-010, ADR-011, QS-011, R-007 (Abschnitte Entscheidung, Decision
+  or Acceptance, Review Notes), `doc-09000`, Status aller ADRs,
+  `vite.config.ts`, Checks von PR #38 auf `1cfdb2d`, CI-Läufe auf `main`
+  (`1367ae4`).
+
 Fehlgeschlagen:
 
 * Erster Branch-Sweep unter zsh (`SWEEP: BLOCKED`), wie am Vortag.
 * Lokales `npm ci` an der Node-Version (siehe oben).
+* Erster Versuch, das Protokoll der Gegenproben in #4 zu posten
+  (`gh issue comment --jq`). Erneut über `--body-file` gepostet.
