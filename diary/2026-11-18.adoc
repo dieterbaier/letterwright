@@ -1,0 +1,137 @@
+= Projekttagebuch 2026-11-18
+
+Fünfter Arbeitstag, Thema Projektgerüst. PR #29 (#27), PR #33 (#19) und
+PR #35 (#34) sind gemergt. Epic #4 hat damit alle Akzeptanzkriterien erfüllt,
+konvergierte aber noch nicht. PR #38 (#37) schließt das ab und ist im Review.
+Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **PR #29 (#27), Modulschnitt nach ADR-016:** Review-Befund P2 behoben
+  (`307f309`). `spiIstEigenstaendig` verbietet jetzt jedes Paket unter dem
+  Basispaket außerhalb von `spi`, statt nur eine Liste bekannter Pakete. Neue
+  Fixtures `SpiMitGemeinsamemPaket` und `SpiMitSpring`. Gegenprobe: Mit der
+  alten Paketliste schlug der neue Test fehl. Convergence Check im PR
+  nachgetragen, per Rebase gemergt, #27 geschlossen.
+* **#19, ArchUnit-Lücken (PR #33, 8 Commits bis `fed5bad`):**
+** Regel `adapterSindVoneinanderIsoliert` als Slice-Regel über
+   `adapter.(*).(*)..`, mit Fixtures für eingehend → ausgehend und
+   `adapter-host` → anderer ausgehender Adapter.
+** `allowEmptyShould(true)` entfernt. Dabei fiel auf: Ohne Annotation erzeugt
+   `package-info.java` keine Klasse, alle 12 Produktivprüfungen wurden rot.
+** Lösung zuerst JSpecify `@NullMarked` in allen 11 `package-info.java`. Im
+   Review schlug der Owner `-Xpkginfo:always` vor. Ein eigener Lauf ohne
+   JSpecify bestätigte: richtiges Basispaket grün, falsches rot. Jetzt gilt
+   beides, getrennt begründet in ADR-015.
+** JSpecify 1.0.1 fest im Versionskatalog, unabhängig von der Boot-BOM.
+** ADR-015 um zwei Ergänzungen erweitert (leere Selektoren, Null-Vertrag), die
+   Aussagen zur Host-Abhängigkeit auf `spi` umgestellt. ADR-016-Folgearbeiten
+   nachgezogen. Beide vom Owner angenommen (`fed5bad`).
+* **Epic #4 geprüft:**
+** Backend-Abdeckungsgate lokal in einer Wegwerf-Kopie belegt: „Rule violated
+   for bundle domaene-modell: lines/branches covered ratio is 0.50, but expected
+   minimum is 0.80“.
+** Fehlender Nachweis Domäne → Adapter: #34, PR #35 (Fixture
+   `DomaeneMitAdapter`, JSpecify in ADR-009), gemergt (`c5da87d`).
+** Alle vier Kriterien in #4 abgehakt, jeweils mit Nachweis.
+** Convergence-Befund des Owners: ADR-010, ADR-011, QS-011 und R-007 waren
+   `proposed`. ADR-011 nannte veraPDF als laufendes Gate. Der Text des Epics
+   nannte alte Pfade, Module und die Beispielanwendung. Epic-Text korrigiert,
+   #37 und PR #38 angelegt.
+* **Neue Issues:** #31 (Wireframe der Beispielanwendung, Unter-Issue von #11),
+  #32 (Spring-Boot-BOM und Boot-Kompatibilität, Unter-Issue von #5), #34, #36
+  (Frontend-Abhängigkeiten), #37.
+* **Wireframe:** Für #31 ein Worktree
+  `../standardschreiben-beispielanwendung` auf Branch `issue_31`. Der Owner hat
+  dort `6a45b09` mit einer pen.dev-Datei und einem SVG committet, noch ohne PR.
+
+== Entscheidungen des Owners
+
+* PR #29, #33, #35 mergen.
+* Spring-Boot-BOM: Der Host wählt seine Boot-Version. BOM aus `spi` entfernen,
+  Starter prüfen, Nachweis mit einem Host auf Java 21 und Boot 4.2.x. Folgearbeit
+  #32. Der Test nutzt den Beispiel-Host aus #11. Die Angabe der
+  Boot-Kompatibilität wird in ADR-009 nachgetragen, kein eigener ADR.
+* JSpecify `@NullMarked` als bewusster Null-Vertrag, vor allem für `spi`, per
+  `api`. Version unabhängig von Boot.
+* Zusätzlich `-Xpkginfo:always`, damit die Sichtbarkeit für ArchUnit nicht an
+  `@NullMarked` hängt.
+* ADR-015, ADR-016 und ADR-009 angenommen.
+* ADR-010, ADR-011, QS-011 und R-007 auf `accepted`. Für veraPDF genügt der
+  Verweis auf #7, kein Platzhalter in `build.yml`.
+
+== Gelernt
+
+* **`package-info.java` ohne Annotation erzeugt keine Klasse.** ArchUnit sieht
+  ein Paket nur mit Klassen darin. `-Xpkginfo:always` erzwingt die Klasse,
+  eine Paket-Annotation wie `@NullMarked` ebenso.
+* **`@Deprecated` auf einem Paket** bricht mit `-Xlint:all -Werror` den Build.
+  Der erste Versuch, eine Paket-Annotation zu testen, war deshalb ungültig.
+* **Der Nachweis mit falschem Basispaket ist schmal.** Er erkennt nur
+  Selektoren, die gar nichts mehr treffen. Ein Selektor über mehrere Pakete
+  bleibt grün, wenn eines wegfällt (Hinweis aus dem Review von PR #33).
+* **Unterpakete erben `@NullMarked` nicht.** Kein Werkzeug prüft, ob ein neues
+  Paket es trägt.
+* **`gh pr merge --delete-branch`** löscht auch den lokalen Branch, wenn er
+  nicht ausgecheckt ist.
+* **Experimente nicht mit `git checkout -- <datei>` zurücksetzen,** wenn die
+  Datei schon eigene Änderungen enthält. Das hat einmal einen neuen Test
+  verworfen, der Fehler fiel erst im Diff auf. Besser eine Kopie sichern oder
+  in einem eigenen Worktree experimentieren.
+* **Prüfung eines Epics:** Nur die Akzeptanzkriterien abzuhaken reicht nicht.
+  Status der verwiesenen Artefakte und der Text des Umfangs gehören dazu.
+* **zsh:** Der Branch-Sweep des Clock-ins blockierte wie gestern, weil zsh
+  `$names` nicht aufteilt. Unter bash lief er durch.
+
+== Offen
+
+* PR #38: Ob die ausgehenden Relationen von ADR-010, ADR-011 und R-007 mit
+  angenommen werden. Danach Merge, #37 schließen, #4 schließen.
+* #31: PR für das Wireframe, offene Fragen zum Ablageort und zur Einbindung in
+  die Doku. Die Datei liegt auf `issue_31` unter `wireframes/exampleApp/`.
+* Danach Epic #5 mit #30, später #32.
+* #36: Frontend-Abhängigkeiten, Frage TypeScript 7.
+* Spring Boot 4.2.0 abwarten (Q-ARCH-002).
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Clock-in: `git status`, `git log`, `gh pr list`, `gh issue list`,
+  Branch-Sweep (unter zsh blockiert, unter bash `SWEEP: CLEAR`). Toolkit-Skills
+  `clock-in` und `clock-out`, `adapters/shared/journal-config.sh get`.
+* Clock-out: `git status`, `gh pr list`, `gh pr checks 38`, Branch-Sweep
+  (`SWEEP: CLEAR`), `git log --since=2026-11-18`, `gh issue list` und
+  `gh pr list` nach Datum.
+* `progress/projektgeruest.adoc`, `progress/prototyp.adoc`,
+  `diary/2026-11-17.adoc`.
+* Issues #4, #5 (Unter-Issues), #11, #19, #27, #30. Selbst angelegt: #31, #32,
+  #34, #36, #37.
+* PR #29: Reviews, Kommentare, Inline-Kommentar 4610716047, Checks.
+  PR #33: Review vom 2026-11-18 12:56, Checks. PR #35, PR #38: Checks. PR #22:
+  Beschreibung (Gegenproben zu #23 und #24).
+* Backend: `ArchitekturRegeln`, `ArchitekturRegelnErkennenVerstoesseTest`,
+  `HexagonaleArchitekturTest`, Fixtures unter `archfixture`, alle
+  `package-info.java`, `settings.gradle.kts`, Convention-Plugin,
+  `PruefeTestsVorhanden.kt`, `gradle/libs.versions.toml`,
+  `domaene/modell/build.gradle.kts`.
+* Frontend: `packages/komponenten/package.json`, `vite.config.ts`. Lokal
+  `npm ci` (scheitert an Node 22.19.0 wegen `engine-strict`), `npm run build`,
+  `npm test`.
+* Doku: ADR-009, ADR-010, ADR-011, ADR-015, ADR-016, QS-011, R-007,
+  `build.yml`.
+* Toolkit: Skills `implement-issue-workflow`, `convergence-check`,
+  `commit-message`, `post-merge-sync`, `adr` (Abschnitt zu angenommenen ADRs).
+* Extern: `maven-metadata.xml` von Maven Central für `jspecify`,
+  `spring-boot`, `archunit`, `org.jacoco.core`; `services.gradle.org/versions/current`;
+  `npm view` für vite, vitest, react, unocss, axe-core, eslint,
+  typescript-eslint, typescript. JSpecify-Dokumentation und javac-Manpage
+  nur über die Links im Review des Owners, nicht selbst abgerufen.
+* Privates Journal: Skill `daily-clock-in`, Invariantenprüfung (`before`,
+  `CHECK: CLEAR`), Sweep der eigenen Branches, Mobile Inbox und
+  `open-threads.adoc`, Tagesdatei vom 18. auf `agent/diary-2026-11-18`.
+
+Fehlgeschlagen:
+
+* Erster Branch-Sweep unter zsh (`SWEEP: BLOCKED`), wie am Vortag.
+* Lokales `npm ci` an der Node-Version (siehe oben).

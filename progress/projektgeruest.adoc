@@ -3,73 +3,56 @@
 Ein leeres, aber vollständig gebautes und geprüftes Gerüst für Backend, Frontend
 und CI, bevor Fachcode entsteht (Epic #4).
 
-*Status:* in flight
+*Status:* in flight — letzter Schritt im Review. Nach dem Merge von PR #38 und
+dem Schließen von #4 durch den Owner wird diese Datei gelöscht.
 
 == The plan
 
-Erst das Backend, weil die Gates (Abdeckung, ArchUnit) für alle folgenden Epics
-gelten. Dann das Frontend. Die gemeinsame CI danach, weil sie beide Gerüste
-voraussetzt. Dann der Schnitt des SPI zur Host-Anwendung (ADR-016), damit die
-Regeln aus #19 die neuen Module von Anfang an abdecken. Zuletzt schließen wir die
-Lücken der ArchUnit-Prüfung, bevor mit #5 echter Fachcode die Regeln zum ersten
-Mal mit Inhalt füllt.
+Alle Bausteine stehen auf `main`. Offen ist nur noch, dass die Entscheidungen
+hinter den Gates angenommen sind und Epic #4 konvergiert. Erst danach ist das
+Gerüst die verbindliche Grundlage für Epic #5.
 
 [options="checklist"]
 * [x] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15
-* [x] Begründung der Modulgrenzen als ADR-015 (accepted): PR #18
-* [x] Frontend-Gerüst mit Vite, UnoCSS nach ADR-013, Vitest-Abdeckungsgate und axe: #13, PR #20
-* [x] CI für Backend (Java 21 und 25) und Frontend (Node 22.22.2, 24, 26) in `build.yml`, Gegenproben für Abdeckung und ArchUnit rot: #14, PR #22
-* [x] Domänenmodell und Domänenservices als getrennte Module, ADR-015 ergänzt: #25, PR #26
-* [x] Schnitt und Datentypen des SPI als ADR-016 (accepted), ADR-002 und ADR-009 accepted: PR #28
-* [ ] Module `spi` und `adapter-host`, Starter exportiert nur `spi`, ArchUnit-Regeln mit Fixtures: #27, PR #29 (im Review, Checks grün)
-* [ ] ArchUnit: Isolation der Adapter prüfen und leere Selektoren verbieten, ADR-015 nachziehen: #19
-
-#19 kommt nach #27: Die Regel zur Isolation der Adapter soll `adapter-host`
-gleich mit abdecken, und ADR-015 wird nur einmal überarbeitet. #19 muss vor #5
-liegen: Solange alle Regeln `allowEmptyShould(true)` setzen, bleibt eine Regel
-grün, deren Selektor nichts trifft. Im Gerüst trifft heute keiner etwas, weil die
-Module nur `package-info.java` enthalten.
+* [x] Begründung der Modulgrenzen als ADR-015: PR #18
+* [x] Frontend-Gerüst: #13, PR #20
+* [x] CI für Backend und Frontend in `build.yml`: #14, PR #22
+* [x] Domänenmodell und Domänenservices als getrennte Module: #25, PR #26
+* [x] ADR-016 zum SPI: PR #28
+* [x] Module `spi` und `adapter-host`, Starter exportiert nur `spi`: #27, PR #29
+* [x] ArchUnit: Isolation der Adapter, keine leeren Selektoren, `-Xpkginfo:always`, JSpecify `@NullMarked`: #19, PR #33
+* [x] Nachweise für die Akzeptanzkriterien von #4: #34, PR #35
+* [ ] ADR-010, ADR-011, QS-011 und R-007 annehmen, veraPDF in ADR-011 als geplant (#7): #37, PR #38
+* [ ] Epic #4 schließen (Owner)
 
 == Where we are
 
-Auf `main` liegt das Backend unter `src/application/backend/` mit den Modulen
-`domaene-modell`, `domaene-service`, `usecases-in`, `usecases-out`,
-`usecases-service`, je einem Modul pro Adapter, dem Starter und
-`architekturtests`. ADR-016 ist angenommen. PR #29 setzt ihn um: neues Modul
-`spi` ohne Abhängigkeit zur Bibliothek, `adapter-host` unter `adapter/out`, der
-Starter exportiert nur noch `spi`, drei neue ArchUnit-Regeln mit Fixtures.
+Das Gerüst ist fertig. Alle vier Akzeptanzkriterien im Text von #4 sind
+abgehakt, jedes mit einem Nachweis. Den Text des Epics hat die Sitzung am
+2026-11-18 an den tatsächlichen Stand angeglichen: Pfade, Module, die
+Beispielanwendung gehört zu #11, veraPDF zu #7.
 
-Der Owner hat #27 im Review von #29 auf den Modulschnitt beschränkt.
-Schnittstellen, Datentypen, Mapping und die Default-`Berechtigungspruefung`
-stehen in #30, Unter-Issue von #5.
-
-ADR-015 kennzeichnet seine alte Host-Empfehlung (`usecases-out` samt
-Domänenmodell) als historischen Stand. Die eigentliche Überarbeitung gehört zu
-#19.
-
-Das Frontend-Paket `@dieterbaier/standardschreiben` liegt unter
-`src/application/frontend/packages/komponenten`. Der Workflow `build.yml` prüft
-Backend und Frontend bei jedem Pull Request, `architekturdoku.yml` die Doku.
-Branch-Schutz für `main` ist nicht eingerichtet.
+PR #38 nimmt die vier Artefakte an und gleicht ADR-011 an den Build an. Offen
+ist dort, ob die ausgehenden Relationen der vier Artefakte mit angenommen
+werden. Die Annahme des Owners nannte sie nicht.
 
 == Open in this topic
 
-* PR #29: Review des Owners abwarten, dann per Rebase mergen und #27 schließen.
-* #19 als letzter Schritt des Epics.
-* Das Convention-Plugin exportiert die Spring-Boot-BOM per
-  `api(platform(...))`. Damit gibt jedes Modul, auch `spi`, dem Host
-  Versions-Constraints vor (Hinweis aus dem Review von #29). Entscheiden, ob die
-  BOM schmaler exportiert wird.
-* Spring Boot 4.2.0 ist noch nicht erschienen. Danach die BOM anheben (Q-ARCH-002
-  in `doc-005`).
+* PR #38: Entscheidung über die Relationen, Gegenlesen der Änderung an ADR-011,
+  dann Convergence Check erneut, Rebase-Merge, #37 schließen.
+* Danach schließt der Owner #4.
+
+Folgearbeiten außerhalb dieses Themas: #30 (SPI-Vertrag) und #32 (BOM,
+Boot-Kompatibilität) unter Epic #5, #36 (Frontend-Abhängigkeiten), #31
+(Wireframe, Branch `issue_31` des Owners, noch ohne PR).
 
 == Checks
 
 [source,sh]
 ----
 ./gradlew build
-gh pr checks 29
+gh pr checks 38
 (cd src/application/frontend && npm ci && npm run lint && npm run build && npm test)
 DOCS_TOOLBOX_LOCAL=1 ./build.sh validate && DOCS_TOOLBOX_LOCAL=1 ./build.sh build
-gh run list --branch main --limit 4
+gh issue view 4 --json body --jq .body | grep '^- \['
 ----
