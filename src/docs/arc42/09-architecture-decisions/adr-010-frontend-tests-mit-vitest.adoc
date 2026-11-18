@@ -2,10 +2,10 @@
 id: ADR-010-frontend-tests-mit-vitest
 type: ADR
 title: 'Frontend-Tests mit Vitest statt Jest'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Die React-Komponenten werden mit Vitest und React Testing Library getestet, weil Vitest die Vite-Konfiguration direkt nutzt und Jest-kompatibel ist.'
 derived_from:
 - type: external
@@ -33,10 +33,10 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-18.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
+Epic #4 angenommen (Issue #37).
 
 === Entscheidung
 

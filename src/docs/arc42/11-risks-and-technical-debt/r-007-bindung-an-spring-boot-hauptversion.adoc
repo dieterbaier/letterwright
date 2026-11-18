@@ -2,10 +2,10 @@
 id: R-007-bindung-an-spring-boot-hauptversion
 type: Risk
 title: 'Bindung an die Spring-Boot-Hauptversion'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Hosts auf einer anderen Spring-Boot-Hauptversion können den Starter nicht nutzen.'
 tags:
 - risk
@@ -24,10 +24,10 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-18.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+Dieses Risiko ist KI-gestützt identifiziert. Der Owner hat es bei der Prüfung
+von Epic #4 geprüft und akzeptiert (Issue #37).
 
 === Risk Statement
 

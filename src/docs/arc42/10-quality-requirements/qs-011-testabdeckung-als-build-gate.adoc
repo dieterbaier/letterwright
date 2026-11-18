@@ -2,10 +2,10 @@
 id: QS-011-testabdeckung-als-build-gate
 type: QualityScenario
 title: 'Testabdeckung als Build-Gate'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Ein Pull Request, der die Zeilen- oder Zweigabdeckung eines Moduls unter 80 Prozent senkt, schlägt im CI fehl.'
 tags:
 - quality
@@ -19,7 +19,8 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-18 durch den Owner bei der Prüfung von
+Epic #4 (Issue #37).
 
 Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
 bis sie bestätigt sind.
