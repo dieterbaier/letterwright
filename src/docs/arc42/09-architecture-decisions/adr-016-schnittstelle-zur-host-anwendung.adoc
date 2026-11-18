@@ -5,7 +5,7 @@ title: 'Schnitt und Datentypen der Schnittstelle zur Host-Anwendung'
 status: accepted
 owner: 'Architektur'
 created: '2026-11-17'
-reviewed: false
+reviewed: true
 summary: 'Die Host-Anwendung kompiliert nur gegen ein eigenes Modul spi mit eigenen Datentypen; ein ausgehender Adapter adapter-host bildet zwischen SPI-Typen und Domänenmodell ab, und der Starter exportiert nur spi.'
 derived_from:
 - type: conversation

@@ -5,7 +5,7 @@ title: 'Durchsetzung der Architekturgrenzen im Backend'
 status: accepted
 owner: 'Architektur'
 created: '2026-11-16'
-reviewed: false
+reviewed: true
 summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft zusätzlich die Paketregeln aus ADR-002.'
 derived_from:
 - type: external
@@ -31,7 +31,7 @@ relations:
   target: QS-007-integration-in-host-anwendung
   status: accepted
   rationale: 'Über die Modulgrenzen sieht ein Host beim Kompilieren nur das Modul spi (ADR-016), auch über den Starter; Domänenmodell, Ports, Anwendungsfälle, Service und Adapter bleiben ihm verborgen.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-015-durchsetzung-der-modulgrenzen-im-backend]]
@@ -58,8 +58,8 @@ ArchUnit-Regel prüft die Isolation der Adapter, und leere Selektoren schlagen
 fehl. Damit ArchUnit auch Pakete ohne weitere Klassen sieht, kompiliert
 `-Xpkginfo:always` jede `package-info`. Unabhängig davon ist jedes Paket mit
 JSpecify `@NullMarked` annotiert (<<adr-015-null-vertrag>>). Beides hat der
-Owner im Review von PR #33 entschieden. Die Ergänzung ist KI-gestützt formuliert
-und noch nicht im Review angenommen.
+Owner im Review von PR #33 entschieden. Die Ergänzung ist KI-gestützt formuliert;
+der Owner hat sie im Review von PR #33 angenommen.
 
 === Entscheidung
 
