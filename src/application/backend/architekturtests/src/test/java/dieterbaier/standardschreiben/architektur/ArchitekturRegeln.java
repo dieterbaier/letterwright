@@ -1,5 +1,7 @@
 package dieterbaier.standardschreiben.architektur;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.lang.ArchRule;
@@ -124,16 +126,19 @@ final class ArchitekturRegeln {
                 .allowEmptyShould(true);
     }
 
-    /** Das SPI ist reines Java und hängt an keinem anderen Paket der Bibliothek. */
+    /**
+     * Das SPI ist reines Java und hängt an keinem anderen Paket der Bibliothek.
+     *
+     * <p>Verboten ist jedes Paket unter dem Basispaket außerhalb von {@code spi}, nicht nur die
+     * heute bekannten. So bleibt die Regel auch für ein später hinzukommendes Paket rot.
+     */
     static ArchRule spiIstEigenstaendig(String basis) {
         return noClasses()
                 .that().resideInAPackage(basis + ".spi..")
-                .should().dependOnClassesThat().resideInAnyPackage(
-                        "org.springframework..",
-                        basis + ".domaene..",
-                        basis + ".usecases..",
-                        basis + ".adapter..",
-                        basis + ".starter..")
+                .should().dependOnClassesThat(
+                        resideInAPackage("org.springframework..")
+                                .or(resideInAPackage(basis + "..")
+                                        .and(resideOutsideOfPackage(basis + ".spi.."))))
                 .because("das SPI ist der einzige Vertrag mit dem Host und hat eigene Datentypen (ADR-016)")
                 .allowEmptyShould(true);
     }

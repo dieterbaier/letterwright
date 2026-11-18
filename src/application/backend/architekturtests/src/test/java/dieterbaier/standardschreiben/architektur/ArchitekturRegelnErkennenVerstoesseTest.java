@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import dieterbaier.standardschreiben.archfixture.adapter.out.host.HostAdapter;
+import dieterbaier.standardschreiben.archfixture.spi.HostDatensatz;
 import dieterbaier.standardschreiben.archfixture.spi.HostSchnittstelle;
 import dieterbaier.standardschreiben.archfixture.usecases.out.AusgehenderPort;
 import org.junit.jupiter.api.BeforeAll;
@@ -97,6 +98,25 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     @Test
     void spiMitDomaenenabhaengigkeitVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.spiIstEigenstaendig(FIXTURE), "SpiMitDomaene");
+    }
+
+    @Test
+    void spiMitAbhaengigkeitInEinNeuesPaketDerBibliothekVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.spiIstEigenstaendig(FIXTURE), "SpiMitGemeinsamemPaket");
+    }
+
+    @Test
+    void spiMitSpringAbhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.spiIstEigenstaendig(FIXTURE), "SpiMitSpring");
+    }
+
+    @Test
+    void spiDarfSichSelbstBenutzen() {
+        JavaClasses erlaubt = new ClassFileImporter()
+                .importClasses(HostSchnittstelle.class, HostDatensatz.class);
+
+        assertThatCode(() -> ArchitekturRegeln.spiIstEigenstaendig(FIXTURE).check(erlaubt))
+                .doesNotThrowAnyException();
     }
 
     @Test
