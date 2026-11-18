@@ -5,7 +5,7 @@ title: 'Monorepo, Gradle und aktuelle Plattformversionen'
 status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Monorepo mit Gradle (Kotlin DSL) für das Backend und npm-Workspaces für das Frontend; aktuelle stabile Spring-Boot-Version (4.x) auf Java 25 mit Bytecode-Ziel 21; ArchUnit und Testcontainers.'
 derived_from:
 - type: external
