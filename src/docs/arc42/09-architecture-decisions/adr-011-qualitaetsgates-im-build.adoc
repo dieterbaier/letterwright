@@ -20,24 +20,24 @@ tags:
 relations:
 - type: addresses
   target: QS-011-testabdeckung-als-build-gate
-  status: proposed
+  status: accepted
   rationale: 'Setzt das Abdeckungsgate um.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
-  status: proposed
+  status: accepted
   rationale: 'veraPDF soll im Build laufen; der Schritt kommt mit der Rendering-Pipeline (#7).'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
-  status: proposed
+  status: accepted
   rationale: 'axe-Prüfungen laufen im Build.'
-  reviewed: false
+  reviewed: true
 - type: depends_on
   target: ADR-010-frontend-tests-mit-vitest
-  status: proposed
+  status: accepted
   rationale: 'Die Frontend-Abdeckung kommt aus Vitest.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-011-qualitaetsgates-im-build]]
@@ -48,7 +48,7 @@ metadata_version: '1.0'
 Angenommen (accepted) am 2026-11-18.
 
 Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
-Epic #4 angenommen (Issue #37).
+Epic #4 angenommen (Issue #37), ebenso seine ausgehenden Relationen.
 
 === Entscheidung
 
@@ -163,4 +163,14 @@ include::generated/adr-011-qualitaetsgates-im-build-traceability.adoc[leveloffse
 
 === Review Notes
 
-Vom Owner inhaltlich bestätigt; Details zur Ausnahme generierten Codes prüfen.
+Der Owner hat die Gates inhaltlich bestätigt und den ADR am 2026-11-18
+angenommen (Issue #37), mit dem Umfang der Entscheidung oben. Dazu gehört die
+Ausnahme für generierten Code vom Abdeckungsgate. Heute gibt es keinen
+generierten Code und deshalb keine Ausschlussregel in JaCoCo oder Vitest. Eine
+solche Regel wird erst konfiguriert, wenn generierter Code entsteht, und ist
+dann im Build-Skript sichtbar.
+
+Die veraPDF-Präzisierung (geplant mit #7) hat der Owner im Review von PR #38
+gegengelesen. Die ausgehenden Relationen hat er im
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen. Die Relation zu QS-001 beschreibt eine
+geplante Maßnahme, keinen erfüllten Konformitätsnachweis.

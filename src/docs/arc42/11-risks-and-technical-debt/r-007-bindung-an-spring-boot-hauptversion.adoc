@@ -14,9 +14,9 @@ tags:
 relations:
 - type: affects
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Versionskonflikte verhindern die Integration.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[r-007-bindung-an-spring-boot-hauptversion]]
@@ -27,7 +27,8 @@ metadata_version: '1.0'
 Angenommen (accepted) am 2026-11-18.
 
 Dieses Risiko ist KI-gestützt identifiziert. Der Owner hat es bei der Prüfung
-von Epic #4 geprüft und akzeptiert (Issue #37).
+von Epic #4 geprüft und akzeptiert (Issue #37), ebenso seine ausgehende
+Relation.
 
 === Risk Statement
 
@@ -54,8 +55,8 @@ Hängt davon ab, welche Hosts tatsächlich integrieren.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+Der Owner hat Bewertung und Mitigation bestätigt und das Risiko am 2026-11-18
+akzeptiert (Issue #37).
 
 === Impact
 
@@ -79,5 +80,6 @@ include::generated/r-007-bindung-an-spring-boot-hauptversion-traceability.adoc[l
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Eintrittswahrscheinlichkeit, Auswirkung und Mitigationspfad sind mit dem Owner
+abgestimmt. Die ausgehende Relation zu QS-007 hat er im
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen.

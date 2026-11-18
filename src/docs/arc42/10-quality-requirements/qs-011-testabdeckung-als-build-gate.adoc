@@ -67,5 +67,5 @@ include::generated/qs-011-testabdeckung-als-build-gate-traceability.adoc[levelof
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Der Owner hat Antwortmaß, Umgebung und Stakeholder-Nutzen bestätigt und das
+Szenario am 2026-11-18 angenommen (Issue #37).

@@ -18,14 +18,14 @@ tags:
 relations:
 - type: addresses
   target: QS-011-testabdeckung-als-build-gate
-  status: proposed
+  status: accepted
   rationale: 'Vitest liefert die Frontend-Abdeckung für das Build-Gate.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
-  status: proposed
+  status: accepted
   rationale: 'axe-core läuft in den Vitest-Komponententests.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-010-frontend-tests-mit-vitest]]
@@ -36,12 +36,12 @@ metadata_version: '1.0'
 Angenommen (accepted) am 2026-11-18.
 
 Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
-Epic #4 angenommen (Issue #37).
+Epic #4 angenommen (Issue #37), ebenso seine ausgehenden Relationen.
 
 === Entscheidung
 
-Wir schlagen **Vitest** mit **React Testing Library**, **jsdom** und
-**vitest-axe** bzw. axe-core vor. Die Abdeckung misst Vitest mit dem V8-Provider.
+Wir verwenden **Vitest** mit **React Testing Library**, **jsdom** und
+**vitest-axe** bzw. axe-core. Die Abdeckung misst Vitest mit dem V8-Provider.
 
 === Kontext
 
@@ -127,4 +127,6 @@ include::generated/adr-010-frontend-tests-mit-vitest-traceability.adoc[leveloffs
 
 === Review Notes
 
-Kann akzeptiert werden, sobald der Owner die Begründung bestätigt.
+Der Owner hat die Begründung bestätigt und den ADR am 2026-11-18 angenommen
+(Issue #37). Die ausgehenden Relationen hat er im
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen.
