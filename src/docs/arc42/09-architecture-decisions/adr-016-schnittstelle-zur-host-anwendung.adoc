@@ -5,7 +5,7 @@ title: 'Schnitt und Datentypen der Schnittstelle zur Host-Anwendung'
 status: accepted
 owner: 'Architektur'
 created: '2026-11-17'
-reviewed: true
+reviewed: false
 summary: 'Die Host-Anwendung kompiliert nur gegen ein eigenes Modul spi mit eigenen Datentypen; ein ausgehender Adapter adapter-host bildet zwischen SPI-Typen und Domänenmodell ab, und der Starter exportiert nur spi.'
 derived_from:
 - type: conversation
@@ -214,14 +214,13 @@ in allen dreien dieselben drei Schnittstellen.
 
 ==== Neutral oder Folgearbeiten
 
-* Issue #27 setzt den Schnitt um, vor #19. Die Regel zur Isolation der Adapter
-  aus #19 deckt `adapter-host` dann von Anfang an ab.
+* Issue #27 hat den Schnitt umgesetzt, vor #19. Die Regel zur Isolation der
+  Adapter aus #19 deckt `adapter-host` ab.
 * ADR-002 und ADR-009 beschreiben, wo die Host-Ports liegen. Beide sind mit
   PR #28 angeglichen und angenommen, die Bausteinsicht ebenfalls angeglichen.
-* ADR-015 bleibt unverändert. Seine Aussagen zur schmalen Host-Abhängigkeit
-  („Ports und transitiv das Domänenmodell“) verfeinert dieser ADR. Mit #19 wird
-  ADR-015 ohnehin nachgezogen; dabei werden die Verweise auf `usecases-out` als
-  Host-Abhängigkeit auf `spi` umgestellt.
+* Die Aussagen von ADR-015 zur schmalen Host-Abhängigkeit („Ports und transitiv das
+  Domänenmodell“) verfeinert dieser ADR. Mit #19 sind die Verweise in ADR-015
+  auf `spi` als Host-Abhängigkeit umgestellt.
 * Die Beispielanwendung (Epic #11) belegt den Vertrag mit einer Implementierung
   gegen `spi`.
 

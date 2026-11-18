@@ -5,7 +5,7 @@ title: 'Durchsetzung der Architekturgrenzen im Backend'
 status: accepted
 owner: 'Architektur'
 created: '2026-11-16'
-reviewed: true
+reviewed: false
 summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft zusätzlich die Paketregeln aus ADR-002.'
 derived_from:
 - type: external
@@ -30,8 +30,8 @@ relations:
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an usecases-out hängen; auf seinem Compile-Classpath liegen dann nur die Ports und transitiv das Domänenmodell, nicht Domänenservices, Anwendungsfälle, Service oder Adapter. Historischer Stand: Seit ADR-016 kompiliert der Host nur gegen das Modul spi.'
-  reviewed: true
+  rationale: 'Über die Modulgrenzen sieht ein Host beim Kompilieren nur das Modul spi (ADR-016), auch über den Starter; Domänenmodell, Ports, Anwendungsfälle, Service und Adapter bleiben ihm verborgen.'
+  reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-015-durchsetzung-der-modulgrenzen-im-backend]]
@@ -48,12 +48,17 @@ Ergänzt am 2026-11-16 um die Trennung von Domänenmodell und Domänenservices
 (<<adr-015-domaenenservices>>, Issue #25). Diese Ergänzung hat der Owner
 entschieden: Option 1 aus drei Varianten, beide Module unter `domaene`.
 
-Verfeinert am 2026-11-17 durch xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28). Die Aussagen
-dieses ADR, nach denen ein Host-Modul direkt an `usecases-out` hängt und das
-Domänenmodell transitiv sieht, beschreiben den Stand davor und sind als
-historisch gekennzeichnet. `usecases-out` ist seitdem ein internes Modul; der
-Host kompiliert nur gegen das Modul `spi`, auch über den Starter. Die
-Überarbeitung der Modulregeln folgt mit Issue #19.
+Verfeinert am 2026-11-17 durch xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28).
+`usecases-out` ist seitdem ein internes Modul; der Host kompiliert nur gegen das
+Modul `spi`, auch über den Starter. Mit Issue #19 sind die Aussagen dieses ADR
+zur Host-Abhängigkeit auf `spi` umgestellt.
+
+Ergänzt am 2026-11-18 mit Issue #19 (<<adr-015-leere-selektoren>>): Eine
+ArchUnit-Regel prüft die Isolation der Adapter, leere Selektoren schlagen fehl,
+und jedes Paket ist in seiner `package-info` mit JSpecify `@NullMarked`
+annotiert. Die Wahl von `@NullMarked` hat der Owner aus drei Varianten
+getroffen. Die Ergänzung ist KI-gestützt formuliert und noch nicht im Review
+angenommen.
 
 === Entscheidung
 
@@ -63,8 +68,9 @@ Gradle-Module** und nicht nur über eine Paketkonvention:
 
 * Jede Grenze, über die eine Abhängigkeit nur in eine Richtung laufen darf, ist
   eine Modulgrenze: `domaene-modell`, `domaene-service`, `usecases-in`,
-  `usecases-out`, `usecases-service` und je Adapter ein Modul (Schnitt in
-  xref:adr-009-build-monorepo-und-versionen[ADR-009]).
+  `usecases-out`, `usecases-service`, `spi` und je Adapter ein Modul (Schnitt in
+  xref:adr-009-build-monorepo-und-versionen[ADR-009] und
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]).
 * Domänenmodell und Domänenservices sind getrennte Module unter `domaene`. Nur
   `usecases-service` bindet `domaene-service` ein, als `implementation`. Ports
   und Adapter sehen beim Kompilieren nur das Modell
@@ -78,10 +84,11 @@ Gradle-Module** und nicht nur über eine Paketkonvention:
   Modulabhängigkeiten nicht ausdrücken: Die Domäne und die Ports sind frei von
   Spring, eingehende und ausgehende Ports kennen einander nicht, der Service
   kennt keine Adapter, eingehende Adapter kennen nur eingehende Ports,
-  ausgehende Adapter nur ausgehende, und kein Adapter hängt am Starter. Das
-  Domänenmodell kennt keine Domänenservices, und weder Ports noch Adapter kennen
-  sie. Die Isolation der Adapter untereinander prüft ArchUnit derzeit nicht. Sie
-  hängt allein an den Gradle-Abhängigkeiten.
+  ausgehende Adapter nur ausgehende, kein Adapter hängt am Starter, und kein
+  Adapter benutzt einen anderen. Das Domänenmodell kennt keine Domänenservices,
+  und weder Ports noch Adapter kennen sie. Die Regeln zu `spi` stehen in
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Keine Regel lässt
+  einen leeren Selektor zu (<<adr-015-leere-selektoren>>).
 * Gemeinsame Build-Regeln stehen im Convention-Plugin
   `standardschreiben.java-modul`, damit die Zahl der Module den Pflegeaufwand
   nicht vervielfacht.
@@ -101,11 +108,12 @@ Geprüfte Belege im Repository:
 
 * `src/application/backend/**/build.gradle.kts`: `adapter-web` hängt nur an
   `usecases-in`, `adapter-rendering` und `adapter-persistenz-jdbc` nur an
-  `usecases-out`; `usecases-service` exportiert `usecases-in` per `api` und
+  `usecases-out`, `adapter-host` an `usecases-out` und `spi`;
+  `usecases-service` exportiert `usecases-in` per `api` und
   nutzt `usecases-out` und `domaene-service` per `implementation`;
-  `spring-boot-starter` bindet Ports, Service und Adapter direkt ein, sieht
-  `domaene-service` beim Kompilieren aber nicht. Er bringt es nur transitiv zur
-  Laufzeit mit.
+  `spring-boot-starter` exportiert nur `spi` per `api` und bindet Ports, Service
+  und Adapter als `implementation` ein. `domaene-service` sieht er beim
+  Kompilieren nicht, er bringt es nur transitiv zur Laufzeit mit.
 * `src/application/backend/architekturtests/`: die ArchUnit-Regeln, jede mit
   einer Fixture, die einen Verstoß nachstellt.
 
@@ -125,11 +133,11 @@ gewöhnlichen Anwendung:
 
 * **Früher Fehlernachweis:** Eine falsche Abhängigkeit soll so früh wie möglich
   scheitern, idealerweise schon in der IDE und beim Kompilieren.
-* **Schmale Abhängigkeit des Hosts:** Ein Host-Modul, das nur SPIs
-  implementiert, soll zum Kompilieren nur die Ports und die Domäne brauchen,
-  nicht die Anwendungsfälle, den Service und die Adapter. Zur Laufzeit bindet
-  der Host über den Starter ohnehin alles ein. _Historischer Stand: Seit
-  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] braucht der Host zum Kompilieren nur `spi`._
+* **Schmale Abhängigkeit des Hosts:** Ein Host soll zum Kompilieren nur den
+  Vertrag brauchen, den er implementiert, nicht die Anwendungsfälle, den Service
+  und die Adapter. Zur Laufzeit bindet der Host über den Starter ohnehin alles
+  ein. Bei der ersten Entscheidung waren das die Ports und die Domäne; seit
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] ist es nur `spi`.
 * **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
   können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
   vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
@@ -174,9 +182,9 @@ Die Grenzen sind Module, die erlaubten Richtungen Projektabhängigkeiten.
 ArchUnit prüft zusätzlich.
 
 Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
-nicht erst an. Ein Host-Modul, das nur SPIs implementiert, kann direkt an
-`usecases-out` hängen (historischer Stand, seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] hängt der
-Host an `spi`). Der Schnitt entspricht der
+nicht erst an. Ein Host hängt beim Kompilieren nur am Modul, das seinen Vertrag
+enthält; seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] ist das
+`spi`. Der Schnitt entspricht der
 feinsten Variante, die Hombergs beschreibt: eingehende und ausgehende Ports als
 getrennte Module, damit jeder Adapter schon an seiner Abhängigkeit als
 eingehend oder ausgehend erkennbar ist. Ein Modul je Adapter vermeidet zudem
@@ -276,6 +284,47 @@ Domänenservices deshalb nicht, und auch ein Host über den Starter bekommt sie
 nur zur Laufzeit. Braucht die Autokonfiguration sie später als Beans, muss der
 Starter `domaene-service` ausdrücklich einbinden.
 
+[[adr-015-leere-selektoren]]
+=== Ergänzung: Isolation der Adapter und leere Selektoren
+
+Das Review von PR #18 hat zwei Lücken in der ArchUnit-Prüfung gefunden
+(Issue #19). Beide sind mit dieser Ergänzung geschlossen.
+
+*Isolation der Adapter.* Die Regel `adapterSindVoneinanderIsoliert` schneidet
+`adapter.<richtung>.<adapter>` in Slices, und keine Slice darf von einer anderen
+abhängen. Sie deckt eingehende und ausgehende Adapter ab, auch `adapter-host`.
+Zwei Fixtures stellen den Verstoß nach: ein eingehender Adapter, der einen
+ausgehenden benutzt, und `adapter-host`, der einen anderen ausgehenden Adapter
+benutzt.
+
+*Leere Selektoren.* Keine Regel setzt mehr `allowEmptyShould(true)`. Trifft ein
+Selektor in der Produktivprüfung keine Klasse, schlägt sie fehl. Das schließt
+die Schwäche, die Hombergs Prüfungen nach dem Kompilieren zuschreibt: Ein
+umbenanntes Paket lässt eine Regel nicht mehr still leer laufen.
+
+Dabei zeigte sich ein Hindernis. Die Module des Gerüsts enthalten nur
+`package-info.java`, und ohne Annotation erzeugt der Compiler daraus keine
+Klasse. Für ArchUnit waren die Module leer, und alle Produktivprüfungen wären rot
+gewesen. Betrachtet wurden drei Varianten:
+
+. *JSpecify `@NullMarked` in jeder `package-info`* (gewählt). Dadurch entsteht
+  `package-info.class`, die Selektoren treffen jedes Paket, auch solange es
+  keinen Fachcode enthält. Zugleich gilt eine Null-Konvention: Typen sind
+  standardmäßig nicht `null`, Ausnahmen tragen `@Nullable`. Auch der Host sieht
+  sie im Vertrag von `spi`. Spring Boot 4 verwendet JSpecify selbst.
+. *#19 aufteilen* und das Verbot leerer Selektoren erst einführen, wenn echte
+  Klassen in den Modulen liegen (nach #30). Bis dahin bliebe die Lücke offen,
+  gerade während #5 die ersten Klassen anlegt.
+. *Leere Selektoren je Regel zulassen*, solange ihr Paket leer ist, mit einer
+  Liste im Test. Das kostet Pflege, und die Liste kann veralten.
+
+Umsetzung: Das Convention-Plugin bindet `org.jspecify:jspecify` per `api` ein,
+die Version kommt aus der Spring-Boot-BOM. Jede `package-info.java` trägt
+`@NullMarked`.
+
+Nachweis: Mit einem absichtlich falschen Basispaket schlagen alle Prüfungen in
+`HexagonaleArchitekturTest` mit „failed to check any classes“ fehl.
+
 === Konsequenzen
 
 ==== Positiv
@@ -285,26 +334,21 @@ Starter `domaene-service` ausdrücklich einbinden.
 
 * Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
   nicht erst angeboten.
-* Ein Host-Modul, das ausschließlich SPIs implementiert, kann direkt an
-  `usecases-out` hängen. Auf seinem Compile-Classpath liegen dann nur die Ports
-  und, weil `usecases-out` das Domänenmodell per `api` exportiert, transitiv
-  die Modelltypen. Domänenservices, Anwendungsfälle, Service und Adapter sieht es beim Kompilieren
-  nicht. Das gilt nicht für das Modul, das den Starter einbindet: Der Starter
-  exportiert zusätzlich `usecases-in` und bringt Service und Adapter zur
-  Laufzeit mit. _Historischer Stand: Seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] hängt
-  ein Host-Modul an `spi` und sieht beim Kompilieren weder Ports noch
-  Domänenmodell; der Starter exportiert nur `spi`._
+* Ein Host sieht beim Kompilieren nur `spi`, auch wenn er den Starter einbindet
+  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Domänenmodell,
+  Ports, Anwendungsfälle, Service und Adapter bringt der Starter nur zur
+  Laufzeit mit.
 * Für die Regeln, die beide abdecken, prüfen ArchUnit und Modulgrenzen auf zwei
   Wegen; fällt einer weg, bleibt der andere. Hombergs empfiehlt diese
   Kombination.
 * Jede neue Modulabhängigkeit steht im Build-Skript und ist damit eine bewusste,
   im Review sichtbare Entscheidung.
 * Die ArchUnit-Fixtures im Paket `archfixture` belegen, dass jede Regel den
-  nachgestellten Verstoß erkennt. Mehr belegen sie nicht. Nach einer Umbenennung
-  im Produktionscode bleiben sie grün, weil sie ihr eigenes Basispaket haben.
-  Die Produktivprüfung bleibt ebenfalls grün, weil alle Regeln
-  `allowEmptyShould(true)` setzen und ein leer laufender Selektor deshalb nicht
-  auffällt. Die Schwäche, die Hombergs nennt, ist damit nicht behoben.
+  nachgestellten Verstoß erkennt. Dass die Regeln den Produktionscode auch
+  treffen, belegt die Produktivprüfung selbst: Ein leer laufender Selektor
+  lässt sie fehlschlagen (<<adr-015-leere-selektoren>>).
+* Jedes Paket ist `@NullMarked`. Die Null-Konvention gilt von Anfang an und
+  nicht erst, wenn jemand sie nachträgt.
 
 ==== Negativ
 
@@ -316,15 +360,18 @@ Starter `domaene-service` ausdrücklich einbinden.
   time“ sind und ein falscher Schnitt deshalb eher bestehen bleibt.
 * Die Modulabhängigkeiten selbst sind Code, der falsch sein kann. Eine
   zusätzliche Projektabhängigkeit hebt eine Grenze still auf. ArchUnit fängt
-  das nur für die Regeln ab, die es prüft. Eine Abhängigkeit von
-  `adapter-web` nach `adapter-persistenz-jdbc` würde nach Ergänzen im
-  Build-Skript kompilieren und alle heutigen Regeln bestehen.
+  das nur für die Regeln ab, die es prüft. Seit #19 gehört die Isolation der
+  Adapter dazu.
+* Jedes Modul hängt an JSpecify, und ein Host sieht es über `spi`. Die
+  Bibliothek enthält nur Annotationen und hat keine weiteren Abhängigkeiten.
+* Ein neues Paket braucht eine `package-info.java` mit `@NullMarked`. Fehlt sie
+  und enthält das Paket noch keine Klasse, schlägt jede Regel fehl, deren
+  Selektor nur dieses Paket trifft. Der Fehler ist laut, nicht still.
 
 ==== Neutral oder Folgearbeiten
 
-* Issue #19: eine ArchUnit-Regel für die Isolation der Adapter untereinander,
-  mit Fixture, und leere Selektoren in der Produktivprüfung fehlschlagen
-  lassen, statt sie mit `allowEmptyShould(true)` zuzulassen.
+* Issue #32: Bekommt `spi` die Spring-Boot-BOM nicht mehr, braucht JSpecify
+  dort eine eigene Version im Versionskatalog.
 * JPMS (Option 4) neu bewerten, falls ein Host auf dem Modulpfad läuft oder
   Kapselung innerhalb eines Artefakts nötig wird.
 * Innerhalb eines Moduls bleibt package-private die Voreinstellung für alles,
@@ -429,3 +476,7 @@ ist.
   Domänenservices als getrennte Module unter `domaene`. Der Owner hatte darauf
   hingewiesen, dass ein Domänenservice im Modul der Domäne für Ports und Adapter
   sichtbar wäre.
+* Ergänzt am 2026-11-18 mit Issue #19: Isolation der Adapter per ArchUnit,
+  leere Selektoren schlagen fehl, `@NullMarked` in jeder `package-info`. Der
+  Owner hat `@NullMarked` aus drei Varianten gewählt. Die Aussagen zur
+  Host-Abhängigkeit sind auf `spi` umgestellt, wie ADR-016 es vorsieht.
