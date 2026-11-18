@@ -43,6 +43,11 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     }
 
     @Test
+    void domaeneMitAdapterAbhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.domaeneIstFrameworkfrei(FIXTURE), "DomaeneMitAdapter");
+    }
+
+    @Test
     void portMitAdapterAbhaengigkeitVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.portsKennenNurDieDomaene(FIXTURE), "AusgehenderPortMitAdapter");
     }
