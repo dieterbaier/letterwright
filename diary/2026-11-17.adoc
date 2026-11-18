@@ -1,0 +1,132 @@
+= Projekttagebuch 2026-11-17
+
+Vierter Arbeitstag, Thema Projektgerüst. Bevor #19 begann, schlug der Owner ein
+eigenes SPI-Modul vor. Daraus wurden ADR-016 (angenommen und gemergt) und die
+Umsetzung des Modulschnitts in PR #29, die noch im Review ist. Die Sitzung lief
+bis zum Morgen des 18. November: Folge-Issue #30, die Anpassung von #27 und #5
+und der Clock-out stammen von dort. Rekonstruiert aus Commit-Historie, Issues
+und Pull Requests.
+
+== Was geschah
+
+* **Ausgangslage:** Die Host-Ports lagen in `usecases-out` neben den internen
+  Ports. `usecases-out` exportierte das Domänenmodell, der Starter
+  `usecases-in` und `usecases-out` per `api`. Ein Host kompilierte damit gegen
+  Domänenmodell und Anwendungsfälle.
+* **Issue #27** neu als Unter-Issue von #4: eigenes SPI-Modul mit eigenen
+  Datentypen, vor #19.
+* **ADR-016 (PR #28, per Rebase gemergt als `fa98768`):** Schnitt und
+  Datentypen der Schnittstelle zur Host-Anwendung.
+** Drei Optionen, Pugh-Summen −2, 0 und +2. Gewählt: Modul `spi` ohne
+   Abhängigkeit zur Bibliothek, ausgehender Adapter `adapter-host` mit dem
+   Mapping, Starter exportiert nur `spi`.
+** ADR-002 und ADR-009 angeglichen, Bausteinsicht und Glossar („SPI“) ergänzt.
+** Im Review angenommen: ADR-016, ADR-002 und ADR-009, jeweils mit ihren
+   ausgehenden Relationen.
+** Review-Befund P1: ADR-015 empfahl dem Host weiterhin `usecases-out` samt
+   Domänenmodell. Diese Stellen sind jetzt als historischer Stand mit Verweis
+   auf ADR-016 gekennzeichnet; die Überarbeitung bleibt bei #19.
+** Review-Befund P2: Q-ARCH-004 ordnete Schlüssel und Dateiname dem SPI zu.
+   Jetzt wie in ADR-016: über React-Komponenten und REST. Der Mechanismus der
+   Benachrichtigung nach dem Speichern bleibt offen.
+* **Modulschnitt (#27, PR #29, offen, Checks grün):**
+** Module `spi` und `adapter-host`, Starter mit nur `api(spi)`.
+** Drei ArchUnit-Regeln mit Fixtures: `spi` ist eigenständig, der Kern kennt
+   `spi` nicht, nur `adapter-host` und der Starter benutzen `spi`.
+** Nachweis mit einem temporären Probemodul: Der Compile-Classpath eines Hosts
+   über den Starter enthält von der Bibliothek nur noch `spi`. Vorher waren es
+   `usecases-in`, `usecases-out` und `domaene-modell`.
+** Review-Befund 2: Der Positivtest der Allowlist hing an den Verstößen anderer
+   Fixtures. Jetzt importiert er nur die erlaubten Klassen; Gegenprobe ohne
+   `adapter-host` in der Allowlist wurde rot.
+** Review-Befund 1: #27 verlangte auch Schnittstellen, Datentypen, Mapping und
+   die Default-`Berechtigungspruefung`. Der Owner hat #27 auf den Modulschnitt
+   beschränkt, der Rest steht in #30.
+* **Issues:** #27 und #30 neu, #30 als Unter-Issue von #5. #5 nennt das SPI
+  jetzt nach ADR-016.
+
+== Entscheidungen des Owners
+
+* **Eigenes SPI-Modul** mit eigenen Datentypen und Mapping zum Domänenmodell,
+  abgeschirmt von den Use-Case-Schnittstellen.
+* **Keine eingehende Java-API für den Host.** Das SPI reicht. Im ADR steht das
+  als Annahme, bis Q-ARCH-004 geklärt ist.
+* **Reihenfolge:** #27 vor #19.
+* **Festhalten als neuer ADR-016**, der ADR-015 verfeinert, statt ADR-015
+  umzuschreiben.
+* **Versionierung:** Eine Version für das ganze Paket, keine eigene für `spi`.
+* **Default-`Berechtigungspruefung`** auf Spring Security im Starter, kein
+  eigenes Modul.
+* **ADR-016, ADR-002 und ADR-009 angenommen.**
+* **Scope von #27:** nur der Modulschnitt, Folge-Issue #30 für den Vertrag.
+
+== Gelernt
+
+* **Rebase-Merge und lokale Branches:** Nach `gh pr merge --rebase` haben die
+  Commits auf `main` neue IDs. `git branch -d` verweigert dann das Löschen,
+  obwohl der Inhalt gemergt ist. Vorher mit `git diff <branch> <merge-commit>`
+  prüfen, dann mit `-D` löschen (nur auf Anweisung des Owners).
+* **Positivfälle von Allowlist-Regeln isoliert prüfen:** Nur die erlaubten
+  Klassen importieren und Durchlaufen erwarten. Eine Prüfung „kommt in der
+  Fehlermeldung nicht vor“ hängt an anderen Fixtures.
+* **BOM über das Convention-Plugin:** `api(platform(...))` gibt die
+  Versions-Constraints der Spring-Boot-BOM an jeden Nutzer jedes Moduls weiter,
+  auch an einen Host, der nur `spi` sieht.
+* **Akzeptierte ADRs:** Wird eine Aussage eines akzeptierten ADR durch einen
+  neuen ADR überholt, reicht die Relation `refines` nicht. Wer den alten ADR
+  liest, braucht dort einen sichtbaren Hinweis.
+* **Arbeitsumgebung (zsh):**
+** `cp` ist auf `cp -i` gelegt. In einem Skript fragt es nach und überschreibt
+   nicht, ohne dass der Befehl scheitert. `command cp -f` verwenden.
+** `>` scheitert mit `noclobber` an vorhandenen Dateien; `>|` verwenden.
+** `echo ===...` scheitert, weil zsh `=wort` als Befehlspfad expandiert. Text
+   mit Gleichheitszeichen am Anfang in Anführungszeichen setzen.
+
+== Offen
+
+* PR #29 im Review des Owners, danach #27 schließen.
+* #19 als letzter Schritt des Projektgerüsts, danach Epic #5 mit #30.
+* Ob das Convention-Plugin die Spring-Boot-BOM schmaler exportiert.
+* Q-ARCH-004: Mechanismus der Benachrichtigung des Hosts nach dem Speichern.
+* Spring Boot 4.2.0 abwarten, dann die BOM anheben.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Branch-Sweep beim Clock-in (erst unter zsh blockiert, dann unter bash
+  `SWEEP: CLEAR`) und beim Clock-out (`SWEEP: CLEAR`), `gh pr list --state open`,
+  `gh issue list`, `gh pr checks 28` und `gh pr checks 29`.
+* `progress/projektgeruest.adoc`, `progress/prototyp.adoc`,
+  `diary/2026-11-16.adoc`, `AGENTS.md`.
+* Issues #19, #25, #5 (Beschreibungen, Unter-Issues von #5), #27 und #30
+  (selbst angelegt), Unter-Issue-API von #4 und #5.
+* PR #28: Inline-Kommentare 4598158312, 4598164755, 4598171002, 4598173014,
+  4598181189, 4598185856, 4598189792, 4599221856, 4599225192, 4601664028,
+  Review-Text mit Befund P1, Check-Runs, Merge-Status.
+* PR #29: Review-Text mit drei Befunden, Check-Runs.
+* Backend: `settings.gradle.kts`, alle `build.gradle.kts` der Module,
+  `package-info.java` von `usecases-out` und Starter, das Convention-Plugin
+  `standardschreiben.java-modul.gradle.kts`, `ArchitekturRegeln`,
+  `ArchitekturRegelnErkennenVerstoesseTest`, `HexagonaleArchitekturTest` und
+  Fixtures aus `archfixture`.
+* `dependencies --configuration compileClasspath` und `runtimeClasspath` eines
+  temporären Probemoduls, auf `issue_27` und auf `main`.
+* ADR-002, ADR-009, ADR-015, QS-007, `doc-05000-building-block-view.adoc`,
+  `doc-12000-glossary.adoc`, `doc-005` (Q-ARCH-004), Fundstellen in
+  `doc-06000-runtime-view.adoc`, `metamodel/artifact.schema.yaml` und
+  `metamodel/relations.schema.yaml`, `templates/adr.adoc`.
+* Toolkit `tools/architecture-knowledge-toolkit`:
+** Skills `clock-in`, `clock-out`, `adr`, `commit-message`,
+   `implement-issue-workflow`, `post-merge-sync`.
+** `skills/references/adr-writing-guide.md`,
+   `clock-in/templates/progress.adoc`, `adapters/shared/journal-config.sh get`.
+* Privates Journal: Skill `daily-clock-in`, Invariantenprüfung (`before`),
+  Sweep der eigenen Branches, Inbox-Abgleich, offene Fäden, Tagesdatei und
+  Draft-PR des 17. November.
+
+Fehlgeschlagen:
+
+* Der erste Branch-Sweep beim Clock-in lief unter zsh und meldete
+  `SWEEP: BLOCKED`, weil zsh die Branchliste nicht in Wörter aufteilt. Unter
+  bash lief er durch.

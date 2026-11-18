@@ -9,8 +9,10 @@ und CI, bevor Fachcode entsteht (Epic #4).
 
 Erst das Backend, weil die Gates (Abdeckung, ArchUnit) für alle folgenden Epics
 gelten. Dann das Frontend. Die gemeinsame CI danach, weil sie beide Gerüste
-voraussetzt. Zuletzt schließen wir die Lücken der ArchUnit-Prüfung, bevor mit
-#5 echter Fachcode die Regeln zum ersten Mal mit Inhalt füllt.
+voraussetzt. Dann der Schnitt des SPI zur Host-Anwendung (ADR-016), damit die
+Regeln aus #19 die neuen Module von Anfang an abdecken. Zuletzt schließen wir die
+Lücken der ArchUnit-Prüfung, bevor mit #5 echter Fachcode die Regeln zum ersten
+Mal mit Inhalt füllt.
 
 [options="checklist"]
 * [x] Backend-Gerüst mit Abdeckungs- und ArchUnit-Gate: #12, PR #15
@@ -18,38 +20,55 @@ voraussetzt. Zuletzt schließen wir die Lücken der ArchUnit-Prüfung, bevor mit
 * [x] Frontend-Gerüst mit Vite, UnoCSS nach ADR-013, Vitest-Abdeckungsgate und axe: #13, PR #20
 * [x] CI für Backend (Java 21 und 25) und Frontend (Node 22.22.2, 24, 26) in `build.yml`, Gegenproben für Abdeckung und ArchUnit rot: #14, PR #22
 * [x] Domänenmodell und Domänenservices als getrennte Module, ADR-015 ergänzt: #25, PR #26
-* [ ] ArchUnit: Isolation der Adapter prüfen und leere Selektoren verbieten: #19
+* [x] Schnitt und Datentypen des SPI als ADR-016 (accepted), ADR-002 und ADR-009 accepted: PR #28
+* [ ] Module `spi` und `adapter-host`, Starter exportiert nur `spi`, ArchUnit-Regeln mit Fixtures: #27, PR #29 (im Review, Checks grün)
+* [ ] ArchUnit: Isolation der Adapter prüfen und leere Selektoren verbieten, ADR-015 nachziehen: #19
 
-Danach beginnt Epic #5 (Domänenmodell und Ports). #19 sollte vorher kommen:
-Solange alle Regeln `allowEmptyShould(true)` setzen, bleibt eine Regel grün, deren
-Selektor nach einem Umbenennen nichts mehr trifft.
+#19 kommt nach #27: Die Regel zur Isolation der Adapter soll `adapter-host`
+gleich mit abdecken, und ADR-015 wird nur einmal überarbeitet. #19 muss vor #5
+liegen: Solange alle Regeln `allowEmptyShould(true)` setzen, bleibt eine Regel
+grün, deren Selektor nichts trifft. Im Gerüst trifft heute keiner etwas, weil die
+Module nur `package-info.java` enthalten.
 
 == Where we are
 
-Das Backend liegt unter `src/application/backend/` mit den Modulen
+Auf `main` liegt das Backend unter `src/application/backend/` mit den Modulen
 `domaene-modell`, `domaene-service`, `usecases-in`, `usecases-out`,
 `usecases-service`, je einem Modul pro Adapter, dem Starter und
-`architekturtests`. Ports exportieren nur das Domänenmodell. Domänenservices sieht
-beim Kompilieren nur `usecases-service` (ADR-015).
+`architekturtests`. ADR-016 ist angenommen. PR #29 setzt ihn um: neues Modul
+`spi` ohne Abhängigkeit zur Bibliothek, `adapter-host` unter `adapter/out`, der
+Starter exportiert nur noch `spi`, drei neue ArchUnit-Regeln mit Fixtures.
+
+Der Owner hat #27 im Review von #29 auf den Modulschnitt beschränkt.
+Schnittstellen, Datentypen, Mapping und die Default-`Berechtigungspruefung`
+stehen in #30, Unter-Issue von #5.
+
+ADR-015 kennzeichnet seine alte Host-Empfehlung (`usecases-out` samt
+Domänenmodell) als historischen Stand. Die eigentliche Überarbeitung gehört zu
+#19.
 
 Das Frontend-Paket `@dieterbaier/standardschreiben` liegt unter
-`src/application/frontend/packages/komponenten`. `.npmrc` setzt `engine-strict`,
-lokal braucht `npm ci` mindestens Node 22.22.2.
-
-Der Workflow `build.yml` prüft beides bei jedem Pull Request, `architekturdoku.yml`
-die Doku. Branch-Schutz für `main` ist nicht eingerichtet.
+`src/application/frontend/packages/komponenten`. Der Workflow `build.yml` prüft
+Backend und Frontend bei jedem Pull Request, `architekturdoku.yml` die Doku.
+Branch-Schutz für `main` ist nicht eingerichtet.
 
 == Open in this topic
 
+* PR #29: Review des Owners abwarten, dann per Rebase mergen und #27 schließen.
 * #19 als letzter Schritt des Epics.
-* Spring Boot 4.2.0 ist noch nicht erschienen (Stand 2026-11-16: RC2). Danach die
-  BOM anheben (Q-ARCH-002 in `doc-005`).
+* Das Convention-Plugin exportiert die Spring-Boot-BOM per
+  `api(platform(...))`. Damit gibt jedes Modul, auch `spi`, dem Host
+  Versions-Constraints vor (Hinweis aus dem Review von #29). Entscheiden, ob die
+  BOM schmaler exportiert wird.
+* Spring Boot 4.2.0 ist noch nicht erschienen. Danach die BOM anheben (Q-ARCH-002
+  in `doc-005`).
 
 == Checks
 
 [source,sh]
 ----
 ./gradlew build
+gh pr checks 29
 (cd src/application/frontend && npm ci && npm run lint && npm run build && npm test)
 DOCS_TOOLBOX_LOCAL=1 ./build.sh validate && DOCS_TOOLBOX_LOCAL=1 ./build.sh build
 gh run list --branch main --limit 4
