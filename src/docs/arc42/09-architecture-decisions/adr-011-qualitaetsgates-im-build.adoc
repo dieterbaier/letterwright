@@ -2,11 +2,11 @@
 id: ADR-011-qualitaetsgates-im-build
 type: ADR
 title: 'Qualitätsgates im Build'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
-summary: 'GitHub Actions erzwingt je Modul 80 Prozent Zeilen- und Zweigabdeckung (JaCoCo, Vitest), ArchUnit-Regeln, veraPDF- und axe-Prüfungen sowie die Validierung der Architekturdoku.'
+reviewed: true
+summary: 'GitHub Actions erzwingt je Modul 80 Prozent Zeilen- und Zweigabdeckung (JaCoCo, Vitest), ArchUnit-Regeln, axe-Prüfungen und die Validierung der Architekturdoku; veraPDF kommt mit der Rendering-Pipeline (#7) dazu.'
 derived_from:
 - type: external
   description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
@@ -26,7 +26,7 @@ relations:
 - type: addresses
   target: QS-001-pdfa-konformitaet
   status: proposed
-  rationale: 'veraPDF läuft im Build.'
+  rationale: 'veraPDF soll im Build laufen; der Schritt kommt mit der Rendering-Pipeline (#7).'
   reviewed: false
 - type: addresses
   target: QS-003-barrierefreie-vorschau
@@ -45,21 +45,22 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-18.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
+Epic #4 angenommen (Issue #37).
 
 === Entscheidung
 
-Wir schlagen eine **GitHub-Actions-Pipeline** vor, die bei jedem Pull Request
+Wir setzen eine **GitHub-Actions-Pipeline** ein, die bei jedem Pull Request
 fehlschlägt, wenn eines dieser Gates verletzt ist:
 
 * **Abdeckung ≥ 80 % Zeilen *und* Zweige**, für **jedes** Backend-Modul (JaCoCo
   `jacocoTestCoverageVerification`) und **jedes** Frontend-Paket (Vitest
   `coverage.thresholds`). Generierter Code ist ausgenommen.
 * **ArchUnit**-Regeln für die hexagonale Struktur.
-* **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1).
+* **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1). Geplant: Der Schritt
+  kommt mit der Rendering-Pipeline (#7). Heute gibt es ihn in `build.yml` nicht.
 * **axe-core** ohne Verstöße der Stufen *serious* und *critical*.
 * **Architekturdoku**: `./build.sh check-adapters` und `./build.sh build` (validiert,
   generiert und rendert inklusive PlantUML) im Workflow
