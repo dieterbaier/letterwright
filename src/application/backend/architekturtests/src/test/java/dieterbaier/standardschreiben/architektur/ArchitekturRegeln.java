@@ -16,6 +16,10 @@ import com.tngtech.archunit.lang.CompositeArchRule;
  *
  * <p>Die Parametrisierung erlaubt es, die Regeln gegen Fixture-Klassen zu prüfen und so zu
  * belegen, dass sie Verstöße tatsächlich erkennen.
+ *
+ * <p>Keine Regel lässt einen leeren Selektor zu. Trifft ein Selektor nach einer Umbenennung keine
+ * Klasse mehr, schlägt die Prüfung fehl, statt still grün zu bleiben (ADR-015). Damit auch ein Modul
+ * ohne Klassen getroffen wird, ist jedes Paket in seiner {@code package-info} {@code @NullMarked}.
  */
 final class ArchitekturRegeln {
 
@@ -31,8 +35,7 @@ final class ArchitekturRegeln {
                         basis + ".usecases..",
                         basis + ".adapter..",
                         basis + ".starter..")
-                .because("die Domäne ist der frameworkfreie Kern (ADR-002)")
-                .allowEmptyShould(true);
+                .because("die Domäne ist der frameworkfreie Kern (ADR-002)");
     }
 
     /** Die Ports sind frameworkfrei und kennen nur die Domäne, nicht Service, Adapter oder Starter. */
@@ -44,8 +47,7 @@ final class ArchitekturRegeln {
                         basis + ".usecases.service..",
                         basis + ".adapter..",
                         basis + ".starter..")
-                .because("Ports sind der Vertrag zu Adaptern und Host und hängen nur an der Domäne (ADR-002)")
-                .allowEmptyShould(true);
+                .because("Ports sind der Vertrag zu Adaptern und Host und hängen nur an der Domäne (ADR-002)");
     }
 
     /** Eingehende und ausgehende Ports kennen einander nicht. */
@@ -54,13 +56,11 @@ final class ArchitekturRegeln {
                 .of(noClasses()
                         .that().resideInAPackage(basis + ".usecases.in..")
                         .should().dependOnClassesThat().resideInAPackage(basis + ".usecases.out..")
-                        .because("ein eingehender Port beschreibt einen Anwendungsfall, kein SPI (ADR-002)")
-                        .allowEmptyShould(true))
+                        .because("ein eingehender Port beschreibt einen Anwendungsfall, kein SPI (ADR-002)"))
                 .and(noClasses()
                         .that().resideInAPackage(basis + ".usecases.out..")
                         .should().dependOnClassesThat().resideInAPackage(basis + ".usecases.in..")
-                        .because("ein ausgehender Port ruft keine Anwendungsfälle auf (ADR-002)")
-                        .allowEmptyShould(true));
+                        .because("ein ausgehender Port ruft keine Anwendungsfälle auf (ADR-002)"));
     }
 
     /** Die Implementierung der Anwendungsfälle kennt keine Adapter und keinen Starter, nur Ports. */
@@ -70,8 +70,7 @@ final class ArchitekturRegeln {
                 .should().dependOnClassesThat().resideInAnyPackage(
                         basis + ".adapter..",
                         basis + ".starter..")
-                .because("Adapter implementieren Ports, nicht umgekehrt (ADR-002)")
-                .allowEmptyShould(true);
+                .because("Adapter implementieren Ports, nicht umgekehrt (ADR-002)");
     }
 
     /** Eingehende Adapter rufen nur eingehende Ports auf. */
@@ -81,8 +80,7 @@ final class ArchitekturRegeln {
                 .should().dependOnClassesThat().resideInAnyPackage(
                         basis + ".usecases.out..",
                         basis + ".usecases.service..")
-                .because("eingehende Adapter sprechen die Anwendung nur über ihre Anwendungsfälle an (ADR-002)")
-                .allowEmptyShould(true);
+                .because("eingehende Adapter sprechen die Anwendung nur über ihre Anwendungsfälle an (ADR-002)");
     }
 
     /** Ausgehende Adapter implementieren nur ausgehende Ports. */
@@ -92,8 +90,7 @@ final class ArchitekturRegeln {
                 .should().dependOnClassesThat().resideInAnyPackage(
                         basis + ".usecases.in..",
                         basis + ".usecases.service..")
-                .because("ausgehende Adapter werden von der Anwendung gerufen, nicht umgekehrt (ADR-002)")
-                .allowEmptyShould(true);
+                .because("ausgehende Adapter werden von der Anwendung gerufen, nicht umgekehrt (ADR-002)");
     }
 
     /** Adapter hängen nicht vom Starter ab; nur der Starter verdrahtet sie. */
@@ -101,8 +98,7 @@ final class ArchitekturRegeln {
         return noClasses()
                 .that().resideInAPackage(basis + ".adapter..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".starter..")
-                .because("nur der Starter verdrahtet Adapter (ADR-002)")
-                .allowEmptyShould(true);
+                .because("nur der Starter verdrahtet Adapter (ADR-002)");
     }
 
     /** Das Domänenmodell kennt keine Domänenservices; die Abhängigkeit läuft nur vom Service zum Modell. */
@@ -110,8 +106,7 @@ final class ArchitekturRegeln {
         return noClasses()
                 .that().resideInAPackage(basis + ".domaene.modell..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".domaene.service..")
-                .because("Domänenservices arbeiten auf dem Modell, nicht umgekehrt (ADR-015)")
-                .allowEmptyShould(true);
+                .because("Domänenservices arbeiten auf dem Modell, nicht umgekehrt (ADR-015)");
     }
 
     /** Ports und Adapter kennen keine Domänenservices; nur die Implementierung der Anwendungsfälle nutzt sie. */
@@ -122,8 +117,7 @@ final class ArchitekturRegeln {
                         basis + ".usecases.out..",
                         basis + ".adapter..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".domaene.service..")
-                .because("Domänenservices sind nur über die Anwendungsfälle erreichbar (ADR-015)")
-                .allowEmptyShould(true);
+                .because("Domänenservices sind nur über die Anwendungsfälle erreichbar (ADR-015)");
     }
 
     /**
@@ -139,8 +133,7 @@ final class ArchitekturRegeln {
                         resideInAPackage("org.springframework..")
                                 .or(resideInAPackage(basis + "..")
                                         .and(resideOutsideOfPackage(basis + ".spi.."))))
-                .because("das SPI ist der einzige Vertrag mit dem Host und hat eigene Datentypen (ADR-016)")
-                .allowEmptyShould(true);
+                .because("das SPI ist der einzige Vertrag mit dem Host und hat eigene Datentypen (ADR-016)");
     }
 
     /** Domäne, Ports und Anwendungsfälle kennen das SPI nicht. */
@@ -148,8 +141,7 @@ final class ArchitekturRegeln {
         return noClasses()
                 .that().resideInAnyPackage(basis + ".domaene..", basis + ".usecases..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".spi..")
-                .because("der Kern fragt den Host über ausgehende Ports in Domänenbegriffen an (ADR-016)")
-                .allowEmptyShould(true);
+                .because("der Kern fragt den Host über ausgehende Ports in Domänenbegriffen an (ADR-016)");
     }
 
     /** Außer dem SPI selbst benutzen nur adapter-host und der Starter das SPI. */
@@ -161,7 +153,6 @@ final class ArchitekturRegeln {
                         basis + ".adapter.out.host..",
                         basis + ".starter..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".spi..")
-                .because("nur adapter-host bildet zwischen SPI und Domäne ab, nur der Starter verdrahtet (ADR-016)")
-                .allowEmptyShould(true);
+                .because("nur adapter-host bildet zwischen SPI und Domäne ab, nur der Starter verdrahtet (ADR-016)");
     }
 }
