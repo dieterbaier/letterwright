@@ -20,7 +20,8 @@ import com.tngtech.archunit.lang.CompositeArchRule;
  *
  * <p>Keine Regel lässt einen leeren Selektor zu. Trifft ein Selektor nach einer Umbenennung keine
  * Klasse mehr, schlägt die Prüfung fehl, statt still grün zu bleiben (ADR-015). Damit auch ein Modul
- * ohne Klassen getroffen wird, ist jedes Paket in seiner {@code package-info} {@code @NullMarked}.
+ * ohne weitere Klassen getroffen wird, kompiliert {@code -Xpkginfo:always} jede {@code package-info}.
+ * Ein Selektor über mehrere Pakete bleibt grün, solange eines davon noch trifft.
  */
 final class ArchitekturRegeln {
 

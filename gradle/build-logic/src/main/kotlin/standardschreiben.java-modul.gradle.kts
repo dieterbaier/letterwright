@@ -9,6 +9,8 @@
 // - Ein Modul mit Produktionscode, aber ohne Tests, schlägt fehl (sonst umginge es das Gate).
 // - JSpecify für den Null-Vertrag: Jedes Paket ist in seiner package-info @NullMarked (ADR-015).
 //   Die Version steht im Versionskatalog, unabhängig von der Spring-Boot-BOM.
+// - -Xpkginfo:always: Jede package-info.java wird zur Klasse, damit ArchUnit auch Pakete ohne
+//   weitere Klassen sieht und leere Selektoren auffallen (ADR-015).
 
 plugins {
     `java-library`
@@ -26,7 +28,7 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.release = 21
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror", "-parameters"))
+    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror", "-parameters", "-Xpkginfo:always"))
 }
 
 dependencies {
