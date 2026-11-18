@@ -7,6 +7,7 @@
 // - Tests mit JUnit 5, Mockito und AssertJ; Versionen aus der Spring-Boot-BOM.
 // - Abdeckungs-Gate: mindestens 80 % Zeilen- UND Zweigabdeckung je Modul, Teil von `check`.
 // - Ein Modul mit Produktionscode, aber ohne Tests, schlägt fehl (sonst umginge es das Gate).
+// - JSpecify für die Null-Konvention: Jedes Paket ist in seiner package-info @NullMarked (ADR-015).
 
 plugins {
     `java-library`
@@ -30,6 +31,7 @@ tasks.withType<JavaCompile>().configureEach {
 dependencies {
     val bom = platform(bibliothek("spring-boot-dependencies"))
     api(bom)
+    api(bibliothek("jspecify"))
     testImplementation(bom)
     testImplementation(bibliothek("junit-jupiter"))
     testImplementation(bibliothek("mockito-junit-jupiter"))
