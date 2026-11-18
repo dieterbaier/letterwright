@@ -1,0 +1,2944 @@
+{
+  "version": "2.22",
+  "children": [
+    {
+      "type": "frame",
+      "id": "s77eed",
+      "x": 0,
+      "y": 0,
+      "name": "Bestellmaske – E-Auto konfigurieren",
+      "clip": true,
+      "width": 1440,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "p9vmfP",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 72,
+          "fill": "$surface",
+          "stroke": "$line",
+          "strokeWidth": {
+            "bottom": 1
+          },
+          "padding": [
+            0,
+            48
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "p01CP",
+              "name": "Logo",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "a5BML",
+                  "name": "Mark",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "$accent",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "c2yw5d",
+                      "name": "Bolt",
+                      "width": 18,
+                      "height": 18,
+                      "icon": "zap",
+                      "library": "lucide",
+                      "fill": "#FFFFFF"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "gepuK",
+                  "name": "Voltwerk Autohaus",
+                  "fill": "$ink",
+                  "content": "Voltwerk Autohaus",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 18,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "oSjFJ",
+                  "name": "Demo Badge",
+                  "fill": "#FFF3D6",
+                  "cornerRadius": 4,
+                  "padding": [
+                    3,
+                    8
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "R6fGH",
+                      "name": "Demo · Standardschreiben",
+                      "fill": "#7A5300",
+                      "content": "Demo · Standardschreiben",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ZZ4zz",
+              "name": "Steps",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "XKVRB",
+                  "name": "Step 1",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "NcQ10",
+                      "name": "Num",
+                      "width": 22,
+                      "height": 22,
+                      "fill": "$accent",
+                      "cornerRadius": 11,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "GhduO",
+                          "name": "1",
+                          "fill": "#FFFFFF",
+                          "content": "1",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "a601rJ",
+                      "name": "Konfigurieren",
+                      "fill": "$ink",
+                      "content": "Konfigurieren",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yRIAK",
+                  "name": "Step 2",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "IMYj8",
+                      "name": "Num",
+                      "width": 22,
+                      "height": 22,
+                      "fill": "$line",
+                      "cornerRadius": 11,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "KaQU4",
+                          "name": "2",
+                          "fill": "$muted",
+                          "content": "2",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "nvpLf",
+                      "name": "Bestellschreiben",
+                      "fill": "$muted",
+                      "content": "Bestellschreiben",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NdmNb",
+                  "name": "Step 3",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "NMdVx",
+                      "name": "Num",
+                      "width": 22,
+                      "height": 22,
+                      "fill": "$line",
+                      "cornerRadius": 11,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "rOMaF",
+                          "name": "3",
+                          "fill": "$muted",
+                          "content": "3",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "SnjvP",
+                      "name": "Auslieferung",
+                      "fill": "$muted",
+                      "content": "Auslieferung",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dA7id",
+          "name": "Body",
+          "width": "fill_container",
+          "gap": 40,
+          "padding": [
+            40,
+            48,
+            64,
+            48
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "AvV9B",
+              "name": "Main",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 48,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "a6wzV",
+                  "name": "Title",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DdcJy",
+                      "name": "Ihr neues E-Auto bestell",
+                      "fill": "$ink",
+                      "content": "Ihr neues E-Auto bestellen",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 36,
+                      "fontWeight": "700",
+                      "letterSpacing": -0.5
+                    },
+                    {
+                      "type": "text",
+                      "id": "VjOUc",
+                      "name": "Wählen Sie ein Modell, e",
+                      "fill": "$muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Wählen Sie ein Modell, ergänzen Sie optionale Extras und geben Sie Ihre Daten ein. Nach der Bestätigung erhalten Sie ein Bestellschreiben als Zusammenfassung.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "paczT",
+                  "name": "Modell wählen",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wwFGa",
+                      "name": "Section Head",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "M9wTyi",
+                          "name": "L",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Hr9JD",
+                              "name": "01",
+                              "fill": "$accent",
+                              "content": "01",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "dqCwK",
+                              "name": "Modell wählen",
+                              "fill": "$ink",
+                              "content": "Modell wählen",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 20,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "hDvPz",
+                          "name": "5 Modelle sofort verfügb",
+                          "fill": "$muted",
+                          "content": "5 Modelle sofort verfügbar · Pflichtfeld",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Ir7nF",
+                      "name": "Car – Voltra City",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 12,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "gap": 20,
+                      "padding": [
+                        14,
+                        20,
+                        14,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zSbKp",
+                          "name": "Car Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "drakcode",
+                            "link": "https://unsplash.com/@drakcode",
+                            "author": "Ashish Ahlawat"
+                          },
+                          "width": 150,
+                          "height": 92,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1785682455582-167209e5e135?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1NTh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "cover"
+                          },
+                          "cornerRadius": 8
+                        },
+                        {
+                          "type": "frame",
+                          "id": "d4OGJh",
+                          "name": "Info",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "d1x490",
+                              "name": "Voltra City",
+                              "fill": "$ink",
+                              "content": "Voltra City",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 17,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ZO6Cj",
+                              "name": "Kompakt · 5 Türen",
+                              "fill": "$muted",
+                              "content": "Kompakt · 5 Türen",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Hjkrf",
+                              "name": "Specs",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "y5leLr",
+                                  "name": "320 km Reichweite",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "RjsEW",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "battery-charging",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "CNG2E",
+                                      "name": "320 km Reichweite",
+                                      "fill": "$muted",
+                                      "content": "320 km Reichweite",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "sTjlD",
+                                  "name": "110 kW",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "O7J9e",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "gauge",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "tODxW",
+                                      "name": "110 kW",
+                                      "fill": "$muted",
+                                      "content": "110 kW",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "btc5e",
+                          "name": "Price",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "x1HEwN",
+                              "name": "ab",
+                              "fill": "$muted",
+                              "content": "ab",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "pNggW",
+                              "name": "32.900 €",
+                              "fill": "$ink",
+                              "content": "32.900 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "qDvDt",
+                          "name": "Radio",
+                          "width": 22,
+                          "height": 22,
+                          "fill": "$surface",
+                          "cornerRadius": 11,
+                          "stroke": "#B8BDB5",
+                          "strokeWidth": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "u8bpN",
+                      "name": "Car – Aurion Tourer",
+                      "width": "fill_container",
+                      "fill": "$accent-soft",
+                      "cornerRadius": 12,
+                      "stroke": "$accent",
+                      "strokeWidth": 2,
+                      "gap": 20,
+                      "padding": [
+                        14,
+                        20,
+                        14,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Zr0Jf",
+                          "name": "Car Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "ericsum",
+                            "link": "https://unsplash.com/@ericsum",
+                            "author": "shen wenjie"
+                          },
+                          "width": 150,
+                          "height": 92,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1766048282886-d9e4470f2bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1NTh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "cover"
+                          },
+                          "cornerRadius": 8
+                        },
+                        {
+                          "type": "frame",
+                          "id": "c0J87",
+                          "name": "Info",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "vD5WC",
+                              "name": "Aurion Tourer",
+                              "fill": "$ink",
+                              "content": "Aurion Tourer",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 17,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "fjApj",
+                              "name": "Kombi · 5 Sitze",
+                              "fill": "$muted",
+                              "content": "Kombi · 5 Sitze",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ITUJa",
+                              "name": "Specs",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "qlu1g",
+                                  "name": "480 km Reichweite",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "Myogi",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "battery-charging",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "TR0kG",
+                                      "name": "480 km Reichweite",
+                                      "fill": "$muted",
+                                      "content": "480 km Reichweite",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "J1bG9S",
+                                  "name": "170 kW",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "Rbq0F",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "gauge",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "le5R0",
+                                      "name": "170 kW",
+                                      "fill": "$muted",
+                                      "content": "170 kW",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "g2hmaQ",
+                          "name": "Price",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "KjYCm",
+                              "name": "ab",
+                              "fill": "$muted",
+                              "content": "ab",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Zrvd4",
+                              "name": "45.500 €",
+                              "fill": "$ink",
+                              "content": "45.500 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "l2iI4g",
+                          "name": "Radio",
+                          "width": 22,
+                          "height": 22,
+                          "fill": "$surface",
+                          "cornerRadius": 11,
+                          "stroke": "$accent",
+                          "strokeWidth": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GuSaG",
+                      "name": "Car – Nordwind SUV",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 12,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "gap": 20,
+                      "padding": [
+                        14,
+                        20,
+                        14,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "iReR9",
+                          "name": "Car Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "maxim_",
+                            "link": "https://unsplash.com/@maxim_",
+                            "author": "Maxim"
+                          },
+                          "width": 150,
+                          "height": 92,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1740170629510-c145511c59a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1NTh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "cover"
+                          },
+                          "cornerRadius": 8
+                        },
+                        {
+                          "type": "frame",
+                          "id": "C0pbt",
+                          "name": "Info",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "goX6i",
+                              "name": "Nordwind SUV",
+                              "fill": "$ink",
+                              "content": "Nordwind SUV",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 17,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "kaVvH",
+                              "name": "SUV · Allrad",
+                              "fill": "$muted",
+                              "content": "SUV · Allrad",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "i9ZaK",
+                              "name": "Specs",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "VcHco",
+                                  "name": "520 km Reichweite",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "abUf6",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "battery-charging",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "BUsv9",
+                                      "name": "520 km Reichweite",
+                                      "fill": "$muted",
+                                      "content": "520 km Reichweite",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "j2NFbv",
+                                  "name": "250 kW",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "fOvp0",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "gauge",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "he4o2",
+                                      "name": "250 kW",
+                                      "fill": "$muted",
+                                      "content": "250 kW",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "GFZzC",
+                          "name": "Price",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "gNVfs",
+                              "name": "ab",
+                              "fill": "$muted",
+                              "content": "ab",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "C10f3H",
+                              "name": "58.900 €",
+                              "fill": "$ink",
+                              "content": "58.900 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "s35hM0",
+                          "name": "Radio",
+                          "width": 22,
+                          "height": 22,
+                          "fill": "$surface",
+                          "cornerRadius": 11,
+                          "stroke": "#B8BDB5",
+                          "strokeWidth": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RJV45",
+                      "name": "Car – Kestrel GT",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 12,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "gap": 20,
+                      "padding": [
+                        14,
+                        20,
+                        14,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "EHkx1",
+                          "name": "Car Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "xtoman",
+                            "link": "https://unsplash.com/@xtoman",
+                            "author": "Maksim Zinchenko"
+                          },
+                          "width": 150,
+                          "height": 92,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1718553703624-b4f7d8861868?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1NTh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "cover"
+                          },
+                          "cornerRadius": 8
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ycMvG",
+                          "name": "Info",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "fBs4A",
+                              "name": "Kestrel GT",
+                              "fill": "$ink",
+                              "content": "Kestrel GT",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 17,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "dflC4",
+                              "name": "Coupé · Allrad",
+                              "fill": "$muted",
+                              "content": "Coupé · Allrad",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "q0W1Pw",
+                              "name": "Specs",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "FCvvR",
+                                  "name": "560 km Reichweite",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "EK687",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "battery-charging",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "h5b9AM",
+                                      "name": "560 km Reichweite",
+                                      "fill": "$muted",
+                                      "content": "560 km Reichweite",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "CB6TD",
+                                  "name": "360 kW",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "bSfJB",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "gauge",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "H9VErl",
+                                      "name": "360 kW",
+                                      "fill": "$muted",
+                                      "content": "360 kW",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ywn0g",
+                          "name": "Price",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "OBnMc",
+                              "name": "ab",
+                              "fill": "$muted",
+                              "content": "ab",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "JGDNw",
+                              "name": "72.400 €",
+                              "fill": "$ink",
+                              "content": "72.400 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VskrW",
+                          "name": "Radio",
+                          "width": 22,
+                          "height": 22,
+                          "fill": "$surface",
+                          "cornerRadius": 11,
+                          "stroke": "#B8BDB5",
+                          "strokeWidth": 1.5
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wRwJK",
+                      "name": "Car – Lumen Van",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 12,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "gap": 20,
+                      "padding": [
+                        14,
+                        20,
+                        14,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "uI8JQ",
+                          "name": "Car Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "zaptec",
+                            "link": "https://unsplash.com/@zaptec",
+                            "author": "Zaptec"
+                          },
+                          "width": 150,
+                          "height": 92,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1712307444068-08aef00d7f36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1NTh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "cover"
+                          },
+                          "cornerRadius": 8
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XDIFO",
+                          "name": "Info",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "kx45Y",
+                              "name": "Lumen Van",
+                              "fill": "$ink",
+                              "content": "Lumen Van",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 17,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "XTgmr",
+                              "name": "Van · 7 Sitze",
+                              "fill": "$muted",
+                              "content": "Van · 7 Sitze",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "QJ3s6",
+                              "name": "Specs",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "NJ2QG",
+                                  "name": "410 km Reichweite",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "KaJHa",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "battery-charging",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "caOOH",
+                                      "name": "410 km Reichweite",
+                                      "fill": "$muted",
+                                      "content": "410 km Reichweite",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "QP7HZ",
+                                  "name": "150 kW",
+                                  "gap": 6,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "nL3jd",
+                                      "name": "i",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "gauge",
+                                      "library": "lucide",
+                                      "fill": "$muted"
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "nxAbG",
+                                      "name": "150 kW",
+                                      "fill": "$muted",
+                                      "content": "150 kW",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "U8f6X",
+                          "name": "Price",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "A7FbT",
+                              "name": "ab",
+                              "fill": "$muted",
+                              "content": "ab",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "f6hfl",
+                              "name": "49.900 €",
+                              "fill": "$ink",
+                              "content": "49.900 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 18,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bYIiH",
+                          "name": "Radio",
+                          "width": 22,
+                          "height": 22,
+                          "fill": "$surface",
+                          "cornerRadius": 11,
+                          "stroke": "#B8BDB5",
+                          "strokeWidth": 1.5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "p8xtd",
+                  "name": "Extras hinzufügen",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "I9unRD",
+                      "name": "Section Head",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "UKjpl",
+                          "name": "L",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tN7Du",
+                              "name": "02",
+                              "fill": "$accent",
+                              "content": "02",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "AdaQn",
+                              "name": "Extras hinzufügen",
+                              "fill": "$ink",
+                              "content": "Extras hinzufügen",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 20,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "n2qta",
+                          "name": "Optional · Mehrfachauswa",
+                          "fill": "$muted",
+                          "content": "Optional · Mehrfachauswahl möglich",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "lkuxq",
+                      "name": "Row 1",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qhmFT",
+                          "name": "Extra – Klima-Automat",
+                          "width": "fill_container",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 12,
+                          "stroke": "$accent",
+                          "strokeWidth": 2,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Q4fG8Y",
+                              "name": "Top",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "kAbWH",
+                                  "name": "Icon",
+                                  "width": 36,
+                                  "height": 36,
+                                  "fill": "$surface",
+                                  "cornerRadius": 8,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "pX2lX",
+                                      "name": "i",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "thermometer-snowflake",
+                                      "library": "lucide",
+                                      "fill": "$accent"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "tXNNL",
+                                  "name": "Checkbox",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$accent",
+                                  "cornerRadius": 5,
+                                  "stroke": "$accent",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "Oeurs",
+                                      "name": "check",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "check",
+                                      "library": "lucide",
+                                      "fill": "#FFFFFF"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "J9MIhn",
+                              "name": "Klima-Automat",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Klima-Automat",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "K6GFE",
+                              "name": "2-Zonen, automatisch ger",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "2-Zonen, automatisch geregelt",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "pG0Vi",
+                              "name": "+ 890 €",
+                              "fill": "$ink",
+                              "content": "+ 890 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "aEgs1",
+                          "name": "Extra – Soundsystem",
+                          "width": "fill_container",
+                          "fill": "$surface",
+                          "cornerRadius": 12,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "b5YO9H",
+                              "name": "Top",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "taKEg",
+                                  "name": "Icon",
+                                  "width": 36,
+                                  "height": 36,
+                                  "fill": "$bg",
+                                  "cornerRadius": 8,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "QwXrQ",
+                                      "name": "i",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "speaker",
+                                      "library": "lucide",
+                                      "fill": "$ink"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "lE2Hk",
+                                  "name": "Checkbox",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$surface",
+                                  "cornerRadius": 5,
+                                  "stroke": "#B8BDB5",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "fwyCV",
+                              "name": "Soundsystem",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Soundsystem",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "gKrI1",
+                              "name": "12 Lautsprecher, 640 W",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "12 Lautsprecher, 640 W",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "k578lH",
+                              "name": "+ 1.290 €",
+                              "fill": "$ink",
+                              "content": "+ 1.290 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "wATX8",
+                          "name": "Extra – Erweitertes Sicherheitspaket",
+                          "width": "fill_container",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 12,
+                          "stroke": "$accent",
+                          "strokeWidth": 2,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Bxdum",
+                              "name": "Top",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "MEnOA",
+                                  "name": "Icon",
+                                  "width": 36,
+                                  "height": 36,
+                                  "fill": "$surface",
+                                  "cornerRadius": 8,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "RVMdf",
+                                      "name": "i",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "shield-check",
+                                      "library": "lucide",
+                                      "fill": "$accent"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "RrYp1",
+                                  "name": "Checkbox",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$accent",
+                                  "cornerRadius": 5,
+                                  "stroke": "$accent",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "MspkV",
+                                      "name": "check",
+                                      "width": 14,
+                                      "height": 14,
+                                      "icon": "check",
+                                      "library": "lucide",
+                                      "fill": "#FFFFFF"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "aqgD4",
+                              "name": "Erweitertes Sicherheitsp",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Erweitertes Sicherheitspaket",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "NB2Fi",
+                              "name": "Spurhalte-, Totwinkel- &",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Spurhalte-, Totwinkel- & Notbremsassistent",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "RW7WU",
+                              "name": "+ 1.950 €",
+                              "fill": "$ink",
+                              "content": "+ 1.950 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xXNaL",
+                      "name": "Row 2",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "XroDx",
+                          "name": "Extra – Heads-Up Display",
+                          "width": "fill_container",
+                          "fill": "$surface",
+                          "cornerRadius": 12,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "uxxMg",
+                              "name": "Top",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "i0hO9",
+                                  "name": "Icon",
+                                  "width": 36,
+                                  "height": 36,
+                                  "fill": "$bg",
+                                  "cornerRadius": 8,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "IXSI0",
+                                      "name": "i",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "scan-eye",
+                                      "library": "lucide",
+                                      "fill": "$ink"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "kaFzF",
+                                  "name": "Checkbox",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$surface",
+                                  "cornerRadius": 5,
+                                  "stroke": "#B8BDB5",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "CGcoW",
+                              "name": "Heads-Up Display",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Heads-Up Display",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "W0YMW",
+                              "name": "Navigation & Tempo in de",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Navigation & Tempo in der Frontscheibe",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "VM5kb",
+                              "name": "+ 1.150 €",
+                              "fill": "$ink",
+                              "content": "+ 1.150 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "q5c0d5",
+                          "name": "Extra – Anhängekupplung",
+                          "width": "fill_container",
+                          "fill": "$surface",
+                          "cornerRadius": 12,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "O9gUz",
+                              "name": "Top",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "Q2CZ9",
+                                  "name": "Icon",
+                                  "width": 36,
+                                  "height": 36,
+                                  "fill": "$bg",
+                                  "cornerRadius": 8,
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "icon",
+                                      "id": "EU7Aj",
+                                      "name": "i",
+                                      "width": 18,
+                                      "height": 18,
+                                      "icon": "link-2",
+                                      "library": "lucide",
+                                      "fill": "$ink"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "Wz3Li",
+                                  "name": "Checkbox",
+                                  "width": 20,
+                                  "height": 20,
+                                  "fill": "$surface",
+                                  "cornerRadius": 5,
+                                  "stroke": "#B8BDB5",
+                                  "strokeWidth": 1.5,
+                                  "justifyContent": "center",
+                                  "alignItems": "center"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "pYJEM",
+                              "name": "Anhängekupplung",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Anhängekupplung",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "D3RhXj",
+                              "name": "Elektrisch schwenkbar, 1",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Elektrisch schwenkbar, 1.500 kg",
+                              "lineHeight": 1.4,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "n9o7Ub",
+                              "name": "+ 790 €",
+                              "fill": "$ink",
+                              "content": "+ 790 €",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "D9dTY",
+                          "name": "Spacer",
+                          "width": "fill_container",
+                          "height": 1
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kd0DR",
+                  "name": "Ihre Daten",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "J9ZcaV",
+                      "name": "Section Head",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "yo6AS",
+                          "name": "L",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "J7jrS",
+                              "name": "03",
+                              "fill": "$accent",
+                              "content": "03",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "zRLG3",
+                              "name": "Ihre Daten",
+                              "fill": "$ink",
+                              "content": "Ihre Daten",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 20,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZRyzS",
+                          "name": "Alle Felder Pflicht · Da",
+                          "fill": "$muted",
+                          "content": "Alle Felder Pflicht · Daten werden nicht gespeichert",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "N3aC3A",
+                      "name": "Form Card",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 12,
+                      "stroke": "$line",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 28,
+                      "padding": 28,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "D1OkR",
+                          "name": "PERSON & KONTAKT",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "GXqAa",
+                              "name": "PERSON & KONTAKT",
+                              "fill": "$muted",
+                              "content": "PERSON & KONTAKT",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.8
+                            },
+                            {
+                              "type": "frame",
+                              "id": "XH6aY",
+                              "name": "Line",
+                              "width": "fill_container",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "bigj7",
+                                  "name": "Field – Vorname",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "H85JR",
+                                      "name": "Vorname",
+                                      "fill": "$ink",
+                                      "content": "Vorname",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Nrd3n",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "dtMyP",
+                                          "name": "Anna",
+                                          "fill": "$ink",
+                                          "content": "Anna",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "u8hLH",
+                                  "name": "Field – Nachname",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "ryfQh",
+                                      "name": "Nachname",
+                                      "fill": "$ink",
+                                      "content": "Nachname",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Rkh6D",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "iBhiB",
+                                          "name": "Schäfer",
+                                          "fill": "$ink",
+                                          "content": "Schäfer",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "JlgcB",
+                              "name": "Line",
+                              "width": "fill_container",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "OtjbX",
+                                  "name": "Field – E-Mail-Adresse",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "v1jI7",
+                                      "name": "E-Mail-Adresse",
+                                      "fill": "$ink",
+                                      "content": "E-Mail-Adresse",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "oKRbo",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C2410C",
+                                      "strokeWidth": 2,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "l2Ovc",
+                                          "name": "anna.schaefer@beispiel",
+                                          "fill": "$ink",
+                                          "content": "anna.schaefer@beispiel",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "icon",
+                                          "id": "Ag3SG",
+                                          "name": "i",
+                                          "width": 16,
+                                          "height": 16,
+                                          "icon": "circle-alert",
+                                          "library": "lucide",
+                                          "fill": "#C2410C"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "R7l33",
+                                      "name": "Bitte geben Sie eine gül",
+                                      "fill": "#C2410C",
+                                      "content": "Bitte geben Sie eine gültige E-Mail-Adresse ein, z.B. name@domain.de",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "l6WVt",
+                          "name": "ADRESSE",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "OZAEN",
+                              "name": "ADRESSE",
+                              "fill": "$muted",
+                              "content": "ADRESSE",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.8
+                            },
+                            {
+                              "type": "frame",
+                              "id": "a8HZZ",
+                              "name": "Line",
+                              "width": "fill_container",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "DzB52",
+                                  "name": "Field – Straße und Hausnummer",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "OH0gK",
+                                      "name": "Straße und Hausnummer",
+                                      "fill": "$ink",
+                                      "content": "Straße und Hausnummer",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "QNRW9",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "J9C206",
+                                          "name": "Lindenallee 14",
+                                          "fill": "$ink",
+                                          "content": "Lindenallee 14",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "IxSrI",
+                              "name": "Line",
+                              "width": "fill_container",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "u44Ax",
+                                  "name": "Field – PLZ",
+                                  "width": 140,
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "LNhg4",
+                                      "name": "PLZ",
+                                      "fill": "$ink",
+                                      "content": "PLZ",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "M4c2S",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "l9bw4",
+                                          "name": "70173",
+                                          "fill": "$ink",
+                                          "content": "70173",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "Vjs1g",
+                                  "name": "Field – Ort",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "LqWML",
+                                      "name": "Ort",
+                                      "fill": "$ink",
+                                      "content": "Ort",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Fvgkk",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "hBlHl",
+                                          "name": "Stuttgart",
+                                          "fill": "$ink",
+                                          "content": "Stuttgart",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "SsXdB",
+                                  "name": "Field – Land",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "c3uXHB",
+                                      "name": "Land",
+                                      "fill": "$ink",
+                                      "content": "Land",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "svzeK",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "GHkpF",
+                                          "name": "Deutschland",
+                                          "fill": "$ink",
+                                          "content": "Deutschland",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "icon",
+                                          "id": "CurAj",
+                                          "name": "i",
+                                          "width": 16,
+                                          "height": 16,
+                                          "icon": "chevron-down",
+                                          "library": "lucide",
+                                          "fill": "$accent"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "c1haQb",
+                          "name": "BANKVERBINDUNG",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 14,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "iZkJO",
+                              "name": "BANKVERBINDUNG",
+                              "fill": "$muted",
+                              "content": "BANKVERBINDUNG",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "600",
+                              "letterSpacing": 0.8
+                            },
+                            {
+                              "type": "frame",
+                              "id": "PKKOE",
+                              "name": "Line",
+                              "width": "fill_container",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "j6vJ0",
+                                  "name": "Field – IBAN",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "sMiFm",
+                                      "name": "IBAN",
+                                      "fill": "$ink",
+                                      "content": "IBAN",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "Ng3an",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "$accent",
+                                      "strokeWidth": 2,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "TC6WK",
+                                          "name": "DE89 3704 0044 0532 0130",
+                                          "fill": "$ink",
+                                          "content": "DE89 3704 0044 0532 0130 00",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        },
+                                        {
+                                          "type": "icon",
+                                          "id": "yPOdE",
+                                          "name": "i",
+                                          "width": 16,
+                                          "height": 16,
+                                          "icon": "circle-check",
+                                          "library": "lucide",
+                                          "fill": "$accent"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "KSZlV",
+                                  "name": "Field – BIC",
+                                  "width": 220,
+                                  "layout": "vertical",
+                                  "gap": 6,
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "GkCY7",
+                                      "name": "BIC",
+                                      "fill": "$ink",
+                                      "content": "BIC",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 13,
+                                      "fontWeight": "500"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "t0015t",
+                                      "name": "Input",
+                                      "width": "fill_container",
+                                      "height": 44,
+                                      "fill": "$surface",
+                                      "cornerRadius": 8,
+                                      "stroke": "#C9CDC6",
+                                      "strokeWidth": 1,
+                                      "padding": [
+                                        0,
+                                        14
+                                      ],
+                                      "justifyContent": "space_between",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "GggMG",
+                                          "name": "COBADEFFXXX",
+                                          "fill": "$ink",
+                                          "content": "COBADEFFXXX",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 14,
+                                          "fontWeight": "normal"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vaD52",
+              "name": "Summary Column",
+              "width": 380,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "DnXfH",
+                  "name": "Summary Card",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "$ink",
+                  "cornerRadius": 16,
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "bhHXf",
+                      "name": "Summary Image",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "shoham_avisrur",
+                        "link": "https://unsplash.com/@shoham_avisrur",
+                        "author": "Shoham Avisrur"
+                      },
+                      "width": "fill_container",
+                      "height": 180,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1794413298676-10daf35d8d7b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTQ5ODg1ODB8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      }
+                    },
+                    {
+                      "type": "frame",
+                      "id": "n4fRld",
+                      "name": "Summary Body",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 20,
+                      "padding": 24,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "PV87M",
+                          "name": "Head",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "B9XXA",
+                              "name": "IHRE BESTELLUNG",
+                              "fill": "#8FD9BD",
+                              "content": "IHRE BESTELLUNG",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600",
+                              "letterSpacing": 1
+                            },
+                            {
+                              "type": "text",
+                              "id": "HNuih",
+                              "name": "Aurion Tourer",
+                              "fill": "#FFFFFF",
+                              "content": "Aurion Tourer",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 24,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "WJCXt",
+                              "name": "Kombi · 480 km · 170 kW",
+                              "fill": "#A9B0BA",
+                              "content": "Kombi · 480 km · 170 kW",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VatQR",
+                          "name": "Lines",
+                          "width": "fill_container",
+                          "stroke": "#2E353F",
+                          "strokeWidth": {
+                            "top": 1,
+                            "bottom": 1
+                          },
+                          "layout": "vertical",
+                          "gap": 10,
+                          "padding": [
+                            16,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "zPdZ3",
+                              "name": "Grundpreis",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ciy91",
+                                  "name": "Grundpreis",
+                                  "fill": "#C9CED6",
+                                  "content": "Grundpreis",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "h7yYv",
+                                  "name": "45.500 €",
+                                  "fill": "#FFFFFF",
+                                  "content": "45.500 €",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "L51QCi",
+                              "name": "Klima-Automat",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "JSFSW",
+                                  "name": "Klima-Automat",
+                                  "fill": "#C9CED6",
+                                  "content": "Klima-Automat",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "aFgfR",
+                                  "name": "890 €",
+                                  "fill": "#FFFFFF",
+                                  "content": "890 €",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "jyQxh",
+                              "name": "Erweitertes Sicherheitspaket",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "M3xoZ",
+                                  "name": "Erweitertes Sicherheitsp",
+                                  "fill": "#C9CED6",
+                                  "content": "Erweitertes Sicherheitspaket",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "EL7Kv",
+                                  "name": "1.950 €",
+                                  "fill": "#FFFFFF",
+                                  "content": "1.950 €",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "t6rrm",
+                              "name": "Überführung & Zulassung",
+                              "width": "fill_container",
+                              "justifyContent": "space_between",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DuNnJ",
+                                  "name": "Überführung & Zulassung",
+                                  "fill": "#C9CED6",
+                                  "content": "Überführung & Zulassung",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "swgUn",
+                                  "name": "0 €",
+                                  "fill": "#FFFFFF",
+                                  "content": "0 €",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "I7ZmJ",
+                          "name": "Total",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "end",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Aioeg",
+                              "name": "TL",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "TQONf",
+                                  "name": "Gesamtpreis",
+                                  "fill": "#C9CED6",
+                                  "content": "Gesamtpreis",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "f6qso",
+                                  "name": "inkl. 19 % MwSt.",
+                                  "fill": "#7F8793",
+                                  "content": "inkl. 19 % MwSt.",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "sH3TG",
+                              "name": "48.340 €",
+                              "fill": "#FFFFFF",
+                              "content": "48.340 €",
+                              "fontFamily": "Space Grotesk",
+                              "fontSize": 28,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "G3zP7",
+                          "name": "Checklist",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "sfOyR",
+                              "name": "Modell gewählt",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "KAVCW",
+                                  "name": "i",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "circle-check",
+                                  "library": "lucide",
+                                  "fill": "#8FD9BD"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "OMru3",
+                                  "name": "Modell gewählt",
+                                  "fill": "#8FD9BD",
+                                  "content": "Modell gewählt",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "mmaHp",
+                              "name": "2 Extras gewählt",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "JSqNz",
+                                  "name": "i",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "circle-check",
+                                  "library": "lucide",
+                                  "fill": "#8FD9BD"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "SstTS",
+                                  "name": "2 Extras gewählt",
+                                  "fill": "#8FD9BD",
+                                  "content": "2 Extras gewählt",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "zjSsI",
+                              "name": "E-Mail-Adresse prüfen",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "gx1tr",
+                                  "name": "i",
+                                  "width": 15,
+                                  "height": 15,
+                                  "icon": "circle-alert",
+                                  "library": "lucide",
+                                  "fill": "#FDBA74"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "V6eM7",
+                                  "name": "E-Mail-Adresse prüfen",
+                                  "fill": "#FDBA74",
+                                  "content": "E-Mail-Adresse prüfen",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "PPA9m",
+                          "name": "Primary Button",
+                          "width": "fill_container",
+                          "height": 52,
+                          "fill": "#16A374",
+                          "cornerRadius": 10,
+                          "gap": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "O09YF",
+                              "name": "Bestellung bestätigen",
+                              "fill": "#FFFFFF",
+                              "content": "Bestellung bestätigen",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "i7SvM",
+                              "name": "arrow",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "arrow-right",
+                              "library": "lucide",
+                              "fill": "#FFFFFF"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "H53UI",
+                          "name": "Nach der Bestätigung sta",
+                          "fill": "#A9B0BA",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Nach der Bestätigung startet der Bestell-Workflow und Sie sehen Ihr Bestellschreiben als Zusammenfassung.",
+                          "lineHeight": 1.5,
+                          "textAlign": "center",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "bg": {
+      "type": "color",
+      "value": "#F4F5F2"
+    },
+    "surface": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "ink": {
+      "type": "color",
+      "value": "#14181F"
+    },
+    "muted": {
+      "type": "color",
+      "value": "#5B6370"
+    },
+    "line": {
+      "type": "color",
+      "value": "#E1E3DE"
+    },
+    "accent": {
+      "type": "color",
+      "value": "#0E7C5A"
+    },
+    "accent-soft": {
+      "type": "color",
+      "value": "#E3F2EC"
+    }
+  },
+  "fileToken": "18578ee6-5dc0-4c35-b460-10dd1c34e379"
+}
