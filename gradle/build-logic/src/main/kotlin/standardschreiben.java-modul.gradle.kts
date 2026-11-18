@@ -7,7 +7,8 @@
 // - Tests mit JUnit 5, Mockito und AssertJ; Versionen aus der Spring-Boot-BOM.
 // - Abdeckungs-Gate: mindestens 80 % Zeilen- UND Zweigabdeckung je Modul, Teil von `check`.
 // - Ein Modul mit Produktionscode, aber ohne Tests, schlägt fehl (sonst umginge es das Gate).
-// - JSpecify für die Null-Konvention: Jedes Paket ist in seiner package-info @NullMarked (ADR-015).
+// - JSpecify für den Null-Vertrag: Jedes Paket ist in seiner package-info @NullMarked (ADR-015).
+//   Die Version steht im Versionskatalog, unabhängig von der Spring-Boot-BOM.
 
 plugins {
     `java-library`
