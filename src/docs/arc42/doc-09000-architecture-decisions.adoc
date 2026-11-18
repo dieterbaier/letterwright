@@ -7,7 +7,7 @@ owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Vorgeschlagene ADRs für Standardschreiben.'
+summary: 'ADRs für Standardschreiben.'
 tags:
 - arc42
 - decisions
@@ -89,7 +89,8 @@ metadata_version: '1.0'
 [[architecture-decisions]]
 = Architekturentscheidungen
 
-Alle ADRs sind *vorgeschlagen*. ADR-003 und ADR-004 hängen von einem Prototyp ab.
+Den Status jedes ADR nennt der Index unten. ADR-003 und ADR-004 hängen von
+einem Prototyp ab.
 
 include::09-architecture-decisions/generated/doc-09001-adr-index.adoc[]
 include::09-architecture-decisions/generated/open-questions.adoc[]
