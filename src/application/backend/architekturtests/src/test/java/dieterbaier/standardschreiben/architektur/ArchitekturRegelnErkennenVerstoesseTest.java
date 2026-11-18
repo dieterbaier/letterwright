@@ -6,7 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
+import dieterbaier.standardschreiben.archfixture.adapter.in.web.WebAdapter;
 import dieterbaier.standardschreiben.archfixture.adapter.out.host.HostAdapter;
+import dieterbaier.standardschreiben.archfixture.adapter.out.rendering.RenderingAdapter;
 import dieterbaier.standardschreiben.archfixture.spi.HostDatensatz;
 import dieterbaier.standardschreiben.archfixture.spi.HostSchnittstelle;
 import dieterbaier.standardschreiben.archfixture.usecases.out.AusgehenderPort;
@@ -132,6 +134,25 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     @Test
     void portMitSpiVerletztDieRegelFuerDieSpiNutzer() {
         erkenntVerstoss(ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE), "AusgehenderPortMitSpi");
+    }
+
+    @Test
+    void eingehenderAdapterMitAusgehendemAdapterVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.adapterSindVoneinanderIsoliert(FIXTURE), "WebAdapterMitRenderingAdapter");
+    }
+
+    @Test
+    void adapterHostMitAnderemAusgehendemAdapterVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.adapterSindVoneinanderIsoliert(FIXTURE), "HostAdapterMitRenderingAdapter");
+    }
+
+    @Test
+    void adapterOhneGegenseitigeAbhaengigkeitErfuellenDieRegel() {
+        JavaClasses erlaubt = new ClassFileImporter()
+                .importClasses(WebAdapter.class, RenderingAdapter.class, HostAdapter.class);
+
+        assertThatCode(() -> ArchitekturRegeln.adapterSindVoneinanderIsoliert(FIXTURE).check(erlaubt))
+                .doesNotThrowAnyException();
     }
 
     @Test

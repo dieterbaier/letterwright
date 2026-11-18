@@ -79,4 +79,9 @@ class HexagonaleArchitekturTest {
     void nurAdapterHostUndStarterKennenDasSpi() {
         ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(BASIS).check(produktionsCode);
     }
+
+    @Test
+    void adapterSindVoneinanderIsoliert() {
+        ArchitekturRegeln.adapterSindVoneinanderIsoliert(BASIS).check(produktionsCode);
+    }
 }

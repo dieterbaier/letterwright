@@ -3,6 +3,7 @@ package dieterbaier.standardschreiben.architektur;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.CompositeArchRule;
@@ -154,5 +155,14 @@ final class ArchitekturRegeln {
                         basis + ".starter..")
                 .should().dependOnClassesThat().resideInAPackage(basis + ".spi..")
                 .because("nur adapter-host bildet zwischen SPI und Domäne ab, nur der Starter verdrahtet (ADR-016)");
+    }
+
+    /** Kein Adapter benutzt einen anderen; jeder spricht die Anwendung nur über ihre Ports an. */
+    static ArchRule adapterSindVoneinanderIsoliert(String basis) {
+        return slices()
+                .matching(basis + ".adapter.(*).(*)..")
+                .namingSlices("Adapter $1.$2")
+                .should().notDependOnEachOther()
+                .because("ein Adapter an den Anwendungsfällen vorbei hebelt die Ports aus (ADR-015)");
     }
 }
