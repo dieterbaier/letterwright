@@ -3,10 +3,10 @@
 Wegwerf-Prototyp, der ADR-003 bis ADR-005 und ADR-014 an realen DOCX-Vorgaben
 belegt oder widerlegt (Epic #3).
 
-*Status:* on ice since 2026-11-14 — Der Fokus liegt auf dem Projektgerüst. Die
-Beispiel-DOCX liegen auf `main` (`src/examples/`). Damit ist der erste
-Schritt (Schriften, Q-PO-010) möglich. Der Topic wird wieder aufgenommen, sobald
-der Owner ihn als Fokus wählt.
+*Status:* aktiv seit 2026-11-19 — Das Projektgerüst ist abgeschlossen (Epic #4
+geschlossen). Der Owner hat den Prototyp als Fokus gewählt. Die Beispiel-DOCX
+liegen auf `main` (`src/examples/`). Erster Schritt sind die Schriften
+(Q-PO-010).
 
 == The plan
 
