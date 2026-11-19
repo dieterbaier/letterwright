@@ -64,12 +64,24 @@ Aktuell bearbeiten wir Ihre Bestellung. Das endgültige Auslieferungsdatum nenne
 Vielen Dank für Ihren Auftrag
 
 \${bearbeiter}`;
+// Manche Browser sperren für file:// den Zugriff auf sessionStorage; schon das Lesen der
+// Eigenschaft wirft dann einen SecurityError. Die Demo läuft in dem Fall ohne Speicher weiter:
+// Gespeichertes bleibt nur bis zum Neuladen der Seite erhalten.
+const speicher = {
+  lesen(key) {
+    try { return JSON.parse(window.sessionStorage.getItem(key)); } catch { return null; }
+  },
+  schreiben(key, wert) {
+    try { window.sessionStorage.setItem(key, JSON.stringify(wert)); return true; } catch { return false; }
+  },
+};
 // Gespeicherter Stand der Vorlage; „Speichern“ übernimmt die Felder, „Abbrechen“ verwirft sie.
-const vorlage = JSON.parse(sessionStorage.getItem('vorlage-bestellbestaetigung') || 'null')
-  || { briefpapier: 'Geschäftsbrief', text: briefKoerper };
+const vorlageStandard = { briefpapier: 'Geschäftsbrief', text: briefKoerper };
+const gespeichert = speicher.lesen('vorlage-bestellbestaetigung');
+const vorlage = { ...vorlageStandard, ...(gespeichert && typeof gespeichert === 'object' ? gespeichert : {}) };
 const save = () => {
   screenEl.querySelectorAll('.field').forEach(f => { vorlage[f.dataset.key] = f.value; });
-  sessionStorage.setItem('vorlage-bestellbestaetigung', JSON.stringify(vorlage));
+  return speicher.schreiben('vorlage-bestellbestaetigung', vorlage);
 };
 const screens = {
   danke: { img: 'aoMno', title: 'Vielen Dank', hot: [
@@ -149,8 +161,9 @@ function render() {
     Object.assign(a.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
     a.onclick = e => {
       e.stopPropagation();
-      if (action.run) action.run();
-      if (action.msg) toast(action.msg);
+      const ok = action.run ? action.run() : true;
+      if (ok === false) toast('Gespeichert bis zum Neuladen – der Browser sperrt den Sitzungsspeicher');
+      else if (action.msg) toast(action.msg);
       const target = action.go || then;
       if (target) { location.hash = target; window.scrollTo(0, 0); }
     };
