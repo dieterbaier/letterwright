@@ -44,7 +44,9 @@ Der Owner verlangt, dass die Styles der zentralen Vorgabe im Ergebnis stimmen, a
 
 === Annahmen
 
-* Die in der Vorgabe verwendeten Schriften dürfen eingebettet werden (Lizenz).
+* Der Host stellt die lizenzpflichtigen Schriften der Vorgabe bereit und besitzt
+  die Lizenz für Einbettung und Webfont. Sonst gilt das Antwortmaß für die freie
+  Ersatzschrift aus xref:adr-017-bereitstellung-der-schriften[ADR-017].
 * Die Vorgabe nutzt benannte Word-Formatvorlagen und nicht überwiegend direkte Formatierung.
 
 === Impact
@@ -65,7 +67,9 @@ include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-traceability.adoc
 === Open Questions
 
 * Wer nimmt die Stiltreue fachlich ab?
-* Dürfen die Schriften der Vorgabe eingebettet werden, oder braucht es eine bestätigte Ersatzschrift? (Q-PO-010)
+* Akzeptiert die zentrale Abteilung die freien Ersatzschriften aus ADR-017, wenn
+  der Host die Originalschriften nicht bereitstellt? Offen vor allem für Arial
+  Narrow.
 
 === Review Notes
 

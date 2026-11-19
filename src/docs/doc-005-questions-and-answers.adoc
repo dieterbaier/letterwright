@@ -113,7 +113,16 @@ Welche Schriften verwendet die zentrale DOCX-Vorgabe, und erlaubt ihre Lizenz di
 Einbettung in PDFs und die Auslieferung als Webfont für die Vorschau? Falls nicht:
 Welche Ersatzschrift bestätigt die zentrale Abteilung?
 
-Answer: Open.
+Answer: Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host
+stellt sie über einen konfigurierbaren Ordner bereit, auf Systemschriften des
+Zielsystems verlässt sich die Bibliothek nicht. Fehlt eine Schrift, verwendet die
+Bibliothek eine freie Ersatzschrift, die das Schriftbild erhält, und die
+Administration weist darauf hin. Vorgeschlagen werden nur freie Schriften. Der
+Ordner ist die einzige Quelle (Owner, 2026-11-19). Festgehalten in
+xref:adr-017-bereitstellung-der-schriften[ADR-017].
+
+Befund (Issue #39): Die Beispiel-DOCX verwenden für sichtbaren Text nur Arial und
+Arial Narrow, im Formular dazu Segoe UI Symbol oder MS Gothic für das Kästchen ☐.
 
 [[q-po-011]]
 === Q-PO-011: Lebensdauer der Vorschau und geänderte Daten

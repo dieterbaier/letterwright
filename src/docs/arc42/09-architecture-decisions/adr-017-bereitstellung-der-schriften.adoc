@@ -1,0 +1,276 @@
+---
+id: ADR-017-bereitstellung-der-schriften
+type: ADR
+title: 'Bereitstellung der Schriften für Vorschau und PDF'
+status: accepted
+owner: 'Architektur'
+created: '2026-11-19'
+reviewed: true
+summary: 'Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host stellt sie über einen konfigurierbaren Ordner bereit; fehlt eine Schrift, nutzt die Bibliothek eine mitgelieferte freie Ersatzschrift mit gleichen Laufweiten und weist in der Administration darauf hin. Systemschriften des Zielsystems werden nicht verwendet.'
+derived_from:
+- type: question
+  description: 'Q-PO-010 Schriften der zentralen Vorgabe, Antwort des Owners vom 2026-11-19'
+  anchor: q-po-010
+- type: external
+  description: 'Issue #39: Schriften: Bereitstellung durch den Host und freie Ersatzschriften'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/39
+tags:
+- decision
+- rendering
+- schriften
+- lizenz
+relations:
+- type: refines
+  target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
+  status: accepted
+  rationale: 'ADR-004 legt fest, dass Vorschau und PDF dieselbe Schriftdatei laden; dieser ADR legt fest, woher diese Datei kommt und was gilt, wenn sie fehlt. Er ersetzt die dortige Folgearbeit „Schriftdateien gehören zum Briefpapier und werden hochgeladen“.'
+  reviewed: true
+- type: addresses
+  target: QS-004-wiedergabetreue-vorschau-und-pdf
+  status: accepted
+  rationale: 'Vorschau und PDF lösen eine Schrift über dieselbe Reihenfolge zur selben Datei auf, auch wenn eine Ersatzschrift greift. Systemschriften, die sich zwischen Server und Browser unterscheiden, sind ausgeschlossen.'
+  reviewed: true
+- type: addresses
+  target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
+  status: accepted
+  rationale: 'Stellt der Host die Originalschriften bereit, entspricht das Schriftbild der Vorgabe; sonst halten Ersatzschriften mit gleichen Laufweiten Zeilen- und Seitenumbrüche gleich.'
+  reviewed: true
+- type: affects
+  target: QS-007-integration-in-host-anwendung
+  status: accepted
+  rationale: 'Der Host konfiguriert zusätzlich einen Schriftordner und befüllt ihn in jeder Umgebung. Ohne Ordner läuft die Bibliothek mit den Ersatzschriften.'
+  reviewed: true
+metadata_version: '1.0'
+---
+[[adr-017-bereitstellung-der-schriften]]
+== ADR-017: Bereitstellung der Schriften für Vorschau und PDF
+
+=== Status
+
+Angenommen (accepted) am 2026-11-19.
+
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #40
+geprüft und angenommen.
+
+=== Entscheidung
+
+Die Schriften kommen aus einem Ordner des Hosts, mit freien Ersatzschriften (Option 3):
+
+* **Keine lizenzpflichtigen Schriften in der Bibliothek.** Maven-Artefakte und
+  npm-Paket enthalten nur Schriften unter freien Lizenzen, die Weitergabe,
+  Einbettung ins PDF und Auslieferung an den Browser erlauben.
+* **Der Host stellt Schriften bereit.** Er konfiguriert einen Ordner, aus dem die
+  Bibliothek Schriftdateien (TrueType oder OpenType) liest. Der Ordner ist die
+  einzige Quelle: Briefpapiere laden keine Schriften hoch, und eine Schnittstelle
+  in `spi` gibt es dafür nicht. Die Lizenz für
+  Server-Nutzung, Einbettung ins PDF und Auslieferung als Webfont verantwortet
+  der Host.
+* **Keine Systemschriften.** Die Bibliothek verlässt sich nicht darauf, dass auf
+  dem Zielsystem des Hosts oder im Browser des Nutzers Schriften installiert sind.
+* **Auflösung in fester Reihenfolge**, für Vorschau und PDF gleich:
+  . Schrift mit diesem Familiennamen im Ordner des Hosts.
+  . Sonst die freie Ersatzschrift aus der Zuordnungstabelle der Bibliothek.
+  . Sonst die freie Standardschrift der Bibliothek.
++
+Beide Engines laden die aufgelöste Datei: openhtmltopdf bettet sie ins PDF ein,
+Paged.js lädt sie per `@font-face` vom Backend der Bibliothek (ADR-004, ADR-014).
+* **Ersatzschriften erhalten das Schriftbild.** Die Zuordnungstabelle nennt nur
+  freie Schriften. Wo es eine OFL-Schrift mit gleichen Laufweiten gibt (metrisch
+  kompatibel), wird sie genommen, damit Zeilen- und Seitenumbrüche gleich bleiben.
+  Sonst wird eine OFL-Schrift ohne gleiche Laufweiten genommen, die dem Bild der
+  Originalschrift möglichst nahekommt.
+* **Hinweis in der Administration.** Verwendet ein Briefpapier oder ein
+  Standardschreiben eine Schrift, die im Ordner des Hosts fehlt, zeigt die
+  Administration einen Hinweis mit der Ersatzschrift, die stattdessen verwendet
+  wird. Der Hinweis blockiert nicht. Die Erzeugung von Schreiben läuft mit der
+  Ersatzschrift weiter.
+Zuordnung für die Schriften der Beispiel-DOCX. Die Kandidaten ohne geprüfte
+Lizenz prüft der Prototyp:
+
+[cols="1,1,2", options="header"]
+|===
+| Schrift der Vorgabe | Ersatzschrift | Anmerkung
+| Arial | Liberation Sans | SIL OFL 1.1, gleiche Laufweiten
+| Arial Narrow | OFL-Schrift ohne gleiche Laufweiten | Liberation Sans Narrow (GPLv2 mit Ausnahmen, nicht mehr Teil von Liberation 2.x) wird nicht verwendet. Welche schmale OFL-Schrift dem Bild am nächsten kommt, wählt der Prototyp.
+| Times New Roman | Liberation Serif | SIL OFL 1.1, gleiche Laufweiten; nur Rückfallwert der DOCX
+| Courier New | Liberation Mono | SIL OFL 1.1, gleiche Laufweiten; nur deklariert
+| Calibri, Cambria | Carlito, Caladea | Lizenz im Prototyp prüfen; nur Theme-Schriften der DOCX
+| Segoe UI Symbol, MS Gothic (Kästchen ☐) | freie Schrift mit U+2610 | Kandidat Noto Sans Symbols 2 oder DejaVu Sans; nur für das Kästchen in `Formular_intern.docx`
+|===
+
+=== Kontext
+
+Die Beispiel-DOCX in `src/examples/` verwenden für sichtbaren Text nur Arial und
+Arial Narrow (`Geschaeftsbrief.docx`) sowie Arial und für das Kästchen ☐ Segoe UI
+Symbol oder MS Gothic (`Formular_intern.docx`). Ermittelt aus `document.xml`,
+Kopf- und Fußzeilen und den Formatvorlagen samt Vererbung, nicht nur aus der
+Schriftentabelle. Keine der DOCX bettet Schriften ein.
+
+Arial und Arial Narrow gehören Monotype. Die Kopien, die mit Betriebssystemen
+ausgeliefert werden, erlauben in ihrer Datei zwar die Einbettung in Dokumente.
+Ein Recht, sie auf einem Server zu nutzen oder an Browser auszuliefern, folgt
+daraus nicht. Die Bibliothek ist MIT-lizenziert und wird über GitHub Packages
+verteilt (ADR-012). Sie kann solche Schriften nicht mitliefern.
+
+ADR-004 sieht bisher vor, dass Schriftdateien zum Briefpapier gehören und vom
+Vorlagenverwalter hochgeladen werden. Die Verteilungssicht sagt dasselbe. Der
+Owner hat am 2026-11-19 entschieden: Der Host stellt die Schriften bereit, über
+einen konfigurierbaren Ordner, und die Bibliothek nutzt freie Ersatzschriften,
+wenn eine Schrift fehlt. Wie DOCX-Vorgaben importiert werden, ist noch offen
+(ADR-003). Der Hinweis auf fehlende Schriften gehört deshalb in die
+Administration, wo auch immer das Briefpapier entsteht.
+
+=== Entscheidungstreiber
+
+* **Lizenzverantwortung beim Betreiber:** Wer eine lizenzpflichtige Schrift nutzt,
+  besitzt die Lizenz und stellt die Datei bereit.
+* **Unabhängigkeit vom Zielsystem:** Das Ergebnis hängt nicht davon ab, welche
+  Schriften auf dem Server oder im Browser installiert sind.
+* **Wiedergabetreue (QS-004):** Vorschau und PDF verwenden dieselbe Datei.
+* **Stiltreue (QS-013):** Das Schriftbild der Vorgabe bleibt erhalten, auch mit
+  Ersatzschrift.
+* **Pflegeaufwand der Fachanwender:** Wer ein Briefpapier pflegt, muss keine
+  Schriftdateien beschaffen.
+* **Betriebsaufwand des Hosts:** Möglichst wenig zusätzliche Konfiguration und
+  Bereitstellung je Umgebung.
+
+=== Betrachtete Optionen
+
+==== Option 1: Schriften als Teil des Briefpapiers hochladen
+
+Bisheriger Stand in ADR-004. Der Vorlagenverwalter lädt die Schriftdateien mit
+dem Briefpapier hoch, sie liegen in der Datenbank des Hosts. Keine Konfiguration
+im Betrieb, Schriften wandern mit den Daten durch die Umgebungen. Aber ein
+Fachanwender muss Schriftdateien beschaffen und entscheidet faktisch über deren
+Lizenz, und dieselbe Schrift liegt je Briefpapier mehrfach in der Datenbank.
+
+==== Option 2: Systemschriften des Zielsystems
+
+Die Engines nutzen installierte Schriften. Kein Aufwand in der Bibliothek. Der
+Server (oft ein schlanker Linux-Container) hat Arial meist nicht, und der Browser
+des Nutzers hat andere Schriften als der Server. Vorschau und PDF können sich
+dadurch unterscheiden, ohne dass es jemand bemerkt.
+
+==== Option 3: Schriftordner des Hosts mit freien Ersatzschriften (gewählt)
+
+Der Host konfiguriert einen Ordner mit lizenzierten Schriften. Die Bibliothek
+bringt freie Ersatzschriften mit gleichen Laufweiten mit und weist in der
+Administration auf fehlende Schriften hin. Der Host muss den Ordner in jeder
+Umgebung befüllen, etwa im Container-Image oder über ein Volume.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
+Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
+einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Lizenzverantwortung beim Betreiber | -1 | 0 | +1
+| Unabhängigkeit vom Zielsystem | +1 | -1 | +1
+| Wiedergabetreue (QS-004) | +1 | -1 | +1
+| Stiltreue (QS-013) | +1 | -1 | ?
+| Pflegeaufwand der Fachanwender | -1 | +1 | +1
+| Betriebsaufwand des Hosts | +1 | 0 | -1
+s| Summe s| +2 s| -2 s| ?
+|===
+
+Bei der Stiltreue bekommt Option 3 `?`: Mit den Originalschriften im Ordner ist
+sie gleichwertig zu Option 1. Ohne sie hängt das Ergebnis davon ab, wie gut die
+Ersatzschrift trifft, und das muss der Prototyp zeigen, vor allem für Arial
+Narrow. Die Ersatzschriften selbst ließen sich mit jeder Option kombinieren. Die
+Matrix vergleicht die Quelle der Originalschriften.
+
+Ohne die Stiltreue kommt Option 3 auf +3. Selbst mit `-1` bei der Stiltreue läge
+sie mit +2 gleichauf mit Option 1, die ihren Vorsprung beim Betriebsaufwand mit
+der Lizenzfrage beim Fachanwender bezahlt.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Die Bibliothek bleibt frei weitergebbar. Keine Schriftlizenz hängt an ihrem
+  Release.
+* Vorschau und PDF verwenden dieselbe Datei, unabhängig von Server und Browser.
+* Ohne Konfiguration läuft die Bibliothek mit Ersatzschriften. Das reicht für die
+  Beispielanwendung und für Tests.
+* Fachanwender sehen in der Administration, wenn ein Schreiben nicht mit der
+  Originalschrift erzeugt wird.
+
+==== Negativ
+
+* Der Host muss den Schriftordner in jeder Umgebung bereitstellen. Fehlt er in
+  einer Umgebung, erzeugt sie Schreiben mit Ersatzschrift. Das fällt nur über den
+  Hinweis in der Administration auf.
+* Eine Ersatzschrift ist nie identisch. Für Arial Narrow gibt es keine
+  OFL-Schrift mit gleichen Laufweiten. Ohne die Originalschrift im Ordner können
+  sich dort Zeilen- und Seitenumbrüche gegenüber der Vorgabe verschieben.
+* Ein PDF, das mit Ersatzschrift erzeugt und gespeichert wurde, bleibt so. Die
+  Unveränderlichkeit gespeicherter Schreiben (ADR-007) gilt auch hier.
+* Die Bibliothek braucht eine Zuordnungstabelle und eine Auflösung nach
+  Familiennamen, beides mit Tests.
+
+==== Neutral oder Folgearbeiten
+
+* ADR-004 und die Verteilungssicht sind mit Issue #39 angeglichen.
+* Der Prototyp (#3) misst die Ersatzschriften gegen QS-004 und QS-013 und prüft,
+  ob Paged.js und openhtmltopdf dieselbe Datei gleich setzen.
+* Umsetzung des Schriftordners in der Rendering-Pipeline (Epic #7). Name und Form
+  der Konfiguration legt die Umsetzung fest, etwa eine Spring-Eigenschaft im
+  Starter.
+* Hinweis auf fehlende Schriften in der Administration: #41 (Epic #8, betrifft
+  auch Epic #9).
+* Die Bibliothek muss die Lizenzen der mitgelieferten Ersatzschriften in ihrer
+  Lizenzdokumentation nennen.
+
+=== Impact
+
+include::generated/adr-017-bereitstellung-der-schriften-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-017-bereitstellung-der-schriften-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-017-bereitstellung-der-schriften-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Die Bibliothek erkennt eine Schrift am Familiennamen aus der Schriftdatei, nicht
+  am Dateinamen. Schnitte (fett, kursiv) liegen als eigene Dateien im Ordner.
+* openhtmltopdf und Paged.js setzen dieselbe TrueType- oder OpenType-Datei mit
+  gleichen Laufweiten. Das prüft der Prototyp.
+* Der Browser fällt nicht auf installierte Schriften zurück, weil die Vorschau
+  nur Schriften verwendet, die per `@font-face` vom Backend kommen. Für Zeichen,
+  die keine dieser Schriften enthält, kann der Browser trotzdem eine
+  Systemschrift nehmen. Das prüft der Prototyp ebenfalls.
+
+=== Open Questions
+
+Der Owner hat im Review von PR #40 entschieden:
+
+* *Ersatz für Arial Narrow:* wie bei den anderen Schriften eine OFL-Schrift, hier
+  ohne gleiche Laufweiten.
+* *Weitere Schriftquelle:* Nein. Der Ordner des Hosts ist die einzige Quelle.
+* *Ordner oder Schnittstelle:* Der Ordner reicht.
+
+Offen bleibt, ob die Bibliothek fehlende Schriften zusätzlich beim Start oder bei
+der Erzeugung protokolliert. Die Frage steht in #41.
+
+=== Review Notes
+
+* Der Owner hat den ADR im Review von PR #40 am 2026-11-19 angenommen, die vier
+  Relationen zu ADR-004, QS-004, QS-013 und QS-007 ebenso.
+* Die Bewertung der Stiltreue in der Pugh-Matrix bleibt `?`, bis der Prototyp die
+  Ersatzschriften gemessen hat.
+* Die Lizenzen von Carlito, Caladea, der Kandidaten für das Kästchen und der
+  schmalen OFL-Schrift für Arial Narrow prüft der Prototyp an ihren
+  Lizenzdateien.

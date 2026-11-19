@@ -10,9 +10,10 @@ arc42-Entwurf, ADRs, Qualitätsszenarien, Risiken; Review durch den Owner.
 
 Voraussetzung: die nachgelieferten DOCX-Referenzen (Q-PO-004).
 
-. **Zuerst Schriften klären:** Lassen sich die Schriften der Vorgabe in beiden
-  Renderern verwenden und im PDF einbetten? Falls nicht, Ersatzvorgabe der zentralen
-  Abteilung einholen (Q-PO-010).
+. **Zuerst Schriften klären:** Schriftquelle und freie Ersatzschriften nach
+  xref:adr-017-bereitstellung-der-schriften[ADR-017] (Q-PO-010). Der Prototyp prüft,
+  ob beide Renderer dieselbe Datei gleich setzen und wie gut die Ersatzschriften
+  treffen.
 . Reale DOCX-Vorlagen im Vorlagenmodell nachbauen (ein- und mehrseitig).
 . Gegen die Abnahmekriterien aus ADR-004 messen: PDF/A (QS-001), PDF/UA (QS-002),
   Wiedergabetreue (QS-004) und **Stiltreue zur DOCX-Vorgabe (QS-013)**.
