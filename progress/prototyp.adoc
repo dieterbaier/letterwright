@@ -17,6 +17,7 @@ und einbetten, sind alle weiteren Messungen der Stiltreue wertlos.
 * [ ] Schriftquelle und Ersatzschriften festlegen (ADR-017 angenommen, PR #40): #39, Q-PO-010
 * [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
 * [ ] Vorschau im sandboxed iframe mit CSP aufbauen und Sandbox, CSP und HTML-Allowlist festlegen: #3, ADR-014
+* [ ] Referenzschriften vom Host: laden im sandboxed iframe unter CSP, im PDF eingebettet, Lizenz für beide Nutzungen bestätigt: #3, ADR-004, ADR-017
 * [ ] Ersatzschriften aus ADR-017 in beiden Renderern setzen und gegen QS-004 und QS-013 messen: #3, ADR-017
 * [ ] Messen gegen QS-001 bis QS-004, QS-013 und die Prüfkriterien aus ADR-014 mit Option 1 (Paged.js und openhtmltopdf): #3
 * [ ] Nur wenn Option 1 scheitert: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
