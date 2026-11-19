@@ -33,6 +33,12 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
 * **#31 (Owner):** Auf `issue_31` zwei weitere Commits mit klickbarer Demo und
   ersten Bildschirmen der Administration (`9af3e30`, `29c57ff`), gepusht, noch
   ohne PR.
+* **#31 abgeschlossen (Owner, zweite Sitzung):** Kennzeichnung je Bildschirm, was
+  vom Tool und was vom Host kommt, und grauer HOST-Badge auf der Bestellmaske.
+  PR #42 mit allen Checks grün per Rebase auf `main` gemergt (`777b61d` bis
+  `92c2b83`), #31 geschlossen, Remote-Branch `issue_31` gelöscht. Wireframe
+  (`exampleApp.pen`) und klickbare Demo liegen unter
+  `src/docs/wireframes/exampleApp/`.
 
 == Entscheidungen des Owners
 
@@ -43,6 +49,7 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
   OFL-Schrift ohne gleiche Laufweiten.
 * ADR-017 mit allen vier Relationen angenommen.
 * PR #40 mergen.
+* PR #42 mergen.
 
 == Gelernt
 
@@ -64,7 +71,8 @@ Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
 * Ablageort des Wegwerf-Prototyps klären, dann Referenzschreiben nachbauen (#3).
 * Welche schmale OFL-Schrift Arial Narrow ersetzt, wählt der Prototyp.
 * #41: Logging fehlender Schriften.
-* #31: PR für Wireframe und Demo.
+* Worktree `standardschreiben-beispielanwendung` (Branch für #31) wird nicht
+  mehr gebraucht. Entfernen mit `git worktree remove` aus dem Hauptcheckout.
 * #36, #30, #32 unverändert offen.
 
 == Gelesen
@@ -92,6 +100,11 @@ Was diese Sitzung tatsächlich abgerufen hat:
 * Clock-out: `git status`, `gh pr list`, Branch-Sweep (`SWEEP: CLEAR`),
   `git log --since=2026-11-19 --all`, `gh issue list` nach Datum, CI-Läufe auf
   `main` (`cd089d7`), `git ls-remote` für `issue_31`.
+* Zweite Sitzung (Merge PR #42): `gh pr view 42` (Status, Checks), Toolkit-Skills
+  `post-merge-sync`, `clock-in`, `clock-out`, `git worktree list`,
+  `git ls-remote` für `issue_31`, `gh issue view 31`, `gh pr list`,
+  `gh issue list`, Branch-Sweep unter bash (`SWEEP: CLEAR`),
+  `journal-config.sh get`, `progress/prototyp.adoc`, dieser Tagebucheintrag.
 
 Fehlgeschlagen:
 
