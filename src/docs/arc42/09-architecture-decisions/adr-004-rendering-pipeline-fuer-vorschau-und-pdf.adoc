@@ -188,7 +188,7 @@ Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prot
 ==== Neutral oder Folgearbeiten
 
 * Prototyp gemeinsam mit ADR-003: Referenzschreiben auf Option 1 rendern und gegen die Abnahmekriterien prüfen; Option 2 nur bei Scheitern von Option 1 gegen dieselben Kriterien prüfen.
-* Schriften: Maßgeblich ist die Schrift der zentralen DOCX-Vorgabe (QS-013). Beide Engines laden **dieselbe Datei** (openhtmltopdf eingebettet ins PDF, Paged.js per `@font-face` aus dem Backend). Woher die Datei kommt, regelt xref:adr-017-bereitstellung-der-schriften[ADR-017]: Lizenzpflichtige Schriften stellt der Host in einem konfigurierbaren Ordner bereit, sonst greift eine freie Ersatzschrift der Bibliothek. Der Spike prüft an den Referenzdateien, ob beide Renderer dieselbe Datei gleich setzen, und misst die Ersatzschriften gegen QS-004 und QS-013 (Q-PO-010).
+* Schriften: Maßgeblich ist die Schrift der zentralen DOCX-Vorgabe (QS-013). Beide Engines laden **dieselbe Datei** (openhtmltopdf eingebettet ins PDF, Paged.js per `@font-face` aus dem Backend). Woher die Datei kommt, regelt xref:adr-017-bereitstellung-der-schriften[ADR-017]: Lizenzpflichtige Schriften stellt der Host in einem konfigurierbaren Ordner bereit, sonst greift eine freie Ersatzschrift der Bibliothek. Der Spike prüft beide Wege getrennt (Q-PO-010): (1) *Referenzschriften vom Host:* Sie laden im sandboxed iframe unter der vorgesehenen CSP (ADR-014), openhtmltopdf bettet sie ins PDF ein, und ihre Lizenz ist für beide Nutzungen freigegeben, Einbettung ins PDF und Auslieferung als Webfont. (2) *Freie Ersatzschriften:* Vorschau und PDF werden gegen QS-004 und QS-013 gemessen. Ein erfolgreicher Weg 2 ersetzt den Nachweis für Weg 1 nicht.
 
 === Impact
 

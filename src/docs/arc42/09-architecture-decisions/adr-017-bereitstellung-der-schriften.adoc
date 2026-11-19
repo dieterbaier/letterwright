@@ -6,7 +6,7 @@ status: accepted
 owner: 'Architektur'
 created: '2026-11-19'
 reviewed: true
-summary: 'Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host stellt sie über einen konfigurierbaren Ordner bereit; fehlt eine Schrift, nutzt die Bibliothek eine mitgelieferte freie Ersatzschrift mit gleichen Laufweiten und weist in der Administration darauf hin. Systemschriften des Zielsystems werden nicht verwendet.'
+summary: 'Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host stellt sie über einen konfigurierbaren Ordner bereit; fehlt eine Schrift, nutzt die Bibliothek eine mitgelieferte freie OFL-Ersatzschrift, mit gleichen Laufweiten, wo es eine gibt, und weist in der Administration darauf hin. Systemschriften des Zielsystems werden nicht verwendet.'
 derived_from:
 - type: question
   description: 'Q-PO-010 Schriften der zentralen Vorgabe, Antwort des Owners vom 2026-11-19'
@@ -33,7 +33,7 @@ relations:
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: accepted
-  rationale: 'Stellt der Host die Originalschriften bereit, entspricht das Schriftbild der Vorgabe; sonst halten Ersatzschriften mit gleichen Laufweiten Zeilen- und Seitenumbrüche gleich.'
+  rationale: 'Stellt der Host die Originalschriften bereit, entspricht das Schriftbild der Vorgabe; sonst greifen freie Ersatzschriften. Nur wo sie gleiche Laufweiten haben, bleiben Zeilen- und Seitenumbrüche gleich; für Arial Narrow gilt das nicht. Ob Umbrüche und Abstände mit Ersatzschrift halten, misst #3.'
   reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
@@ -154,7 +154,7 @@ dadurch unterscheiden, ohne dass es jemand bemerkt.
 ==== Option 3: Schriftordner des Hosts mit freien Ersatzschriften (gewählt)
 
 Der Host konfiguriert einen Ordner mit lizenzierten Schriften. Die Bibliothek
-bringt freie Ersatzschriften mit gleichen Laufweiten mit und weist in der
+bringt freie Ersatzschriften mit, wo möglich mit gleichen Laufweiten, und weist in der
 Administration auf fehlende Schriften hin. Der Host muss den Ordner in jeder
 Umgebung befüllen, etwa im Container-Image oder über ein Volume.
 
@@ -216,8 +216,10 @@ der Lizenzfrage beim Fachanwender bezahlt.
 ==== Neutral oder Folgearbeiten
 
 * ADR-004 und die Verteilungssicht sind mit Issue #39 angeglichen.
-* Der Prototyp (#3) misst die Ersatzschriften gegen QS-004 und QS-013 und prüft,
-  ob Paged.js und openhtmltopdf dieselbe Datei gleich setzen.
+* Der Prototyp (#3) prüft beide Wege getrennt: Referenzschriften vom Host laden
+  im sandboxed iframe unter CSP, werden ins PDF eingebettet und sind für beide
+  Nutzungen lizenziert; die Ersatzschriften werden gegen QS-004 und QS-013
+  gemessen (ADR-004).
 * Umsetzung des Schriftordners in der Rendering-Pipeline (Epic #7). Name und Form
   der Konfiguration legt die Umsetzung fest, etwa eine Spring-Eigenschaft im
   Starter.

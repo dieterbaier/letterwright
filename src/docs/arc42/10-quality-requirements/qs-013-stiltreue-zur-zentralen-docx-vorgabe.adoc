@@ -35,7 +35,7 @@ bis sie bestätigt sind.
 | Environment | Briefpapier wurde einmalig vom Vorlagenverwalter im Editor nach der Vorgabe angelegt.
 | Artifact | Stilvorgaben des Briefpapiers, Rendering, erzeugtes PDF.
 | Response | Schriftart, Schriftgrößen, Zeilenabstände, Absatzabstände und die Positionen von Logo, Absender, Anschriftfeld und Fußzeile stimmen mit der Vorgabe überein.
-| Response Measure | Für die nachgelieferten Beispiel-DOCX: gleiche Schriftart (oder die von der zentralen Abteilung bestätigte Ersatzschrift) und Schriftgröße je Stil, im PDF eingebettet; Abweichung von Positionen und Abständen ≤ 1 mm; Abnahme durch die zentrale Abteilung im Prototyp.
+| Response Measure | Für die nachgelieferten Beispiel-DOCX: gleiche Schriftart (oder eine von der zentralen Abteilung bestätigte freie Ersatzschrift) und Schriftgröße je Stil, im PDF eingebettet; Abweichung von Positionen und Abständen ≤ 1 mm; Abnahme durch die zentrale Abteilung im Prototyp.
 |===
 
 === Begründung
@@ -45,8 +45,13 @@ Der Owner verlangt, dass die Styles der zentralen Vorgabe im Ergebnis stimmen, a
 === Annahmen
 
 * Der Host stellt die lizenzpflichtigen Schriften der Vorgabe bereit und besitzt
-  die Lizenz für Einbettung und Webfont. Sonst gilt das Antwortmaß für die freie
-  Ersatzschrift aus xref:adr-017-bereitstellung-der-schriften[ADR-017].
+  die Lizenz für Einbettung und Webfont.
+* Technischer Rückfall und fachliche Abnahme sind getrennt. Fehlt eine Schrift,
+  verwendet die Bibliothek eine freie Ersatzschrift aus
+  xref:adr-017-bereitstellung-der-schriften[ADR-017], und der Spike kann sie
+  bereits messen. Für den Ersatzfall ist QS-013 aber erst erfüllt, wenn die
+  zentrale Abteilung die Ersatzschrift bestätigt hat und die Toleranzen des
+  Antwortmaßes eingehalten sind.
 * Die Vorgabe nutzt benannte Word-Formatvorlagen und nicht überwiegend direkte Formatierung.
 
 === Impact
