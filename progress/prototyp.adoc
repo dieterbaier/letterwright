@@ -14,9 +14,10 @@ Die Schriften kommen zuerst. Lassen sie sich nicht in beiden Renderern verwenden
 und einbetten, sind alle weiteren Messungen der Stiltreue wertlos.
 
 [options="checklist"]
-* [ ] Schriften der Vorgabe auf Verwendbarkeit und Einbettung prüfen, sonst eine bestätigte Ersatzvorgabe einholen: Q-PO-010
+* [ ] Schriftquelle und Ersatzschriften festlegen (ADR-017 angenommen, PR #40): #39, Q-PO-010
 * [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
 * [ ] Vorschau im sandboxed iframe mit CSP aufbauen und Sandbox, CSP und HTML-Allowlist festlegen: #3, ADR-014
+* [ ] Ersatzschriften aus ADR-017 in beiden Renderern setzen und gegen QS-004 und QS-013 messen: #3, ADR-017
 * [ ] Messen gegen QS-001 bis QS-004, QS-013 und die Prüfkriterien aus ADR-014 mit Option 1 (Paged.js und openhtmltopdf): #3
 * [ ] Nur wenn Option 1 scheitert: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
 * [ ] Ergebnisse in ADR-003 bis ADR-005 und ADR-014 eintragen, Entscheidung des Owners einholen: #3
@@ -26,15 +27,18 @@ ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 
 == Where we are
 
-Noch nichts gebaut. Die Abnahmekriterien stehen in ADR-004 und ADR-014 und als
-Akzeptanzkriterien in #3.
+Die wirksamen Schriften der Beispiel-DOCX sind ermittelt: Arial und Arial Narrow,
+im Formular dazu ein Symbolschrift-Kästchen. ADR-017 ist angenommen: Der Ordner
+des Hosts ist die einzige Schriftquelle, sonst greifen freie OFL-Ersatzschriften
+(PR #40). Der Hinweis in der Administration ist #41. Noch kein Prototyp-Code. Die
+Abnahmekriterien stehen in ADR-004 und ADR-014 und als Akzeptanzkriterien in #3.
 
 == Open in this topic
 
 * Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“. Die Beispiel-DOCX
   liegen inzwischen auf `main`. Mit #3 nachziehen, zusammen mit der
   Architekturdoku dazu (Entscheidung des Owners).
-* Q-PO-010: Schriften der zentralen Vorgabe und ihre Lizenz zur Einbettung.
+* Welche schmale OFL-Schrift Arial Narrow ersetzt, wählt der Prototyp (ADR-017).
 * Hinweis aus dem Re-Review von PR #17 (nicht blockierend): Nachrichten aus dem
   iframe per `postMessage` zusätzlich mit einem Korrelationswert je
   Vorschau-Instanz absichern, besonders bei parallelen oder neu geladenen
