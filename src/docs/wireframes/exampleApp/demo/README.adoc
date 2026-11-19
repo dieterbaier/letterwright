@@ -2,9 +2,9 @@
 :status: draft
 :reviewed: false
 
-Klickbarer Prototyp der Wireframes aus `../step1_ordering_car.pen`.
+Klickbarer Prototyp der Wireframes aus `../exampleApp.pen`.
 Er zeigt den Kundenweg (Bestellmaske) und den Administratorweg
-(Login, Bestellungen, Standardschreiben, Vorlagen).
+(Login, Bestellungen, Standardschreiben, Vorlagen, Briefpapiere).
 
 == Demo starten
 
@@ -54,7 +54,19 @@ Leere zeigt auf den Admin-Seiten die klickbaren Bereiche.
 | „Abschließen“ → Bestellübersicht, „Drucken“ zeigt nur einen Hinweis
 
 | Vorlagen Standardschreiben
+| „Bearbeiten“ bei der Bestellbestätigung → Vorlage bearbeiten; bei der
+  Auslieferungsanordnung nur ein Hinweis
+
+| Briefpapiere
 | „Bearbeiten“ zeigt nur einen Hinweis (Bildschirm noch nicht entworfen)
+
+| Vorlage bearbeiten (Bestellbestätigung)
+| Briefpapier auswählen und Brief-Körper bearbeiten (echte Eingabefelder über
+  dem Bild), „Speichern“ merkt sich den Stand für die Browsersitzung,
+  „Abbrechen“ verwirft ihn; beide → Vorlagen Standardschreiben
+
+| Administration
+| Reiter „Vorlagen für Standardschreiben“ / „Briefpapiere“
 
 | Alle Admin-Seiten
 | Menü „Bestellungen“ / „Administration“, „Abmelden“ → Admin-Login
@@ -67,7 +79,8 @@ Leere zeigt auf den Admin-Seiten die klickbaren Bereiche.
 | Datei | Art | Inhalt
 
 | `index.html` | von Hand gepflegt
-| Navigation der Admin-Seiten: Bildschirme und Koordinaten der Klickflächen
+| Navigation der Admin-Seiten: Bildschirme, Koordinaten der Klickflächen und
+  der Eingabefelder (`fields`) auf der Maske „Vorlage bearbeiten“
 
 | `bestellmaske-demo.js` | von Hand gepflegt
 | Klicklogik der Bestellmaske; findet Elemente über die Ebenennamen aus pen.dev
@@ -85,7 +98,7 @@ braucht die pen.dev-App und lässt sich nicht in der Pipeline wiederholen.
 
 == Demo nach Designänderungen aktualisieren
 
-Das Design in `../step1_ordering_car.pen` ist die Quelle. Nach Änderungen dort:
+Das Design in `../exampleApp.pen` ist die Quelle. Nach Änderungen dort:
 
 . *Admin-Seiten, Login, Danke-Seite:* den Bildschirm als PNG (Skalierung 1)
   nach `screens/<Knoten-ID>.png` exportieren. Haben sich Buttons verschoben,

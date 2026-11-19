@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
 <title>Klick-Demo – Standardschreiben Beispielanwendung</title>
 <style>
   body { margin: 0; background: #2b2f36; font-family: Inter, system-ui, sans-serif; }
@@ -18,6 +19,12 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #14181F; color: #fff;
            padding: 12px 20px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
   .toast.show { opacity: 1; }
+  .field { position: absolute; box-sizing: border-box; margin: 0; color: #14181F; background: #fff; outline: 0; }
+  textarea.field { border: 1px solid #E1E3DE; border-radius: 8px; padding: 18px 20px; resize: none;
+                   font: 13px/1.6 "JetBrains Mono", monospace; }
+  textarea.field:focus { border: 1px solid #0E7C5A; box-shadow: 0 0 0 3px rgba(14,124,90,.15); }
+  select.field { border: 0; padding: 0 36px 0 0; appearance: none; cursor: pointer; font: 14px Inter, system-ui, sans-serif;
+                 background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2314181F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 13px center; }
 </style>
 </head>
 <body>
@@ -37,6 +44,33 @@ const menu = [
   [583, 0, 150, 72, go('vorlagen')],
   [1288, 20, 112, 32, go('login')],
 ];
+const adminTabs = [
+  [40, 200, 269, 41, go('vorlagen')],
+  [314, 200, 138, 41, go('briefpapiere')],
+];
+const briefKoerper = `\${bestellerVorname} \${bestellerNachname},
+
+wir bestätigen die Bestellung des Fahrzeugs \${fahrzeug} zum Basispreis von \${fahrzeugBasispreis}.
+
+Zusätzlich haben Sie folgende Extras bestellt:
+
+* \${extra} zum Preis von \${extraPreis}
+* ...
+
+Der Gesamtpreis des bestellten Fahrzeugs beträgt \${gesamtpreisFahrzeug}.
+
+Aktuell bearbeiten wir Ihre Bestellung. Das endgültige Auslieferungsdatum nennen wir Ihnen per E-Mail an die Adresse \${bestellerEMail}.
+
+Vielen Dank für Ihren Auftrag
+
+\${bearbeiter}`;
+// Gespeicherter Stand der Vorlage; „Speichern“ übernimmt die Felder, „Abbrechen“ verwirft sie.
+const vorlage = JSON.parse(sessionStorage.getItem('vorlage-bestellbestaetigung') || 'null')
+  || { briefpapier: 'Geschäftsbrief', text: briefKoerper };
+const save = () => {
+  screenEl.querySelectorAll('.field').forEach(f => { vorlage[f.dataset.key] = f.value; });
+  sessionStorage.setItem('vorlage-bestellbestaetigung', JSON.stringify(vorlage));
+};
 const screens = {
   danke: { img: 'aoMno', title: 'Vielen Dank', hot: [
     [48, 20, 374, 32, go('bestellmaske')],
@@ -64,9 +98,22 @@ const screens = {
     [997, 903, 163, 46, msg('Bestellung abgeschlossen'), 'bestellungen'],
   ]},
   vorlagen: { img: 'GKqpV', title: 'Vorlagen Standardschreiben', hot: [
-    ...menu,
-    [1256, 264, 116, 32, msg('Bearbeiten – Bildschirm noch nicht entworfen')],
-    [1256, 336, 116, 32, msg('Bearbeiten – Bildschirm noch nicht entworfen')],
+    ...menu, ...adminTabs,
+    [1256, 329, 116, 32, go('vorlage-bestellbestaetigung')],
+    [1256, 401, 116, 32, msg('Bearbeiten – nur die Bestellbestätigung ist ausgestaltet')],
+  ]},
+  briefpapiere: { img: 'rAp3M', title: 'Briefpapiere', hot: [
+    ...menu, ...adminTabs,
+    [1256, 329, 116, 32, msg('Briefpapier bearbeiten – Bildschirm noch nicht entworfen')],
+    [1256, 401, 116, 32, msg('Briefpapier bearbeiten – Bildschirm noch nicht entworfen')],
+  ]},
+  'vorlage-bestellbestaetigung': { img: 'SbVoX', title: 'Vorlage bearbeiten: Bestellbestätigung', hot: [
+    ...menu, ...adminTabs,
+    [756, 886, 110, 44, msg('Änderungen verworfen'), 'vorlagen'],
+    [878, 886, 130, 44, { run: save, msg: 'Vorlage gespeichert' }, 'vorlagen'],
+  ], fields: [
+    { key: 'briefpapier', tag: 'select', box: [586, 316, 421, 42], options: ['Geschäftsbrief', 'Internes Formular'] },
+    { key: 'text', tag: 'textarea', box: [68, 428, 940, 393] },
   ]},
 };
 const screenEl = document.getElementById('screen');
@@ -83,13 +130,26 @@ function render() {
   const s = screens[key] || screens.login;
   document.title = s.title + ' – Klick-Demo';
   img.src = 'screens/' + s.img + '.png';
-  screenEl.querySelectorAll('.hot').forEach(h => h.remove());
+  screenEl.querySelectorAll('.hot, .field').forEach(h => h.remove());
+  for (const f of s.fields || []) {
+    const el = document.createElement(f.tag);
+    el.className = 'field';
+    el.dataset.key = f.key;
+    const [x, y, w, h] = f.box;
+    Object.assign(el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+    for (const o of f.options || []) el.add(new Option(o));
+    el.value = vorlage[f.key];
+    el.spellcheck = false;
+    el.onclick = e => e.stopPropagation();
+    screenEl.appendChild(el);
+  }
   for (const [x, y, w, h, action, then] of s.hot) {
     const a = document.createElement('div');
     a.className = 'hot';
     Object.assign(a.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
     a.onclick = e => {
       e.stopPropagation();
+      if (action.run) action.run();
       if (action.msg) toast(action.msg);
       const target = action.go || then;
       if (target) { location.hash = target; window.scrollTo(0, 0); }

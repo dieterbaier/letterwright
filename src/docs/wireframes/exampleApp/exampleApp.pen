@@ -3935,7 +3935,8 @@
                           "fill": "$muted",
                           "content": "19.11.2026, 09:14",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3958,7 +3959,8 @@
                           "fill": "$ink",
                           "content": "Anna Becker",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -3981,7 +3983,8 @@
                           "fill": "$muted",
                           "content": "anna.becker@mail.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4004,7 +4007,8 @@
                           "fill": "$ink",
                           "content": "Aurora Touring",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4027,7 +4031,8 @@
                           "fill": "$ink",
                           "content": "Wärmepumpe, AHK",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4116,7 +4121,8 @@
                           "fill": "$muted",
                           "content": "18.11.2026, 17:42",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4139,7 +4145,8 @@
                           "fill": "$ink",
                           "content": "Jonas Weber",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4162,7 +4169,8 @@
                           "fill": "$muted",
                           "content": "j.weber@web.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4185,7 +4193,8 @@
                           "fill": "$ink",
                           "content": "Volta City",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4208,7 +4217,8 @@
                           "fill": "$ink",
                           "content": "–",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4297,7 +4307,8 @@
                           "fill": "$muted",
                           "content": "18.11.2026, 11:05",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4320,7 +4331,8 @@
                           "fill": "$ink",
                           "content": "Leyla Demir",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4343,7 +4355,8 @@
                           "fill": "$muted",
                           "content": "leyla.demir@gmx.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4366,7 +4379,8 @@
                           "fill": "$ink",
                           "content": "Aurora Touring",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4389,7 +4403,8 @@
                           "fill": "$ink",
                           "content": "Panoramadach",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4478,7 +4493,8 @@
                           "fill": "$muted",
                           "content": "17.11.2026, 20:31",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4501,7 +4517,8 @@
                           "fill": "$ink",
                           "content": "Thomas Krüger",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4524,7 +4541,8 @@
                           "fill": "$muted",
                           "content": "tkrueger@posteo.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4547,7 +4565,8 @@
                           "fill": "$ink",
                           "content": "Strom GT",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4570,7 +4589,8 @@
                           "fill": "$ink",
                           "content": "Wärmepumpe, Sound",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4659,7 +4679,8 @@
                           "fill": "$muted",
                           "content": "16.11.2026, 08:57",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4682,7 +4703,8 @@
                           "fill": "$ink",
                           "content": "Mia Schulz",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4705,7 +4727,8 @@
                           "fill": "$muted",
                           "content": "mia.schulz@mail.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4728,7 +4751,8 @@
                           "fill": "$ink",
                           "content": "Volta City",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4751,7 +4775,8 @@
                           "fill": "$ink",
                           "content": "Wallbox",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4840,7 +4865,8 @@
                           "fill": "$muted",
                           "content": "15.11.2026, 14:22",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4863,7 +4889,8 @@
                           "fill": "$ink",
                           "content": "Paul Fischer",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4886,7 +4913,8 @@
                           "fill": "$muted",
                           "content": "p.fischer@t-online.de",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4909,7 +4937,8 @@
                           "fill": "$ink",
                           "content": "Strom GT",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -4932,7 +4961,8 @@
                           "fill": "$ink",
                           "content": "–",
                           "fontFamily": "Inter",
-                          "fontSize": 14
+                          "fontSize": 14,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -5529,7 +5559,8 @@
                           "content": "Lindenstraße 12\n70173 Stuttgart",
                           "lineHeight": 1.45,
                           "fontFamily": "Inter",
-                          "fontSize": 15
+                          "fontSize": 15,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -5559,7 +5590,8 @@
                           "content": "anna.becker@mail.de",
                           "lineHeight": 1.45,
                           "fontFamily": "Inter",
-                          "fontSize": 15
+                          "fontSize": 15,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -6297,7 +6329,8 @@
                           "content": "Lindenstraße 12\n70173 Stuttgart",
                           "lineHeight": 1.45,
                           "fontFamily": "Inter",
-                          "fontSize": 15
+                          "fontSize": 15,
+                          "fontWeight": "normal"
                         }
                       ]
                     },
@@ -6327,7 +6360,8 @@
                           "content": "anna.becker@mail.de",
                           "lineHeight": 1.45,
                           "fontFamily": "Inter",
-                          "fontSize": 15
+                          "fontSize": 15,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -6773,6 +6807,89 @@
                   "fontFamily": "Inter",
                   "fontSize": 14,
                   "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ayebf",
+              "name": "Admin-Navigation",
+              "width": "fill_container",
+              "stroke": "$line",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ocT9a",
+                  "name": "Tab Vorlagen für Standardschreiben",
+                  "stroke": "$accent",
+                  "strokeWidth": {
+                    "bottom": 2
+                  },
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "PRwMf",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "file-text",
+                      "library": "lucide",
+                      "fill": "$accent"
+                    },
+                    {
+                      "type": "text",
+                      "id": "yN060",
+                      "name": "Label",
+                      "fill": "$ink",
+                      "content": "Vorlagen für Standardschreiben",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "l7Zw7c",
+                  "name": "Tab Briefpapiere",
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "Us0JT",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "mail",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "SCzMe",
+                      "name": "Label",
+                      "fill": "$muted",
+                      "content": "Briefpapiere",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
                 }
               ]
             },
@@ -7670,6 +7787,2008 @@
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "rAp3M",
+      "x": 3120,
+      "y": 2040,
+      "name": "Admin – Briefpapiere",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "reIp2",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 72,
+          "fill": "$surface",
+          "stroke": "$line",
+          "strokeWidth": {
+            "bottom": 1
+          },
+          "padding": [
+            0,
+            40
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "cB8mI",
+              "name": "Left",
+              "height": "fill_container",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zbsFW",
+                  "name": "Logo",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "l3KOw",
+                      "name": "Mark",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$accent",
+                      "cornerRadius": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "GU96Y",
+                          "name": "Bolt",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "zap",
+                          "library": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "J8TjR0",
+                      "name": "Voltwerk Autohaus",
+                      "fill": "$ink",
+                      "content": "Voltwerk Autohaus",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jUebm",
+                      "name": "Demo Badge",
+                      "fill": "#FFF3D6",
+                      "cornerRadius": 4,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "a9ghW",
+                          "name": "Demo · Standardschreiben",
+                          "fill": "#7A5300",
+                          "content": "Demo · Standardschreiben",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kx7AO",
+                  "name": "Menü",
+                  "height": "fill_container",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "L0Cg7",
+                      "name": "Menüpunkt Bestellungen",
+                      "height": "fill_container",
+                      "stroke": "$accent",
+                      "strokeWidth": {
+                        "bottom": 2
+                      },
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "zkCCu",
+                          "name": "Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "package",
+                          "library": "lucide",
+                          "fill": "$muted"
+                        },
+                        {
+                          "type": "text",
+                          "id": "dT2DC",
+                          "name": "Label",
+                          "fill": "$muted",
+                          "content": "Bestellungen",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "A7mQyd",
+                      "name": "Menüpunkt Administration",
+                      "height": "fill_container",
+                      "stroke": "$accent",
+                      "strokeWidth": {
+                        "bottom": 2
+                      },
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "g0ktyC",
+                          "name": "Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "settings",
+                          "library": "lucide",
+                          "fill": "$accent"
+                        },
+                        {
+                          "type": "text",
+                          "id": "C32fWp",
+                          "name": "Label",
+                          "fill": "$ink",
+                          "content": "Administration",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zHftf",
+              "name": "User",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Y4l8T8",
+                  "name": "Benutzer",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "v6J14c",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "circle-user",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "etYn6",
+                      "name": "Angemeldet",
+                      "fill": "$ink",
+                      "content": "admin",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Blrrq",
+                  "name": "Abmelden",
+                  "cornerRadius": 8,
+                  "stroke": "$line",
+                  "strokeWidth": 1,
+                  "gap": 6,
+                  "padding": [
+                    8,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "qShCo",
+                      "name": "Icon",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "log-out",
+                      "library": "lucide",
+                      "fill": "$ink"
+                    },
+                    {
+                      "type": "text",
+                      "id": "RqqRY",
+                      "name": "Label",
+                      "fill": "$ink",
+                      "content": "Abmelden",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BObya",
+          "name": "Body",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "w6RlO",
+              "name": "Title",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "U6RAL",
+                  "name": "Heading",
+                  "fill": "$ink",
+                  "content": "Briefpapiere",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 32,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "yUHuv",
+                  "name": "Sub",
+                  "fill": "$muted",
+                  "content": "Administrationsbereich – 2 Briefpapiere",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "CC5xU",
+              "name": "Admin-Navigation",
+              "width": "fill_container",
+              "stroke": "$line",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "iDumz",
+                  "name": "Tab Vorlagen für Standardschreiben",
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "tozau",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "file-text",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wcEKl",
+                      "name": "Label",
+                      "fill": "$muted",
+                      "content": "Vorlagen für Standardschreiben",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zpqIA",
+                  "name": "Tab Briefpapiere",
+                  "stroke": "$accent",
+                  "strokeWidth": {
+                    "bottom": 2
+                  },
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "BBDme",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "mail",
+                      "library": "lucide",
+                      "fill": "$accent"
+                    },
+                    {
+                      "type": "text",
+                      "id": "x4MEii",
+                      "name": "Label",
+                      "fill": "$ink",
+                      "content": "Briefpapiere",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "AS0xl",
+              "name": "Tabelle",
+              "clip": true,
+              "width": "fill_container",
+              "fill": "$surface",
+              "cornerRadius": 12,
+              "stroke": "$line",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "liNBa",
+                  "name": "Header Row",
+                  "width": "fill_container",
+                  "height": 44,
+                  "fill": "#F8F9F6",
+                  "stroke": "$line",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "padding": [
+                    0,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "E2nCvo",
+                      "name": "Cell Vorlage",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "z7Wob",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "content": "Briefpapier",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hoxia",
+                      "name": "Cell Verwendet in Schritt",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NecPC",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "content": "Verwendet von",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kZur3",
+                      "name": "Cell Zuletzt geändert",
+                      "width": 200,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ry4xZ",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "content": "Zuletzt geändert",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "L6vLj",
+                      "name": "Cell Aktion",
+                      "width": 140,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "end",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Gp1yZ",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gmTOj",
+                  "name": "Row Geschäftsbrief",
+                  "width": "fill_container",
+                  "height": 72,
+                  "stroke": "$line",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "padding": [
+                    0,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hoABo",
+                      "name": "Cell Vorlage",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "yYWf3",
+                          "name": "Doc",
+                          "width": 36,
+                          "height": 36,
+                          "fill": "$accent-soft",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "Vdxmw",
+                              "name": "Icon",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "mail",
+                              "library": "lucide",
+                              "fill": "$accent"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "B8SPaf",
+                          "name": "Texte",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "zllvI",
+                              "name": "Name",
+                              "fill": "$ink",
+                              "content": "Geschäftsbrief",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "TwpoF",
+                              "name": "Beschreibung",
+                              "fill": "$muted",
+                              "content": "Briefkopf mit Logo, Anschriftfeld nach DIN 5008, Fußzeile mit Firmenangaben",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KKOdj",
+                      "name": "Cell Verwendet in Schritt",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "CCmbS",
+                          "name": "Text",
+                          "fill": "$ink",
+                          "content": "1 Vorlage",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "pniKN",
+                      "name": "Cell Zuletzt geändert",
+                      "width": 200,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Zm82z",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "content": "12.11.2026",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ylDuo",
+                      "name": "Cell Aktion",
+                      "width": 140,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "end",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "JvLYc",
+                          "name": "Bearbeiten",
+                          "cornerRadius": 8,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "gap": 6,
+                          "padding": [
+                            8,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "b8sjH",
+                              "name": "Icon",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "pencil",
+                              "library": "lucide",
+                              "fill": "$ink"
+                            },
+                            {
+                              "type": "text",
+                              "id": "VKpfz",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Bearbeiten",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Tbkh2",
+                  "name": "Row Internes Formular",
+                  "width": "fill_container",
+                  "height": 72,
+                  "stroke": "$line",
+                  "strokeWidth": {
+                    "bottom": 1
+                  },
+                  "padding": [
+                    0,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wngkr",
+                      "name": "Cell Vorlage",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "qlD0l",
+                          "name": "Doc",
+                          "width": 36,
+                          "height": 36,
+                          "fill": "$accent-soft",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "Dai1g",
+                              "name": "Icon",
+                              "width": 18,
+                              "height": 18,
+                              "icon": "clipboard-list",
+                              "library": "lucide",
+                              "fill": "$accent"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "mRnMW",
+                          "name": "Texte",
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tSO9H",
+                              "name": "Name",
+                              "fill": "$ink",
+                              "content": "Internes Formular",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "i8WetB",
+                              "name": "Beschreibung",
+                              "fill": "$muted",
+                              "content": "Schlichter Kopf mit Formulartitel, ohne Anschriftfeld, für interne Abläufe",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iYKNS",
+                      "name": "Cell Verwendet in Schritt",
+                      "width": 220,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "o5cCA",
+                          "name": "Text",
+                          "fill": "$ink",
+                          "content": "1 Vorlage",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vpw7S",
+                      "name": "Cell Zuletzt geändert",
+                      "width": 200,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "esg8v",
+                          "name": "Text",
+                          "fill": "$muted",
+                          "content": "12.11.2026",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "R8Buc",
+                      "name": "Cell Aktion",
+                      "width": 140,
+                      "height": "fill_container",
+                      "gap": 12,
+                      "padding": [
+                        0,
+                        8
+                      ],
+                      "justifyContent": "end",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "XwPzG",
+                          "name": "Bearbeiten",
+                          "cornerRadius": 8,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "gap": 6,
+                          "padding": [
+                            8,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "f8sqj",
+                              "name": "Icon",
+                              "width": 14,
+                              "height": 14,
+                              "icon": "pencil",
+                              "library": "lucide",
+                              "fill": "$ink"
+                            },
+                            {
+                              "type": "text",
+                              "id": "dNsR2",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Bearbeiten",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "SbVoX",
+      "x": 7800,
+      "y": 1020,
+      "name": "Admin – Vorlage bearbeiten: Bestellbestätigung",
+      "clip": true,
+      "width": 1440,
+      "height": 998,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "gLqFH",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 72,
+          "fill": "$surface",
+          "stroke": "$line",
+          "strokeWidth": {
+            "bottom": 1
+          },
+          "padding": [
+            0,
+            40
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "TJtKO",
+              "name": "Left",
+              "height": "fill_container",
+              "gap": 24,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hLRoH",
+                  "name": "Logo",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wHlDG",
+                      "name": "Mark",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$accent",
+                      "cornerRadius": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "vUmti",
+                          "name": "Bolt",
+                          "width": 18,
+                          "height": 18,
+                          "icon": "zap",
+                          "library": "lucide",
+                          "fill": "#FFFFFF"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "x0hJVS",
+                      "name": "Voltwerk Autohaus",
+                      "fill": "$ink",
+                      "content": "Voltwerk Autohaus",
+                      "fontFamily": "Space Grotesk",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "I6t0m",
+                      "name": "Demo Badge",
+                      "fill": "#FFF3D6",
+                      "cornerRadius": 4,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "j1ufW6",
+                          "name": "Demo · Standardschreiben",
+                          "fill": "#7A5300",
+                          "content": "Demo · Standardschreiben",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RSHOI",
+                  "name": "Menü",
+                  "height": "fill_container",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xUE7y",
+                      "name": "Menüpunkt Bestellungen",
+                      "height": "fill_container",
+                      "stroke": "$accent",
+                      "strokeWidth": {
+                        "bottom": 2
+                      },
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "pU9Dr",
+                          "name": "Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "package",
+                          "library": "lucide",
+                          "fill": "$muted"
+                        },
+                        {
+                          "type": "text",
+                          "id": "d8puV",
+                          "name": "Label",
+                          "fill": "$muted",
+                          "content": "Bestellungen",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QqTnT",
+                      "name": "Menüpunkt Administration",
+                      "height": "fill_container",
+                      "stroke": "$accent",
+                      "strokeWidth": {
+                        "bottom": 2
+                      },
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "m8tgCZ",
+                          "name": "Icon",
+                          "width": 16,
+                          "height": 16,
+                          "icon": "settings",
+                          "library": "lucide",
+                          "fill": "$accent"
+                        },
+                        {
+                          "type": "text",
+                          "id": "x53Xh",
+                          "name": "Label",
+                          "fill": "$ink",
+                          "content": "Administration",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "qAqbh",
+              "name": "User",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KyvbC",
+                  "name": "Benutzer",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "ntcrJ",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "circle-user",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "CDjop",
+                      "name": "Angemeldet",
+                      "fill": "$ink",
+                      "content": "admin",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ESCYp",
+                  "name": "Abmelden",
+                  "cornerRadius": 8,
+                  "stroke": "$line",
+                  "strokeWidth": 1,
+                  "gap": 6,
+                  "padding": [
+                    8,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "bxebx",
+                      "name": "Icon",
+                      "width": 14,
+                      "height": 14,
+                      "icon": "log-out",
+                      "library": "lucide",
+                      "fill": "$ink"
+                    },
+                    {
+                      "type": "text",
+                      "id": "W11Aou",
+                      "name": "Label",
+                      "fill": "$ink",
+                      "content": "Abmelden",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "a7ixEE",
+          "name": "Body",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "Eg9OZ",
+              "name": "Title",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "yaprt",
+                  "name": "Heading",
+                  "fill": "$ink",
+                  "content": "Vorlage bearbeiten: Bestellbestätigung",
+                  "fontFamily": "Space Grotesk",
+                  "fontSize": 32,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "yB422",
+                  "name": "Sub",
+                  "fill": "$muted",
+                  "content": "Vorlagen für Standardschreiben › Bestellbestätigung",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "PyG73",
+              "name": "Admin-Navigation",
+              "width": "fill_container",
+              "stroke": "$line",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "h94EI",
+                  "name": "Tab Vorlagen für Standardschreiben",
+                  "stroke": "$accent",
+                  "strokeWidth": {
+                    "bottom": 2
+                  },
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "UTROl",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "file-text",
+                      "library": "lucide",
+                      "fill": "$accent"
+                    },
+                    {
+                      "type": "text",
+                      "id": "FsNmN",
+                      "name": "Label",
+                      "fill": "$ink",
+                      "content": "Vorlagen für Standardschreiben",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ESxmX",
+                  "name": "Tab Briefpapiere",
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "DzNFR",
+                      "name": "Icon",
+                      "width": 16,
+                      "height": 16,
+                      "icon": "mail",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "QnRWb",
+                      "name": "Label",
+                      "fill": "$muted",
+                      "content": "Briefpapiere",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "T5LgIT",
+              "name": "Inhalt",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "SylkN",
+                  "name": "Formular",
+                  "width": "fill_container",
+                  "fill": "$surface",
+                  "cornerRadius": 12,
+                  "stroke": "$line",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 24,
+                  "padding": 28,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "BjXVI",
+                      "name": "Zeile Stammdaten",
+                      "width": "fill_container",
+                      "gap": 20,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ZIjBA",
+                          "name": "Feld Name der Vorlage",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "nJZgo",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Name der Vorlage",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "rKCO2",
+                              "name": "Input",
+                              "width": "fill_container",
+                              "height": 44,
+                              "fill": "$surface",
+                              "cornerRadius": 8,
+                              "stroke": "$line",
+                              "strokeWidth": 1,
+                              "gap": 10,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "M0YPC1",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "file-text",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Krslr",
+                                  "name": "Value",
+                                  "fill": "$ink",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Bestellbestätigung",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ilrDo",
+                          "name": "Feld Briefpapier",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Q5GDb",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Briefpapier",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "XXU8t",
+                              "name": "Auswahl",
+                              "width": "fill_container",
+                              "height": 44,
+                              "fill": "$surface",
+                              "cornerRadius": 8,
+                              "stroke": "$accent",
+                              "strokeWidth": 1,
+                              "gap": 10,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon",
+                                  "id": "eOm7C",
+                                  "name": "Icon",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "mail",
+                                  "library": "lucide",
+                                  "fill": "$muted"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "wnM9d",
+                                  "name": "Value",
+                                  "fill": "$ink",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Geschäftsbrief",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "jOZ3j",
+                                  "name": "Chevron",
+                                  "width": 16,
+                                  "height": 16,
+                                  "icon": "chevron-down",
+                                  "library": "lucide",
+                                  "fill": "$ink"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "jtFnu",
+                              "name": "Hinweis",
+                              "fill": "$muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Briefkopf, Anschriftfeld und Fußzeile kommen aus dem Briefpapier.",
+                              "lineHeight": 1.45,
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "m0Gisw",
+                      "name": "Feld Brief-Körper",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "eqoJS",
+                          "name": "Label-Zeile",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "HcCIu",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Brief-Körper",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "text",
+                              "id": "YkNjX",
+                              "name": "Info",
+                              "fill": "$muted",
+                              "content": "Platzhalter in ${…} werden beim Erzeugen ersetzt",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "okFNW",
+                          "name": "Textarea",
+                          "width": "fill_container",
+                          "fill": "$surface",
+                          "cornerRadius": 8,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "layout": "vertical",
+                          "padding": [
+                            18,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "mEqd3",
+                              "name": "Text",
+                              "fill": "$ink",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "${bestellerVorname} ${bestellerNachname},\n\nwir bestätigen die Bestellung des Fahrzeugs ${fahrzeug} zum Basispreis von ${fahrzeugBasispreis}.\n\nZusätzlich haben Sie folgende Extras bestellt:\n\n* ${extra} zum Preis von ${extraPreis}\n* ...\n\nDer Gesamtpreis des bestellten Fahrzeugs beträgt ${gesamtpreisFahrzeug}.\n\nAktuell bearbeiten wir Ihre Bestellung. Das endgültige Auslieferungsdatum nennen wir Ihnen per E-Mail an die Adresse ${bestellerEMail}.\n\nVielen Dank für Ihren Auftrag\n\n${bearbeiter}",
+                              "lineHeight": 1.6,
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Umpsw",
+                          "name": "Statuszeile",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "EzaEt",
+                              "name": "Hinweis",
+                              "fill": "$muted",
+                              "content": "Zeilen mit * werden als Aufzählung gesetzt, „* ...“ wiederholt die Zeile darüber für jedes Extra.",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "VLAm4",
+                              "name": "Stand",
+                              "fill": "$muted",
+                              "content": "Zuletzt geändert 12.11.2026 von admin",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wi1cc",
+                      "name": "Aktionen",
+                      "width": "fill_container",
+                      "stroke": "$line",
+                      "strokeWidth": {
+                        "top": 1
+                      },
+                      "gap": 12,
+                      "padding": [
+                        20,
+                        0,
+                        0,
+                        0
+                      ],
+                      "justifyContent": "end",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "d2EkzI",
+                          "name": "Abbrechen",
+                          "height": 44,
+                          "cornerRadius": 8,
+                          "stroke": "$line",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            18
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "FqYun",
+                              "name": "Label",
+                              "fill": "$ink",
+                              "content": "Abbrechen",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "buJ2v",
+                          "name": "Speichern",
+                          "height": 44,
+                          "fill": "$accent",
+                          "cornerRadius": 8,
+                          "gap": 8,
+                          "padding": [
+                            0,
+                            18
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "gQiKX",
+                              "name": "Icon",
+                              "width": 16,
+                              "height": 16,
+                              "icon": "check",
+                              "library": "lucide",
+                              "fill": "#FFFFFF"
+                            },
+                            {
+                              "type": "text",
+                              "id": "aRIa5",
+                              "name": "Label",
+                              "fill": "#FFFFFF",
+                              "content": "Speichern",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "LcAUr",
+                  "name": "Platzhalter",
+                  "width": 340,
+                  "fill": "$surface",
+                  "cornerRadius": 12,
+                  "stroke": "$line",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 14,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ixIgp",
+                      "name": "Titel",
+                      "fill": "$ink",
+                      "content": "Verfügbare Platzhalter",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "O9r28",
+                      "name": "Hinweis",
+                      "fill": "$muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Klick fügt den Platzhalter an der Cursor-Position ein.",
+                      "lineHeight": 1.45,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "t48EL",
+                      "name": "Gruppe Besteller",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": [
+                        6,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Zb9ES",
+                          "name": "Gruppe",
+                          "fill": "$muted",
+                          "content": "BESTELLER",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.6
+                        },
+                        {
+                          "type": "frame",
+                          "id": "QHU4S",
+                          "name": "Chip bestellerVorname",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "tFjNK",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${bestellerVorname}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "dk6tL",
+                          "name": "Chip bestellerNachname",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "IXYDe",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${bestellerNachname}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HZ9t8",
+                          "name": "Chip bestellerEMail",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Pb5Jf",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${bestellerEMail}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ckUtN",
+                      "name": "Gruppe Fahrzeug",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": [
+                        6,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Kt5dV",
+                          "name": "Gruppe",
+                          "fill": "$muted",
+                          "content": "FAHRZEUG",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.6
+                        },
+                        {
+                          "type": "frame",
+                          "id": "aWrUU",
+                          "name": "Chip fahrzeug",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ygbgw",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${fahrzeug}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DD6V4",
+                          "name": "Chip fahrzeugBasispreis",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "b5oLY7",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${fahrzeugBasispreis}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "uo5QN",
+                          "name": "Chip gesamtpreisFahrzeug",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Lm7Uu",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${gesamtpreisFahrzeug}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "e7FPeu",
+                      "name": "Gruppe Je Extra",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": [
+                        6,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ApByc",
+                          "name": "Gruppe",
+                          "fill": "$muted",
+                          "content": "JE EXTRA",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.6
+                        },
+                        {
+                          "type": "frame",
+                          "id": "LnOgP",
+                          "name": "Chip extra",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "SZWXt",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${extra}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "R9biQ",
+                          "name": "Chip extraPreis",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "PBlAT",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${extraPreis}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "C3j2Wx",
+                      "name": "Gruppe Bearbeitung",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 6,
+                      "padding": [
+                        6,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "GPPrF",
+                          "name": "Gruppe",
+                          "fill": "$muted",
+                          "content": "BEARBEITUNG",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 0.6
+                        },
+                        {
+                          "type": "frame",
+                          "id": "n5sd7",
+                          "name": "Chip bearbeiter",
+                          "fill": "$accent-soft",
+                          "cornerRadius": 6,
+                          "padding": [
+                            5,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "c9jSK",
+                              "name": "Code",
+                              "fill": "$accent",
+                              "content": "${bearbeiter}",
+                              "fontFamily": "JetBrains Mono",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
