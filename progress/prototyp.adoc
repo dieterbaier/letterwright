@@ -3,18 +3,18 @@
 Wegwerf-Prototyp, der ADR-003 bis ADR-005 und ADR-014 an realen DOCX-Vorgaben
 belegt oder widerlegt (Epic #3).
 
-*Status:* aktiv seit 2026-11-19 — Das Projektgerüst ist abgeschlossen (Epic #4
-geschlossen). Der Owner hat den Prototyp als Fokus gewählt. Die Beispiel-DOCX
-liegen auf `main` (`src/examples/`). Erster Schritt sind die Schriften
-(Q-PO-010).
+*Status:* aktiv seit 2026-11-19 — Der Owner hat den Prototyp als Fokus gewählt.
+Die Schriftfrage ist entschieden (ADR-017). Nächster Schritt ist der erste
+Prototyp-Code: Referenzschreiben nachbauen und durch beide Renderer schicken.
 
 == The plan
 
-Die Schriften kommen zuerst. Lassen sie sich nicht in beiden Renderern verwenden
-und einbetten, sind alle weiteren Messungen der Stiltreue wertlos.
+Die Schriften kamen zuerst. Jetzt folgt das Referenzschreiben, weil erst damit
+etwas da ist, woran sich Schriften, Vorschau und PDF messen lassen. Die
+Schriftprüfungen laufen am nachgebauten Schreiben, nicht isoliert.
 
 [options="checklist"]
-* [ ] Schriftquelle und Ersatzschriften festlegen (ADR-017 angenommen, PR #40): #39, Q-PO-010
+* [x] Schriftquelle und Ersatzschriften festlegen (ADR-017 angenommen, PR #40 gemergt): #39, Q-PO-010
 * [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
 * [ ] Vorschau im sandboxed iframe mit CSP aufbauen und Sandbox, CSP und HTML-Allowlist festlegen: #3, ADR-014
 * [ ] Referenzschriften vom Host: laden im sandboxed iframe unter CSP, im PDF eingebettet, Lizenz für beide Nutzungen bestätigt: #3, ADR-004, ADR-017
@@ -31,11 +31,15 @@ ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 Die wirksamen Schriften der Beispiel-DOCX sind ermittelt: Arial und Arial Narrow,
 im Formular dazu ein Symbolschrift-Kästchen. ADR-017 ist angenommen: Der Ordner
 des Hosts ist die einzige Schriftquelle, sonst greifen freie OFL-Ersatzschriften
-(PR #40). Der Hinweis in der Administration ist #41. Noch kein Prototyp-Code. Die
+(PR #40, gemergt). Der
+Hinweis in der Administration ist #41. Noch kein Prototyp-Code, und es ist noch
+nicht festgelegt, wo der Wegwerf-Code liegt. Die
 Abnahmekriterien stehen in ADR-004 und ADR-014 und als Akzeptanzkriterien in #3.
 
 == Open in this topic
 
+* Ablageort des Wegwerf-Prototyps im Repository (eigener Ordner oder Branch,
+  außerhalb des Gradle- und npm-Builds?). Vor dem ersten Code mit dem Owner klären.
 * Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“. Die Beispiel-DOCX
   liegen inzwischen auf `main`. Mit #3 nachziehen, zusammen mit der
   Architekturdoku dazu (Entscheidung des Owners).

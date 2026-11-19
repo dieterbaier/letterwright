@@ -1,0 +1,100 @@
+= Projekttagebuch 2026-11-19
+
+Sechster Arbeitstag, Thema Prototyp (Epic #3), nach dem Projektgerüst wieder
+aufgenommen. PR #40 (#39) ist gemergt, ADR-017 angenommen, #41 neu angelegt.
+Rekonstruiert aus Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **Clock-in:** Thema Prototyp gewählt. `progress/prototyp.adoc` stand noch auf
+  „on ice, Fokus Projektgerüst“ und wurde auf aktiv gesetzt.
+* **Schriften der Beispiel-DOCX ermittelt:** Ausgewertet wurden Formatvorlagen
+  samt Vererbung, direkte Formatierung, Dokument, Kopf- und Fußzeilen. Sichtbarer
+  Text nutzt nur Arial und Arial Narrow, im Formular dazu Segoe UI Symbol oder
+  MS Gothic für das Kästchen ☐. Die Schriftentabelle listet viel mehr Schriften,
+  als verwendet werden. Keine DOCX bettet Schriften ein.
+* **#39 angelegt** (Unter-Issue von #3), Branch `issue_39`, PR #40.
+* **ADR-017 „Bereitstellung der Schriften für Vorschau und PDF“:** Die Bibliothek
+  liefert keine lizenzpflichtigen Schriften aus. Der Host stellt sie über einen
+  konfigurierbaren Ordner bereit, der die einzige Quelle ist. Sonst greifen freie
+  OFL-Ersatzschriften. Die Administration weist auf fehlende Schriften hin.
+  Systemschriften werden nicht verwendet. Q-PO-010 beantwortet. ADR-004, QS-013,
+  Verteilungssicht und Roadmap angeglichen. Bisher sahen ADR-004 und die
+  Verteilungssicht vor, Schriften mit dem Briefpapier hochzuladen.
+* **#41 angelegt** (Unter-Issue von #8): Hinweis auf fehlende Schriften in der
+  Administration, mit der offenen Frage nach zusätzlichem Logging.
+* **Review von PR #40** (Stand `79b3432`): P1 zu ADR-004, Nachweis für Laden und
+  Einbetten der Referenzschriften als ausdrücklicher Prüfauftrag. P2 zu ADR-017,
+  keine pauschalen gleichen Laufweiten. P2 zu QS-013, technischer Rückfall und
+  fachliche Abnahme getrennt. Alle in `39206c3` behoben. Convergence Check:
+  Converged, mit dem Renderschritt als an #3 übergebenem Restrisiko.
+* **Merge:** PR #40 per Rebase auf `main` (`cd089d7`), #39 geschlossen, CI auf
+  `main` grün.
+* **#31 (Owner):** Auf `issue_31` zwei weitere Commits mit klickbarer Demo und
+  ersten Bildschirmen der Administration (`9af3e30`, `29c57ff`), gepusht, noch
+  ohne PR.
+
+== Entscheidungen des Owners
+
+* Prototyp als Thema des Tages.
+* Schriftquelle ist allein der Ordner des Hosts. Kein Upload mit dem
+  Briefpapier, keine Schnittstelle in `spi`.
+* Für jede fehlende Schrift eine freie OFL-Ersatzschrift. Für Arial Narrow eine
+  OFL-Schrift ohne gleiche Laufweiten.
+* ADR-017 mit allen vier Relationen angenommen.
+* PR #40 mergen.
+
+== Gelernt
+
+* **Die Schriftentabelle einer DOCX sagt nicht, welche Schriften wirken.** Erst
+  die Auflösung über Formatvorlagen, Vererbung und direkte Formatierung zeigt
+  es. Eine Schrift kann nur an der Absatzmarke eines leeren Absatzes hängen.
+* **„Gleiche Laufweiten“ ist kein Pauschalversprechen.** Für Arial Narrow gibt es
+  keine metrisch gleiche OFL-Schrift. Zusammenfassung und Relationen müssen die
+  Ausnahme nennen (Review von PR #40).
+* **Ein Erfolg mit Ersatzschriften belegt nichts für die Originalschriften.**
+  Beide Wege brauchen eigene Nachweise (Review von PR #40).
+* **zsh:** Branch-Sweep blockiert wieder wegen Wortaufteilung, unter bash
+  `SWEEP: CLEAR`. Zusätzlich verhindert `noclobber` das Überschreiben von Dateien
+  mit `>`. Ein Skript arbeitete deshalb einmal mit einer veralteten lokalen Datei
+  weiter. Das Ergebnis war zufällig richtig.
+
+== Offen
+
+* Ablageort des Wegwerf-Prototyps klären, dann Referenzschreiben nachbauen (#3).
+* Welche schmale OFL-Schrift Arial Narrow ersetzt, wählt der Prototyp.
+* #41: Logging fehlender Schriften.
+* #31: PR für Wireframe und Demo.
+* #36, #30, #32 unverändert offen.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Clock-in: `git status`, `git log`, `gh pr list`, `gh issue list`,
+  Branch-Sweep (unter zsh blockiert, unter bash `SWEEP: CLEAR`). Toolkit-Skill
+  `clock-in`, `adapters/shared/journal-config.sh get`.
+* `progress/prototyp.adoc`, `diary/2026-11-18.adoc`, Issue #3,
+  `doc-005` (Q-PO-010 und Umgebung), `doc-004` (Phase 1).
+* Beide DOCX unter `src/examples/`: `fontTable.xml`, `styles.xml`,
+  `document.xml`, Kopf- und Fußzeilen.
+* Lokale Schriftdateien unter `/System/Library/Fonts/Supplemental/` (Arial,
+  Arial Narrow; OS/2 `fsType`).
+* Extern: Websuche zu Liberation Sans Narrow (Wikipedia, CentOS-Paket, ArchWiki).
+* Toolkit: Skills `adr`, `implement-issue-workflow`, `commit-message`,
+  `convergence-check`, `post-merge-sync`, `clock-out`;
+  `skills/references/adr-writing-guide.md`, `relation-rules.md`;
+  `templates/adr.adoc`, `metamodel/relations.schema.yaml`.
+* Doku: ADR-003 (Kontext), ADR-004, ADR-014, ADR-016, QS-004, QS-013, R-009,
+  `doc-07000`.
+* PR #40: Review vom 2026-11-19 13:02 mit drei Inline-Kommentaren, Checks auf
+  `79b3432` und `39206c3`. Issue #8 (Titel, Labels).
+* Clock-out: `git status`, `gh pr list`, Branch-Sweep (`SWEEP: CLEAR`),
+  `git log --since=2026-11-19 --all`, `gh issue list` nach Datum, CI-Läufe auf
+  `main` (`cd089d7`), `git ls-remote` für `issue_31`.
+
+Fehlgeschlagen:
+
+* Erster Branch-Sweep unter zsh (`SWEEP: BLOCKED`), wie an den Vortagen.
+* `unzip` mit Glob auf `[Content_Types].xml` und mit Pipe aus `git show`, ersetzt
+  durch Python bzw. temporäre Dateien.
