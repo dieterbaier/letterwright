@@ -6867,8 +6867,6 @@
       "width": 1440,
       "height": 900,
       "fill": "$bg",
-      "stroke": "#7C3AED",
-      "strokeAlignment": "outer",
       "layout": "vertical",
       "children": [
         {
@@ -8280,8 +8278,6 @@
       "width": 1440,
       "height": 900,
       "fill": "$bg",
-      "stroke": "#7C3AED",
-      "strokeAlignment": "outer",
       "layout": "vertical",
       "children": [
         {
@@ -9259,8 +9255,6 @@
       "width": 1440,
       "height": 998,
       "fill": "$bg",
-      "stroke": "#7C3AED",
-      "strokeAlignment": "outer",
       "layout": "vertical",
       "children": [
         {
