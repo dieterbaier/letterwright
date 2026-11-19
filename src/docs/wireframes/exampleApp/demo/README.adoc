@@ -1,0 +1,104 @@
+= Klick-Demo der Beispielanwendung
+:status: draft
+:reviewed: false
+
+Klickbarer Prototyp der Wireframes aus `../step1_ordering_car.pen`.
+Er zeigt den Kundenweg (Bestellmaske) und den Administratorweg
+(Login, Bestellungen, Standardschreiben, Vorlagen).
+
+== Demo starten
+
+Die Demo besteht aus statischen HTML-Dateien. Sie braucht keinen Server und
+keine Installation, aber eine Internetverbindung (Schriften von Google Fonts,
+Fahrzeugbilder von Unsplash).
+
+[source,bash]
+----
+open src/docs/wireframes/exampleApp/demo/bestellmaske.html
+----
+
+Alternativ die Datei im Finder doppelt anklicken.
+
+Einstiege::
+* `bestellmaske.html` – Kundenweg: Modell wählen, Extras wählen, Daten eingeben, bestellen
+* `index.html#login` – Administratorweg
+
+Über die dunkle Leiste oben wechselt man zwischen beiden Wegen. Ein Klick ins
+Leere zeigt auf den Admin-Seiten die klickbaren Bereiche.
+
+== Abläufe
+
+[cols="1,2"]
+|===
+| Bildschirm | Klickbar
+
+| Bestellmaske
+| Modell und Extras wählen (Zusammenfassung und Gesamtpreis rechnen mit),
+  Felder bearbeiten (E-Mail wird geprüft), „Bestellung bestätigen“ → Danke-Seite,
+  „Anmelden“ → Admin-Login
+
+| Danke-Seite
+| „Zurück zur Bestellmaske“, Logo → Bestellmaske, „Anmelden“ → Admin-Login
+
+| Admin-Login
+| „Anmelden“ → Bestellübersicht, „Zurück zur Bestellmaske“
+
+| Bestellübersicht
+| jede Zeile → Bestellung B-1006 (nur diese ist ausgestaltet)
+
+| Bestellung (Bestellbestätigung)
+| „Abschließen“ → Auslieferungsanordnung, „Zurück“ → Bestellübersicht,
+  „Drucken“ zeigt nur einen Hinweis
+
+| Auslieferungsanordnung
+| „Abschließen“ → Bestellübersicht, „Drucken“ zeigt nur einen Hinweis
+
+| Vorlagen Standardschreiben
+| „Bearbeiten“ zeigt nur einen Hinweis (Bildschirm noch nicht entworfen)
+
+| Alle Admin-Seiten
+| Menü „Bestellungen“ / „Administration“, „Abmelden“ → Admin-Login
+|===
+
+== Dateien
+
+[cols="1,1,2"]
+|===
+| Datei | Art | Inhalt
+
+| `index.html` | von Hand gepflegt
+| Navigation der Admin-Seiten: Bildschirme und Koordinaten der Klickflächen
+
+| `bestellmaske-demo.js` | von Hand gepflegt
+| Klicklogik der Bestellmaske; findet Elemente über die Ebenennamen aus pen.dev
+  (`Car – …`, `Extra – …`, `Field – …`, `Summary Card`, `Primary Button`, `Menüpunkt Anmelden`)
+
+| `bestellmaske.html` | aus pen.dev exportiert
+| HTML-Export der Bestellmaske, ergänzt um `<script src="bestellmaske-demo.js">`
+
+| `screens/*.png` | aus pen.dev exportiert
+| Bilder der übrigen Bildschirme, Dateiname = Knoten-ID in der `.pen`-Datei
+|===
+
+Die exportierten Dateien sind eingecheckt, obwohl sie erzeugt sind: Der Export
+braucht die pen.dev-App und lässt sich nicht in der Pipeline wiederholen.
+
+== Demo nach Designänderungen aktualisieren
+
+Das Design in `../step1_ordering_car.pen` ist die Quelle. Nach Änderungen dort:
+
+. *Admin-Seiten, Login, Danke-Seite:* den Bildschirm als PNG (Skalierung 1)
+  nach `screens/<Knoten-ID>.png` exportieren. Haben sich Buttons verschoben,
+  die Koordinaten `[x, y, Breite, Höhe]` in `index.html` anpassen.
+. *Bestellmaske:* als „HTML + CSS“ nach `bestellmaske.html` exportieren, dann
+  wieder `<script src="bestellmaske-demo.js"></script>` vor `</body>` einfügen.
+  Die Ebenennamen (siehe oben) nicht umbenennen, sonst findet das Skript die
+  Elemente nicht mehr.
+. *Neuer Bildschirm:* PNG exportieren und in `index.html` unter `screens` mit
+  seinen Klickflächen eintragen.
+. Die Demo im Browser einmal durchklicken.
+
+Mit einem KI-Agenten in pen.dev genügt die Anweisung „Demo aktualisieren“.
+
+Die SVG-Screenshots der Masken im übergeordneten Ordner werden ebenfalls aus
+pen.dev exportiert (Export als SVG) und bei Designänderungen neu erzeugt.
