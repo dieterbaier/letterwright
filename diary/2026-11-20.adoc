@@ -1,0 +1,113 @@
+= Projekttagebuch 2026-11-20
+
+Siebter Arbeitstag, Thema Prototyp (Epic #3). Der Spike ist gebaut: PR #45 und
+PR #47 sind gemergt, #46 ist neu. Rekonstruiert aus Commit-Historie, Issues und
+Pull Requests.
+
+== Was geschah
+
+* **AGENTS.md:** Hinweis auf die archivierten Pull Requests (PR #43) und
+  eindeutige Toolkit-Pfade (PR #44). Die früheren PRs #2 bis #42 stehen als
+  Issues mit dem Label `archiv:pr`.
+* **PR #45, Referenzschreiben und Vorschau** (`20de3b5` bis `f590d72`): Beide
+  Referenzschreiben im Vorlagenmodell nachgebaut, höchstens 0,1 mm neben dem
+  Word-PDF. Paged.js-Vorschau im sandboxed iframe mit CSP, veraPDF-Prüfung
+  (PDF/A-2b, PDF/UA-1), axe-Prüfung, Lesereihenfolge, Tastatur-Scrollen. Der
+  Owner prüfte mit VoiceOver in Safari. Das Review fand, dass der Vergleich
+  zusätzliche Seiten und Zeilen übersah; der erweiterte Vergleich fand dann ein
+  zusätzliches Druckblatt durch die Fußzeilenkopie (`b156091`).
+* **PR #47, zweiter Teil** (`8333dd4` bis `3a254a1`):
+** Fußzeile im PDF per PDFBox-Nachbearbeitung getaggt; VoiceOver liest sie
+   (Owner).
+** Regression aus `b156091` behoben: Paged.js wendet `@media print` auf dem
+   Bildschirm an, die Kopie war unsichtbar (`933d4c4`).
+** HTML-Bereinigung nach Allowlist mit jsoup und bösartigem Testschreiben mit 25
+   Angriffen (`ed73b0c`).
+** Links aus der Vorschau öffnen einen neuen Tab über `postMessage` an die
+   Host-Seite (`9ea4803`).
+** Ersatzschriften nach ADR-017: Liberation Sans für Arial, PT Sans Narrow für
+   Arial Narrow; Encode Sans Condensed verworfen (`938ce13`).
+** Feature-Liste „Funktionen und Grenzen“ im README des Prototyps (`ee1c254`).
+* **Review von PR #47:** Not converged. P1: Chromium nicht als „nicht nötig“
+  vorwegnehmen, QS-004 durchgängig als Teilergebnis bezeichnen. P2: gezielter
+  Nachweis für das Fußzeilen-Tagging. Beides in `3a254a1` behoben, Nachweis mit
+  Gegenprobe. Danach Converged with recorded waivers (Gherkin-Verzicht für den
+  Spike). Merge per Rebase, Branch `issue_3` gelöscht.
+* **#46 angelegt:** Ort und Form einer Funktionsbeschreibung des Produkts.
+* **Kommentar in #3:** vier Entscheidungen beim Owner und die offenen Prüfungen.
+
+== Entscheidungen des Owners
+
+* Vorschau bei 200 % Zoom scrollbar statt Reflow: in Ordnung.
+* Betreff als Überschrift, solange er wie im Word aussieht.
+* Was technisch nicht geht, offen als Makel dokumentieren; Feature-Liste mit
+  ADR-Verweisen im README.
+* Gherkin-Verzicht für den Wegwerf-Code des Spikes.
+* Links in der Vorschau öffnen einen neuen Tab; geht das nicht, sind sie im iframe
+  nicht erlaubt.
+* Befunde in einer Vorlage nur nach Hinweis und ausdrücklicher Wahl:
+  Ablehnen, Trotzdem akzeptieren, Bereinigen.
+* Den Aufwand für VoiceOver in der Vorschau nicht weiter treiben.
+* PR #45 und PR #47 mergen.
+
+== Gelernt
+
+* **openhtmltopdf schreibt laufende Elemente immer als Artefakt.** Keine
+  Einstellung ändert das. Absolut positionierter Inhalt unterhalb des
+  Inhaltsbereichs wandert auf die nächste Seite.
+* **Paged.js wendet `@media print` auch auf dem Bildschirm an.** Eine Druckregel
+  zum Verbergen trifft deshalb auch die Vorschau.
+* **CSP und Bereinigung leisten Verschiedenes.** Die CSP blockiert Code, aber
+  nicht `meta refresh`; das verhindert nur die Bereinigung.
+* **Ein Vergleich, der nur Abweichungen misst, übersieht Überzähliges.** Erst
+  Seitenzahl und Zeilen in beiden Richtungen plus Gegenprobe machten ihn
+  belastbar, und er fand sofort einen eigenen Fehler.
+* **Ein Nachbearbeitungsschritt braucht einen Nachweis seines Ergebnisses**, nicht
+  nur „hat etwas gefunden“ (Review von PR #47).
+* **PDFBox 3 schreibt Ligaturen als Unicode-Ligatur in den Text.** Mit PT Sans
+  Narrow wird „fi“ zu U+FB01; Suche und Kopieren sind je nach Viewer betroffen.
+* **Prüfskripte dürfen nicht ins Netz.** Ein Testlauf klickte einen echten Link
+  an eine geparkte Domain. Seitdem bricht das Skript jede Anfrage nach außen ab.
+* **Ein Statuswort im README ist eine Behauptung.** „Nicht nötig“ nahm eine
+  Entscheidung des Owners vorweg (Review von PR #47).
+
+== Offen
+
+* Entscheidungen des Owners in #3: Chromium, Fußzeilen-Semantik für QS-002,
+  Nachbearbeitungsschritt, „Trotzdem akzeptieren“.
+* Manuelle PDF/UA-Stichprobe, QS-013, Freigabe der Originalschriften, NVDA,
+  Messung der Bildschirmdarstellung (QS-004).
+* #46: Ort und Form der Funktionsbeschreibung.
+* Lokaler Branch `tmp`: vier Commits, deren Patches alle auf `main` sind
+  (`git cherry -v main tmp`). Rest des Owner-Cherry-picks; löschen, wenn nicht
+  mehr gebraucht.
+* Worktree `standardschreiben-beispielanwendung` aus dem Vortag; nicht geprüft.
+* #41, #36, #30, #32 unverändert offen.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Toolkit: `AGENTS.md`, Skills `clock-in`, `clock-out`, `bdd-specification`,
+  `implement-issue-workflow`, `commit-message`, `convergence-check`,
+  `post-merge-sync`; `features/`-Verzeichnis.
+* Doku: ADR-004 (Entscheidung, Optionen, Treiber), ADR-014, ADR-017, Liste aller
+  ADR-Zusammenfassungen, QS-002 (Antwortmaß), QS-004, QS-013.
+* GitHub: PR #45 und #47 (Reviews, Inline-Kommentare, Checks), Issue #3, Issue #7
+  mit dem Kommentar von hadesloc, Labelliste, offene Issues, Issues und PRs seit
+  2026-11-20, CI-Läufe auf `main`.
+* Prototyp: alle Quellen unter `prototyp/`, Ausgaben von `run`, `vergleich`,
+  `gegenprobe`, `konformitaet`, `pruefen`, `barrierefreiheit`, `angriff`,
+  `struktur`, `laufweiten`.
+* Extern: google/fonts (Commit `f391eb5`), Liberation Fonts 2.1.5, jeweils mit
+  SHA-256 geprüft. Ungewollt: Anfragen an `www.superfirma.de` durch das
+  Prüfskript.
+* Clock-out: `git status`, `gh pr list`, Branch-Sweep über alle Refs,
+  `git cherry -v main tmp`, `git log main --since=2026-11-20`,
+  `progress/prototyp.adoc`, `diary/2026-11-19.adoc`.
+
+Fehlgeschlagen:
+
+* Ein Tool-Aufruf wurde unterbrochen; Stand geprüft, Vorlage mit `git restore`
+  wiederhergestellt.
+* zsh `noclobber` blockierte einmal das Überschreiben einer Datei.
