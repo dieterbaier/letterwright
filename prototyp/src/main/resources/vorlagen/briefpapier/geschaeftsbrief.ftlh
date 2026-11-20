@@ -107,7 +107,10 @@
   .betreffblock { margin-bottom: 13.6mm; }
   /* openhtmltopdf setzt negativen text-indent nicht um; daher negativer Rand am Label.
      line-height: 1 hält das Inline-Block-Label innerhalb der Zeile, sonst wächst der Zeilenabstand. */
-  .betreffblock p { line-height: 4.86mm; padding-left: 15mm; }
+  /* Der Betreff ist die Überschrift des Schreibens (h1) für Screenreader und PDF/UA, sieht aber
+     aus wie die übrigen Zeilen des Betreffblocks. */
+  .betreffblock h1 { font-size: inherit; font-weight: normal; margin: 0; }
+  .betreffblock p, .betreffblock h1 { line-height: 4.86mm; padding-left: 15mm; }
   .betreffblock .label { display: inline-block; width: 15mm; margin-left: -15mm; line-height: 1; font-family: "Arial Narrow"; font-size: 9pt; }
   .betreffblock .wert-fett { font-weight: bold; }
   .betreffblock p.hinweis { font-family: "Arial Narrow"; font-size: 9pt; line-height: 3.8mm; }
@@ -161,7 +164,7 @@
        Vorschau entfernt die Rolle an den Fortsetzungen. Ein <main> behielte sie (drei Landmarks). -->
   <div class="schreiben" role="main">
     <div class="betreffblock">
-      <p><span class="label">Betreff</span><span class="wert-fett">${schreiben.betreff}</span></p>
+      <h1><span class="label">Betreff</span><span class="wert-fett">${schreiben.betreff}</span></h1>
       <p><span class="label">Bezug</span>${schreiben.bezug}</p>
       <p><span class="label">Anlagen</span>${schreiben.anlagen}</p>
       <p><span class="label">GZ</span><span class="wert-fett">${schreiben.geschaeftszeichen}</span></p>

@@ -39,11 +39,20 @@ try {
   console.log(`  ${zeilen.length} Zeilen, gespeichert in ${path.relative(process.cwd(), baumDatei)}`);
   const landmarks = zeilen.filter((z) => /^\s*- (main|contentinfo|banner|complementary|navigation|region)\b/.test(z));
   console.log(`  Landmarks: ${landmarks.map((z) => z.trim().split(/[: ]/)[1]).join(", ") || "keine"}`);
-  for (const text of ["Seite \\d+ von \\d+", "Öffnungszeiten", "Im Auftrag"]) {
+  for (const text of ["Öffnungszeiten", "Im Auftrag"]) {
     const n = zeilen.filter((z) => new RegExp(text).test(z)).length;
     console.log(`  „${text}“: ${n}x`);
   }
-  const reihenfolge = ["Filiale Musterstadt", "Arial 12", "Sachgebiet", "Betreff", "Sehr geehrte", "Im Auftrag"]
+  // Paged.js setzt Randfelder vor den Seiteninhalt; die Vorschau verbirgt sie und hängt die
+  // Fußzeile ans Ende. ariaSnapshot zeigt generierten CSS-Inhalt wie „Seite x von y“ nicht,
+  // deshalb wird das Verbergen der Randfelder direkt geprüft.
+  const randfelder = await frame.evaluate(() => {
+    const alle = [...document.querySelectorAll(".pagedjs_margin")];
+    return { alle: alle.length, sichtbar: alle.filter((e) => !e.closest("[aria-hidden=true]")).length };
+  });
+  console.log(`  Randfelder (Kopf- und Fußzeilen): ${randfelder.alle}, davon für Screenreader sichtbar ${randfelder.sichtbar}`);
+  fehler += randfelder.sichtbar === 0 ? 0 : 1;
+  const reihenfolge = ["Filiale Musterstadt", "Arial 12", "Sachgebiet", "heading", "Sehr geehrte", "Im Auftrag", "contentinfo"]
     .map((t) => [t, zeilen.findIndex((z) => z.includes(t))]);
   const geordnet = reihenfolge.every(([, i], k) => i >= 0 && (k === 0 || i > reihenfolge[k - 1][1]));
   console.log(`  Lesereihenfolge ${reihenfolge.map(([t]) => t).join(" → ")}: ${geordnet ? "eingehalten" : "VERLETZT"}`);
@@ -53,7 +62,7 @@ try {
   console.log("== Tastatur");
   await page.mouse.click(5, 5);
   const schritte = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     await page.keyboard.press("Tab");
     schritte.push(await fokus(page, frame));
   }
@@ -100,6 +109,18 @@ try {
   }));
   console.log(`  Host: Seitenbreite ${host.seite} px bei ${host.fenster} px Fenster, iframe ${host.iframe} px breit`);
   console.log(`  iframe: Inhalt ${innen.inhalt} px bei ${innen.sichtbar} px sichtbar, overflow-x ${innen.overflowX}`);
+  // Der Bereich um das iframe muss sich per Tastatur waagerecht scrollen lassen.
+  const bereich = zoom.locator(".blaettern");
+  await bereich.focus();
+  // Chrome scrollt animiert; deshalb kurz warten.
+  for (let i = 0; i < 15; i++) {
+    await zoom.keyboard.press("ArrowRight");
+    await zoom.waitForTimeout(100);
+  }
+  await zoom.waitForTimeout(600);
+  const scroll = await bereich.evaluate((e) => ({ links: Math.round(e.scrollLeft), max: e.scrollWidth - e.clientWidth }));
+  console.log(`  Bereich per Pfeiltaste gescrollt: ${scroll.links} von ${scroll.max} px`);
+  fehler += scroll.max <= 0 || scroll.links >= scroll.max ? 0 : 1;
   await zoom.screenshot({ path: path.resolve("ausgabe", `${schreiben}-vorschau-zoom200.png`) });
 } finally {
   await browser.close();
