@@ -31,8 +31,17 @@ final class Vorschau {
      * <li>Die Fußzeile als visuell versteckte Kopie ans Ende setzen, damit ihr Inhalt am Schluss
      * vorgelesen wird.</li>
      * </ul>
+     * Klicks auf Links navigieren das iframe nicht. Das Ziel geht per {@code postMessage} an die
+     * Host-Seite, die es prüft und in einem neuen Tab öffnet. Die Sandbox braucht dafür kein
+     * {@code allow-popups}.
      */
     private static final String KONFIGURATION = """
+            document.addEventListener("click", (event) => {
+              const link = event.target.closest && event.target.closest("a[href]");
+              if (!link) return;
+              event.preventDefault();
+              parent.postMessage({ typ: "standardschreiben-link", href: link.getAttribute("href") }, "*");
+            });
             window.PagedConfig = {
               auto: true,
               after: (flow) => {
@@ -167,6 +176,13 @@ final class Vorschau {
                   window.addEventListener("message", (event) => {
                     if (event.source !== frame.contentWindow) return;
                     const d = event.data;
+                    // Link aus dem Schreiben: nur erlaubte Schemata, in neuem Tab ohne Zugriff zurück
+                    if (d && d.typ === "standardschreiben-link" && typeof d.href === "string") {
+                      if (/^(https?:|mailto:|tel:)/i.test(d.href.trim())) {
+                        window.open(d.href.trim(), "_blank", "noopener,noreferrer");
+                      }
+                      return;
+                    }
                     if (!d || d.typ !== "standardschreiben-vorschau"
                         || !Number.isInteger(d.seiten) || !Number.isFinite(d.hoehe)) return;
                     frame.style.height = Math.ceil(d.hoehe) + "px";

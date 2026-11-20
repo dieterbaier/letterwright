@@ -1,5 +1,6 @@
 // Prüft das bösartige Testschreiben in der Vorschau (ADR-014): Kein Angriff darf Code ausführen,
-// einen Dialog öffnen oder eine Anfrage nach außen stellen.
+// einen Dialog öffnen oder eine Anfrage nach außen stellen. Ein erlaubter Link öffnet einen neuen
+// Tab und navigiert das iframe nicht.
 //
 // Aufruf im Ordner prototyp/:
 //   ../gradlew run --args="boesartig" && npm run angriff -- boesartig
@@ -22,6 +23,7 @@ const dialoge = [];
 const anfragen = [];
 const csp = [];
 const navigationen = [];
+const neueTabs = [];
 let fehler = 0;
 try {
   const page = await browser.newPage();
@@ -35,10 +37,16 @@ try {
     if (f !== page.mainFrame() && !/^(about:srcdoc|file:)/.test(f.url())) navigationen.push(f.url());
   });
   // Nichts verlässt den Rechner: Jede Anfrage außer file: und data: wird protokolliert und abgebrochen.
-  await page.route("**/*", (route) => {
+  // Neue Tabs (Links aus dem Schreiben) im selben Kontext: Anfragen dort ebenfalls abbrechen.
+  await page.context().route("**/*", (route) => {
     const url = route.request().url();
     if (url.startsWith("file:") || url.startsWith("data:")) return route.continue();
     anfragen.push(url);
+    // Anfragen aus einem anderen Tab als der Vorschau stammen von einem geöffneten Link.
+    // Bei der ersten Navigation eines neuen Tabs kennt Playwright den Frame noch nicht.
+    let herkunft = null;
+    try { herkunft = route.request().frame().page(); } catch { herkunft = null; }
+    if (herkunft !== page) neueTabs.push(url);
     return route.abort();
   });
   await page.goto(pathToFileURL(path.resolve("ausgabe", `${schreiben}-vorschau.html`)).href);
@@ -71,13 +79,16 @@ try {
     await a.click({ force: true, noWaitAfter: true, timeout: 2000 }).catch(() => {});
   }
   await page.waitForTimeout(1500);
-  // Navigation durch Klick auf einen erlaubten Link ist Bedienung, kein Angriff.
+  // Ein Link darf das iframe nicht navigieren; erlaubte Links öffnen einen neuen Tab.
   const ohneKlick = navigationen.slice(0, vorKlicks);
+  const durchKlick = navigationen.slice(vorKlicks);
 
   console.log(`Ausgeführt: ${ausgefuehrt.length ? ausgefuehrt.join(" | ") : "nichts"}`);
   console.log(`Dialoge: ${dialoge.length ? dialoge.join(" | ") : "keine"}`);
   console.log(`Anfragen nach außen: ${anfragen.length ? anfragen.join(", ") : "keine"}`);
   console.log(`Navigationen des iframe ohne Klick: ${ohneKlick.length ? ohneKlick.join(", ") : "keine"}`);
+  console.log(`Navigationen des iframe durch Klick: ${durchKlick.length ? durchKlick.join(", ") : "keine"}`);
+  console.log(`Neue Tabs: ${[...new Set(neueTabs)].join(", ") || "keine"}`);
   console.log(`CSP-Verstöße: ${csp.length}`);
   csp.slice(0, 6).forEach((m) => console.log("  " + m.slice(0, 140)));
 
@@ -89,7 +100,9 @@ try {
     if (ohneKlick.length) console.log("Ohne Bereinigung erwartet: Das iframe wurde weitergeleitet (meta refresh); die CSP verhindert das nicht.");
   } else {
     // Anfragen an angriff.invalid kommen nur von Angriffen; erlaubt.invalid ist der erlaubte Link.
-    fehler += ohneKlick.length + anfragen.filter((u) => u.includes("angriff.invalid")).length;
+    fehler += ohneKlick.length + durchKlick.length + anfragen.filter((u) => u.includes("angriff.invalid")).length;
+    // Der erlaubte Link muss als neuer Tab ankommen.
+    if (!neueTabs.some((u) => u.startsWith("https://erlaubt.invalid"))) { console.log("Erlaubter Link hat keinen neuen Tab geöffnet."); fehler++; }
     fehler += dom.skripte === 2 ? 0 : 1;
     fehler += dom.eventhandler.length + dom.eingebettet.length + dom.externeBilder.length;
     fehler += dom.links.filter((h) => !/^(https?:|mailto:|tel:|#)/i.test(h)).length;
