@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "pruefen": "node vorschau/pruefen.mjs",
-    "barrierefreiheit": "node vorschau/barrierefreiheit.mjs"
+    "barrierefreiheit": "node vorschau/barrierefreiheit.mjs",
+    "angriff": "node vorschau/angriff.mjs"
   },
   "devDependencies": {
     "axe-core": "4.14.1",

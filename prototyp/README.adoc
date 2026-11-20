@@ -17,6 +17,9 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 * Aus demselben HTML eine Vorschau nach ADR-014 bauen: Paged.js paginiert das Schreiben in
   einem iframe mit `sandbox="allow-scripts"` ohne `allow-same-origin` und einer restriktiven
   CSP. Die Host-Seite übernimmt Höhe und Seitenzahl per `postMessage`.
+* Das zusammengeführte HTML nach einer Allowlist bereinigen (ADR-014), bevor PDF und Vorschau
+  entstehen. Ein bösartiges Testschreiben belegt, dass kein Angriff aus Vorlage oder Daten Code
+  ausführt.
 * Die Vorschau mit Playwright in Chrome prüfen und als PDF drucken. Damit prüft `vergleich`
   auch Vorschau gegen PDF nach QS-004: Seitenzahl, erste und letzte Zeile je Seite, Abweichung.
 * Zwei Referenzschreiben: `geschaeftsbrief-einseitig` (der Inhalt der Vorgabe) und
@@ -88,6 +91,13 @@ npm run pruefen -- geschaeftsbrief-mehrseitig
 
 # Barrierefreiheit der Vorschau (QS-003, ADR-014): axe-core, Accessibility-Baum, Tastatur, Zoom
 npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
+
+# HTML-Bereinigung (ADR-014): bösartiges Testschreiben in der Vorschau angreifen lassen
+../gradlew run --args="boesartig"
+npm run angriff -- boesartig
+# Gegenprobe ohne Bereinigung: Die CSP allein muss jeden Code blockieren
+BEREINIGUNG=aus ../gradlew run --args="boesartig"
+npm run angriff -- boesartig --gegenprobe
 
 # PDF/A-2b (QS-001) und PDF/UA-1 (QS-002) mit veraPDF prüfen
 ../gradlew konformitaet --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
@@ -225,3 +235,53 @@ des Schreibens mit `role="main"` als Gruppe behandelt; die Fortsetzungen auf den
 haben die Rolle nicht. Nicht weiter untersucht; es kann auch an der Bedienung liegen.
 
 *Ungeprüft:* NVDA (Windows). Dafür stand kein Gerät zur Verfügung.
+
+== HTML-Bereinigung
+
+`Bereinigung` bereinigt das fertig zusammengeführte Dokument mit jsoup nach einer Allowlist,
+bevor PDF und Vorschau entstehen. Platzhalterwerte sind schon beim Zusammenführen escaped
+(ADR-008); die Bereinigung fängt ab, was eine Vorlage selbst mitbringt oder mit `?no_esc` aus
+den Daten durchlässt. Jede Entfernung wird als Befund gemeldet.
+
+* *Elemente:* Struktur und Text eines Schreibens (Absätze, Überschriften, Listen, Tabellen,
+  `img`, `a`, `address`, `header`, `footer`, `main` u. a.); im Kopf nur `title`, `meta` und
+  `style`. Aktive und einbettende Elemente fliegen samt Inhalt heraus (`script`, `iframe`,
+  `object`, `embed`, `svg`, `form`, `base`, `link`, `meta` außerhalb des Kopfs …). Andere
+  unbekannte Elemente werden aufgelöst, ihr Text bleibt.
+* *Attribute:* `class`, `id`, `lang`, `dir`, `title`, `role`, `style`, einige `aria-*`, dazu je
+  Element das Nötige (`img`: `src`, `alt`; `a`: `href`; Tabellenzellen: `colspan`, `rowspan` …).
+  Damit fallen alle Eventhandler weg.
+* *URLs:* Links nur `http`, `https`, `mailto`, `tel` und Fragmente; Bilder nur
+  `data:`-Bilder. Ein Link ohne erlaubtes Ziel wird zu Text. Steuer- und Leerzeichen werden vor
+  der Prüfung entfernt (`java&#x09;script:`).
+* *CSS* in `style`-Elementen und -Attributen: `@import` und `url()` außer `data:`-Bildern und
+  -Schriften fallen weg; bei `expression()`, `javascript:` u. Ä. die ganze Stilangabe.
+* *Ausgabe* als XHTML ohne Pretty-Print. openhtmltopdf braucht wohlgeformtes XML, und
+  zusätzlicher Leerraum würde das Layout verschieben. Die Referenzschreiben ergeben 0 Befunde
+  und unveränderte Messwerte.
+
+Das Testschreiben `boesartig` bringt 25 Angriffe mit, aus der Vorlage und aus den Daten:
+Skripte, Eventhandler, `javascript:`- und `data:`-Links (auch verschleiert), iframe, object,
+embed, SVG, Formular, externe Bilder und CSS, `expression()`, `base`, `meta refresh` und einen
+Kommentar. `npm run angriff` öffnet die Vorschau, fährt über alle Absätze, klickt alle Links und
+beobachtet Konsole, Dialoge, Netzanfragen (alle abgebrochen) und Navigationen des iframe.
+Ergebnis: nichts wird ausgeführt, nichts nachgeladen, das iframe bleibt beim Schreiben. Das PDF
+ist weiter PDF/A-2b und PDF/UA-1.
+
+Die Gegenprobe ohne Bereinigung zeigt, was jede Schicht leistet:
+
+* Die CSP allein blockiert jeden Code (25 Verstöße: Skripte, Eventhandler, externes CSS und
+  Bilder).
+* Gegen `<meta http-equiv="refresh">` hilft die CSP nicht: Das iframe springt auf eine fremde
+  Seite und zeigt deren Inhalt an der Stelle des Schreibens. Das verhindert nur die Bereinigung.
+* openhtmltopdf bricht ohne Bereinigung ab, weil Daten mit `?no_esc` kein wohlgeformtes XHTML
+  ergeben. Ohne Bereinigung würde es außerdem externe Ressourcen laden.
+
+Für das Produkt bleibt offen:
+
+* Erlaubte Links sind in der Vorschau anklickbar und navigieren das iframe weg vom Schreiben.
+  Die Komponente sollte Klicks abfangen oder Links in der Vorschau nur anzeigen.
+* Ein erlaubter Link ohne `title` erzeugt den openhtmltopdf-Hinweis „PDF/UA – No title text
+  provided for link“; veraPDF meldet keinen Verstoß. Ein Hinweis für Vorlagenautoren.
+* Ob Vorlagen bei Befunden abgelehnt statt still bereinigt werden, ist eine Produktentscheidung
+  (Briefpapier- und Standardschreiben-Pflege).

@@ -1,0 +1,32 @@
+{
+  "briefpapier": "geschaeftsbrief",
+  "standardschreiben": "boesartig",
+  "empfaenger": {
+    "zeilen": [
+      "Erika Mustermann",
+      "<img src=x onerror=\"console.log('ANGRIFF empfaenger')\">",
+      "12345 Musterstadt"
+    ]
+  },
+  "absender": {
+    "sachgebiet": "Sachgebiet XXX",
+    "sachgebietHinweis": "(bitte Bezeichnung des Sachgebietes ergänzen)",
+    "kuerzel": "ww",
+    "name": "(Vorname Nachname)",
+    "strasse": "Musterstr. 1",
+    "ort": "12345 Musterstadt",
+    "telefon": "(bitte ergänzen)",
+    "fax": "(bitte ergänzen)",
+    "email": "(...)@superfirma.de"
+  },
+  "schreiben": {
+    "datum": "TT.MM.JJJJ",
+    "betreff": "Betreff <script>console.log(\"ANGRIFF betreff\")</script>",
+    "bezug": "(Bitte Bezug ergänzen)",
+    "anlagen": "(Bitte Anlagen ergänzen)",
+    "geschaeftszeichen": "(Bitte Geschäftszeichen ergänzen)",
+    "anrede": "Sehr geehrte Damen und Herren,",
+    "gruss": "Im Auftrag",
+    "angriff": "<img src=x onerror=\"console.log('ANGRIFF daten')\"><a href=\"javascript:console.log('ANGRIFF daten-link')\">Daten-Link</a>"
+  }
+}
