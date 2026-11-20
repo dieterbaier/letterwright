@@ -44,7 +44,11 @@ final class Vorschau {
                   kopie.className = "nur-vorlesen";
                   // Im Briefpapier stehen die Spalten ohne Leerraum; vorgelesen braucht es einen.
                   kopie.querySelector(".links")?.after(" ");
-                  document.body.append(kopie);
+                  // In den Inhaltsbereich der letzten Seite, nicht ans Ende des Body: Dort
+                  // erzeugte sie im Druck ein zusätzliches leeres Blatt. Eine Druckregel hilft
+                  // nicht, weil Paged.js @media print auch auf dem Bildschirm anwendet.
+                  const seiten = document.querySelectorAll(".pagedjs_page_content");
+                  (seiten[seiten.length - 1] || document.body).append(kopie);
                 }
                 window.vorschauFertig = true;
                 parent.postMessage({
@@ -62,8 +66,6 @@ final class Vorschau {
     private static final String BILDSCHIRM = """
             .nur-vorlesen { position: absolute; width: 1px; height: 1px; overflow: hidden;
               clip-path: inset(50%); white-space: nowrap; }
-            /* Im Druck erzeugte die Kopie hinter der letzten Seite ein zusätzliches leeres Blatt. */
-            @media print { .nur-vorlesen { display: none; } }
             @media screen {
               html { background: #e6e6e6; }
               .pagedjs_pages { padding: 8mm 0; }
@@ -91,12 +93,11 @@ final class Vorschau {
         kopf.append("<script>").append(polyfill).append("</script>\n");
 
         // Direkt nach <meta charset>, damit die CSP vor allen Ressourcen gilt.
-        String marke = "<meta charset=\"UTF-8\"/>";
-        int stelle = html.indexOf(marke);
-        if (stelle < 0) {
-            throw new IllegalStateException("Kein <meta charset=\"UTF-8\"/> im Kopf des Schreibens");
+        java.util.regex.Matcher marke = java.util.regex.Pattern.compile("<meta charset=\"UTF-8\"\\s*/?>").matcher(html);
+        if (!marke.find()) {
+            throw new IllegalStateException("Kein <meta charset=\"UTF-8\"> im Kopf des Schreibens");
         }
-        stelle += marke.length();
+        int stelle = marke.end();
         String dokument = html.substring(0, stelle) + "\n" + kopf + html.substring(stelle);
 
         Path dokumentDatei = ausgabe.resolve(name + "-vorschau-dokument.html");
