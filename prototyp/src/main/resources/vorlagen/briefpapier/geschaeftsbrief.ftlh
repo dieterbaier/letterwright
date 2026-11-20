@@ -64,7 +64,7 @@
 
   html { font-family: "Arial"; font-size: 12pt; color: #000; }
   body { margin: 0; }
-  .seite1, main { margin: 0 20mm 0 30mm; }
+  .seite1, .schreiben { margin: 0 20mm 0 30mm; }
   p { margin: 0; }
 
   /* Bereich der ersten Seite mit fest positionierten Teilen; der Fließtext beginnt darunter. */
@@ -157,7 +157,9 @@
     <div class="marke falz-unten" aria-hidden="true"></div>
   </div>
 
-  <main>
+  <#-- div mit role="main" statt <main>: Paged.js klont das Element auf jeder Folgeseite, und die
+       Vorschau entfernt die Rolle an den Fortsetzungen. Ein <main> behielte sie (drei Landmarks). -->
+  <div class="schreiben" role="main">
     <div class="betreffblock">
       <p><span class="label">Betreff</span><span class="wert-fett">${schreiben.betreff}</span></p>
       <p><span class="label">Bezug</span>${schreiben.bezug}</p>
@@ -168,6 +170,6 @@
     <div class="inhalt">
       ${inhalt?no_esc}
     </div>
-  </main>
+  </div>
 </body>
 </html>

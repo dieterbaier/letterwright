@@ -20,11 +20,16 @@ import java.util.List;
  */
 final class Vorschau {
 
-    /** Startet Paged.js und meldet dem Host nach der Paginierung Seitenzahl und Höhe. */
+    /**
+     * Startet Paged.js und meldet dem Host nach der Paginierung Seitenzahl und Höhe. Vorher
+     * entfernt sie die Rollen an den Fortsetzungen, die Paged.js beim Seitenumbruch klont; sonst
+     * gäbe es je Seite eine eigene main-Landmark.
+     */
     private static final String KONFIGURATION = """
             window.PagedConfig = {
               auto: true,
               after: (flow) => {
+                document.querySelectorAll("[data-split-from][role]").forEach((e) => e.removeAttribute("role"));
                 window.vorschauFertig = true;
                 parent.postMessage({
                   typ: "standardschreiben-vorschau",
@@ -114,13 +119,21 @@ final class Vorschau {
                 <body>
                 <main>
                   <h1>Vorschau</h1>
+                  <button type="button" id="aktualisieren">Aktualisieren</button>
                   <p id="status" role="status" aria-live="polite">Vorschau wird erstellt …</p>
                   <iframe id="vorschau" title="Vorschau des Schreibens: %1$s" sandbox="allow-scripts"
                           srcdoc="%2$s"></iframe>
+                  <p><a href="#aktualisieren">Zurück zu „Aktualisieren“</a></p>
                 </main>
                 <script>
                   const frame = document.getElementById("vorschau");
                   const status = document.getElementById("status");
+                  // Lädt das Dokument im iframe neu; der Fokus bleibt auf dem Knopf, die Meldung
+                  // kommt über die aria-live-Region außerhalb des iframe.
+                  document.getElementById("aktualisieren").addEventListener("click", () => {
+                    status.textContent = "Vorschau wird aktualisiert …";
+                    frame.setAttribute("srcdoc", frame.getAttribute("srcdoc"));
+                  });
                   window.addEventListener("message", (event) => {
                     if (event.source !== frame.contentWindow) return;
                     const d = event.data;

@@ -78,6 +78,9 @@ npm run pruefen -- geschaeftsbrief-einseitig
 ../gradlew vergleich --args="referenz/geschaeftsbrief-word.pdf ausgabe/geschaeftsbrief-einseitig.pdf"
 ../gradlew vergleich --args="referenz/geschaeftsbrief-mehrseitig-word.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
 
+# Barrierefreiheit der Vorschau (QS-003, ADR-014): axe-core, Accessibility-Baum, Tastatur, Zoom
+npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
+
 # PDF/A-2b (QS-001) und PDF/UA-1 (QS-002) mit veraPDF prüfen
 ../gradlew konformitaet --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
 
@@ -144,3 +147,27 @@ Prototyps fällt auf:
   (Öffnungszeiten, Homepage) fehlt damit für Hilfstechnologien.
 * Der Betreff ist ein Absatz, keine Überschrift. Die Word-Vorgabe hat dort auch keine.
 * Die Anschrift (`<address>`) wird zu `Sect` mit `P`, nicht zu einem eigenen Tag.
+
+== Barrierefreiheit der Vorschau
+
+`barrierefreiheit` prüft die Kriterien aus ADR-014, die sich automatisieren lassen. axe-core
+läuft getrennt auf der Host-Seite und im Dokument des iframe; wegen der opaken Origin kann es
+nicht von außen hineinsehen. Playwright wertet über das DevTools-Protokoll aus, die CSP des
+iframe gilt dafür nicht. Stand für das mehrseitige Referenzschreiben:
+
+* axe-core: keine Verstöße der Stufen serious und critical. Moderat bleiben „keine
+  Überschrift der Ebene 1“ und „Inhalt außerhalb von Landmarks“ (Briefkopf, Infoblock).
+* Paged.js klont ein Element, das über eine Seite reicht, samt Rolle. Aus `<main>` wurden so
+  drei Landmarks. Das Schreiben ist deshalb ein `div` mit `role="main"`, und die Vorschau
+  entfernt die Rolle an den Fortsetzungen (`[data-split-from]`).
+* Lesereihenfolge eingehalten. „Seite x von y“ erscheint nicht im Accessibility-Baum.
+* Die Fußzeile steht im Accessibility-Baum vor dem Schreiben, weil Paged.js die Randfelder im
+  DOM vor den Seiteninhalt setzt. Im PDF ist sie ein Artefakt und fehlt ganz.
+* Tastatur: Das iframe ist kein Tab-Stopp, weil das Schreiben nichts Fokussierbares enthält.
+  Keine Fokusfalle. „Aktualisieren“ behält den Fokus, beide Statusmeldungen kommen über die
+  `aria-live`-Region.
+* Zoom 200 %: Die Seite ist breiter als das iframe und wird rechts abgeschnitten (Logo,
+  Infoblock). Per Tastatur lässt sie sich nicht waagerecht scrollen. Das verfehlt das
+  Kriterium „ohne Informationsverlust“.
+
+Offen bleibt die Prüfung mit NVDA (Firefox oder Chrome) und VoiceOver (Safari).
