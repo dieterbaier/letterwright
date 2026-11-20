@@ -39,3 +39,10 @@ tasks.register<JavaExec>("vergleich") {
     mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Vergleich"
     workingDir = projectDir
 }
+
+// Jede Seite eines PDFs als PNG ausgeben, für den Sichtvergleich.
+tasks.register<JavaExec>("bild") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Bild"
+    workingDir = projectDir
+}

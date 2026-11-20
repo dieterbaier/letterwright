@@ -13,6 +13,9 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
   Geprüft ist die Konformität noch nicht.
 * Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
   mit dem PDF des Prototyps.
+* Zwei Referenzschreiben: `geschaeftsbrief-einseitig` (der Inhalt der Vorgabe) und
+  `geschaeftsbrief-mehrseitig` (drei Seiten mit Kopfzeile „Seite x von y“ ab Seite 2). Beide
+  liegen auf allen Seiten höchstens 0,1 mm neben dem Word-PDF.
 
 == Aufbau
 
@@ -21,7 +24,7 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 | `src/main/resources/vorlagen/briefpapier/` | Briefpapier mit Layout, festen Angaben und Platzhaltern
 | `src/main/resources/vorlagen/standardschreiben/` | Inhalt eines Standardschreibens
 | `daten/` | Daten je Schreiben, wie sie der Host liefern würde
-| `referenz/` | Referenz-PDFs, mit Microsoft Word aus der DOCX-Vorgabe exportiert
+| `referenz/` | Referenz-PDFs, mit Microsoft Word aus der DOCX-Vorgabe exportiert, und was es braucht, um sie neu zu erzeugen
 | `schriften/` | Schriftordner des Hosts (ADR-017), nicht eingecheckt
 | `ausgabe/` | Erzeugtes HTML und PDF, nicht eingecheckt
 |===
@@ -59,6 +62,27 @@ Alle Aufrufe im Ordner `prototyp/`; sie nutzen den Gradle-Wrapper des Repository
 
 # Mit dem Word-PDF der Vorgabe vergleichen
 ../gradlew vergleich --args="referenz/geschaeftsbrief-word.pdf ausgabe/geschaeftsbrief-einseitig.pdf"
+../gradlew vergleich --args="referenz/geschaeftsbrief-mehrseitig-word.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
+
+# Jede Seite als PNG ausgeben: ausgabe/<schreiben>-s<seite>.png
+../gradlew bild --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
+----
+
+== Referenz-PDFs
+
+`geschaeftsbrief-word.pdf` ist die DOCX-Vorgabe, mit Microsoft Word für macOS als PDF
+gespeichert. Das Word-PDF hat eine zweite, leere Seite mit Kopfzeile; der Prototyp erzeugt sie
+nicht.
+
+`geschaeftsbrief-mehrseitig-word.pdf` entsteht aus einer abgeleiteten DOCX, in der statt des
+Ausfüllhinweises die Absätze aus `mehrseitig-absaetze.txt` stehen. Dieselben Absätze stehen
+im Standardschreiben `mehrseitig.ftlh`.
+
+[source,sh]
+----
+python3 -I referenz/mehrseitige-docx.py ../src/examples/Geschaeftsbrief.docx \
+    referenz/mehrseitig-absaetze.txt /tmp/Geschaeftsbrief-mehrseitig.docx
+# danach in Word öffnen und als PDF sichern
 ----
 
 == Vorgehen bei den Maßen
