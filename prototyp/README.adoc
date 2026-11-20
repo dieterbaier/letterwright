@@ -9,8 +9,8 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 
 * Briefpapier, Standardschreiben und Daten mit FreeMarker (ADR-008) in zwei Durchläufen zu
   einem HTML-Dokument zusammenführen.
-* Daraus mit openhtmltopdf ein PDF erzeugen, angefordert als PDF/A-2b mit PDF/UA-Tagging.
-  Geprüft ist die Konformität noch nicht.
+* Daraus mit openhtmltopdf ein PDF/A-2b mit PDF/UA-1-Tagging erzeugen. veraPDF meldet für beide
+  Referenzschreiben keine Verstöße. Die manuelle Stichprobe aus QS-002 steht noch aus.
 * Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
   mit dem PDF des Prototyps.
 * Aus demselben HTML eine Vorschau nach ADR-014 bauen: Paged.js paginiert das Schreiben in
@@ -78,6 +78,12 @@ npm run pruefen -- geschaeftsbrief-einseitig
 ../gradlew vergleich --args="referenz/geschaeftsbrief-word.pdf ausgabe/geschaeftsbrief-einseitig.pdf"
 ../gradlew vergleich --args="referenz/geschaeftsbrief-mehrseitig-word.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
 
+# PDF/A-2b (QS-001) und PDF/UA-1 (QS-002) mit veraPDF prüfen
+../gradlew konformitaet --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
+
+# Strukturhierarchie (Tags) für die manuelle Stichprobe aus QS-002
+../gradlew struktur --args="ausgabe/geschaeftsbrief-einseitig.pdf"
+
 # Jede Seite als PNG ausgeben: ausgabe/<schreiben>-s<seite>.png
 ../gradlew bild --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
 ----
@@ -123,3 +129,18 @@ Was beim Abgleich mit Paged.js 0.4.3 gelernt wurde, steht im CSS des Briefpapier
 Randfeld mit `content: none` blendet die folgenden Randfelder derselben Seite aus; der Abstand
 vor dem ersten Absatz einer Folgeseite bleibt erhalten; Randfelder zählen den Einzug in die
 Breite.
+
+== Konformität
+
+`konformitaet` prüft mit der veraPDF-Bibliothek (Greenfield-Modell) gegen PDF/A-2b und
+PDF/UA-1 und listet jede verletzte Regel mit Anzahl und Beispielmeldung. Die Gegenprobe mit
+dem Word-PDF und dem Chrome-PDF der Vorschau, die beide nicht als PDF/A erzeugt sind, zeigt die
+erwarteten Verstöße: fehlende XMP-Metadaten, kein Tagging, keine Sprachangabe.
+
+Was veraPDF nicht prüft und die Stichprobe klären muss, zeigt `struktur`. Beim Stand dieses
+Prototyps fällt auf:
+
+* Die Fußzeile ist ein Artefakt, weil openhtmltopdf laufende Elemente nicht taggt. Ihr Inhalt
+  (Öffnungszeiten, Homepage) fehlt damit für Hilfstechnologien.
+* Der Betreff ist ein Absatz, keine Überschrift. Die Word-Vorgabe hat dort auch keine.
+* Die Anschrift (`<address>`) wird zu `Sect` mit `P`, nicht zu einem eigenen Tag.

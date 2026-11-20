@@ -16,6 +16,7 @@ dependencies {
     implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.114")
     implementation("org.freemarker:freemarker:2.3.35")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.23.0")
+    implementation("org.verapdf:validation-model:1.30.4")
 }
 
 application {
@@ -44,5 +45,19 @@ tasks.register<JavaExec>("vergleich") {
 tasks.register<JavaExec>("bild") {
     classpath = sourceSets["main"].runtimeClasspath
     mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Bild"
+    workingDir = projectDir
+}
+
+// PDF gegen PDF/A-2b (QS-001) und PDF/UA-1 (QS-002) mit veraPDF prüfen.
+tasks.register<JavaExec>("konformitaet") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Konformitaet"
+    workingDir = projectDir
+}
+
+// Strukturhierarchie (Tags) eines PDFs ausgeben, für die manuelle Stichprobe aus QS-002.
+tasks.register<JavaExec>("struktur") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Struktur"
     workingDir = projectDir
 }
