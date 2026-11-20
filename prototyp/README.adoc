@@ -16,8 +16,8 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 * Aus demselben HTML eine Vorschau nach ADR-014 bauen: Paged.js paginiert das Schreiben in
   einem iframe mit `sandbox="allow-scripts"` ohne `allow-same-origin` und einer restriktiven
   CSP. Die Host-Seite übernimmt Höhe und Seitenzahl per `postMessage`.
-* Die Vorschau mit Playwright in Chrome prüfen und als PDF drucken. Damit misst `vergleich`
-  auch Vorschau gegen PDF (QS-004).
+* Die Vorschau mit Playwright in Chrome prüfen und als PDF drucken. Damit prüft `vergleich`
+  auch Vorschau gegen PDF nach QS-004: Seitenzahl, erste und letzte Zeile je Seite, Abweichung.
 * Zwei Referenzschreiben: `geschaeftsbrief-einseitig` (der Inhalt der Vorgabe) und
   `geschaeftsbrief-mehrseitig` (drei Seiten mit Kopfzeile „Seite x von y“ ab Seite 2). Beide
   liegen auf allen Seiten höchstens 0,1 mm neben dem Word-PDF.
@@ -64,12 +64,19 @@ Google Chrome und lädt keinen eigenen Browser.
 ----
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install
 
-# Schreiben erzeugen: ausgabe/geschaeftsbrief-einseitig.html, .pdf und -vorschau.html
+# Schreiben erzeugen: ausgabe/<schreiben>.html, .pdf und -vorschau.html
 ../gradlew run --args="geschaeftsbrief-einseitig"
+../gradlew run --args="geschaeftsbrief-mehrseitig"
 
-# Vorschau prüfen (CSP, Sandbox, Paginierung) und als ausgabe/<schreiben>-vorschau.pdf drucken
+# Vorschau prüfen (CSP, Sandbox, Paginierung) und als ausgabe/<schreiben>-vorschau.pdf drucken,
+# dann gegen das PDF vergleichen (QS-004)
 npm run pruefen -- geschaeftsbrief-einseitig
+npm run pruefen -- geschaeftsbrief-mehrseitig
 ../gradlew vergleich --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-einseitig-vorschau.pdf"
+../gradlew vergleich --args="ausgabe/geschaeftsbrief-mehrseitig.pdf ausgabe/geschaeftsbrief-mehrseitig-vorschau.pdf"
+
+# Gegenprobe: erkennt der Vergleich eine zusätzliche Seite oder Zeile?
+../gradlew gegenprobe --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
 
 # Textpositionen eines PDFs ausgeben
 ../gradlew positionen --args="ausgabe/geschaeftsbrief-einseitig.pdf"
@@ -95,7 +102,9 @@ npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
 
 `geschaeftsbrief-word.pdf` ist die DOCX-Vorgabe, mit Microsoft Word für macOS als PDF
 gespeichert. Das Word-PDF hat eine zweite, leere Seite mit Kopfzeile; der Prototyp erzeugt sie
-nicht.
+nicht. Der Vergleich mit Word meldet deshalb für das einseitige Schreiben ausdrücklich eine
+abweichende Seitenzahl und die fehlende Zeile „Seite 2 von 2“. Das ist der einzige bekannte
+Unterschied.
 
 `geschaeftsbrief-mehrseitig-word.pdf` entsteht aus einer abgeleiteten DOCX, in der statt des
 Ausfüllhinweises die Absätze aus `mehrseitig-absaetze.txt` stehen. Dieselben Absätze stehen
@@ -107,6 +116,24 @@ python3 -I referenz/mehrseitige-docx.py ../src/examples/Geschaeftsbrief.docx \
     referenz/mehrseitig-absaetze.txt /tmp/Geschaeftsbrief-mehrseitig.docx
 # danach in Word öffnen und als PDF sichern
 ----
+
+== Vergleich und QS-004
+
+`vergleich` sucht zu jeder Zeile der Referenz den Partner im Kandidaten und umgekehrt. Er
+meldet fehlende und überzählige Zeilen, Textabweichungen und die größte Positionsabweichung.
+Dazu prüft er die Kriterien aus QS-004: gleiche Seitenzahl, gleiche erste und letzte Textzeile
+je Seite, Abweichung höchstens 1 mm. Ist eines verletzt, endet er mit Status 1.
+
+Stand: Vorschau und PDF erfüllen QS-004 für beide Referenzschreiben, mit höchstens 0,3 mm
+Abweichung. Die Vorschau ist dabei das Chrome-Druck-PDF des paginierten Dokuments; ob die
+Bildschirmdarstellung ebenso genau ist, misst der Prototyp nicht. Das bleibt ein Teilergebnis
+von QS-004.
+
+`gegenprobe` macht aus einem PDF Kandidaten mit bekanntem Fehler: eine zusätzliche leere Seite,
+eine angehängte Kopie der letzten Seite und eine zusätzliche Zeile am Seitenende. Alle drei
+muss der Vergleich als verletzt melden, das unveränderte PDF als erfüllt. Die Gegenprobe hat
+dabei einen echten Fehler gefunden: Die versteckte Kopie der Fußzeile für Screenreader
+erzeugte im Chrome-Druck ein zusätzliches leeres Blatt. Sie ist im Druck jetzt ausgeblendet.
 
 == Vorgehen bei den Maßen
 
@@ -180,5 +207,14 @@ iframe gilt dafür nicht. Stand für das mehrseitige Referenzschreiben:
 VoiceOver (Safari) liest das Schreiben im sandboxed iframe vollständig, sobald man den Frame
 betreten hat (VO+Shift+Pfeil runter). Das gilt auch ohne Sandbox, mit `src` statt `srcdoc` und
 mit `allow-same-origin`; die Isolation selbst ist also kein Hindernis. Safaris einfache
-Vorlesefunktion liest dagegen nur die Host-Seite. Offen bleibt die Prüfung mit NVDA und eine
-erneute Prüfung mit VoiceOver nach der geänderten Reihenfolge.
+Vorlesefunktion liest dagegen nur die Host-Seite.
+
+Zweiter VoiceOver-Durchgang nach dem Verbergen der Randfelder (Owner, 2026-11-20): Die
+Reihenfolge stimmt, die Fußzeile kommt am Ende. *Bekannte Grenze:* Mit VO+Pfeil rechts endet
+die Navigation am Ende der ersten Seite. Weiter geht es erst, wenn man den Frame verlässt und
+wieder betritt; danach bis zum Ende. Das trat auch auf, wenn die Randfelder nicht verborgen
+waren oder der scrollbare Bereich fehlte. Eine Vermutung ist, dass VoiceOver den ersten Teil
+des Schreibens mit `role="main"` als Gruppe behandelt; die Fortsetzungen auf den Folgeseiten
+haben die Rolle nicht. Nicht weiter untersucht; es kann auch an der Bedienung liegen.
+
+*Ungeprüft:* NVDA (Windows). Dafür stand kein Gerät zur Verfügung.

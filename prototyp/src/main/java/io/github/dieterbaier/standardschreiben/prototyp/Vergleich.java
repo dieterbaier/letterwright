@@ -18,10 +18,24 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  * <p>Zwei Zeilen gehören zusammen, wenn sie auf derselben Seite stehen und der eine Text mit dem
  * anderen beginnt. Das fängt den Fall ab, dass ein Renderer Bezeichnung und Wert als eine Zeile
  * schreibt und der andere als zwei. Gibt es mehrere Kandidaten, gewinnt der nächstgelegene.
+ *
+ * <p>Zusätzlich prüft er die Kriterien aus QS-004: gleiche Seitenzahl, gleiche erste und letzte
+ * Textzeile je Seite, Abweichung höchstens 1 mm. Er weist auch Kandidatenzeilen ohne Partner in
+ * der Referenz aus; sonst bliebe eine zusätzliche Zeile oder Seite im Kandidaten unbemerkt. Ist
+ * ein Kriterium verletzt, endet er mit Status 1.
  */
 public final class Vergleich {
 
     record Zeile(int seite, float x, float y, String schrift, float groesse, String text) {
+    }
+
+    /** Toleranz aus QS-004 für die Positionsabweichung. */
+    static final float TOLERANZ_MM = 1.0f;
+
+    /** Segmente, deren Grundlinien so nah beieinander liegen, bilden eine Textzeile. */
+    static final float ZEILE_MM = 0.5f;
+
+    record Pdf(int seiten, List<Zeile> zeilen) {
     }
 
     public static void main(String[] args) throws IOException {
@@ -29,8 +43,15 @@ public final class Vergleich {
             System.err.println("Aufruf: vergleich <referenz.pdf> <kandidat.pdf>");
             System.exit(2);
         }
-        List<Zeile> referenz = lies(args[0]);
-        List<Zeile> kandidat = lies(args[1]);
+        if (!pruefe(lies(args[0]), lies(args[1]))) {
+            System.exit(1);
+        }
+    }
+
+    /** Vergleicht zwei PDFs, gibt das Protokoll aus und meldet, ob QS-004 erfüllt ist. */
+    static boolean pruefe(Pdf refPdf, Pdf kandPdf) {
+        List<Zeile> referenz = refPdf.zeilen();
+        List<Zeile> kandidat = kandPdf.zeilen();
         float maxDx = 0;
         float maxDy = 0;
         int fehlend = 0;
@@ -56,8 +77,68 @@ public final class Vergleich {
             }
             System.out.printf(Locale.ROOT, "S%d  dx=%+5.1f  dy=%+5.1f  %s%s%s%n", r.seite(), dx, dy, kurz(r.text()), schrift, text);
         }
-        System.out.printf(Locale.ROOT, "%nGrößte Abweichung: dx=%.1f mm, dy=%.1f mm; fehlende Zeilen: %d; Textabweichungen: %d%n",
-                maxDx, maxDy, fehlend, textAbweichung);
+        // Gegenrichtung: Kandidatenzeilen ohne Partner in der Referenz
+        int ueberzaehlig = 0;
+        for (Zeile k : kandidat) {
+            if (partner(k, referenz).isEmpty()) {
+                ueberzaehlig++;
+                System.out.printf(Locale.ROOT, "S%d  ÜBERZÄHLIG         %s%n", k.seite(), kurz(k.text()));
+            }
+        }
+
+        // QS-004: Seitenzahl und Umbruchstellen
+        System.out.printf(Locale.ROOT, "%nSeiten: Referenz %d, Kandidat %d%n", refPdf.seiten(), kandPdf.seiten());
+        int umbruch = 0;
+        for (int seite = 1; seite <= Math.max(refPdf.seiten(), kandPdf.seiten()); seite++) {
+            List<String> r = textzeilen(referenz, seite);
+            List<String> k = textzeilen(kandidat, seite);
+            umbruch += pruefeRand(seite, "erste", r.isEmpty() ? null : r.getFirst(), k.isEmpty() ? null : k.getFirst());
+            umbruch += pruefeRand(seite, "letzte", r.isEmpty() ? null : r.getLast(), k.isEmpty() ? null : k.getLast());
+        }
+
+        System.out.printf(Locale.ROOT, "%nGrößte Abweichung: dx=%.1f mm, dy=%.1f mm; fehlende Zeilen: %d; überzählige Zeilen: %d; Textabweichungen: %d%n",
+                maxDx, maxDy, fehlend, ueberzaehlig, textAbweichung);
+        boolean erfuellt = refPdf.seiten() == kandPdf.seiten() && umbruch == 0 && fehlend == 0 && ueberzaehlig == 0
+                && textAbweichung == 0 && maxDx <= TOLERANZ_MM && maxDy <= TOLERANZ_MM;
+        System.out.println("QS-004: " + (erfuellt ? "erfüllt" : "VERLETZT"));
+        return erfuellt;
+    }
+
+    /** Vergleicht die erste oder letzte Textzeile einer Seite; null heißt: Seite fehlt oder ist leer. */
+    private static int pruefeRand(int seite, String welche, String referenz, String kandidat) {
+        boolean gleich = referenz == null ? kandidat == null : kandidat != null && normal(referenz).equals(normal(kandidat));
+        if (gleich) {
+            return 0;
+        }
+        System.out.printf(Locale.ROOT, "S%d  %s Zeile weicht ab: Referenz „%s“, Kandidat „%s“%n", seite, welche,
+                referenz == null ? "—" : kurz(referenz), kandidat == null ? "—" : kurz(kandidat));
+        return 1;
+    }
+
+    /**
+     * Textzeilen einer Seite von oben nach unten. Segmente mit fast gleicher Grundlinie werden von
+     * links nach rechts zu einer Zeile verbunden, z. B. die beiden Spalten der Fußzeile.
+     */
+    static List<String> textzeilen(List<Zeile> zeilen, int seite) {
+        List<Zeile> s = zeilen.stream().filter(z -> z.seite() == seite)
+                .sorted(Comparator.comparingDouble(Zeile::y).thenComparingDouble(Zeile::x)).toList();
+        List<String> ergebnis = new ArrayList<>();
+        List<Zeile> aktuell = new ArrayList<>();
+        for (Zeile z : s) {
+            if (!aktuell.isEmpty() && z.y() - aktuell.getFirst().y() > ZEILE_MM) {
+                ergebnis.add(verbinde(aktuell));
+                aktuell.clear();
+            }
+            aktuell.add(z);
+        }
+        if (!aktuell.isEmpty()) {
+            ergebnis.add(verbinde(aktuell));
+        }
+        return ergebnis;
+    }
+
+    private static String verbinde(List<Zeile> segmente) {
+        return String.join(" ", segmente.stream().sorted(Comparator.comparingDouble(Zeile::x)).map(Zeile::text).toList());
     }
 
     static Optional<Zeile> partner(Zeile r, List<Zeile> kandidaten) {
@@ -71,14 +152,18 @@ public final class Vergleich {
                 .min(Comparator.comparingDouble(k -> Math.hypot(k.x() - r.x(), k.y() - r.y())));
     }
 
-    static List<Zeile> lies(String datei) throws IOException {
-        List<Zeile> zeilen = new ArrayList<>();
+    static Pdf lies(String datei) throws IOException {
         try (PDDocument dokument = Loader.loadPDF(new File(datei))) {
-            for (Positionen.Zeile z : Positionen.zeilen(dokument)) {
-                zeilen.add(new Zeile(z.seite(), z.x(), z.y(), z.schrift(), z.groesse(), z.text()));
-            }
+            return lies(dokument);
         }
-        return zeilen;
+    }
+
+    static Pdf lies(PDDocument dokument) throws IOException {
+        List<Zeile> zeilen = new ArrayList<>();
+        for (Positionen.Zeile z : Positionen.zeilen(dokument)) {
+            zeilen.add(new Zeile(z.seite(), z.x(), z.y(), z.schrift(), z.groesse(), z.text()));
+        }
+        return new Pdf(dokument.getNumberOfPages(), zeilen);
     }
 
     private static String normal(String text) {
