@@ -127,6 +127,10 @@ thin routing wrappers instead of hand-writing them:
 - Das Toolkit ist als Git-Submodule unter `tools/architecture-knowledge-toolkit`
   eingebunden und auf einen festen Commit gepinnt. Das ist Schritt 3 der
   Lookup-Reihenfolge. Nach dem Klonen: `git submodule update --init`.
+- Toolkit-Pfade wie `skills/…`, `templates/…` oder
+  `general-semantic-contracts.md` beziehen sich auf das
+  Toolkit-Wurzelverzeichnis, hier `tools/architecture-knowledge-toolkit/`.
+  Ein projektlokales `skills/` gibt es derzeit nicht.
 - Claude Code findet die Toolkit-Skills über Symlinks unter `.claude/skills`.
   Sie werden mit
   `tools/architecture-knowledge-toolkit/adapters/shared/install-skills.sh install claude`
