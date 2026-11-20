@@ -62,6 +62,8 @@ final class Vorschau {
     private static final String BILDSCHIRM = """
             .nur-vorlesen { position: absolute; width: 1px; height: 1px; overflow: hidden;
               clip-path: inset(50%); white-space: nowrap; }
+            /* Im Druck erzeugte die Kopie hinter der letzten Seite ein zusätzliches leeres Blatt. */
+            @media print { .nur-vorlesen { display: none; } }
             @media screen {
               html { background: #e6e6e6; }
               .pagedjs_pages { padding: 8mm 0; }
