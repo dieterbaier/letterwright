@@ -264,8 +264,9 @@ Das Testschreiben `boesartig` bringt 25 Angriffe mit, aus der Vorlage und aus de
 Skripte, Eventhandler, `javascript:`- und `data:`-Links (auch verschleiert), iframe, object,
 embed, SVG, Formular, externe Bilder und CSS, `expression()`, `base`, `meta refresh` und einen
 Kommentar. `npm run angriff` öffnet die Vorschau, fährt über alle Absätze, klickt alle Links und
-beobachtet Konsole, Dialoge, Netzanfragen (alle abgebrochen) und Navigationen des iframe.
-Ergebnis: nichts wird ausgeführt, nichts nachgeladen, das iframe bleibt beim Schreiben. Das PDF
+beobachtet Konsole, Dialoge, Netzanfragen (alle abgebrochen), Navigationen des iframe und neue
+Tabs. Ergebnis: nichts wird ausgeführt, nichts nachgeladen, das iframe bleibt beim Schreiben,
+und der erlaubte Link öffnet einen neuen Tab. Das PDF
 ist weiter PDF/A-2b und PDF/UA-1.
 
 Die Gegenprobe ohne Bereinigung zeigt, was jede Schicht leistet:
@@ -279,9 +280,15 @@ Die Gegenprobe ohne Bereinigung zeigt, was jede Schicht leistet:
 
 Für das Produkt bleibt offen:
 
-* Erlaubte Links sind in der Vorschau anklickbar und navigieren das iframe weg vom Schreiben.
-  Die Komponente sollte Klicks abfangen oder Links in der Vorschau nur anzeigen.
+* Links in der Vorschau öffnen einen neuen Tab (Entscheidung des Owners, 2026-11-20). Ein
+  Skript im iframe fängt den Klick ab und schickt das Ziel per `postMessage` an die Host-Seite;
+  die prüft das Schema (`http`, `https`, `mailto`, `tel`) und öffnet es mit `noopener`. Das
+  iframe selbst navigiert nicht, und die Sandbox braucht kein `allow-popups`.
 * Ein erlaubter Link ohne `title` erzeugt den openhtmltopdf-Hinweis „PDF/UA – No title text
   provided for link“; veraPDF meldet keinen Verstoß. Ein Hinweis für Vorlagenautoren.
-* Ob Vorlagen bei Befunden abgelehnt statt still bereinigt werden, ist eine Produktentscheidung
-  (Briefpapier- und Standardschreiben-Pflege).
+* Befunde in einer Vorlage werden nicht still bereinigt (Entscheidung des Owners, 2026-11-20).
+  Beim Speichern einer Vorlage zeigt die Pflege die Befunde an und verlangt eine ausdrückliche
+  Wahl: *Ablehnen* (die Autorin bereinigt selbst), *Trotzdem akzeptieren* (die Vorlage wird
+  gespeichert; beim Rendern greifen Bereinigung und CSP weiterhin) oder *Bereinigen* (die
+  Vorlage wird mit der automatischen Bereinigung gespeichert, soweit sie möglich ist). Betrifft
+  die Epics „Briefpapier-Pflege“ und „Standardschreiben-Pflege“.
