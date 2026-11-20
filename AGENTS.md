@@ -158,11 +158,17 @@ thin routing wrappers instead of hand-writing them:
   Pull Request zu einem anderen Thema und wartet auf dessen Review. Der Clock-out
   integriert `session-diary` per Fast-Forward in `main` und lässt den Branch für
   die nächste Sitzung stehen.
-- Pull Requests #2 bis #42 liegen als geschlossene Issues mit dem Label
-  `archiv:pr` vor (Beschreibung, Reviews, Inline-Kommentare mit Datei und
-  Zeile). `gh pr view` findet sie nicht; stattdessen
-  `gh issue view <n> --comments` bzw.
-  `gh issue list --label archiv:pr --state closed`. Die zugehörigen Commits
-  stehen auf `main` und tragen das Präfix `issue_<n>:` (`git log --grep`).
-  Kurz-SHAs und CI-Links in diesen Archiven, die nicht auflösbar sind, gehörten
-  zu früheren PR-Branches und sind nicht mehr vorhanden.
+
+## PR-Historie und Archiv
+
+- Bei der Recherche zur PR-Historie auch geschlossene Issues mit dem Label
+  `archiv:pr` durchsuchen (`gh issue list --label archiv:pr --state closed`).
+  Das Archiv enthält die früheren Pull Requests #2 bis #42 mit Beschreibung,
+  Reviews und Inline-Kommentaren (Datei und Zeile). `gh pr view` findet sie
+  nicht. Beispiel: `gh issue view 42 --comments` zeigt das Archiv zu PR #42.
+- Die Nummer des archivierten PRs und die des Arbeitsissues sind verschieden.
+  Die Commits auf `main` tragen das Präfix des Quellbranches, den der Kopf des
+  Archiv-Issues nennt. Beispiel: PR #42 kam von Branch `issue_31`, die Commits
+  findet `git log main --grep='^issue_31:'`.
+- Kurz-SHAs und CI-Links in den Archiven, die sich nicht auflösen lassen,
+  gehörten zu früheren PR-Branches und sind nicht mehr vorhanden.
