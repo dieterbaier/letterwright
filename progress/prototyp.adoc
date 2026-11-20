@@ -4,8 +4,9 @@ Wegwerf-Prototyp, der ADR-003 bis ADR-005 und ADR-014 an realen DOCX-Vorgaben
 belegt oder widerlegt (Epic #3).
 
 *Status:* aktiv seit 2026-11-19 — Der Owner hat den Prototyp als Fokus gewählt.
-Die Schriftfrage ist entschieden (ADR-017). Nächster Schritt ist der erste
-Prototyp-Code: Referenzschreiben nachbauen und durch beide Renderer schicken.
+Die Schriftfrage ist entschieden (ADR-017). Der Prototyp-Code liegt in
+`prototyp/` außerhalb des Builds (Owner, 2026-11-20). Nächster Schritt ist der
+erste Prototyp-Code: Referenzschreiben nachbauen und durch beide Renderer schicken.
 
 == The plan
 
@@ -32,14 +33,13 @@ Die wirksamen Schriften der Beispiel-DOCX sind ermittelt: Arial und Arial Narrow
 im Formular dazu ein Symbolschrift-Kästchen. ADR-017 ist angenommen: Der Ordner
 des Hosts ist die einzige Schriftquelle, sonst greifen freie OFL-Ersatzschriften
 (PR #40, gemergt). Der
-Hinweis in der Administration ist #41. Noch kein Prototyp-Code, und es ist noch
-nicht festgelegt, wo der Wegwerf-Code liegt. Die
+Hinweis in der Administration ist #41. Noch kein Prototyp-Code. Er kommt in den
+Ordner `prototyp/` im Wurzelverzeichnis, außerhalb des Gradle- und npm-Builds;
+`settings.gradle.kts` nimmt nur die fest eingetragenen Backend-Module auf. Die
 Abnahmekriterien stehen in ADR-004 und ADR-014 und als Akzeptanzkriterien in #3.
 
 == Open in this topic
 
-* Ablageort des Wegwerf-Prototyps im Repository (eigener Ordner oder Branch,
-  außerhalb des Gradle- und npm-Builds?). Vor dem ersten Code mit dem Owner klären.
 * Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“. Die Beispiel-DOCX
   liegen inzwischen auf `main`. Mit #3 nachziehen, zusammen mit der
   Architekturdoku dazu (Entscheidung des Owners).
