@@ -5,26 +5,124 @@ prüft ADR-003, ADR-004, ADR-005 und ADR-014 an der DOCX-Vorgabe unter `src/exam
 Der Code wird nicht ins MVP übernommen und liegt deshalb außerhalb des Gradle- und
 npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backend` ein.
 
-== Was er heute kann
+== Funktionen und Grenzen
 
-* Briefpapier, Standardschreiben und Daten mit FreeMarker (ADR-008) in zwei Durchläufen zu
-  einem HTML-Dokument zusammenführen.
-* Daraus mit openhtmltopdf ein PDF/A-2b mit PDF/UA-1-Tagging erzeugen. Ein Nachbearbeitungsschritt
-  mit PDFBox taggt die Fußzeile, die openhtmltopdf als Artefakt ausgibt. veraPDF meldet für beide
-  Referenzschreiben keine Verstöße. Die manuelle Stichprobe aus QS-002 steht noch aus.
-* Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
-  mit dem PDF des Prototyps.
-* Aus demselben HTML eine Vorschau nach ADR-014 bauen: Paged.js paginiert das Schreiben in
-  einem iframe mit `sandbox="allow-scripts"` ohne `allow-same-origin` und einer restriktiven
-  CSP. Die Host-Seite übernimmt Höhe und Seitenzahl per `postMessage`.
-* Das zusammengeführte HTML nach einer Allowlist bereinigen (ADR-014), bevor PDF und Vorschau
-  entstehen. Ein bösartiges Testschreiben belegt, dass kein Angriff aus Vorlage oder Daten Code
-  ausführt.
-* Die Vorschau mit Playwright in Chrome prüfen und als PDF drucken. Damit prüft `vergleich`
-  auch Vorschau gegen PDF nach QS-004: Seitenzahl, erste und letzte Zeile je Seite, Abweichung.
-* Zwei Referenzschreiben: `geschaeftsbrief-einseitig` (der Inhalt der Vorgabe) und
-  `geschaeftsbrief-mehrseitig` (drei Seiten mit Kopfzeile „Seite x von y“ ab Seite 2). Beide
-  liegen auf allen Seiten höchstens 0,1 mm neben dem Word-PDF.
+Was der Prototyp zeigt, was nur mit Einschränkung geht und was nicht gelungen ist. Die Spalte
+„Nachweis“ nennt den Befehl oder den Test, der den Stand belegt; die Abschnitte weiter unten
+erklären die Einzelheiten. Der Stand ist der eines Wegwerf-Spikes: Er belegt Machbarkeit, keine
+Produktqualität.
+
+[cols="3,1,4,2", options="header"]
+|===
+| Funktion | Stand | Nachweis und Grenzen | Entscheidung
+
+| Briefpapier, Standardschreiben und Daten in zwei Durchläufen zu einem HTML-Dokument
+  zusammenführen
+| erfüllt
+| `run`. Abgesicherte FreeMarker-Konfiguration, Platzhalterwerte HTML-escaped.
+| ADR-003, ADR-004, ADR-008
+
+| Eine Quelle für Vorschau und PDF
+| erfüllt
+| Beide entstehen aus demselben bereinigten HTML; die Vorschau ergänzt nur CSP, Schriften,
+  Paged.js und Bildschirmdarstellung.
+| ADR-004
+
+| Nachbau der DOCX-Vorgabe, ein- und mehrseitig
+| erfüllt
+| `vergleich` gegen das Word-PDF: höchstens 0,1 mm, gleiche Umbrüche. Word setzt in der
+  einseitigen Vorgabe eine leere zweite Seite, der Prototyp nicht. Die Abnahme der
+  Stiltreue durch die zentrale Abteilung (QS-013) steht aus.
+| ADR-003
+
+| PDF/A-2b und PDF/UA-1
+| erfüllt, Stichprobe offen
+| `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
+  Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
+  den Tag-Baum mit Text.
+| ADR-005
+
+| Fußzeile im PDF vorlesbar
+| mit Grenze
+| openhtmltopdf gibt laufende Elemente immer als Artefakt aus. Ein PDFBox-Nachbearbeitungsschritt
+  taggt sie; VoiceOver liest sie (Owner). Der Schritt hängt an der Ausgabe von openhtmltopdf;
+  findet er die Fußzeile nicht, bricht die Erzeugung ab.
+| ADR-004, ADR-005
+
+| Vorschau als HTML statt als PDF
+| erfüllt
+| Paged.js paginiert im Browser. Eine Vorschau des fertigen PDFs (pdf.js) wäre exakt gleich,
+  aber für Hilfstechnologien schlechter zugänglich, und jede Vorschau kostete eine PDF-Erzeugung.
+| ADR-004
+
+| Vorschau und PDF gleich (QS-004)
+| erfüllt, Teilergebnis
+| `vergleich` Vorschau gegen PDF: gleiche Seitenzahl, gleiche erste und letzte Zeile je Seite,
+  höchstens 0,3 mm; `gegenprobe` belegt, dass der Vergleich Abweichungen findet. Gemessen ist
+  das Chrome-Druck-PDF der Vorschau, nicht die Bildschirmdarstellung.
+| ADR-004
+
+| Vorschau isoliert im sandboxed iframe mit CSP
+| erfüllt
+| `pruefen`: kein Zugriff auf die Host-Seite, keine CSP-Verstöße, Höhe und Seitenzahl per
+  `postMessage`.
+| ADR-014
+
+| HTML-Bereinigung nach Allowlist
+| erfüllt
+| `angriff`: 25 Angriffe aus Vorlage und Daten, keiner führt Code aus, lädt nach oder leitet
+  um. Die Gegenprobe zeigt, dass die CSP allein Code blockiert, gegen `meta refresh` aber
+  nur die Bereinigung hilft.
+| ADR-014
+
+| Links in der Vorschau öffnen einen neuen Tab
+| erfüllt
+| `angriff`: Das iframe navigiert nicht; die Host-Seite prüft das Schema und öffnet den Tab.
+| ADR-014
+
+| Befunde in einer Vorlage: Ablehnen, Trotzdem akzeptieren, Bereinigen
+| entschieden, nicht gebaut
+| Die Bereinigung meldet jeden Befund; die Wahl beim Speichern gehört in die Pflege (#8, #9).
+  Ort der Funktionsbeschreibung: #46.
+| ADR-014
+
+| Barrierefreie Vorschau
+| mit Grenzen
+| `barrierefreiheit`: axe-core ohne Verstöße der Stufen serious und critical, Lesereihenfolge
+  mit Fußzeile am Ende, keine Fokusfalle, Aktualisieren mit `aria-live`. VoiceOver liest das
+  Schreiben (Owner). Grenzen: VoiceOver bleibt am Ende der ersten Seite stehen und braucht
+  einen neuen Einstieg in den Frame; bei 200 % Zoom scrollt die Seite waagerecht statt
+  umzubrechen (festes A4-Blatt). NVDA ist ungeprüft.
+| ADR-005, ADR-014
+
+| Schriften nur aus dem Ordner des Hosts
+| erfüllt
+| Familie, Gewicht und Stil aus der Schriftdatei; keine Systemschriften, keine Schriften im
+  Repository.
+| ADR-017
+
+| Freie Ersatzschriften, wenn eine Schrift fehlt
+| mit Grenzen
+| Liberation Sans für Arial mit gleichen Laufweiten. Für Arial Narrow gibt es keine
+  OFL-Schrift mit gleichen Laufweiten; PT Sans Narrow hält alle Umbrüche, ist aber 6 bis 7 %
+  schmaler und weicher im Bild. PDFBox schreibt die fi-Ligatur als „ﬁ“ in den Text des PDFs.
+| ADR-017
+
+| Chromium als Alternative (Option 2 aus ADR-004)
+| nicht nötig
+| Option 1 hat die Kriterien bis auf die genannten Grenzen erfüllt; Chromium ist nicht geprüft.
+| ADR-004
+|===
+
+Nicht gelungen oder bewusst nicht gemacht:
+
+* Die Fußzeile ohne Nachbearbeitung zu taggen. openhtmltopdf hat dafür keine Einstellung, und
+  als Inhalt der ersten Seite schiebt es sie auf Seite 2.
+* Reflow bei 200 % Zoom. Die Vorschau zeigt ein festes A4-Blatt; sie scrollt stattdessen, auch
+  per Tastatur (Ausnahme für zweidimensionale Inhalte in WCAG 1.4.10).
+* Durchgehendes Vorlesen über Seitenwechsel mit VoiceOver. Nicht weiter untersucht.
+* Eine gleich breite freie Ersatzschrift für Arial Narrow. Es gibt keine.
+* NVDA-Prüfung. Kein Windows-Gerät.
 
 == Aufbau
 
