@@ -1,0 +1,6 @@
+/.gradle/
+/build/
+# Ausgaben des Prototyps
+/ausgabe/
+# Schriftordner des Hosts (ADR-017): lizenzpflichtige Schriften werden nicht eingecheckt
+/schriften/
