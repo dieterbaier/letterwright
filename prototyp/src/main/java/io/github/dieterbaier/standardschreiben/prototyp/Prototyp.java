@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +23,8 @@ import java.util.Map;
  *
  * <p>Aufruf: {@code ../gradlew run --args="<schreiben> [schriftenordner]"}. Das Schreiben ist der
  * Name einer Datei unter {@code daten/} ohne Endung, z. B. {@code geschaeftsbrief-einseitig}.
- * Ausgabe nach {@code ausgabe/<schreiben>.html} und {@code ausgabe/<schreiben>.pdf}.
+ * Ausgabe nach {@code ausgabe/<schreiben>.html}, {@code .pdf} und als Vorschau
+ * {@code ausgabe/<schreiben>-vorschau.html}. Die Vorschau braucht vorher {@code npm install}.
  */
 public final class Prototyp {
 
@@ -35,16 +37,34 @@ public final class Prototyp {
         Path schriften = Path.of(args.length == 2 ? args[1] : "schriften");
         Path ausgabe = Files.createDirectories(Path.of("ausgabe"));
 
-        String html = zusammenfuehren(Path.of("daten", schreiben + ".json"));
+        List<Schriften.Schrift> schriftliste = Schriften.lies(schriften);
+        for (Schriften.Schrift s : schriftliste) {
+            System.out.printf("Schrift: %-16s %3d %-7s %s%n", s.familie(), s.gewicht(),
+                    s.kursiv() ? "kursiv" : "normal", s.datei().getFileName());
+        }
+
+        Path datenDatei = Path.of("daten", schreiben + ".json");
+        String html = zusammenfuehren(datenDatei);
         Path htmlDatei = ausgabe.resolve(schreiben + ".html");
         Files.writeString(htmlDatei, html, StandardCharsets.UTF_8);
 
         Path pdfDatei = ausgabe.resolve(schreiben + ".pdf");
         try (OutputStream out = Files.newOutputStream(pdfDatei)) {
-            PdfErzeugung.erzeuge(html, htmlDatei.toAbsolutePath().toUri().toString(), schriften, out);
+            PdfErzeugung.erzeuge(html, htmlDatei.toAbsolutePath().toUri().toString(), schriftliste, out);
         }
-        System.out.println("HTML: " + htmlDatei);
-        System.out.println("PDF:  " + pdfDatei);
+
+        Vorschau.Dateien vorschau = Vorschau.erzeuge(html, betreff(datenDatei), schriftliste,
+                Path.of("node_modules", "pagedjs", "dist", "paged.polyfill.min.js"), ausgabe, schreiben);
+
+        System.out.println("HTML:     " + htmlDatei);
+        System.out.println("PDF:      " + pdfDatei);
+        System.out.println("Vorschau: " + vorschau.host() + " (Dokument im iframe: " + vorschau.dokument() + ")");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String betreff(Path datenDatei) throws IOException {
+        Map<String, Object> daten = new ObjectMapper().readValue(datenDatei.toFile(), Map.class);
+        return (String) ((Map<String, Object>) daten.get("schreiben")).get("betreff");
     }
 
     /**

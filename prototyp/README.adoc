@@ -13,6 +13,11 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
   Geprüft ist die Konformität noch nicht.
 * Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
   mit dem PDF des Prototyps.
+* Aus demselben HTML eine Vorschau nach ADR-014 bauen: Paged.js paginiert das Schreiben in
+  einem iframe mit `sandbox="allow-scripts"` ohne `allow-same-origin` und einer restriktiven
+  CSP. Die Host-Seite übernimmt Höhe und Seitenzahl per `postMessage`.
+* Die Vorschau mit Playwright in Chrome prüfen und als PDF drucken. Damit misst `vergleich`
+  auch Vorschau gegen PDF (QS-004).
 * Zwei Referenzschreiben: `geschaeftsbrief-einseitig` (der Inhalt der Vorgabe) und
   `geschaeftsbrief-mehrseitig` (drei Seiten mit Kopfzeile „Seite x von y“ ab Seite 2). Beide
   liegen auf allen Seiten höchstens 0,1 mm neben dem Word-PDF.
@@ -25,6 +30,7 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 | `src/main/resources/vorlagen/standardschreiben/` | Inhalt eines Standardschreibens
 | `daten/` | Daten je Schreiben, wie sie der Host liefern würde
 | `referenz/` | Referenz-PDFs, mit Microsoft Word aus der DOCX-Vorgabe exportiert, und was es braucht, um sie neu zu erzeugen
+| `vorschau/` | Prüfskript für die Vorschau (Playwright)
 | `schriften/` | Schriftordner des Hosts (ADR-017), nicht eingecheckt
 | `ausgabe/` | Erzeugtes HTML und PDF, nicht eingecheckt
 |===
@@ -50,12 +56,20 @@ kommen in einem späteren Schritt.
 
 == Aufrufe
 
-Alle Aufrufe im Ordner `prototyp/`; sie nutzen den Gradle-Wrapper des Repositorys.
+Alle Aufrufe im Ordner `prototyp/`; sie nutzen den Gradle-Wrapper des Repositorys. Die
+Vorschau braucht Paged.js und Playwright aus `npm install`. Playwright nutzt das installierte
+Google Chrome und lädt keinen eigenen Browser.
 
 [source,sh]
 ----
-# Schreiben erzeugen: ausgabe/geschaeftsbrief-einseitig.html und .pdf
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install
+
+# Schreiben erzeugen: ausgabe/geschaeftsbrief-einseitig.html, .pdf und -vorschau.html
 ../gradlew run --args="geschaeftsbrief-einseitig"
+
+# Vorschau prüfen (CSP, Sandbox, Paginierung) und als ausgabe/<schreiben>-vorschau.pdf drucken
+npm run pruefen -- geschaeftsbrief-einseitig
+../gradlew vergleich --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-einseitig-vorschau.pdf"
 
 # Textpositionen eines PDFs ausgeben
 ../gradlew positionen --args="ausgabe/geschaeftsbrief-einseitig.pdf"
@@ -92,3 +106,20 @@ Formatvorlagen. Wo Word eigene Regeln anwendet, z. B. beim Zeilenabstand, sind s
 Grundlinien des Word-PDFs abgeglichen. Die Kommentare im CSS nennen die Grundlinie, auf die
 eine Angabe zielt. Was dabei über openhtmltopdf gelernt wurde, steht an der jeweiligen Stelle
 im CSS.
+
+== Vorschau
+
+Das Dokument im iframe ist das HTML des PDFs mit Zusätzen im Kopf, die das Layout nicht
+ändern:
+
+* Content Security Policy: `default-src 'none'`, Skripte nur per SHA-256-Hash (Paged.js und
+  seine Konfiguration), Schriften und Bilder nur als `data:`-URI. `style-src` braucht
+  `'unsafe-inline'`, weil Paged.js zur Laufzeit eigene `<style>`-Elemente anlegt.
+* Die Schriften des Hosts als `@font-face` mit `data:`-URIs. Das macht das Dokument rund 5 MB
+  groß; im Produkt kämen sie vom Ressourcen-Endpunkt der Bibliothek.
+* Eine Bildschirmdarstellung der Seiten, die nur unter `@media screen` wirkt.
+
+Was beim Abgleich mit Paged.js 0.4.3 gelernt wurde, steht im CSS des Briefpapiers: ein
+Randfeld mit `content: none` blendet die folgenden Randfelder derselben Seite aus; der Abstand
+vor dem ersten Absatz einer Folgeseite bleibt erhalten; Randfelder zählen den Einzug in die
+Breite.
