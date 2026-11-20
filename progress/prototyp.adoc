@@ -1,58 +1,64 @@
 = Prototyp: Vorlagenformat und Rendering absichern
 
-Wegwerf-Prototyp, der ADR-003 bis ADR-005 und ADR-014 an realen DOCX-Vorgaben
-belegt oder widerlegt (Epic #3).
+Wegwerf-Prototyp, der ADR-003 bis ADR-005, ADR-014 und ADR-017 an realen
+DOCX-Vorgaben belegt oder widerlegt (Epic #3).
 
-*Status:* aktiv seit 2026-11-19 — Der Owner hat den Prototyp als Fokus gewählt.
-Die Schriftfrage ist entschieden (ADR-017). Der Prototyp-Code liegt in
-`prototyp/` außerhalb des Builds (Owner, 2026-11-20). Nächster Schritt ist der
-erste Prototyp-Code: Referenzschreiben nachbauen und durch beide Renderer schicken.
+*Status:* aktiv seit 2026-11-19. Der Spike ist gebaut (PR #45 und #47 gemergt).
+Jetzt warten vier Entscheidungen beim Owner, danach gehen die Ergebnisse in die
+ADRs. Die Liste steht im Kommentar zu #3 vom 2026-11-20.
 
 == The plan
 
-Die Schriften kamen zuerst. Jetzt folgt das Referenzschreiben, weil erst damit
-etwas da ist, woran sich Schriften, Vorschau und PDF messen lassen. Die
-Schriftprüfungen laufen am nachgebauten Schreiben, nicht isoliert.
+Erst die Entscheidungen des Owners, weil von ihnen abhängt, was in ADR-004,
+ADR-005 und QS-002 steht. Chromium kommt nur, wenn der Owner die beobachteten
+Abweichungen von Option 1 nicht hinnimmt.
 
 [options="checklist"]
-* [x] Schriftquelle und Ersatzschriften festlegen (ADR-017 angenommen, PR #40 gemergt): #39, Q-PO-010
-* [ ] Referenzschreiben (ein- und mehrseitig, DIN 5008 Form B) im Vorlagenmodell nachbauen: #3
-* [ ] Vorschau im sandboxed iframe mit CSP aufbauen und Sandbox, CSP und HTML-Allowlist festlegen: #3, ADR-014
-* [ ] Referenzschriften vom Host: laden im sandboxed iframe unter CSP, im PDF eingebettet, Lizenz für beide Nutzungen bestätigt: #3, ADR-004, ADR-017
-* [ ] Ersatzschriften aus ADR-017 in beiden Renderern setzen und gegen QS-004 und QS-013 messen: #3, ADR-017
-* [ ] Messen gegen QS-001 bis QS-004, QS-013 und die Prüfkriterien aus ADR-014 mit Option 1 (Paged.js und openhtmltopdf): #3
-* [ ] Nur wenn Option 1 scheitert: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
-* [ ] Ergebnisse in ADR-003 bis ADR-005 und ADR-014 eintragen, Entscheidung des Owners einholen: #3
+* [x] Schriftquelle und Ersatzschriften festlegen (ADR-017, PR #40): #39, Q-PO-010
+* [x] Referenzschreiben ein- und mehrseitig nachbauen (PR #45): #3
+* [x] Vorschau im sandboxed iframe mit CSP, HTML-Allowlist, Links in neuem Tab (PR #45, #47): #3, ADR-014
+* [x] Ersatzschriften setzen und messen; Arial Narrow → PT Sans Narrow (PR #47): #3, ADR-017
+* [ ] Entscheidungen des Owners in #3: Chromium prüfen oder nicht, Fußzeilen-Semantik für QS-002, Nachbearbeitungsschritt als Preis, „Trotzdem akzeptieren“
+* [ ] Manuelle PDF/UA-Stichprobe (Owner), QS-013 (zentrale Abteilung), Freigabe der Originalschriften für Einbettung und Webfont: #3, ADR-004, ADR-017
+* [ ] Nur wenn der Owner es entscheidet: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
+* [ ] Ergebnisse in ADR-003, -004, -005, -014, -017 und QS-002, QS-004 eintragen; Q-PO-004 in `doc-005` nachziehen: #3
 
 ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 (Owner, 2026-11-15).
 
 == Where we are
 
-Die wirksamen Schriften der Beispiel-DOCX sind ermittelt: Arial und Arial Narrow,
-im Formular dazu ein Symbolschrift-Kästchen. ADR-017 ist angenommen: Der Ordner
-des Hosts ist die einzige Schriftquelle, sonst greifen freie OFL-Ersatzschriften
-(PR #40, gemergt). Der
-Hinweis in der Administration ist #41. Noch kein Prototyp-Code. Er kommt in den
-Ordner `prototyp/` im Wurzelverzeichnis, außerhalb des Gradle- und npm-Builds;
-`settings.gradle.kts` nimmt nur die fest eingetragenen Backend-Module auf. Die
-Abnahmekriterien stehen in ADR-004 und ADR-014 und als Akzeptanzkriterien in #3.
+Der Prototyp liegt in `prototyp/`, außerhalb des Gradle- und npm-Builds. Sein
+README beginnt mit einer Tabelle „Funktionen und Grenzen“, je Funktion mit
+Nachweis und ADR. Messwerte stehen dort und kommen aus den Befehlen unten, nicht
+aus dieser Datei. Bekannte Abweichungen: VoiceOver braucht am Seitenwechsel einen
+neuen Einstieg in den Frame, bei 200 % Zoom scrollt die Vorschau statt
+umzubrechen, die Fußzeile im PDF wird nur per PDFBox-Nachbearbeitung lesbar und
+widerspricht damit dem Antwortmaß von QS-002, QS-004 ist nur am Chrome-Druck-PDF
+gemessen.
 
 == Open in this topic
 
-* Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“. Die Beispiel-DOCX
-  liegen inzwischen auf `main`. Mit #3 nachziehen, zusammen mit der
-  Architekturdoku dazu (Entscheidung des Owners).
-* Welche schmale OFL-Schrift Arial Narrow ersetzt, wählt der Prototyp (ADR-017).
-* Hinweis aus dem Re-Review von PR #17 (nicht blockierend): Nachrichten aus dem
-  iframe per `postMessage` zusätzlich mit einem Korrelationswert je
-  Vorschau-Instanz absichern, besonders bei parallelen oder neu geladenen
-  Vorschauen, und auf den vorgesehenen Zweck begrenzen. In ADR-014 aufnehmen,
-  wenn der Prototyp die Kommunikation festlegt.
+* Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“; mit der Übernahme
+  in die ADRs nachziehen.
+* NVDA: Kein Windows-Gerät; braucht eine Windows-Prüfumgebung.
+* Hinweis aus dem Re-Review von PR #17: Nachrichten aus dem iframe zusätzlich mit
+  einem Korrelationswert je Vorschau-Instanz absichern. Der Prototyp prüft nur
+  Quelle und Schema. In ADR-014 aufnehmen.
+* Ligatur „ﬁ“ im Text des PDFs mit PT Sans Narrow: Abhilfe fürs Produkt offen.
 
 == Checks
 
+Im Ordner `prototyp/`, Ersatzschriften vorher mit `sh ersatzschriften/laden.sh`:
+
 [source,sh]
 ----
-# entsteht mit dem Prototyp
+../gradlew run --args="geschaeftsbrief-mehrseitig"          # PDF, Vorschau, Fußzeilen-Nachweis
+../gradlew vergleich --args="referenz/geschaeftsbrief-mehrseitig-word.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
+npm run pruefen -- geschaeftsbrief-mehrseitig               # Sandbox, CSP, Druck-PDF der Vorschau
+../gradlew vergleich --args="ausgabe/geschaeftsbrief-mehrseitig.pdf ausgabe/geschaeftsbrief-mehrseitig-vorschau.pdf"
+../gradlew gegenprobe --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
+../gradlew konformitaet --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
+npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
+../gradlew run --args="boesartig" && npm run angriff -- boesartig
 ----
