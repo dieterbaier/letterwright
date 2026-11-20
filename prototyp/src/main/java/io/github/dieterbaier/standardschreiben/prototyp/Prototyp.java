@@ -33,17 +33,14 @@ public final class Prototyp {
             System.err.println("Aufruf: run <schreiben> [schriftenordner]");
             System.exit(2);
         }
-        String schreiben = args[0];
+        String daten = args[0];
         Path schriften = Path.of(args.length == 2 ? args[1] : "schriften");
+        // Mit einem anderen Schriftordner bekommt die Ausgabe dessen Namen als Zusatz, damit sie
+        // neben der Ausgabe mit dem Standardordner liegt.
+        String schreiben = args.length == 2 ? daten + "-" + schriften.getFileName() : daten;
         Path ausgabe = Files.createDirectories(Path.of("ausgabe"));
 
-        List<Schriften.Schrift> schriftliste = Schriften.lies(schriften);
-        for (Schriften.Schrift s : schriftliste) {
-            System.out.printf("Schrift: %-16s %3d %-7s %s%n", s.familie(), s.gewicht(),
-                    s.kursiv() ? "kursiv" : "normal", s.datei().getFileName());
-        }
-
-        Path datenDatei = Path.of("daten", schreiben + ".json");
+        Path datenDatei = Path.of("daten", daten + ".json");
         String html = zusammenfuehren(datenDatei);
         // Nur für die Gegenprobe: BEREINIGUNG=aus zeigt, was ohne Bereinigung ankäme.
         boolean gegenprobe = "aus".equals(System.getenv("BEREINIGUNG"));
@@ -55,6 +52,15 @@ public final class Prototyp {
             System.out.println("Bereinigung: " + bereinigt.befunde().size() + " Befunde");
             bereinigt.befunde().forEach(b -> System.out.println("  " + b));
         }
+        // Schriften nach ADR-017 auflösen: Ordner des Hosts, sonst Ersatzschrift, sonst Standard
+        Schriften.Aufloesung aufloesung = Schriften.loese(Schriften.benoetigt(html), schriften, Path.of("ersatzschriften"));
+        List<Schriften.Schrift> schriftliste = aufloesung.schriften();
+        for (Schriften.Schrift s : schriftliste) {
+            System.out.printf("Schrift: %-16s %3d %-7s %s%n", s.familie(), s.gewicht(),
+                    s.kursiv() ? "kursiv" : "normal", s.datei());
+        }
+        aufloesung.hinweise().forEach(h -> System.out.println("Hinweis: " + h));
+
         Path htmlDatei = ausgabe.resolve(schreiben + ".html");
         Files.writeString(htmlDatei, html, StandardCharsets.UTF_8);
 

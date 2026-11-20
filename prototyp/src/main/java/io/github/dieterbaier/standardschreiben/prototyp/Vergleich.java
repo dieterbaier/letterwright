@@ -166,8 +166,12 @@ public final class Vergleich {
         return new Pdf(dokument.getNumberOfPages(), zeilen);
     }
 
+    /**
+     * Vergleichsform eines Texts: ohne Leerraum und nach Unicode-Kompatibilität normalisiert. So
+     * gilt die Ligatur „ﬁ“ (U+FB01), die PDFBox bei Ersatzschriften schreibt, als „fi“.
+     */
     private static String normal(String text) {
-        return text.replaceAll("\\s+", "");
+        return java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFKC).replaceAll("\\s+", "");
     }
 
     private static String kurz(String text) {

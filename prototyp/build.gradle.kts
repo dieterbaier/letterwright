@@ -68,3 +68,9 @@ tasks.register<JavaExec>("gegenprobe") {
     mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Gegenprobe"
     workingDir = projectDir
 }
+
+tasks.register<JavaExec>("laufweiten") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass = "io.github.dieterbaier.standardschreiben.prototyp.Laufweiten"
+    workingDir = projectDir
+}
