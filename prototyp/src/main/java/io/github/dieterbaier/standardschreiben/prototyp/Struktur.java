@@ -37,13 +37,7 @@ public final class Struktur {
                 return;
             }
             for (PDPage seite : dokument.getPages()) {
-                PDFMarkedContentExtractor extraktor = new PDFMarkedContentExtractor();
-                extraktor.processPage(seite);
-                Map<Integer, String> texte = new HashMap<>();
-                for (PDMarkedContent mc : extraktor.getMarkedContents()) {
-                    sammle(mc, texte);
-                }
-                TEXTE.put(seite, texte);
+                TEXTE.put(seite, texte(seite));
             }
             ausgeben(wurzel, 0);
         }
@@ -74,6 +68,17 @@ public final class Struktur {
                 ausgeben(e, tiefe + 1);
             }
         }
+    }
+
+    /** Text je MCID einer Seite. */
+    static Map<Integer, String> texte(PDPage seite) throws IOException {
+        PDFMarkedContentExtractor extraktor = new PDFMarkedContentExtractor();
+        extraktor.processPage(seite);
+        Map<Integer, String> texte = new HashMap<>();
+        for (PDMarkedContent mc : extraktor.getMarkedContents()) {
+            sammle(mc, texte);
+        }
+        return texte;
     }
 
     private static void sammle(PDMarkedContent mc, Map<Integer, String> texte) {
