@@ -36,6 +36,7 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 | `referenz/` | Referenz-PDFs, mit Microsoft Word aus der DOCX-Vorgabe exportiert, und was es braucht, um sie neu zu erzeugen
 | `vorschau/` | Prüfskript für die Vorschau (Playwright)
 | `schriften/` | Schriftordner des Hosts (ADR-017), nicht eingecheckt
+| `ersatzschriften/` | Zuordnungstabelle und Ladeskript der freien Ersatzschriften; die Schriften selbst nicht eingecheckt
 | `ausgabe/` | Erzeugtes HTML und PDF, nicht eingecheckt
 |===
 
@@ -55,8 +56,61 @@ for f in "Arial" "Arial Bold" "Arial Italic" "Arial Bold Italic" \
 done
 ----
 
-Ein anderer Ordner wird als zweites Argument übergeben. Die OFL-Ersatzschriften aus ADR-017
-kommen in einem späteren Schritt.
+Ein anderer Ordner wird als zweites Argument übergeben; die Ausgabe bekommt dann seinen Namen
+als Zusatz, z. B. `ausgabe/geschaeftsbrief-einseitig-leer.pdf`.
+
+=== Ersatzschriften
+
+Fehlt eine Familie im Ordner des Hosts, löst der Prototyp sie nach ADR-017 auf: Ersatzschrift
+aus `ersatzschriften/zuordnung.properties`, sonst die Standardschrift. Die Ersatzschrift wird
+unter dem Familiennamen der Vorlage registriert, das CSS bleibt gleich, und PDF und Vorschau
+bekommen dieselbe Datei. Für jede ersetzte Familie gibt es einen Hinweis, wie ihn die
+Administration zeigen würde. Die freien Schriften lädt `ersatzschriften/laden.sh` mit festen
+Versionen und Prüfsummen; sie werden nicht eingecheckt.
+
+[source,sh]
+----
+sh ersatzschriften/laden.sh
+mkdir -p leer
+../gradlew run --args="geschaeftsbrief-mehrseitig leer"
+../gradlew vergleich --args="referenz/geschaeftsbrief-mehrseitig-word.pdf ausgabe/geschaeftsbrief-mehrseitig-leer.pdf"
+
+# Laufweiten von Kandidaten gegen die Originalschrift (Dateinamen ohne Leerzeichen)
+../gradlew laufweiten --args="<original.ttf> <kandidat.ttf> ..."
+----
+
+Ergebnis:
+
+* *Arial → Liberation Sans 2.1.5* (SIL OFL 1.1): gleiche Laufweiten, wie ADR-017 annimmt.
+* *Arial Narrow → PT Sans Narrow* (SIL OFL 1.1). Eine OFL-Schrift mit gleichen Laufweiten gibt
+  es nicht. Gemessen an den Texten des Geschäftsbriefs, die in Arial Narrow stehen:
++
+[cols="2,1,1", options="header"]
+|===
+| Kandidat (statisch, regulär / fett) | Mittlere Laufweite | Größte Abweichung je Text
+| Encode Sans Condensed | 104,4 % / 107,5 % | 12,7 % / 19,5 %
+| Fira Sans Condensed | 108,8 % / 105,8 % | 16,8 % / 13,1 %
+| IBM Plex Sans Condensed | 111,3 % / 110,6 % | 16,6 % / 13,9 %
+| PT Sans Narrow | 93,9 % / 92,8 % | 21,9 % / 17,0 %
+|===
++
+Eine breitere Schrift bricht in den Spalten fester Breite um: Mit Encode Sans Condensed läuft
+die fette Zeile „(bitte Bezeichnung des Sachgebietes ergänzen)“ im Infoblock auf zwei Zeilen,
+und alles darunter rückt 4,2 mm tiefer. PT Sans Narrow ist schmaler; alle Umbrüche bleiben,
+die Zeilenanfänge liegen weiter höchstens 0,1 mm neben Word, und Vorschau und PDF erfüllen
+QS-004. Die Texte in Arial Narrow werden dabei 6 bis 7 % kürzer, und PT Sans wirkt weicher als
+Arial. Ob das Bild reicht, entscheidet die zentrale Abteilung (QS-013). Variable Schriften wie
+Archivo Narrow oder Roboto Condensed sind nicht geprüft; PDFBox bettet sie nicht verlässlich ein.
+* Beide Referenzschreiben bleiben mit Ersatzschriften PDF/A-2b und PDF/UA-1.
+* *Ligaturen:* PDFBox 3 setzt bei PT Sans Narrow die Ligatur „fi“ und schreibt sie als
+  U+FB01 („ﬁ“) in den Text des PDFs; Chrome setzt sie auch, schreibt aber „fi“. Optisch gleich.
+  Wer im PDF nach „superfirma“ sucht oder den Text kopiert, bekommt je nach Viewer „superﬁrma“.
+  Arial hat keine fi-Ligatur. `vergleich` normalisiert Text deshalb nach NFKC. Abhilfe fürs
+  Produkt wäre, Ligaturen beim Einbetten abzuschalten oder die Ersatzschrift ohne `liga`
+  auszuliefern; Letzteres ändert die Schrift und verlangt nach der OFL einen neuen Namen.
+* Times New Roman und Courier New stehen in der Zuordnung, ihre Ersatzschriften sind nicht
+  geladen; der Geschäftsbrief braucht sie nicht. Fehlt eine Ersatzschrift, greift die
+  Standardschrift Liberation Sans mit eigenem Hinweis.
 
 == Aufrufe
 
