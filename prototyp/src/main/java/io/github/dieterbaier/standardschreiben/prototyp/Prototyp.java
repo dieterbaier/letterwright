@@ -78,12 +78,12 @@ public final class Prototyp {
             PdfErzeugung.erzeuge(html, htmlDatei.toAbsolutePath().toUri().toString(), schriftliste, out);
         }
         int fuss = FusszeileTaggen.anwenden(pdfDatei);
-        // Absicherung: Hat das Briefpapier eine Fußzeile, muss der Schritt sie finden. Schlägt das
-        // fehl, hat sich vermutlich die Ausgabe von openhtmltopdf geändert.
-        if (fuss == 0 && html.contains("<footer")) {
-            throw new IllegalStateException("Fußzeile im PDF nicht gefunden; Ausgabe von openhtmltopdf geändert?");
-        }
-        System.out.println("Fußzeile: " + fuss + " Textblock/-blöcke vom Artefakt zu getaggtem Inhalt");
+        // Nachweis: Genau die Texte der Fußzeile aus dem HTML stehen, in dieser Reihenfolge, am
+        // Ende des Strukturbaums. Sonst Abbruch, z. B. wenn sich die Ausgabe von openhtmltopdf
+        // geändert hat oder anderer Text im unteren Rand getaggt wurde.
+        List<String> erwartet = fusszeilentexte(html);
+        List<String> gefunden = FusszeileTaggen.pruefe(pdfDatei, erwartet, fuss);
+        System.out.println("Fußzeile: " + fuss + " Textblöcke getaggt, am Ende des Strukturbaums: " + gefunden);
 
         Vorschau.Dateien vorschau = Vorschau.erzeuge(html, betreff(datenDatei), schriftliste,
                 Path.of("node_modules", "pagedjs", "dist", "paged.polyfill.min.js"), ausgabe, schreiben);
@@ -91,6 +91,19 @@ public final class Prototyp {
         System.out.println("HTML:     " + htmlDatei);
         System.out.println("PDF:      " + pdfDatei);
         System.out.println("Vorschau: " + vorschau.host() + " (Dokument im iframe: " + vorschau.dokument() + ")");
+    }
+
+    /** Texte der Fußzeile in Lesereihenfolge: je Spalte (Kindelement) ein Text. */
+    static List<String> fusszeilentexte(String html) {
+        List<String> texte = new java.util.ArrayList<>();
+        for (org.jsoup.nodes.Element footer : org.jsoup.Jsoup.parse(html).select("footer")) {
+            if (footer.children().isEmpty()) {
+                texte.add(footer.text());
+            } else {
+                footer.children().forEach(spalte -> texte.add(spalte.text()));
+            }
+        }
+        return texte;
     }
 
     @SuppressWarnings("unchecked")

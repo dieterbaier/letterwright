@@ -216,6 +216,52 @@ final class FusszeileTaggen {
         return null;
     }
 
+    /**
+     * Nachweis nach dem Taggen: Die letzten Elemente des Strukturbaums sind genau die erwarteten
+     * Fußzeilentexte, in dieser Reihenfolge, je als {@code P}, und es wurde nichts anderes getaggt.
+     * Fängt einen falschen Treffer (anderer Text im unteren Rand) und eine nur teilweise getaggte
+     * Fußzeile ab. Wirft, wenn der Nachweis scheitert.
+     */
+    static List<String> pruefe(Path pdf, List<String> erwartet, int getaggt) throws IOException {
+        if (getaggt != erwartet.size()) {
+            throw new IllegalStateException("Fußzeile: " + getaggt + " Textblöcke getaggt, erwartet "
+                    + erwartet.size() + " " + erwartet);
+        }
+        try (PDDocument dokument = Loader.loadPDF(pdf.toFile())) {
+            PDStructureTreeRoot wurzel = dokument.getDocumentCatalog().getStructureTreeRoot();
+            PDStructureElement document = (PDStructureElement) wurzel.getKids().getFirst();
+            List<Object> kinder = document.getKids();
+            if (kinder.size() < erwartet.size()) {
+                throw new IllegalStateException("Fußzeile: Strukturbaum zu kurz");
+            }
+            List<String> gefunden = new ArrayList<>();
+            List<Object> letzte = kinder.subList(kinder.size() - erwartet.size(), kinder.size());
+            for (Object kind : letzte) {
+                if (!(kind instanceof PDStructureElement e) || !"P".equals(e.getStructureType())) {
+                    throw new IllegalStateException("Fußzeile: Ende des Strukturbaums ist kein P: " + kind);
+                }
+                var texte = Struktur.texte(e.getPage());
+                StringBuilder text = new StringBuilder();
+                for (Object mcid : e.getKids()) {
+                    if (mcid instanceof Integer i && texte.containsKey(i)) {
+                        text.append(texte.get(i));
+                    }
+                }
+                gefunden.add(text.toString());
+            }
+            for (int i = 0; i < erwartet.size(); i++) {
+                if (!normal(gefunden.get(i)).equals(normal(erwartet.get(i)))) {
+                    throw new IllegalStateException("Fußzeile: erwartet " + erwartet + ", im Strukturbaum " + gefunden);
+                }
+            }
+            return gefunden;
+        }
+    }
+
+    private static String normal(String text) {
+        return java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFKC).replaceAll("\\s+", " ").strip();
+    }
+
     private FusszeileTaggen() {
     }
 }
