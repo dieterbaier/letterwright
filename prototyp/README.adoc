@@ -160,14 +160,22 @@ iframe gilt dafür nicht. Stand für das mehrseitige Referenzschreiben:
 * Paged.js klont ein Element, das über eine Seite reicht, samt Rolle. Aus `<main>` wurden so
   drei Landmarks. Das Schreiben ist deshalb ein `div` mit `role="main"`, und die Vorschau
   entfernt die Rolle an den Fortsetzungen (`[data-split-from]`).
-* Lesereihenfolge eingehalten. „Seite x von y“ erscheint nicht im Accessibility-Baum.
+* Lesereihenfolge im Schreiben eingehalten. „Seite x von y“ steht im Accessibility-Baum von
+  Chrome (Abfrage über das DevTools-Protokoll); Playwrights `ariaSnapshot` blendet generierten
+  CSS-Inhalt aus und zeigt es nicht. Die Seitenzahlen werden also vermutlich vorgelesen.
 * Die Fußzeile steht im Accessibility-Baum vor dem Schreiben, weil Paged.js die Randfelder im
-  DOM vor den Seiteninhalt setzt. Im PDF ist sie ein Artefakt und fehlt ganz.
+  DOM vor den Seiteninhalt setzt. VoiceOver in Safari bestätigt das (Owner, 2026-11-20): Beim
+  Betreten des iframe liest es zuerst die Öffnungszeiten, dann den Brief von oben. Im PDF ist
+  die Fußzeile ein Artefakt und fehlt ganz.
 * Tastatur: Das iframe ist kein Tab-Stopp, weil das Schreiben nichts Fokussierbares enthält.
   Keine Fokusfalle. „Aktualisieren“ behält den Fokus, beide Statusmeldungen kommen über die
   `aria-live`-Region.
-* Zoom 200 %: Die Seite ist breiter als das iframe und wird rechts abgeschnitten (Logo,
-  Infoblock). Per Tastatur lässt sie sich nicht waagerecht scrollen. Das verfehlt das
-  Kriterium „ohne Informationsverlust“.
+* Zoom 200 %: Ob die Seite passt, hängt von der Fensterbreite ab. In einem breiten Fenster
+  (1920 px) passt sie. Bei 1280 px Fensterbreite bleiben 640 CSS-Pixel; die Seite ist breiter
+  als das iframe und wird rechts abgeschnitten (Logo, Infoblock). Mit der Maus lässt sich das
+  iframe waagerecht scrollen, per Tastatur nicht. Vom Owner nachgestellt (2026-11-20).
 
-Offen bleibt die Prüfung mit NVDA (Firefox oder Chrome) und VoiceOver (Safari).
+VoiceOver (Safari) liest das Schreiben im sandboxed iframe vollständig, sobald man den Frame
+betreten hat (VO+Shift+Pfeil runter). Das gilt auch ohne Sandbox, mit `src` statt `srcdoc` und
+mit `allow-same-origin`; die Isolation selbst ist also kein Hindernis. Safaris einfache
+Vorlesefunktion liest dagegen nur die Host-Seite. Offen bleibt die Prüfung mit NVDA.
