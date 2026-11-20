@@ -4,9 +4,11 @@
   "description": "Wegwerf-Prototyp für Issue #3: Paged.js-Vorschau und ihre Prüfung",
   "type": "module",
   "scripts": {
-    "pruefen": "node vorschau/pruefen.mjs"
+    "pruefen": "node vorschau/pruefen.mjs",
+    "barrierefreiheit": "node vorschau/barrierefreiheit.mjs"
   },
   "devDependencies": {
+    "axe-core": "4.14.1",
     "pagedjs": "0.4.3",
     "playwright": "1.65.1"
   }
