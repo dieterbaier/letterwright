@@ -52,6 +52,8 @@ public final class Prototyp {
         try (OutputStream out = Files.newOutputStream(pdfDatei)) {
             PdfErzeugung.erzeuge(html, htmlDatei.toAbsolutePath().toUri().toString(), schriftliste, out);
         }
+        int fuss = FusszeileTaggen.anwenden(pdfDatei);
+        System.out.println("Fußzeile: " + fuss + " Textblock/-blöcke vom Artefakt zu getaggtem Inhalt");
 
         Vorschau.Dateien vorschau = Vorschau.erzeuge(html, betreff(datenDatei), schriftliste,
                 Path.of("node_modules", "pagedjs", "dist", "paged.polyfill.min.js"), ausgabe, schreiben);
