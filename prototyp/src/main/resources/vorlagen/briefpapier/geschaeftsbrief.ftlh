@@ -21,10 +21,17 @@
   /* Die DOCX-Ränder sind links 30 mm und rechts 20 mm. openhtmltopdf schneidet aber alles ab,
      was über den Inhaltsbereich der Seite hinausragt, und Word setzt Falzmarken und den rechten
      Rahmen in den Rand. Darum sind die seitlichen Seitenränder 0 und der Body rückt ein. */
+  /* Word setzt den zusätzlichen Zeilenabstand des 1,5-zeiligen Fließtexts unter die Schrift, CSS
+     verteilt ihn je zur Hälfte darüber und darunter. Die Zeilenbox liegt in CSS daher 1,15 mm
+     höher zum Text als in Word. Damit der Text oben auf Folgeseiten wie in Word steht, ist der
+     obere Rand um diesen Betrag kleiner. Unten braucht es keinen Ausgleich: Word lässt den
+     Zeilenabstand der letzten Zeile in den unteren Rand ragen (Grundlinie 274,2 mm im
+     mehrseitigen Referenzschreiben). Eine Verschiebung der Absätze mit position: relative setzt
+     openhtmltopdf über Seitenumbrüche nicht verlässlich um. */
   @page {
     size: A4;
-    /* Folgeseiten: zweiter Abschnitt der DOCX, oben 1474 twips */
-    margin: 26mm 0 20mm 0;
+    /* Folgeseiten: zweiter Abschnitt der DOCX, oben 1474 twips (26 mm), unten 1134 twips (20 mm) */
+    margin: 24.85mm 0 20mm 0;
     @top-left {
       content: "Seite " counter(page) " von " counter(pages);
       font-family: "Arial Narrow";
@@ -38,7 +45,8 @@
     }
   }
   @page :first {
-    /* Erste Seite: erster Abschnitt der DOCX, oben 567 twips */
+    /* Erste Seite: erster Abschnitt der DOCX, oben 567 twips. Der feste Bereich .seite1 bezieht
+       sich auf diese Kante, deshalb hier ohne Verschiebung. */
     margin-top: 10mm;
     @top-left { content: none; }
     @bottom-left {
@@ -98,8 +106,10 @@
   .betreffblock .wert-fett { font-weight: bold; }
   .betreffblock p.hinweis { font-family: "Arial Narrow"; font-size: 9pt; line-height: 3.8mm; }
 
-  /* Formatvorlage „Standard“: Arial 12, 1,5-zeilig (1,5 × 1,149 × 12 pt), 6 pt davor und danach */
-  .inhalt p { line-height: 7.25mm; margin: 6pt 0; }
+  /* Formatvorlage „Standard“: Arial 12, 1,5-zeilig (1,5 × 1,1499 × 12 pt = 7,30 mm), 6 pt davor
+     und danach. keepLines: Absatz nicht über Seiten trennen; keine Absatzkontrolle.
+     Zum Versatz der Zeilenbox gegenüber Word siehe @page. */
+  .inhalt p { line-height: 7.3mm; margin: 6pt 0; page-break-inside: avoid; orphans: 1; widows: 1; }
   /* Formatvorlage „Unterzeichnen“: 600 twips davor */
   .inhalt p.gruss { margin-top: 10.6mm; }
 

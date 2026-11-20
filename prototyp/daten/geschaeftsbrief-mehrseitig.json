@@ -1,0 +1,27 @@
+{
+  "briefpapier": "geschaeftsbrief",
+  "standardschreiben": "mehrseitig",
+  "empfaenger": {
+    "zeilen": ["Arial 12"]
+  },
+  "absender": {
+    "sachgebiet": "Sachgebiet XXX",
+    "sachgebietHinweis": "(bitte Bezeichnung des Sachgebietes ergänzen)",
+    "kuerzel": "ww",
+    "name": "(Vorname Nachname)",
+    "strasse": "Musterstr. 1",
+    "ort": "12345 Musterstadt",
+    "telefon": "(bitte ergänzen)",
+    "fax": "(bitte ergänzen)",
+    "email": "(...)@superfirma.de"
+  },
+  "schreiben": {
+    "datum": "TT.MM.JJJJ",
+    "betreff": "(Bitte Betreff ergänzen)",
+    "bezug": "(Bitte Bezug ergänzen)",
+    "anlagen": "(Bitte Anlagen ergänzen)",
+    "geschaeftszeichen": "(Bitte Geschäftszeichen ergänzen)",
+    "anrede": "Sehr geehrte Damen und Herren,",
+    "gruss": "Im Auftrag"
+  }
+}
