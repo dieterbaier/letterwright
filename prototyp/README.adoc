@@ -9,7 +9,8 @@ npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backen
 
 * Briefpapier, Standardschreiben und Daten mit FreeMarker (ADR-008) in zwei Durchläufen zu
   einem HTML-Dokument zusammenführen.
-* Daraus mit openhtmltopdf ein PDF/A-2b mit PDF/UA-1-Tagging erzeugen. veraPDF meldet für beide
+* Daraus mit openhtmltopdf ein PDF/A-2b mit PDF/UA-1-Tagging erzeugen. Ein Nachbearbeitungsschritt
+  mit PDFBox taggt die Fußzeile, die openhtmltopdf als Artefakt ausgibt. veraPDF meldet für beide
   Referenzschreiben keine Verstöße. Die manuelle Stichprobe aus QS-002 steht noch aus.
 * Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
   mit dem PDF des Prototyps.
@@ -91,7 +92,7 @@ npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
 # PDF/A-2b (QS-001) und PDF/UA-1 (QS-002) mit veraPDF prüfen
 ../gradlew konformitaet --args="ausgabe/geschaeftsbrief-einseitig.pdf ausgabe/geschaeftsbrief-mehrseitig.pdf"
 
-# Strukturhierarchie (Tags) für die manuelle Stichprobe aus QS-002
+# Strukturhierarchie (Tags) mit dem Text je Element für die manuelle Stichprobe aus QS-002
 ../gradlew struktur --args="ausgabe/geschaeftsbrief-einseitig.pdf"
 
 # Jede Seite als PNG ausgeben: ausgabe/<schreiben>-s<seite>.png
@@ -170,10 +171,16 @@ erwarteten Verstöße: fehlende XMP-Metadaten, kein Tagging, keine Sprachangabe.
 Was veraPDF nicht prüft und die Stichprobe klären muss, zeigt `struktur`. Beim Stand dieses
 Prototyps fällt auf:
 
-* *Bekannter Makel:* Die Fußzeile (Öffnungszeiten, Homepage) ist im PDF ein Artefakt, weil
-  openhtmltopdf laufende Elemente (`position: running()`) nicht taggt. Hilfstechnologien lesen
-  sie nicht vor. Eine Umgehung, etwa eine unsichtbare Kopie im Tag-Baum, ist nicht umgesetzt; in
-  der Vorschau wird die Fußzeile vorgelesen.
+* Die Fußzeile (Öffnungszeiten, Homepage) wird im PDF vorgelesen, und zwar nach dem Brieftext.
+  openhtmltopdf gibt laufende Elemente (`position: running()`) grundsätzlich als
+  Paginierungs-Artefakt aus; eine Einstellung dafür gibt es nicht. Als Fließinhalt der ersten
+  Seite geht es auch nicht: Unterhalb des Inhaltsbereichs schiebt openhtmltopdf ein absolut
+  positioniertes Element auf die nächste Seite. Deshalb schreibt `FusszeileTaggen` das fertige
+  PDF nach: Artefakt-Abschnitte mit Text ganz im unteren Seitenrand werden je Textblock zu
+  `/P <</MCID n>>`, und je Block hängt ein `P` am Ende des Strukturbaums. Kopfzeilen wie
+  „Seite x von y“ bleiben Artefakte. Preis: Der Schritt hängt davon ab, wie openhtmltopdf den
+  Content-Stream schreibt (Artefakt-Abschnitte, ein Textblock je Spalte), und muss bei jedem
+  Update von openhtmltopdf mitgeprüft werden. Im Produkt läge er vor einer Signatur des PDFs.
 * Der Betreff ist eine Überschrift (`H1`), sieht aber aus wie in der Word-Vorgabe.
 * Die Anschrift (`<address>`) wird zu `Sect` mit `P`, nicht zu einem eigenen Tag.
 
