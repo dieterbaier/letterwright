@@ -22,14 +22,30 @@ final class Vorschau {
 
     /**
      * Startet Paged.js und meldet dem Host nach der Paginierung Seitenzahl und Höhe. Vorher
-     * entfernt sie die Rollen an den Fortsetzungen, die Paged.js beim Seitenumbruch klont; sonst
-     * gäbe es je Seite eine eigene main-Landmark.
+     * bereitet sie das paginierte Dokument für Screenreader auf:
+     * <ul>
+     * <li>Rollen an den Fortsetzungen entfernen, die Paged.js beim Seitenumbruch klont; sonst gäbe
+     * es je Seite eine eigene main-Landmark.</li>
+     * <li>Randfelder verbergen. Paged.js setzt sie im DOM vor den Seiteninhalt; sonst käme die
+     * Fußzeile vor dem Brief und „Seite x von y“ mitten im Text.</li>
+     * <li>Die Fußzeile als visuell versteckte Kopie ans Ende setzen, damit ihr Inhalt am Schluss
+     * vorgelesen wird.</li>
+     * </ul>
      */
     private static final String KONFIGURATION = """
             window.PagedConfig = {
               auto: true,
               after: (flow) => {
                 document.querySelectorAll("[data-split-from][role]").forEach((e) => e.removeAttribute("role"));
+                document.querySelectorAll(".pagedjs_margin").forEach((e) => e.setAttribute("aria-hidden", "true"));
+                const fuss = document.querySelector(".pagedjs_margin .fusszeile");
+                if (fuss) {
+                  const kopie = fuss.cloneNode(true);
+                  kopie.className = "nur-vorlesen";
+                  // Im Briefpapier stehen die Spalten ohne Leerraum; vorgelesen braucht es einen.
+                  kopie.querySelector(".links")?.after(" ");
+                  document.body.append(kopie);
+                }
                 window.vorschauFertig = true;
                 parent.postMessage({
                   typ: "standardschreiben-vorschau",
@@ -39,8 +55,13 @@ final class Vorschau {
               }
             };""";
 
-    /** Seiten auf dem Bildschirm wie Blätter darstellen; im Druck ohne Wirkung. */
+    /**
+     * Seiten auf dem Bildschirm wie Blätter darstellen; im Druck ohne Wirkung. Dazu die übliche
+     * Regel für Inhalt, der nur für Screenreader da ist.
+     */
     private static final String BILDSCHIRM = """
+            .nur-vorlesen { position: absolute; width: 1px; height: 1px; overflow: hidden;
+              clip-path: inset(50%); white-space: nowrap; }
             @media screen {
               html { background: #e6e6e6; }
               .pagedjs_pages { padding: 8mm 0; }
@@ -113,7 +134,11 @@ final class Vorschau {
                 <title>Vorschau: %1$s</title>
                 <style>
                   body { font-family: system-ui, sans-serif; margin: 1rem; }
-                  iframe { display: block; width: 230mm; max-width: 100%%; height: 80vh; border: 1px solid #999; }
+                  /* Ist das Fenster schmaler als die Seite (Zoom 200 %%), scrollt der Bereich
+                     waagerecht. Er ist fokussierbar, damit das auch mit den Pfeiltasten geht. */
+                  .blaettern { overflow-x: auto; max-width: 100%%; border: 1px solid #999; }
+                  .blaettern:focus-visible { outline: 3px solid #1a5fb4; outline-offset: 2px; }
+                  iframe { display: block; width: 230mm; height: 80vh; border: 0; }
                 </style>
                 </head>
                 <body>
@@ -121,8 +146,10 @@ final class Vorschau {
                   <h1>Vorschau</h1>
                   <button type="button" id="aktualisieren">Aktualisieren</button>
                   <p id="status" role="status" aria-live="polite">Vorschau wird erstellt …</p>
-                  <iframe id="vorschau" title="Vorschau des Schreibens: %1$s" sandbox="allow-scripts"
-                          srcdoc="%2$s"></iframe>
+                  <div class="blaettern" tabindex="0" role="region" aria-label="Seiten der Vorschau">
+                    <iframe id="vorschau" title="Vorschau des Schreibens: %1$s" sandbox="allow-scripts"
+                            srcdoc="%2$s"></iframe>
+                  </div>
                   <p><a href="#aktualisieren">Zurück zu „Aktualisieren“</a></p>
                 </main>
                 <script>

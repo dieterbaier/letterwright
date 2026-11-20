@@ -143,9 +143,11 @@ erwarteten Verstöße: fehlende XMP-Metadaten, kein Tagging, keine Sprachangabe.
 Was veraPDF nicht prüft und die Stichprobe klären muss, zeigt `struktur`. Beim Stand dieses
 Prototyps fällt auf:
 
-* Die Fußzeile ist ein Artefakt, weil openhtmltopdf laufende Elemente nicht taggt. Ihr Inhalt
-  (Öffnungszeiten, Homepage) fehlt damit für Hilfstechnologien.
-* Der Betreff ist ein Absatz, keine Überschrift. Die Word-Vorgabe hat dort auch keine.
+* *Bekannter Makel:* Die Fußzeile (Öffnungszeiten, Homepage) ist im PDF ein Artefakt, weil
+  openhtmltopdf laufende Elemente (`position: running()`) nicht taggt. Hilfstechnologien lesen
+  sie nicht vor. Eine Umgehung, etwa eine unsichtbare Kopie im Tag-Baum, ist nicht umgesetzt; in
+  der Vorschau wird die Fußzeile vorgelesen.
+* Der Betreff ist eine Überschrift (`H1`), sieht aber aus wie in der Word-Vorgabe.
 * Die Anschrift (`<address>`) wird zu `Sect` mit `P`, nicht zu einem eigenen Tag.
 
 == Barrierefreiheit der Vorschau
@@ -155,27 +157,28 @@ läuft getrennt auf der Host-Seite und im Dokument des iframe; wegen der opaken 
 nicht von außen hineinsehen. Playwright wertet über das DevTools-Protokoll aus, die CSP des
 iframe gilt dafür nicht. Stand für das mehrseitige Referenzschreiben:
 
-* axe-core: keine Verstöße der Stufen serious und critical. Moderat bleiben „keine
-  Überschrift der Ebene 1“ und „Inhalt außerhalb von Landmarks“ (Briefkopf, Infoblock).
+* axe-core: keine Verstöße der Stufen serious und critical. Moderat bleibt „Inhalt außerhalb
+  von Landmarks“ (Briefkopf, Anschrift, Infoblock).
+* Der Betreff ist die Überschrift des Schreibens (`h1`), im Stil der übrigen Betreffzeilen.
 * Paged.js klont ein Element, das über eine Seite reicht, samt Rolle. Aus `<main>` wurden so
   drei Landmarks. Das Schreiben ist deshalb ein `div` mit `role="main"`, und die Vorschau
   entfernt die Rolle an den Fortsetzungen (`[data-split-from]`).
-* Lesereihenfolge im Schreiben eingehalten. „Seite x von y“ steht im Accessibility-Baum von
-  Chrome (Abfrage über das DevTools-Protokoll); Playwrights `ariaSnapshot` blendet generierten
-  CSS-Inhalt aus und zeigt es nicht. Die Seitenzahlen werden also vermutlich vorgelesen.
-* Die Fußzeile steht im Accessibility-Baum vor dem Schreiben, weil Paged.js die Randfelder im
-  DOM vor den Seiteninhalt setzt. VoiceOver in Safari bestätigt das (Owner, 2026-11-20): Beim
-  Betreten des iframe liest es zuerst die Öffnungszeiten, dann den Brief von oben. Im PDF ist
-  die Fußzeile ein Artefakt und fehlt ganz.
-* Tastatur: Das iframe ist kein Tab-Stopp, weil das Schreiben nichts Fokussierbares enthält.
-  Keine Fokusfalle. „Aktualisieren“ behält den Fokus, beide Statusmeldungen kommen über die
-  `aria-live`-Region.
-* Zoom 200 %: Ob die Seite passt, hängt von der Fensterbreite ab. In einem breiten Fenster
-  (1920 px) passt sie. Bei 1280 px Fensterbreite bleiben 640 CSS-Pixel; die Seite ist breiter
-  als das iframe und wird rechts abgeschnitten (Logo, Infoblock). Mit der Maus lässt sich das
-  iframe waagerecht scrollen, per Tastatur nicht. Vom Owner nachgestellt (2026-11-20).
+* Paged.js setzt die Randfelder im DOM vor den Seiteninhalt. Ohne Eingriff liest VoiceOver
+  zuerst die Fußzeile und dann den Brief (Owner, 2026-11-20), dazu „Seite x von y“ mitten im
+  Text. Die Vorschau verbirgt deshalb alle Randfelder mit `aria-hidden` und hängt eine visuell
+  versteckte Kopie der Fußzeile ans Ende. Lesereihenfolge jetzt: Briefkopf, Anschrift,
+  Infoblock, Betreff, Brieftext, Fußzeile. Playwrights `ariaSnapshot` zeigt generierten
+  CSS-Inhalt wie „Seite x von y“ nicht; die Prüfung kontrolliert deshalb die Randfelder direkt.
+* Tastatur: Keine Fokusfalle. Die Seiten liegen in einem fokussierbaren Bereich
+  (`role="region"`), der sich mit den Pfeiltasten scrollen lässt. „Aktualisieren“ behält den
+  Fokus, beide Statusmeldungen kommen über die `aria-live`-Region.
+* Zoom 200 %: In einem schmalen Fenster (1280 px, also 640 CSS-Pixel) ist die Seite breiter als
+  das Fenster. Der Bereich scrollt dann waagerecht, mit der Maus und mit den Pfeiltasten. Die
+  Seite selbst bricht nicht um; sie ist ein festes A4-Blatt (Ausnahme für zweidimensionale
+  Inhalte in WCAG 1.4.10).
 
 VoiceOver (Safari) liest das Schreiben im sandboxed iframe vollständig, sobald man den Frame
 betreten hat (VO+Shift+Pfeil runter). Das gilt auch ohne Sandbox, mit `src` statt `srcdoc` und
 mit `allow-same-origin`; die Isolation selbst ist also kein Hindernis. Safaris einfache
-Vorlesefunktion liest dagegen nur die Host-Seite. Offen bleibt die Prüfung mit NVDA.
+Vorlesefunktion liest dagegen nur die Host-Seite. Offen bleibt die Prüfung mit NVDA und eine
+erneute Prüfung mit VoiceOver nach der geänderten Reihenfolge.
