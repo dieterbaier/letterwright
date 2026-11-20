@@ -45,14 +45,38 @@ public final class Prototyp {
 
         Path datenDatei = Path.of("daten", schreiben + ".json");
         String html = zusammenfuehren(datenDatei);
+        // Nur für die Gegenprobe: BEREINIGUNG=aus zeigt, was ohne Bereinigung ankäme.
+        boolean gegenprobe = "aus".equals(System.getenv("BEREINIGUNG"));
+        if (gegenprobe) {
+            System.out.println("Bereinigung: AUSGESCHALTET (Gegenprobe)");
+        } else {
+            Bereinigung.Ergebnis bereinigt = Bereinigung.bereinige(html);
+            html = bereinigt.html();
+            System.out.println("Bereinigung: " + bereinigt.befunde().size() + " Befunde");
+            bereinigt.befunde().forEach(b -> System.out.println("  " + b));
+        }
         Path htmlDatei = ausgabe.resolve(schreiben + ".html");
         Files.writeString(htmlDatei, html, StandardCharsets.UTF_8);
 
         Path pdfDatei = ausgabe.resolve(schreiben + ".pdf");
+        if (gegenprobe) {
+            // Ohne Bereinigung ist das HTML oft kein wohlgeformtes XHTML, und openhtmltopdf bricht
+            // ab. Für die Gegenprobe zählt nur die Vorschau.
+            Files.deleteIfExists(pdfDatei);
+            Vorschau.Dateien v = Vorschau.erzeuge(html, betreff(datenDatei), schriftliste,
+                    Path.of("node_modules", "pagedjs", "dist", "paged.polyfill.min.js"), ausgabe, schreiben);
+            System.out.println("Vorschau: " + v.host() + " (ohne PDF)");
+            return;
+        }
         try (OutputStream out = Files.newOutputStream(pdfDatei)) {
             PdfErzeugung.erzeuge(html, htmlDatei.toAbsolutePath().toUri().toString(), schriftliste, out);
         }
         int fuss = FusszeileTaggen.anwenden(pdfDatei);
+        // Absicherung: Hat das Briefpapier eine Fußzeile, muss der Schritt sie finden. Schlägt das
+        // fehl, hat sich vermutlich die Ausgabe von openhtmltopdf geändert.
+        if (fuss == 0 && html.contains("<footer")) {
+            throw new IllegalStateException("Fußzeile im PDF nicht gefunden; Ausgabe von openhtmltopdf geändert?");
+        }
         System.out.println("Fußzeile: " + fuss + " Textblock/-blöcke vom Artefakt zu getaggtem Inhalt");
 
         Vorschau.Dateien vorschau = Vorschau.erzeuge(html, betreff(datenDatei), schriftliste,

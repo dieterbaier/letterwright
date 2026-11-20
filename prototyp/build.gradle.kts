@@ -17,6 +17,7 @@ dependencies {
     implementation("org.freemarker:freemarker:2.3.35")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.23.0")
     implementation("org.verapdf:validation-model:1.30.4")
+    implementation("org.jsoup:jsoup:1.24.1")
 }
 
 application {
