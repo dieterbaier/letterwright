@@ -34,6 +34,7 @@ public final class Vergleich {
         float maxDx = 0;
         float maxDy = 0;
         int fehlend = 0;
+        int textAbweichung = 0;
         for (Zeile r : referenz) {
             Optional<Zeile> k = partner(r, kandidat);
             if (k.isEmpty()) {
@@ -46,9 +47,17 @@ public final class Vergleich {
             maxDx = Math.max(maxDx, Math.abs(dx));
             maxDy = Math.max(maxDy, Math.abs(dy));
             String schrift = r.schrift().equals(k.get().schrift()) ? "" : "  Schrift " + k.get().schrift();
-            System.out.printf(Locale.ROOT, "S%d  dx=%+5.1f  dy=%+5.1f  %s%s%n", r.seite(), dx, dy, kurz(r.text()), schrift);
+            // Eine Bezeichnung, die der eine Renderer mit ihrem Wert als einen Abschnitt schreibt,
+            // passt als Präfix. Ein umbrochener Text passt genauso; deshalb wird jede Textabweichung
+            // ausgewiesen, damit ein Umbruch nicht als Treffer durchgeht.
+            String text = normal(r.text()).equals(normal(k.get().text())) ? "" : "  TEXT≠ „" + kurz(k.get().text()) + "“";
+            if (!text.isEmpty()) {
+                textAbweichung++;
+            }
+            System.out.printf(Locale.ROOT, "S%d  dx=%+5.1f  dy=%+5.1f  %s%s%s%n", r.seite(), dx, dy, kurz(r.text()), schrift, text);
         }
-        System.out.printf(Locale.ROOT, "%nGrößte Abweichung: dx=%.1f mm, dy=%.1f mm; fehlende Zeilen: %d%n", maxDx, maxDy, fehlend);
+        System.out.printf(Locale.ROOT, "%nGrößte Abweichung: dx=%.1f mm, dy=%.1f mm; fehlende Zeilen: %d; Textabweichungen: %d%n",
+                maxDx, maxDy, fehlend, textAbweichung);
     }
 
     static Optional<Zeile> partner(Zeile r, List<Zeile> kandidaten) {

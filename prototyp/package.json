@@ -1,0 +1,13 @@
+{
+  "name": "standardschreiben-prototyp",
+  "private": true,
+  "description": "Wegwerf-Prototyp für Issue #3: Paged.js-Vorschau und ihre Prüfung",
+  "type": "module",
+  "scripts": {
+    "pruefen": "node vorschau/pruefen.mjs"
+  },
+  "devDependencies": {
+    "pagedjs": "0.4.3",
+    "playwright": "1.65.1"
+  }
+}

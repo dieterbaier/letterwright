@@ -20,7 +20,8 @@
 <style>
   /* Die DOCX-Ränder sind links 30 mm und rechts 20 mm. openhtmltopdf schneidet aber alles ab,
      was über den Inhaltsbereich der Seite hinausragt, und Word setzt Falzmarken und den rechten
-     Rahmen in den Rand. Darum sind die seitlichen Seitenränder 0 und der Body rückt ein. */
+     Rahmen in den Rand. Darum sind die seitlichen Seitenränder 0, und die Inhaltsblöcke rücken
+     ein. Nicht der Body: Paged.js verschiebt dessen Inhalt in eigene Seitencontainer. */
   /* Word setzt den zusätzlichen Zeilenabstand des 1,5-zeiligen Fließtexts unter die Schrift, CSS
      verteilt ihn je zur Hälfte darüber und darunter. Die Zeilenbox liegt in CSS daher 1,15 mm
      höher zum Text als in Word. Damit der Text oben auf Folgeseiten wie in Word steht, ist der
@@ -41,24 +42,29 @@
       /* Grundlinie 17,1 mm */
       padding-top: 14.1mm;
       padding-left: 30mm;
-      width: 160mm;
+      /* Paged.js zählt den Einzug in die Breite, openhtmltopdf nicht; 180 mm reicht für beide */
+      width: 180mm;
     }
   }
   @page :first {
     /* Erste Seite: erster Abschnitt der DOCX, oben 567 twips. Der feste Bereich .seite1 bezieht
        sich auf diese Kante, deshalb hier ohne Verschiebung. */
     margin-top: 10mm;
-    @top-left { content: none; }
+    /* content: "" statt none: In Paged.js 0.4.3 blendet ein Randfeld mit content: none alle
+       folgenden Randfelder derselben Seite aus, hier die Fußzeile. */
+    @top-left { content: ""; }
     @bottom-left {
       content: element(fusszeile);
       vertical-align: top;
       padding-left: 30mm;
-      width: 160mm;
+      /* Paged.js zählt den Einzug in die Breite, openhtmltopdf nicht; 180 mm reicht für beide */
+      width: 180mm;
     }
   }
 
   html { font-family: "Arial"; font-size: 12pt; color: #000; }
-  body { margin: 0; padding: 0 20mm 0 30mm; }
+  body { margin: 0; }
+  .seite1, main { margin: 0 20mm 0 30mm; }
   p { margin: 0; }
 
   /* Bereich der ersten Seite mit fest positionierten Teilen; der Fließtext beginnt darunter. */
@@ -107,9 +113,11 @@
   .betreffblock p.hinweis { font-family: "Arial Narrow"; font-size: 9pt; line-height: 3.8mm; }
 
   /* Formatvorlage „Standard“: Arial 12, 1,5-zeilig (1,5 × 1,1499 × 12 pt = 7,30 mm), 6 pt davor
-     und danach. keepLines: Absatz nicht über Seiten trennen; keine Absatzkontrolle.
+     und danach, die Word zu 6 pt zwischen zwei Absätzen zusammenfasst. Hier nur als Abstand
+     danach: Oben auf einer Folgeseite verwerfen Word und openhtmltopdf den Abstand davor,
+     Paged.js nicht. keepLines: Absatz nicht über Seiten trennen; keine Absatzkontrolle.
      Zum Versatz der Zeilenbox gegenüber Word siehe @page. */
-  .inhalt p { line-height: 7.3mm; margin: 6pt 0; page-break-inside: avoid; orphans: 1; widows: 1; }
+  .inhalt p { line-height: 7.3mm; margin: 0 0 6pt; page-break-inside: avoid; orphans: 1; widows: 1; }
   /* Formatvorlage „Unterzeichnen“: 600 twips davor */
   .inhalt p.gruss { margin-top: 10.6mm; }
 
