@@ -1,0 +1,70 @@
+= Prototyp: Vorlagenformat und Rendering
+
+Wegwerf-Prototyp für https://github.com/dieterbaier/standardschreiben/issues/3[#3]. Er
+prüft ADR-003, ADR-004, ADR-005 und ADR-014 an der DOCX-Vorgabe unter `src/examples/`.
+Der Code wird nicht ins MVP übernommen und liegt deshalb außerhalb des Gradle- und
+npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backend` ein.
+
+== Was er heute kann
+
+* Briefpapier, Standardschreiben und Daten mit FreeMarker (ADR-008) in zwei Durchläufen zu
+  einem HTML-Dokument zusammenführen.
+* Daraus mit openhtmltopdf ein PDF erzeugen, angefordert als PDF/A-2b mit PDF/UA-Tagging.
+  Geprüft ist die Konformität noch nicht.
+* Die Textpositionen zweier PDFs in Millimetern vergleichen, z. B. das Word-PDF der Vorgabe
+  mit dem PDF des Prototyps.
+
+== Aufbau
+
+[cols="1,3"]
+|===
+| `src/main/resources/vorlagen/briefpapier/` | Briefpapier mit Layout, festen Angaben und Platzhaltern
+| `src/main/resources/vorlagen/standardschreiben/` | Inhalt eines Standardschreibens
+| `daten/` | Daten je Schreiben, wie sie der Host liefern würde
+| `referenz/` | Referenz-PDFs, mit Microsoft Word aus der DOCX-Vorgabe exportiert
+| `schriften/` | Schriftordner des Hosts (ADR-017), nicht eingecheckt
+| `ausgabe/` | Erzeugtes HTML und PDF, nicht eingecheckt
+|===
+
+== Schriften
+
+Nach ADR-017 ist der Ordner des Hosts die einzige Schriftquelle. Der Prototyp liest jede
+`.ttf` und `.otf` aus `schriften/` und nimmt Familie, Gewicht und Stil aus der Datei selbst.
+Lizenzpflichtige Schriften werden nicht eingecheckt. Auf macOS lässt sich der Ordner mit den
+Systemschriften füllen:
+
+[source,sh]
+----
+mkdir -p schriften
+for f in "Arial" "Arial Bold" "Arial Italic" "Arial Bold Italic" \
+         "Arial Narrow" "Arial Narrow Bold" "Arial Narrow Italic" "Arial Narrow Bold Italic"; do
+  ln -sf "/System/Library/Fonts/Supplemental/$f.ttf" "schriften/$f.ttf"
+done
+----
+
+Ein anderer Ordner wird als zweites Argument übergeben. Die OFL-Ersatzschriften aus ADR-017
+kommen in einem späteren Schritt.
+
+== Aufrufe
+
+Alle Aufrufe im Ordner `prototyp/`; sie nutzen den Gradle-Wrapper des Repositorys.
+
+[source,sh]
+----
+# Schreiben erzeugen: ausgabe/geschaeftsbrief-einseitig.html und .pdf
+../gradlew run --args="geschaeftsbrief-einseitig"
+
+# Textpositionen eines PDFs ausgeben
+../gradlew positionen --args="ausgabe/geschaeftsbrief-einseitig.pdf"
+
+# Mit dem Word-PDF der Vorgabe vergleichen
+../gradlew vergleich --args="referenz/geschaeftsbrief-word.pdf ausgabe/geschaeftsbrief-einseitig.pdf"
+----
+
+== Vorgehen bei den Maßen
+
+Die Maße im Briefpapier stammen aus der DOCX: Seitenränder, Rahmen, Tabstopps und
+Formatvorlagen. Wo Word eigene Regeln anwendet, z. B. beim Zeilenabstand, sind sie an den
+Grundlinien des Word-PDFs abgeglichen. Die Kommentare im CSS nennen die Grundlinie, auf die
+eine Angabe zielt. Was dabei über openhtmltopdf gelernt wurde, steht an der jeweiligen Stelle
+im CSS.
