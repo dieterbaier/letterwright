@@ -1,0 +1,210 @@
+---
+id: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
+type: ADR
+title: 'DDD-Rollen und Selbstvalidierung im Fachmodell'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-21'
+reviewed: false
+summary: 'Die DDD-Rollen im Fachmodell sind mit den Annotationen von jMolecules gekennzeichnet. Briefpapier und Standardschreiben sind Aggregate über ihre Versionen. Aggregate und Entitäten sind über ihre Identität gleich, Value Objects über ihren Wert. Jeder Typ prüft seine Pflichtattribute im Konstruktor mit den allgemeinen Prüfungen aus dem Modul validierung.'
+derived_from:
+- type: external
+  description: 'Review zu PR #57 (Fachmodell, #51) und Entscheidungen des Owners vom 2026-11-21'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/57
+tags:
+- decision
+- domaene
+- ddd
+- validierung
+relations:
+- type: refines
+  target: ADR-002-hexagonale-architektur-und-ports
+  status: proposed
+  rationale: 'ADR-002 verlangt eine frameworkfreie Domäne nach DDD. Dieser ADR legt fest, wie die DDD-Rollen sichtbar werden und welche Bibliotheken die Domäne dafür nutzen darf.'
+  reviewed: false
+- type: refines
+  target: ADR-007-versionierung-und-unveraenderlichkeit
+  status: proposed
+  rationale: 'ADR-007 legt Versionen, Zustände und Snapshot fest. Dieser ADR legt fest, wer die Regeln über alle Versionen einer Vorlage sichert: das Aggregat der Vorlage.'
+  reviewed: false
+- type: addresses
+  target: QS-008-unveraenderliche-schreiben
+  status: proposed
+  rationale: 'Veröffentlichte Versionen lassen sich nur über das Aggregat ihrer Vorlage ändern, und das lässt es nicht zu. Ungültige Modellobjekte entstehen gar nicht erst.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell]]
+== ADR-018: DDD-Rollen und Selbstvalidierung im Fachmodell
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Der Owner hat die vier Einzelentscheidungen am 2026-11-21 nach dem Review von
+PR #57 getroffen: jMolecules-Annotationen, die Version als Teil der Vorlage,
+Gleichheit über die Identität und leerer Inhalt nur im Entwurf. Dieser ADR ist
+KI-gestützt formuliert und wartet auf die Annahme im Review.
+
+=== Entscheidung
+
+* **DDD-Rollen mit jMolecules-Annotationen.** Die Domäne nutzt nur das Artefakt
+  `org.jmolecules:jmolecules-ddd` mit `@AggregateRoot`, `@Entity`, `@ValueObject`
+  und `@Identity`. Es enthält nur Annotationen und Interfaces und hängt nur an
+  `jstereotype`, das ebenfalls nur Annotationen enthält. Die Klassennamen bleiben
+  Ubiquitous Language, also `Briefpapier` und nicht `BriefpapierAggregate`.
+  Integrationen von jMolecules (Spring, Jackson, ByteBuddy) und dessen
+  ArchUnit-Regeln sind damit nicht zugelassen.
+* **Aggregate.**
+** `Briefpapier` und `Standardschreiben` sind Aggregate Roots über ihre
+   Versionen. `Vorlagenversion` ist eine Entität in ihrem Aggregat. Jede Änderung
+   an einer Version geht über die Root. Die Root sichert die Regeln über alle
+   Versionen: Die Nummern laufen lückenlos von 1, es gibt höchstens einen
+   Entwurf, und er ist die neueste Version.
+** `Snapshot` und `Schreiben` sind eigene Aggregate. Sie verweisen auf
+   Vorlagenversionen nur per `Versionsverweis`, das Standardschreiben auf sein
+   Briefpapier nur per ID.
+* **Gleichheit.** Aggregate und Entitäten sind finale Klassen und über ihre
+  Identität gleich. Zwei Stände desselben Briefpapiers sind also gleich. Value
+  Objects sind Records, Enums oder unveränderliche Klassen mit Wertgleichheit.
+* **Selbstvalidierung.**
+** Jeder Typ prüft jedes Pflichtattribut im Konstruktor, auch zusammengesetzte
+   Typen. Dass ein enthaltener Value Object sich selbst prüft, ersetzt nicht die
+   Prüfung, ob er vorhanden ist.
+** Die allgemeinen Prüfungen liegen im Modul `validierung`: Pflichtwert, nicht
+   leer, nicht blank, Untergrenze, Sammlung ohne Lücken. Es ist frameworkfrei und
+   kennt kein anderes Modul.
+** Welche Prüfung für ein Attribut gilt, entscheidet der Typ selbst. Fachliche
+   Regeln wie Zustandsübergänge bleiben im Modell.
+* **Fehlervertrag.**
+** Ein ungültiger oder fehlender Wert ergibt `Validierungsfehler` (eine
+   `IllegalArgumentException`), dessen Meldung das Attribut nennt. Nie eine
+   `NullPointerException`.
+** Ein fachlich verbotener Schritt ergibt `UnzulaessigerZustandswechsel` (eine
+   `IllegalStateException`), etwa eine veröffentlichte Version ändern.
+* **Erzeugung.**
+** Neue Objekte entstehen über sprechende Fabrikmethoden wie `anlegen`,
+   `ausSnapshot` und `neu()`.
+** Gespeicherte Objekte entstehen über `wiederherstellen`. Auch dabei gelten
+   alle Prüfungen.
+* **Zeit als Parameter.** Das Modell liest keine Uhr. Der Anwendungsfall liest
+  seine Uhr einmal und übergibt den Zeitpunkt.
+* **Leerer Inhalt.** Ein Entwurf darf leeren Inhalt haben, aber keinen fehlenden.
+  Veröffentlichen verlangt Inhalt, der nicht nur aus Leerraum besteht.
+
+ArchUnit prüft, dass die Domäne außer dem JDK nur JSpecify, die
+jMolecules-Annotationen und `validierung` benutzt. Ebenso prüft es, dass
+`validierung` kein anderes Paket der Bibliothek kennt. Das SPI nutzt
+`validierung` nicht, es bleibt nach ADR-016 eigenständig.
+
+=== Kontext
+
+Das Review zu PR #57 hat gezeigt, dass das erste Fachmodell ungültige Objekte
+zuließ. `new Briefpapier(null, "Name", null)` war möglich, ein fehlender Text
+ergab eine `NullPointerException` statt einer verständlichen Meldung. Records
+verglichen alle Komponenten, sodass zwei Stände desselben Briefpapiers ungleich
+waren. Dass jede Versionsnummer nur einmal vergeben wird, konnte kein Objekt
+sichern.
+
+Der Owner möchte die DDD-Rollen im Code erkennen und die allgemeinen Prüfungen
+in einem eigenen Modul haben. ADR-002 hält fest, welche Bibliotheken die Domäne
+nutzen darf.
+
+=== Entscheidungstreiber
+
+* Ubiquitous Language: Die Namen im Code sind die Begriffe des Glossars.
+* Kein ungültiges Modellobjekt, Fehler am Ort ihrer Entstehung.
+* Invarianten über mehrere Objekte liegen im Modell, nicht im Anwendungsfall.
+* Möglichst wenige und möglichst kleine Abhängigkeiten in der Domäne.
+
+=== Betrachtete Optionen
+
+==== Option 1: Namenskonvention
+
+Suffixe wie `…Aggregate`, `…Entity` und `…Value`, mit dokumentierten Varianten
+wie `…Id` und `…Verweis`. Keine Abhängigkeit, aber technische Namen im Code und
+im Glossar.
+
+==== Option 2: jMolecules-Annotationen (gewählt)
+
+Standardisierte Annotationen, Namen bleiben fachlich. Eine kleine Abhängigkeit
+nur aus Annotationen. Die ArchUnit-Regeln von jMolecules lassen sich später
+nutzen, wenn ein Anlass besteht.
+
+==== Option 3: Rolle nur im Glossar
+
+Keine Änderung am Code; die Rolle steht im Glossar. Nichts prüft, ob Code und
+Glossar übereinstimmen.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
+Unterstützung. Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Rolle im Code erkennbar | +1 | +1 | -1
+| Namen bleiben Ubiquitous Language | -1 | +1 | +1
+| Keine zusätzliche Abhängigkeit | +1 | -1 | +1
+| Später automatisch prüfbar | 0 | +1 | -1
+s| Summe s| +1 s| +2 s| 0
+|===
+
+Die Selbstvalidierung, die Aggregatgrenzen und die Gleichheit sind mit jeder
+Option dieselben. Die Matrix vergleicht nur die Kennzeichnung.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Ein Modellobjekt ist immer gültig. Wer es erzeugt, bekommt einen Fehler mit
+  Attributnamen statt einer späteren `NullPointerException`.
+* Die Regeln über alle Versionen einer Vorlage sichert das Aggregat. Der
+  Anwendungsfall und die Persistenz müssen sie nicht nachbauen.
+* Die Rollen sind im Code sichtbar, die Namen bleiben fachlich.
+
+==== Negativ
+
+* Eine Vorlage wird mit all ihren Versionen geladen. Bei vielen Versionen kann
+  das teuer werden; dann wäre ein eigenes Aggregat für die Version neu zu bewerten.
+* Aggregate sind Klassen mit handgeschriebenem `equals`, `hashCode` und Zugriffen
+  statt Records.
+* Eine zusätzliche Abhängigkeit in der Domäne, die bei Updates mitzuprüfen ist.
+
+==== Neutral oder Folgearbeiten
+
+* ADR-002 hält fest, welche Bibliotheken die Domäne nutzen darf. Die Fassung vom
+  2026-11-21 stammt aus dem Review zu PR #57.
+* Das Querschnittskonzept „Fachmodell“ beschreibt die Konventionen für neue
+  Typen.
+* Die Persistenz (#6) stellt Aggregate über `wiederherstellen` her. Gleichzeitige
+  Änderungen derselben Vorlage regelt sie, etwa über eine Versionsspalte.
+* Ob es neben der neuesten veröffentlichten Version weitere gültige geben darf,
+  legt #55 fest. Das Modell erlaubt mehrere veröffentlichte Versionen.
+
+=== Impact
+
+include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Gibt es höchstens eine veröffentlichte Version je Vorlage, oder bleiben ältere
+  veröffentlicht, bis sie zurückgezogen werden? Das klärt #55.
+
+=== Review Notes
+
+Wird erst nach Annahme durch den Owner als reviewed markiert.

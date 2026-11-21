@@ -79,6 +79,27 @@ Wir setzen eine **hexagonale Architektur** (Ports and Adapters) nach DDD ein:
 Schnitt und Datentypen des SPI begründet
 xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016].
 
+**Frameworkfreiheit der Domäne** (präzisiert am 2026-11-21, Review zu PR #57):
+Die Domäne bleibt unabhängig von Anwendungs-, DI- und Persistenzframeworks. Ihr
+fachliches Verhalten muss ohne Container, Proxies und Technologieintegration
+ausführbar und testbar sein. Externe Bibliotheken werden einzeln anhand von Zweck,
+transitiven Abhängigkeiten, Einfluss auf das Modell und Austauschaufwand bewertet.
+Rein beschreibende Annotationen oder allgemeine Hilfsbibliotheken können
+ausdrücklich zugelassen werden; daraus folgt keine pauschale Freigabe weiterer
+Abhängigkeiten. Codegenerierung wird gesondert bewertet, auch wenn sie keine
+Laufzeitabhängigkeit erzeugt. Spring-Komponenten bleiben außerhalb der Domäne;
+Spring kann reine Domänenservices von außen über die Konfiguration instanziieren.
+
+Zugelassen sind derzeit:
+
+* JSpecify für den Null-Vertrag (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
+* Die DDD-Annotationen aus `jmolecules-ddd`
+  (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
+* Das projekteigene Modul `validierung` (ADR-018).
+
+Andere Bibliotheken sind damit nicht freigegeben, auch Lombok nicht. Eine Regel
+in den ArchUnit-Tests prüft diese Liste.
+
 Die Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren: Driving
 Adapter kennen nur `usecases-in`, Driven Adapter nur `usecases-out` (ADR-009).
 `adapter-host` kennt zusätzlich `spi`, der Kern kennt `spi` nicht.
