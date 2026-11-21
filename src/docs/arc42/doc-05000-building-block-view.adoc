@@ -31,7 +31,7 @@ xref:bausteine-ebene-2-adapter-rendering[adapter-rendering].
 !include <C4/C4_Component>
 System_Boundary(host, "Host-Anwendung") {
   Container_Boundary(fe, "Frontend (npm-Paket)") {
-    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte, barrierefreie Vorschau im sandboxed iframe")
+    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte Vorschau im sandboxed iframe")
     Component(ui_uebersicht, "Übersicht", "React", "Gespeicherte Schreiben listen, laden, löschen")
     Component(ui_editor, "Vorlagen-Editor", "React, ProseMirror/TipTap", "Briefpapier und Standardschreiben pflegen")
   }
@@ -84,7 +84,7 @@ Rel(ren, schriften, "liest Schriftdateien")
 | adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006]) | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
 | adapter-host | Ausgehender Adapter: ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab | Java 21, JSpecify | `src/application/backend/adapter/out/adapter-host`
 | spring-boot-starter | Autokonfiguration, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security; exportiert nur `spi` | Spring Boot Autoconfigure 4.1, _Spring Security_ | `src/application/backend/spring-boot-starter`
-| Frontend-Paket | Vorschau, Übersicht, Editor | React 19, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | `src/application/frontend`
+| Frontend-Paket | Vorschau, Übersicht, Editor. Die Vorschau soll barrierefrei sein (xref:qs-003-barrierefreie-vorschau[QS-003]); der Nachweis ist in #3 noch offen (VoiceOver am Seitenwechsel, Reflow bei 200 %, NVDA). | React 19, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | `src/application/frontend`
 |===
 
 Querschnittlich, ohne eigenen Baustein:
@@ -154,9 +154,13 @@ Vorschau und PDF entstehen aus demselben bereinigten HTML. Die Vorschau bekommt
 nur Zusätze im Kopf, die das Layout nicht ändern; paginiert wird sie im Browser
 mit Paged.js in der Vorschau-Komponente des Frontends
 (xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). Die
-Konformitätsprüfung ruft `usecases-service` vor jedem Speichern über den Port
-auf, nicht die Rendering-Steuerung
-(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]).
+Konformitätsprüfung ruft `usecases-service` über den Port auf, nicht die
+Rendering-Steuerung, und zwar an zwei Stellen: vor jedem Speichern eines
+Schreibens und beim Veröffentlichen einer Vorlagenversion für ein Probe-PDF mit
+Beispieldaten. Die Prüfung ist Pflicht. Ohne Prüfer startet der
+Anwendungskontext des Hosts nicht; ist das PDF nicht konform oder die Prüfung
+nicht ausführbar, wird nichts gespeichert
+(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], Abschnitt Entscheidung).
 
 [cols="2,4,3,3,3", options="header"]
 |===
@@ -167,7 +171,7 @@ auf, nicht die Rendering-Steuerung
   wenn ein Schritt fehlschlägt; nichts wird still repariert.
 | Implementiert `Renderer` aus `usecases-out`
 | Java 21
-| `…adapter.out.rendering`
+| `…rendering`
 
 | Zusammenführung
 | Führt Briefpapier, Standardschreiben und Datenkontext in zwei Durchläufen zu
@@ -219,8 +223,9 @@ auf, nicht die Rendering-Steuerung
 | `…rendering.pdf`
 
 | PDF-Nachbearbeitung
-| Taggt die Fußzeile, die openhtmltopdf als Artefakt ausgibt, als lesbaren
-  Inhalt. Prüft bei jeder Erzeugung, dass genau die Fußzeilentexte aus dem HTML
+| Taggt die inhaltliche Fußzeile, die openhtmltopdf als Artefakt ausgibt, als
+  lesbaren Inhalt: die beiden Textblöcke der ersten Seite, Öffnungszeiten und
+  Homepage, je einmal nach dem Brieftext. Prüft bei jeder Erzeugung, dass genau die Fußzeilentexte aus dem HTML
   in dieser Reihenfolge am Ende des Strukturbaums stehen, sonst Abbruch.
   Seitenzahlen, Dekoration und identische Wiederholungen bleiben Artefakte.
   Vom Owner akzeptiert, sofern der Ausweichweg dokumentiert ist (Review zu
@@ -230,8 +235,11 @@ auf, nicht die Rendering-Steuerung
 | `…rendering.pdf`
 
 | Konformitätsprüfung
-| Prüft ein PDF gegen PDF/A-2b und PDF/UA-1. Default-Prüfer, den der Starter
-  automatisch konfiguriert.
+| Prüft ein PDF gegen PDF/A-2b und PDF/UA-1, vor jedem Speichern und beim
+  Veröffentlichen einer Vorlagenversion. Default-Prüfer, den der Starter
+  automatisch konfiguriert; ohne Prüfer startet der Host nicht (fail-fast), bei
+  nicht konformem PDF oder nicht ausführbarer Prüfung wird nichts gespeichert
+  (fail-closed).
 | Implementiert `KonformitaetsPruefer` aus `usecases-out`
 | veraPDF-Bibliothek mit Greenfield-Modell (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005])
 | `…rendering.konformitaet`
