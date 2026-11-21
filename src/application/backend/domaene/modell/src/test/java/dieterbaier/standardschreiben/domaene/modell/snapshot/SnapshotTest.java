@@ -1,4 +1,4 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.snapshot;
 
 import static dieterbaier.standardschreiben.domaene.modell.Pruefungen.lehntAb;
 import static dieterbaier.standardschreiben.domaene.modell.Testdaten.BRIEFPAPIER_V1;
@@ -9,6 +9,10 @@ import static dieterbaier.standardschreiben.domaene.modell.Testdaten.SACHBEARBEI
 import static dieterbaier.standardschreiben.domaene.modell.Testdaten.STANDARDSCHREIBEN_V3;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
+import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.Testdaten;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;

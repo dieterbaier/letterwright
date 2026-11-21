@@ -1,15 +1,15 @@
 package dieterbaier.standardschreiben.adapter.out.host;
 
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
-import dieterbaier.standardschreiben.domaene.modell.Dokumentverweis;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
-import dieterbaier.standardschreiben.domaene.modell.SchreibenId;
-import dieterbaier.standardschreiben.domaene.modell.Schreiben;
-import dieterbaier.standardschreiben.domaene.modell.Standardschreiben;
-import dieterbaier.standardschreiben.domaene.modell.Versionsnummer;
-import dieterbaier.standardschreiben.domaene.modell.Versionsverweis;
-import dieterbaier.standardschreiben.domaene.modell.VorlagenId;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 

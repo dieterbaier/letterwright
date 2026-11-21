@@ -3,7 +3,7 @@ package dieterbaier.standardschreiben.usecases.out;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
-import dieterbaier.standardschreiben.domaene.modell.Standardschreiben;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 
 /** Liefert den Datenkontext des Hosts in Domänenbegriffen. Implementiert von {@code adapter-host} (ADR-016). */
 public interface Platzhalterdatenquelle {

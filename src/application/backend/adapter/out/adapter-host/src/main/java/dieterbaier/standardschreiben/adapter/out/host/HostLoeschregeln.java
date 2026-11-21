@@ -1,8 +1,8 @@
 package dieterbaier.standardschreiben.adapter.out.host;
 
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
-import dieterbaier.standardschreiben.domaene.modell.Loeschentscheidung;
-import dieterbaier.standardschreiben.domaene.modell.Schreiben;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.spi.Loeschrichtlinie;
 import dieterbaier.standardschreiben.usecases.out.Loeschregeln;
 import dieterbaier.standardschreiben.validierung.Pruefe;

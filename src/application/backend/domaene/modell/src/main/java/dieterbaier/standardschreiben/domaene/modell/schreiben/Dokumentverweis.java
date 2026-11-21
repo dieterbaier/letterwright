@@ -1,4 +1,4 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.schreiben;
 
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import org.jmolecules.ddd.annotation.ValueObject;

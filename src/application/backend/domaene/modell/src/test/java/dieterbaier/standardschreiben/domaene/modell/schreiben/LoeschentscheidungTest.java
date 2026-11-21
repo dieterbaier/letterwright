@@ -1,4 +1,4 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.schreiben;
 
 import static dieterbaier.standardschreiben.domaene.modell.Pruefungen.lehntAb;
 import static org.assertj.core.api.Assertions.assertThat;
