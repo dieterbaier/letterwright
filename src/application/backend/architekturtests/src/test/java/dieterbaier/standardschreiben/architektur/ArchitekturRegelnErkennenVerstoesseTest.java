@@ -53,6 +53,16 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     }
 
     @Test
+    void zyklusZwischenAggregatpaketenVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.aggregatpaketeSindZyklenfrei(FIXTURE), "AggregatA");
+    }
+
+    @Test
+    void geteilterWerttypMitAggregatabhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.geteilteWerttypenKennenKeineAggregate(FIXTURE), "GeteilterTypMitAggregat");
+    }
+
+    @Test
     void entitaetOhneIdentitaetVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.aggregateUndEntitaetenKennzeichnenIhreIdentitaet(FIXTURE),
                 "EntitaetOhneIdentitaet");
