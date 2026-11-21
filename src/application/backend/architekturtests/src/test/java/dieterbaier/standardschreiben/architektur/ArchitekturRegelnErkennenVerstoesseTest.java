@@ -48,6 +48,16 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     }
 
     @Test
+    void domaeneMitNichtZugelassenerBibliothekVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.domaeneNutztNurZugelasseneBibliotheken(FIXTURE), "DomaeneMitFremderBibliothek");
+    }
+
+    @Test
+    void validierungMitDomaenenabhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.validierungIstEigenstaendig(FIXTURE), "ValidierungMitDomaene");
+    }
+
+    @Test
     void portMitAdapterAbhaengigkeitVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.portsKennenNurDieDomaene(FIXTURE), "AusgehenderPortMitAdapter");
     }
