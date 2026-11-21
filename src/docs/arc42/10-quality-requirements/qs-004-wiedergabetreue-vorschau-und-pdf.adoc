@@ -52,10 +52,14 @@ Der Owner verlangt, dass Vorschau und endgültiges Dokument gleich aussehen.
 Der Prototyp aus #3 erfüllt das Antwortmaß für beide Referenzschreiben am
 Chrome-Druck-PDF der Vorschau: gleiche Seitenzahl, gleiche erste und letzte
 Zeile je Seite, höchstens 0,3 mm Abweichung. Eine Gegenprobe belegt, dass der
-Vergleich zusätzliche Seiten und Zeilen findet. Die Bildschirmdarstellung der
-Vorschau ist nicht gemessen; wie sie sich messen lässt, ist offen. Ob die
-Vergleichswerkzeuge des Prototyps als Testwerkzeuge ins Produkt wandern, ist
-ebenfalls offen.
+Vergleich zusätzliche Seiten und Zeilen findet.
+
+Die Bildschirmdarstellung hat der Owner am 2026-11-21 per Sichtprobe geprüft:
+Vorschau im Browser und PDF bei 100 % nebeneinander, kein Unterschied zu erkennen.
+Die Grenze von 1 mm lässt sich so nicht belegen, ein Bildschirmpixel misst etwa
+0,26 mm. Die genaue Messung wird ein automatischer Test in #7: Er liest nach dem
+Umbruch durch Paged.js die Zeilenpositionen aus dem DOM des Browsers, also genau
+das, was der Bildschirm zeigt, und vergleicht sie wie der Prototyp mit dem PDF.
 
 === Impact
 

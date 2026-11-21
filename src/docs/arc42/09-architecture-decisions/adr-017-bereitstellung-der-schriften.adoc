@@ -284,6 +284,11 @@ include::generated/adr-017-bereitstellung-der-schriften-traceability.adoc[levelo
 
 === Annahmen
 
+* Lizenz der Originalschriften (Owner, 2026-11-21): Die Bibliothek liefert sie
+  weder im Repository noch in Artefakten oder Tests aus. Stellt der Host sie
+  bereit, bettet das PDF Teilmengen davon ein (PDF/A verlangt das), und die
+  Vorschau erhält sie als Webfont. Das Projekt nimmt an, dass der Host beides darf;
+  maßgeblich ist seine Lizenz.
 * Die Bibliothek erkennt eine Schrift am Familiennamen aus der Schriftdatei, nicht
   am Dateinamen. Schnitte (fett, kursiv) liegen als eigene Dateien im Ordner.
 * openhtmltopdf und Paged.js setzen dieselbe TrueType- oder OpenType-Datei mit

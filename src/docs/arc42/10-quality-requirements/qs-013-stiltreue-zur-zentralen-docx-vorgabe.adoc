@@ -44,6 +44,11 @@ Der Owner verlangt, dass die Styles der zentralen Vorgabe im Ergebnis stimmen, a
 
 === Annahmen
 
+* *Stiltreue gilt als gegeben* (Owner, 2026-11-21). Für die Abnahme durch die
+  zentrale Abteilung besteht kein Zugriff. Das Projekt nimmt an, dass das Ergebnis
+  passt: Der Prototyp weicht höchstens 0,1 mm vom Word-PDF ab. Ob das Tool taugt,
+  zeigt der erste echte Kundeneinsatz, und der ist erst mit einem produktionsreifen
+  Stand möglich.
 * Der Host stellt die lizenzpflichtigen Schriften der Vorgabe bereit und besitzt
   die Lizenz für Einbettung und Webfont.
 * Technischer Rückfall und fachliche Abnahme sind getrennt. Fehlt eine Schrift,
@@ -71,7 +76,7 @@ include::generated/qs-013-stiltreue-zur-zentralen-docx-vorgabe-traceability.adoc
 
 === Open Questions
 
-* Wer nimmt die Stiltreue fachlich ab?
+* Wer nimmt die Stiltreue fachlich ab? Vorerst niemand; siehe die erste Annahme.
 * Akzeptiert die zentrale Abteilung die freien Ersatzschriften aus ADR-017, wenn
   der Host die Originalschriften nicht bereitstellt? Offen vor allem für Arial
   Narrow.
