@@ -113,6 +113,17 @@ xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
 * **Zeit.** Das Modell liest keine Uhr. Methoden, die eine Zeit brauchen,
   bekommen `jetzt` als Parameter.
 * **Personenbezogene Daten.** `toString` gibt keinen Datenkontext aus.
+* **Pakete je Aggregat.** Innerhalb von `domaene-modell` gibt es je Aggregat ein
+  Paket: `vorlage` (Briefpapier und Standardschreiben), `snapshot` und
+  `schreiben`. Briefpapier und Standardschreiben teilen sich ein Paket, weil sie
+  dieselben Versionsregeln haben; die `Versionsfolge`, die sie durchsetzt, bleibt
+  so paketintern. Was nur ein Aggregat braucht, liegt in dessen Paket und ist dort
+  so weit wie möglich gekapselt. Die Werttypen, die mehrere Aggregate und die
+  Ports teilen (`BenutzerKennung`, `FachlicherBezug`, `Datenkontext`, `Pruefsumme`,
+  `Aktion`), liegen im Wurzelpaket `domaene.modell`. Eine weitere Unterteilung nach
+  Rollen (Entitäten, Value Objects) gibt es nicht, und kein Aggregat bekommt ein
+  eigenes Gradle-Modul (Owner, 2026-11-21). ArchUnit prüft, dass die Aggregatpakete
+  keinen Zyklus bilden und das Wurzelpaket keines von ihnen kennt.
 
 == Platzhalter
 
