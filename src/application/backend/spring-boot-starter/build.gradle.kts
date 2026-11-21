@@ -15,4 +15,8 @@ dependencies {
     implementation(project(":adapter-rendering"))
     implementation(project(":adapter-web"))
     implementation(libs.spring.boot.autoconfigure)
+    // Für die Default-Berechtigungspruefung; der Host bringt Spring Security ohnehin mit (ADR-001).
+    implementation(libs.spring.security.core)
+
+    testImplementation(libs.spring.boot.test)
 }

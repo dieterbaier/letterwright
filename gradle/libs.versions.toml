@@ -15,5 +15,7 @@ mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter" }
 assertj-core = { module = "org.assertj:assertj-core" }
 archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
 spring-context = { module = "org.springframework:spring-context" }
+spring-security-core = { module = "org.springframework.security:spring-security-core" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-test" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jmolecules-ddd = { module = "org.jmolecules:jmolecules-ddd", version.ref = "jmolecules" }
