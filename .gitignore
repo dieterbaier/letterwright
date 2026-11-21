@@ -26,6 +26,9 @@ gradle-app.setting
 # Architekturdoku: erzeugte Fragmente und Build-Ausgaben (aus Quellen reproduzierbar)
 **/generated/
 build/
+# Font-Cache von Java im docs-toolbox-Container: Podman mit --userns=keep-id setzt
+# das Home des Nutzers auf /app, Java nimmt user.home von dort, nicht aus HOME.
+/.java/
 
 # Symlinks auf Toolkit-Skills (lokal per install-skills.sh erzeugt)
 .claude/skills/
