@@ -14,11 +14,15 @@ import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -60,13 +64,19 @@ class EingebauteBerechtigungspruefungTest {
                 .isFalse());
     }
 
-    @Test
-    void ohneAnmeldungIstNichtsErlaubt() {
-        // Given: niemand ist angemeldet
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {"niemand ist angemeldet", "Erika greift nur anonym zu"})
+    void ohneAnmeldungIstNichtsErlaubt(String zugriff) {
+        // Given: Der Host hat ROLE_ANONYMOUS fürs Erzeugen konfiguriert, und es gibt nur den Zugriff aus dem Beispiel
+        if (zugriff.startsWith("Erika")) {
+            SecurityContextHolder.getContext().setAuthentication(new AnonymousAuthenticationToken("schluessel",
+                    "erika", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")));
+        }
 
         // When / Then: Erzeugen ist nicht erlaubt
-        ohneEigenePruefung.run(kontext -> assertThat(darfErikaErzeugen(kontext.getBean(Berechtigungen.class)))
-                .isFalse());
+        ohneEigenePruefung
+                .withPropertyValues("standardschreiben.berechtigung.rollen.SCHREIBEN_ERZEUGEN=ROLE_ANONYMOUS")
+                .run(kontext -> assertThat(darfErikaErzeugen(kontext.getBean(Berechtigungen.class))).isFalse());
     }
 
     @Test
