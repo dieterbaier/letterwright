@@ -44,7 +44,7 @@ Code.
 | Berechtigungsprüfung | Teil des SPI: entscheidet, ob ein Benutzer eine Aktion ausführen darf. Ohne eigene Implementierung des Hosts gilt die Rollenprüfung des Starters. | `Berechtigungspruefung`, Anfrage `Berechtigungsanfrage`; intern Port `Berechtigungen`
 | Aktion | Handlung, für die der Host die Berechtigung erteilt: Vorlagen bearbeiten, Vorlagen veröffentlichen (einschließlich Zurückziehen), Schreiben erzeugen, ansehen, herunterladen, löschen. Die Aktionen für Schreiben beziehen sich auf einen fachlichen Bezug, die für Vorlagen nicht. | `Aktion` (Value Object); im SPI `spi.Aktion`
 | Löschrichtlinie | Teil des SPI: entscheidet, ob und wie ein Schreiben gelöscht wird. Der Host muss sie bereitstellen (RB-10). | `Loeschrichtlinie`, Anfrage `Loeschanfrage`; intern Port `Loeschregeln`
-| Löschentscheidung | Antwort der Löschrichtlinie: hart löschen (Schreiben und PDF entfernen), logisch löschen (nicht mehr anzeigen, PDF bleibt) oder gesperrt (nicht löschen). | `Loeschentscheidung` (Value Object) mit `HART`, `LOGISCH`, `GESPERRT`; im SPI `spi.Loeschentscheidung`
+| Löschentscheidung | Antwort der Löschrichtlinie: hart löschen (Schreiben und PDF entfernen), logisch löschen (nicht mehr anzeigen, PDF bleibt) oder gesperrt (nicht löschen, mit Grund für den Benutzer). | `Loeschentscheidung` (Value Object) mit `hart()`, `logisch()`, `gesperrt(grund)`; im SPI `spi.Loeschentscheidung`
 | Sachbearbeiter | Benutzer, der Schreiben erzeugt, speichert, herunterlädt und löscht. |
 | Vorlagenverwalter | Fachanwender, der Briefpapier und Standardschreiben pflegt. |
 | Form A / Form B | Varianten des DIN-5008-Geschäftsbriefs mit unterschiedlicher Höhe des Anschriftfelds; Default Form B. | `Briefpapiertyp.GESCHAEFTLICH_FORM_A`, `GESCHAEFTLICH_FORM_B`

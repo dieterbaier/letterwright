@@ -88,7 +88,7 @@ class StandardschreibenAutoKonfigurationTest {
 
         @Bean
         Loeschrichtlinie loeschrichtlinie() {
-            return anfrage -> Loeschentscheidung.GESPERRT;
+            return anfrage -> Loeschentscheidung.gesperrt("Aufbewahrungsfrist");
         }
     }
 
@@ -102,7 +102,7 @@ class StandardschreibenAutoKonfigurationTest {
 
         @Bean
         Loeschrichtlinie loeschrichtlinie() {
-            return anfrage -> Loeschentscheidung.GESPERRT;
+            return anfrage -> Loeschentscheidung.gesperrt("Aufbewahrungsfrist");
         }
     }
 
