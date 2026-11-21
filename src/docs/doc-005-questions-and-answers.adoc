@@ -62,8 +62,9 @@ bereitgestellt werden?
 
 Answer: Ja, der Owner liefert Beispiel-DOCX nach (2026-11-14). Geliefert in
 `src/examples/` (`Geschaeftsbrief.docx`, `Formular_intern.docx`,
-2026-11-15). Der nächste Schritt des Prototyps (#3) ist die Schriftprüfung
-(Q-PO-010).
+2026-11-15). Der Prototyp (#3) hat `Geschaeftsbrief.docx` ein- und
+mehrseitig nachgebaut; die Ergebnisse stehen in ADR-003, ADR-004, ADR-005,
+ADR-014 und ADR-017. `Formular_intern.docx` ist nicht nachgebaut.
 
 [[q-po-005]]
 === Q-PO-005: Abschied von Word für Vorlagen

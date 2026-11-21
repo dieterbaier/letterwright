@@ -34,12 +34,18 @@ bis sie bestätigt sind.
 | Environment | Normalbetrieb; Referenzvorlagen im CI.
 | Artifact | Erzeugtes PDF.
 | Response | Lesereihenfolge, Überschriften, Absender- und Empfängerblock, Tabellen und Bilder mit Alternativtext sind korrekt getaggt; Dokumentsprache und Titel sind gesetzt.
-| Response Measure | Automatisch: 0 veraPDF-Fehler gegen PDF/UA-1 für alle Referenz-PDFs. Manuelle Stichprobe je Release an mindestens einem ein- und einem mehrseitigen Referenz-PDF (z. B. mit NVDA und dem PDF Accessibility Checker PAC): Lesereihenfolge entspricht der logischen Briefreihenfolge (Absender, Anschrift, Informationsblock, Betreff, Text, Grußformel); Alternativtexte sind inhaltlich sinnvoll (kein Dateiname, kein „Bild“); dekorative Elemente, Kopf- und Fußzeilen sowie Falzmarken sind als Artefakt markiert; Dokumenttitel und Sprache werden angesagt. 0 offene Befunde.
+| Response Measure | Automatisch: 0 veraPDF-Fehler gegen PDF/UA-1 für alle Referenz-PDFs. Manuelle Stichprobe je Release an mindestens einem ein- und einem mehrseitigen Referenz-PDF (z. B. mit NVDA und dem PDF Accessibility Checker PAC): Lesereihenfolge entspricht der logischen Briefreihenfolge (Absender, Anschrift, Informationsblock, Betreff, Text, Grußformel, inhaltliche Fußzeile); Alternativtexte sind inhaltlich sinnvoll (kein Dateiname, kein „Bild“); eine inhaltliche Fußzeile (z. B. Öffnungszeiten, Homepage) wird genau einmal nach dem Brieftext vorgelesen; Seitenzahlen, dekorative Elemente, identische Wiederholungen von Kopf- und Fußzeilen sowie Falzmarken sind als Artefakt markiert; Dokumenttitel und Sprache werden angesagt. 0 offene Befunde.
 |===
 
 === Begründung
 
 Issue #1 fordert ein barrierefreies gespeichertes Dokument.
+
+Zur Fußzeile hat der Owner im https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[Review zu PR #47] entschieden: Angaben wie Öffnungszeiten und
+Homepage gehören einmal nach dem Brieftext in die Lesereihenfolge. Bis dahin
+verlangte das Antwortmaß Kopf- und Fußzeilen pauschal als Artefakt.
+openhtmltopdf schafft das nur mit einem Nachbearbeitungsschritt
+(xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]).
 
 === Annahmen
 

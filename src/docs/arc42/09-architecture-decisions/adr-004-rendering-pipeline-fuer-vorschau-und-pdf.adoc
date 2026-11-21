@@ -187,8 +187,59 @@ Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prot
 
 ==== Neutral oder Folgearbeiten
 
-* Prototyp gemeinsam mit ADR-003: Referenzschreiben auf Option 1 rendern und gegen die Abnahmekriterien prüfen; Option 2 nur bei Scheitern von Option 1 gegen dieselben Kriterien prüfen.
+* Prototyp gemeinsam mit ADR-003: erledigt für Option 1, Ergebnis oben. Option 2 ist zurückgestellt (Entscheidung des Owners).
+* Die PDFBox-Nachbearbeitung der Fußzeile muss bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
 * Schriften: Maßgeblich ist die Schrift der zentralen DOCX-Vorgabe (QS-013). Beide Engines laden **dieselbe Datei** (openhtmltopdf eingebettet ins PDF, Paged.js per `@font-face` aus dem Backend). Woher die Datei kommt, regelt xref:adr-017-bereitstellung-der-schriften[ADR-017]: Lizenzpflichtige Schriften stellt der Host in einem konfigurierbaren Ordner bereit, sonst greift eine freie Ersatzschrift der Bibliothek. Der Spike prüft beide Wege getrennt (Q-PO-010): (1) *Referenzschriften vom Host:* Sie laden im sandboxed iframe unter der vorgesehenen CSP (ADR-014), openhtmltopdf bettet sie ins PDF ein, und ihre Lizenz ist für beide Nutzungen freigegeben, Einbettung ins PDF und Auslieferung als Webfont. (2) *Freie Ersatzschriften:* Vorschau und PDF werden gegen QS-004 und QS-013 gemessen. Ein erfolgreicher Weg 2 ersetzt den Nachweis für Weg 1 nicht.
+
+
+=== Ergebnis des Prototyps
+
+Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat Option 1 an beiden
+Referenzschreiben geprüft. Stand der Abnahmekriterien:
+
+[cols="2,1,4", options="header"]
+|===
+| Kriterium | Stand | Befund
+| PDF/A-2b (QS-001) | erfüllt | veraPDF ohne Verstöße, auch mit Ersatzschriften und für ein bösartiges Testschreiben.
+| PDF/UA-1 (QS-002) | teilweise | veraPDF ohne Verstöße. Die manuelle Stichprobe steht aus. Die inhaltliche Fußzeile wird erst durch einen Nachbearbeitungsschritt mit PDFBox lesbar (siehe unten).
+| Barrierefreie Vorschau (QS-003) | mit Grenzen | axe-core ohne Verstöße der Stufen serious und critical, keine Fokusfalle, Statusmeldungen über `aria-live`. VoiceOver liest das Schreiben vollständig, braucht am Ende der ersten Seite aber einen neuen Einstieg in den Frame. Bei 200 % Zoom scrollt die Vorschau statt umzubrechen. NVDA ist ungeprüft.
+| Wiedergabetreue (QS-004) | Teilergebnis | Das Chrome-Druck-PDF der Vorschau weicht höchstens 0,3 mm vom PDF ab, bei gleicher Seitenzahl und gleicher erster und letzter Zeile je Seite. Die Bildschirmdarstellung ist nicht gemessen.
+| Stiltreue (QS-013) | offen | Das PDF weicht höchstens 0,1 mm vom Word-PDF ab. Die Abnahme durch die zentrale Abteilung steht aus.
+|===
+
+*Fußzeile im PDF.* openhtmltopdf gibt laufende Elemente immer als Artefakt aus;
+eine Einstellung dafür gibt es nicht. Als Fließinhalt der ersten Seite schiebt es
+die Fußzeile auf die nächste Seite. Ein Nachbearbeitungsschritt mit PDFBox taggt
+deshalb die inhaltliche Fußzeile als Absätze am Ende des Strukturbaums. Bei jeder
+Erzeugung wird geprüft, dass genau die Fußzeilentexte aus dem HTML in dieser
+Reihenfolge dort stehen; sonst bricht die Erzeugung ab.
+
+*Entscheidungen des Owners* im https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[Review zu PR #47]:
+
+* *Chromium (Option 2) wird vorerst nicht geprüft.* Ein anderer PDF-Renderer
+  behebt die Grenzen der Paged.js-Vorschau nicht. Die Abweichungen bleiben offen.
+  Option 2 kommt wieder infrage, wenn die PDF/UA-Stichprobe ein Problem zeigt,
+  das sich mit openhtmltopdf und PDFBox nicht zuverlässig lösen lässt.
+* *Die PDFBox-Nachbearbeitung ist akzeptiert*, solange sie und ihr Ausweichweg
+  dokumentiert sind. Der Nachweis bleibt bei jeder Erzeugung aktiv. Ausweichweg:
+  die Fußzeile als regulärer, getaggter Block im Brieflayout; eine geänderte
+  Platzierung braucht die Abnahme nach QS-013.
+* Die Vorschau darf bei 200 % Zoom scrollen statt umzubrechen. Den Aufwand für
+  VoiceOver am Seitenwechsel treibt das Projekt nicht weiter (Owner, 2026-11-20).
+
+*Schriften.* Weg 1: Arial und Arial Narrow aus dem Schriftordner laden im
+sandboxed iframe unter der CSP, und openhtmltopdf bettet sie ein. Die Freigabe
+ihrer Lizenz für Einbettung und Webfont steht aus. Weg 2: siehe
+xref:adr-017-bereitstellung-der-schriften[ADR-017].
+
+*Weitere Befunde:* Vorschau und PDF entstehen aus demselben bereinigten HTML
+(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]); die Vorschau bekommt nur
+Zusätze im Kopf. Die Vorschau des fertigen PDFs (Option 4) wäre exakt gleich,
+bleibt aber aus den genannten Gründen ausgeschieden. Den Wartungsstand von
+openhtmltopdf (Annahme unten, R-003) hat der Prototyp nicht geprüft.
+
+Damit kann Option 1 noch nicht angenommen werden: Es fehlen die PDF/UA-Stichprobe,
+NVDA, die Messung der Bildschirmdarstellung und QS-013.
 
 === Impact
 

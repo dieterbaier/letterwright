@@ -235,8 +235,91 @@ Barrierefreiheit belegt der Prototyp.
 
 * Der Prototyp (#3) prüft die Vorschau im iframe gegen die Prüfkriterien oben und
   die Abnahmekriterien aus ADR-004.
-* Die genaue `sandbox`- und CSP-Konfiguration wird im Prototyp festgelegt und hier
-  ergänzt.
+* Die `sandbox`- und CSP-Konfiguration und die Allowlist stehen im Ergebnis des
+  Prototyps oben.
+* Ob die Schriften im Produkt als `data:`-URI oder vom Ressourcen-Endpunkt in
+  `adapter-web` kommen, und wer das Skript von Paged.js einbringt, ist offen
+  (Bausteinsicht, `adapter-rendering`).
+
+
+=== Ergebnis des Prototyps
+
+Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) legt die Konfiguration fest
+und prüft die Kriterien oben.
+
+==== Konfiguration
+
+* *Sandbox:* `sandbox="allow-scripts"` ohne `allow-same-origin` und ohne
+  `allow-popups`. Paged.js paginiert darunter.
+* *CSP im Dokument des iframe:* `default-src 'none'`. Skripte nur per
+  SHA-256-Hash (Paged.js und seine Konfiguration). Schriften und Bilder nur als
+  `data:`-URI. `style-src` braucht `'unsafe-inline'`, weil Paged.js zur Laufzeit
+  eigene `<style>`-Elemente anlegt.
+* *`postMessage`:* Das iframe meldet Höhe, Seitenzahl und angeklickte Links. Die
+  Komponente prüft Quelle und Schema.
+* *Links* öffnen einen neuen Tab (Owner, 2026-11-20). Ein Skript im iframe fängt
+  den Klick ab und schickt das Ziel an die Host-Seite. Die prüft das Schema
+  (`http`, `https`, `mailto`, `tel`) und öffnet es mit `noopener`. Das iframe
+  navigiert nicht. Geht das nicht, sind Links im iframe nicht erlaubt.
+
+==== Allowlist der Bereinigung
+
+Das Backend bereinigt das fertig zusammengeführte Dokument mit jsoup, bevor PDF
+und Vorschau entstehen, und meldet jede Entfernung als Befund.
+
+* *Elemente:* Struktur und Text eines Schreibens (Absätze, Überschriften, Listen,
+  Tabellen, `img`, `a`, `address`, `header`, `footer`, `main` u. a.), im Kopf nur
+  `title`, `meta` und `style`. Aktive und einbettende Elemente fallen samt Inhalt
+  weg (`script`, `iframe`, `object`, `embed`, `svg`, `form`, `base`, `link`).
+  Andere unbekannte Elemente werden aufgelöst, ihr Text bleibt.
+* *Attribute:* `class`, `id`, `lang`, `dir`, `title`, `role`, `style`, einige
+  `aria-*` und je Element das Nötige (`img`: `src`, `alt`; `a`: `href`;
+  Tabellenzellen: `colspan`, `rowspan`). Eventhandler fallen damit weg.
+* *URLs:* Links nur `http`, `https`, `mailto`, `tel` und Fragmente, Bilder nur als
+  `data:`-URI. Ein Link ohne erlaubtes Ziel wird zu Text. Steuer- und Leerzeichen
+  werden vor der Prüfung entfernt.
+* *CSS:* `@import` und `url()` außer `data:`-Bildern und -Schriften fallen weg;
+  bei `expression()` oder `javascript:` die ganze Stilangabe.
+* *Ausgabe:* XHTML ohne Pretty-Print, weil openhtmltopdf wohlgeformtes XML braucht
+  und zusätzlicher Leerraum das Layout verschiebt.
+
+Ein Testschreiben mit 25 Angriffen aus Vorlage und Daten führt in der Vorschau
+keinen Code aus, lädt nichts nach und navigiert nicht. Die Gegenprobe ohne
+Bereinigung zeigt, was jede Schicht leistet: Die CSP allein blockiert jeden
+Code. Gegen `<meta http-equiv="refresh">` hilft sie nicht; das verhindert nur die
+Bereinigung.
+
+*Befunde in Vorlagen* (Owner, 2026-11-20 und https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[Review zu PR #47]): Die Pflege bereinigt nicht
+still. Sie zeigt die Befunde und verlangt eine Wahl: Ablehnen, Trotzdem
+akzeptieren oder Bereinigen. „Trotzdem akzeptieren“ speichert die Vorlage
+unverändert. Vor jeder Ausgabe bereinigt das Backend das zusammengeführte HTML
+trotzdem nach der Allowlist; Vorschau und PDF bekommen nur das bereinigte HTML,
+die Vorschau zusätzlich unter der CSP. Umsetzung in #8 und #9.
+
+==== Prüfkriterien
+
+[cols="3,1,4", options="header"]
+|===
+| Kriterium | Stand | Befund
+| Tastatur ohne Fokusfalle | erfüllt | Die Seiten liegen in einem fokussierbaren, mit Pfeiltasten scrollbaren Bereich.
+| Screenreader liest einmal, vollständig, in logischer Reihenfolge | mit Grenze | VoiceOver/Safari liest Briefkopf, Anschrift, Infoblock, Betreff, Brieftext, Fußzeile. Am Ende der ersten Seite ist ein neuer Einstieg in den Frame nötig. Die Randfelder sind mit `aria-hidden` verborgen, eine versteckte Kopie der Fußzeile steht am Ende.
+| Zoom 200 % und Reflow | mit Grenze | Die Seite ist ein festes A4-Blatt und scrollt waagerecht, auch per Tastatur (Ausnahme für zweidimensionale Inhalte in WCAG 1.4.10). Der Owner akzeptiert das.
+| Aktualisieren ohne Fokusverlust, `aria-live` | erfüllt |
+| NVDA und VoiceOver | teilweise | VoiceOver geprüft (Owner). NVDA ungeprüft, es fehlt eine Windows-Prüfumgebung.
+| axe-core im iframe | erfüllt | 0 Verstöße der Stufen serious und critical; moderat bleibt „Inhalt außerhalb von Landmarks“.
+| Höhe, Schriften, Bilder, Paginierung unter Sandbox und CSP | erfüllt | Schriften im Prototyp als `data:`-URI, rund 5 MB je Dokument.
+| Kein Code aus Vorlage und Daten | erfüllt | 25 Angriffe, siehe oben.
+|===
+
+Paged.js klont ein Element, das über eine Seite reicht, samt Rolle. Das Schreiben
+ist deshalb ein `div` mit `role="main"`, und die Vorschau entfernt die Rolle an
+den Fortsetzungen. VoiceOver liest das Schreiben auch ohne Sandbox, mit `src`
+statt `srcdoc` und mit `allow-same-origin` gleich; die Isolation selbst ist also
+kein Hindernis.
+
+Hinweis aus dem Re-Review von PR #17: Nachrichten aus dem iframe zusätzlich mit
+einem Korrelationswert je Vorschau-Instanz absichern. Der Prototyp prüft nur
+Quelle und Schema.
 
 === Impact
 
@@ -263,9 +346,11 @@ include::generated/adr-014-isolation-der-vorschau-im-iframe-traceability.adoc[le
 
 === Open Questions
 
-* Welche `sandbox`- und CSP-Konfiguration braucht Paged.js genau? (Prototyp)
-* Welche Allowlist für Elemente und Attribute deckt das Vorlagenmodell ab?
-  (Prototyp, zusammen mit ADR-003)
+* `sandbox`- und CSP-Konfiguration für Paged.js: beantwortet durch den
+  Prototyp, siehe oben.
+* Allowlist für das Vorlagenmodell: beantwortet durch den Prototyp, siehe oben.
+  Die beiden Referenzschreiben ergeben 0 Befunde.
+* Wie wird NVDA geprüft? Es fehlt eine Windows-Prüfumgebung.
 
 === Review Notes
 

@@ -91,7 +91,7 @@ Lizenz prüft der Prototyp:
 |===
 | Schrift der Vorgabe | Ersatzschrift | Anmerkung
 | Arial | Liberation Sans | SIL OFL 1.1, gleiche Laufweiten
-| Arial Narrow | OFL-Schrift ohne gleiche Laufweiten | Liberation Sans Narrow (GPLv2 mit Ausnahmen, nicht mehr Teil von Liberation 2.x) wird nicht verwendet. Welche schmale OFL-Schrift dem Bild am nächsten kommt, wählt der Prototyp.
+| Arial Narrow | PT Sans Narrow | SIL OFL 1.1, ohne gleiche Laufweiten; vom Prototyp gewählt, siehe Ergebnis. Liberation Sans Narrow (GPLv2 mit Ausnahmen, nicht mehr Teil von Liberation 2.x) wird nicht verwendet.
 | Times New Roman | Liberation Serif | SIL OFL 1.1, gleiche Laufweiten; nur Rückfallwert der DOCX
 | Courier New | Liberation Mono | SIL OFL 1.1, gleiche Laufweiten; nur deklariert
 | Calibri, Cambria | Carlito, Caladea | Lizenz im Prototyp prüfen; nur Theme-Schriften der DOCX
@@ -228,6 +228,44 @@ der Lizenzfrage beim Fachanwender bezahlt.
 * Die Bibliothek muss die Lizenzen der mitgelieferten Ersatzschriften in ihrer
   Lizenzdokumentation nennen.
 
+
+=== Ergebnis des Prototyps
+
+Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat beide Wege am
+`Geschaeftsbrief.docx` geprüft.
+
+* *Ordner des Hosts:* Familie, Gewicht und Stil kommen aus der Schriftdatei,
+  nicht aus dem Dateinamen. Keine Systemschriften, keine Schriften im
+  Repository. Arial und Arial Narrow laden im sandboxed iframe unter der CSP und
+  werden ins PDF eingebettet. Die Freigabe ihrer Lizenz für Einbettung und
+  Webfont steht aus.
+* *Auflösung:* Ordner des Hosts, dann Zuordnungstabelle, dann Standardschrift
+  Liberation Sans. Die Ersatzschrift wird unter dem Familiennamen der Vorlage
+  registriert, das CSS bleibt gleich, und PDF und Vorschau bekommen dieselbe
+  Datei. Je ersetzte Familie entsteht ein Hinweis.
+* *Arial → Liberation Sans 2.1.5:* gleiche Laufweiten, wie angenommen.
+* *Arial Narrow → PT Sans Narrow:* Eine OFL-Schrift mit gleichen Laufweiten gibt
+  es nicht. Verglichen wurden Encode Sans Condensed, Fira Sans Condensed, IBM
+  Plex Sans Condensed und PT Sans Narrow. Breitere Schriften brechen in den
+  Spalten fester Breite um; mit Encode Sans Condensed rückt der Infoblock
+  4,2 mm tiefer. PT Sans Narrow ist 6 bis 7 % schmaler und wirkt weicher, hält
+  aber alle Umbrüche. Die Zeilenanfänge liegen höchstens 0,1 mm neben Word. Ob
+  das Bild reicht, entscheidet die zentrale Abteilung (QS-013).
+* Beide Referenzschreiben bleiben mit Ersatzschriften PDF/A-2b und PDF/UA-1.
+* *Ligaturen:* PDFBox 3 schreibt die fi-Ligatur von PT Sans Narrow als U+FB01
+  in den Text des PDFs. Suche und Kopieren liefern je nach Viewer „ﬁ“. Abhilfe
+  fürs Produkt ist offen: Ligaturen beim Einbetten abschalten oder die
+  Ersatzschrift ohne `liga` ausliefern; Letzteres verlangt nach der OFL einen
+  neuen Namen.
+* *Variable Schriften* (etwa Archivo Narrow, Roboto Condensed) bettet PDFBox
+  nicht verlässlich ein. Die Zuordnungstabelle nennt nur statische Schriften.
+* Die Ersatzschriften lädt ein Skript mit fester Version und Prüfsumme; sie sind
+  nicht eingecheckt.
+
+Nicht geprüft: Carlito, Caladea, die Kandidaten für das Kästchen und Liberation
+Serif und Mono. Der Geschäftsbrief braucht sie nicht. Ebenso nicht, ob der
+Browser für fehlende Zeichen auf eine Systemschrift zurückfällt.
+
 === Impact
 
 include::generated/adr-017-bereitstellung-der-schriften-impact.adoc[leveloffset=+2]
@@ -271,8 +309,8 @@ der Erzeugung protokolliert. Die Frage steht in #41.
 
 * Der Owner hat den ADR im Review von PR #40 am 2026-11-19 angenommen, die vier
   Relationen zu ADR-004, QS-004, QS-013 und QS-007 ebenso.
-* Die Bewertung der Stiltreue in der Pugh-Matrix bleibt `?`, bis der Prototyp die
-  Ersatzschriften gemessen hat.
-* Die Lizenzen von Carlito, Caladea, der Kandidaten für das Kästchen und der
-  schmalen OFL-Schrift für Arial Narrow prüft der Prototyp an ihren
-  Lizenzdateien.
+* Die Bewertung der Stiltreue in der Pugh-Matrix bleibt `?`. Der Prototyp hat die
+  Ersatzschriften gemessen; die Abnahme nach QS-013 steht aus.
+* Liberation Sans und PT Sans Narrow stehen unter SIL OFL 1.1. Die Lizenzen von
+  Carlito, Caladea und der Kandidaten für das Kästchen sind noch zu prüfen, wenn
+  eine Vorlage sie braucht.
