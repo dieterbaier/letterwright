@@ -48,6 +48,15 @@ Default-Implementierung nicht aus. Wer Schreiben nach Bezug sichtbar machen will
 (Q-PO-003), stellt eine eigene Bean bereit; dann tritt die Default-Implementierung
 zurück.
 
+Das Verhalten der Default-Implementierung ist als Feature spezifiziert. Die Tests
+in `EingebauteBerechtigungspruefungTest` (Modul `spring-boot-starter`) bilden die
+Szenarien eins zu eins ab:
+
+[source,gherkin]
+----
+include::../../../features/eingebaute-berechtigungspruefung.feature[lines=5..-1]
+----
+
 == Test
 
 * Domäne und Anwendung: JUnit 5 und Mockito, ohne Spring.
