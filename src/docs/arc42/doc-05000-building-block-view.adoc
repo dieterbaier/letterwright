@@ -133,7 +133,7 @@ Container_Boundary(ren, "adapter-rendering") {
   ComponentDb(ersatz, "Ersatzschriften", "OFL-Schriften, Zuordnungstabelle", "Liberation Sans, PT Sans Narrow u. a.")
   Component(vor, "Vorschau-Aufbereitung", "Java", "Ergänzt CSP, @font-face und Bildschirmdarstellung, ohne das Layout zu ändern")
   Component(pdf, "PDF-Erzeugung", "openhtmltopdf mit PDFBox-Backend", "PDF/A-2b mit PDF/UA-1-Tagging, Schriften eingebettet")
-  Component(nach, "PDF-Nachbearbeitung", "Apache PDFBox", "Taggt die Fußzeile und weist das Ergebnis nach; vorbehaltlich #3")
+  Component(nach, "PDF-Nachbearbeitung", "Apache PDFBox", "Taggt die inhaltliche Fußzeile und weist das Ergebnis nach")
   Component(kon, "Konformitätsprüfung", "veraPDF, Greenfield-Modell", "Implementiert KonformitaetsPruefer: PDF/A-2b und PDF/UA-1")
 }
 Rel(steuerung, uout, "implementiert Renderer")
@@ -221,8 +221,10 @@ auf, nicht die Rendering-Steuerung
 | PDF-Nachbearbeitung
 | Taggt die Fußzeile, die openhtmltopdf als Artefakt ausgibt, als lesbaren
   Inhalt. Prüft bei jeder Erzeugung, dass genau die Fußzeilentexte aus dem HTML
-  in dieser Reihenfolge am Ende des Strukturbaums stehen, sonst Abbruch. Ob es
-  den Schritt gibt, entscheidet der Owner in #3.
+  in dieser Reihenfolge am Ende des Strukturbaums stehen, sonst Abbruch.
+  Seitenzahlen, Dekoration und identische Wiederholungen bleiben Artefakte.
+  Vom Owner akzeptiert, sofern der Ausweichweg dokumentiert ist (Review zu
+  PR #47, Übernahme in QS-002 über #3).
 | Intern: PDF rein, PDF raus
 | Apache PDFBox
 | `…rendering.pdf`
@@ -274,17 +276,23 @@ Testwerkzeuge für QS-004 ins Produkt wandern, ist offen.
 
 ==== Offene Punkte
 
-* *PDF-Nachbearbeitung:* Ob der Schritt bleibt, hängt an der Entscheidung zur
-  Fußzeilen-Semantik in #3. Er widerspricht dem Antwortmaß von QS-002 und muss
-  bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
+* *PDF-Nachbearbeitung:* Der Owner hat den Schritt im Review zu PR #47
+  akzeptiert. Die Fußzeilen-Semantik ist noch nicht in QS-002 übernommen, dessen
+  Antwortmaß Fußzeilen bisher als Artefakt verlangt (#3). Ausweichweg, falls
+  der Nachweis bricht: die Fußzeile als regulärer, getaggter Block im
+  Brieflayout; eine geänderte Platzierung braucht die Abnahme nach QS-013. Der
+  Schritt muss bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
 * *Befunde der Bereinigung:* Die Vorlagenpflege braucht sie beim Speichern
-  (Ablehnen, Trotzdem akzeptieren, Bereinigen; #46). Über welchen Port sie den
-  Kern erreichen, ist offen.
+  (Ablehnen, Trotzdem akzeptieren, Bereinigen; #8, #9). Auch nach „Trotzdem
+  akzeptieren“ bereinigt die Pipeline vor jeder Ausgabe. Über welchen Port die
+  Befunde den Kern erreichen, ist offen.
 * *Schriften für die Vorschau:* Ob sie eingebettet als `data:`-URI oder vom
   Ressourcen-Endpunkt in `adapter-web` kommen, ist offen (ADR-014). Im zweiten
   Fall braucht `adapter-web` die aufgelösten Dateien über einen Port.
 * *Paged.js im iframe:* Im Prototyp fügt das Backend das Skript inline ein. Ob
   im Produkt die Vorschau-Aufbereitung oder die Vorschau-Komponente es
   einbringt, ist offen. Die CSP muss in beiden Fällen den Hash kennen.
-* *Chromium (Option 2 aus ADR-004):* Würde die PDF-Erzeugung ersetzen; ob es
-  geprüft wird, entscheidet der Owner in #3.
+* *Chromium (Option 2 aus ADR-004):* Würde die PDF-Erzeugung ersetzen. Der
+  Owner hat die Prüfung zurückgestellt (Review zu PR #47). Sie kommt wieder
+  infrage, wenn die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und
+  PDFBox nicht zuverlässig lösen (#3).
