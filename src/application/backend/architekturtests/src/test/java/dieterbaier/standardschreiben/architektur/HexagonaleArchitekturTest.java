@@ -31,6 +31,11 @@ class HexagonaleArchitekturTest {
     }
 
     @Test
+    void aggregateUndEntitaetenKennzeichnenIhreIdentitaet() {
+        ArchitekturRegeln.aggregateUndEntitaetenKennzeichnenIhreIdentitaet(BASIS).check(produktionsCode);
+    }
+
+    @Test
     void validierungIstEigenstaendig() {
         ArchitekturRegeln.validierungIstEigenstaendig(BASIS).check(produktionsCode);
     }

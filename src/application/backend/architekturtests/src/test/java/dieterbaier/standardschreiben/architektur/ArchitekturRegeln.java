@@ -6,7 +6,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
+import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.lang.CompositeArchRule;
 
 /**
@@ -57,6 +61,34 @@ final class ArchitekturRegeln {
                         basis + ".validierung..")
                 .because("jede Bibliothek in der Domäne ist eine einzelne Entscheidung (ADR-002, ADR-018)");
     }
+
+    /**
+     * Jedes Aggregat und jede Entität kennzeichnet ihre Identität mit {@code @Identity}, am Feld oder an der Methode,
+     * die sie liefert (ADR-018). Sonst findet weder ein Leser noch eine spätere Auswertung der Annotationen sie.
+     */
+    static ArchRule aggregateUndEntitaetenKennzeichnenIhreIdentitaet(String basis) {
+        return classes()
+                .that().resideInAPackage(basis + ".domaene..")
+                .and().areAnnotatedWith(AGGREGATE_ROOT)
+                .or().resideInAPackage(basis + ".domaene..")
+                .and().areAnnotatedWith(ENTITAET)
+                .should(new ArchCondition<JavaClass>("ein Feld oder eine Methode mit @Identity haben") {
+                    @Override
+                    public void check(JavaClass klasse, ConditionEvents ereignisse) {
+                        boolean gekennzeichnet = klasse.getFields().stream()
+                                        .anyMatch(feld -> feld.isAnnotatedWith(IDENTITAET))
+                                || klasse.getMethods().stream()
+                                        .anyMatch(methode -> methode.isAnnotatedWith(IDENTITAET));
+                        ereignisse.add(new SimpleConditionEvent(klasse, gekennzeichnet,
+                                klasse.getName() + " hat kein Feld und keine Methode mit @Identity"));
+                    }
+                })
+                .because("die Identität bestimmt die Gleichheit von Aggregaten und Entitäten (ADR-018)");
+    }
+
+    private static final String AGGREGATE_ROOT = "org.jmolecules.ddd.annotation.AggregateRoot";
+    private static final String ENTITAET = "org.jmolecules.ddd.annotation.Entity";
+    private static final String IDENTITAET = "org.jmolecules.ddd.annotation.Identity";
 
     /** Das Prüfmodul ist allgemein und kennt kein anderes Paket der Bibliothek. */
     static ArchRule validierungIstEigenstaendig(String basis) {

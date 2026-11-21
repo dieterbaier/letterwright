@@ -18,6 +18,8 @@ dependencies {
     testImplementation(project(":adapter-web"))
     testImplementation(project(":spring-boot-starter"))
     testImplementation(libs.archunit.junit5)
+    // Für die Fixtures, die die DDD-Annotationen verwenden (ADR-018).
+    testImplementation(libs.jmolecules.ddd)
     // Nur für die Fixture-Klassen, die einen Regelverstoß nachstellen.
     testImplementation(libs.spring.context)
 }
