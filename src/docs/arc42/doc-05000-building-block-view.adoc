@@ -41,7 +41,7 @@ System_Boundary(host, "Host-Anwendung") {
     Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
     Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
     Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
-    Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
+    Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben")
     Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
     Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Zusammenführen, Bereinigen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")

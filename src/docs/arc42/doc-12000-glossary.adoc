@@ -17,24 +17,27 @@ metadata_version: '1.0'
 [[glossary]]
 = Glossar
 
-[cols="1,3", options="header"]
+[cols="2,5,2", options="header"]
 |===
-| Begriff | Definition
-| Briefpapier | Vorlage für das Seitenlayout eines Schreibens (Header mit Logo und Slogan, Absender, Anschriftfeld, Informationsblock, Fußzeile, Seitenzahlen). Typ privat oder geschäftlich (DIN 5008 Form A oder B).
-| Standardschreiben | Vorlage für den Inhalt eines Schreibens mit Platzhaltern; ihr ist genau ein Briefpapier zugewiesen.
-| Schreiben | Ein aus einem Standardschreiben mit konkreten Daten erzeugtes und gespeichertes Dokument (PDF). Im Issue „gespeichertes Standardschreiben“.
-| Vorlagenversion | Unveränderlicher Stand eines Briefpapiers oder Standardschreibens; Zustand Entwurf, veröffentlicht oder zurückgezogen.
-| Baustein | Abgegrenzter Teil eines Briefpapiers oder Standardschreibens (z. B. Anschriftfeld, Betreff, Wiederholungsblock).
-| Platzhalter | Ausdruck wie `${empfaenger.name}`, der beim Zusammenführen durch einen Wert aus dem Datenkontext ersetzt wird; optional mit Defaultwert.
-| Datenkontext | Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert.
-| Fachlicher Bezug | Das Domänenobjekt, zu dem ein Schreiben erzeugt wird (z. B. Kunde, Vorgang), als Typ und ID.
-| Vorschau | Paginierte HTML-Darstellung eines befüllten Standardschreibens vor dem Speichern.
-| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird.
-| Host-Anwendung | Die Spring-Boot-/React-Anwendung, in die Standardschreiben eingebettet ist.
-| SPI | Service Provider Interface: die Schnittstellen und Datentypen im Modul `spi`, die die Host-Anwendung implementiert bzw. liefert (Platzhalterdaten, Berechtigung, Löschrichtlinie). Einziger Teil der Bibliothek, gegen den der Host kompiliert.
-| Sachbearbeiter | Benutzer, der Schreiben erzeugt, speichert, herunterlädt und löscht.
-| Vorlagenverwalter | Fachanwender, der Briefpapier und Standardschreiben pflegt.
-| Form A / Form B | Varianten des DIN-5008-Geschäftsbriefs mit unterschiedlicher Höhe des Anschriftfelds; Default Form B.
-| PDF/A | ISO-Norm für langzeitarchivierbare PDFs; hier Teil 2, Stufe b.
-| PDF/UA | ISO-Norm für barrierefreie PDFs; hier PDF/UA-1.
+| Begriff | Definition | Im Code
+| Briefpapier | Vorlage für das Seitenlayout eines Schreibens (Header mit Logo und Slogan, Absender, Anschriftfeld, Informationsblock, Fußzeile, Seitenzahlen). Typ privat oder geschäftlich (DIN 5008 Form A oder B). | `Briefpapier`, Typ `Briefpapiertyp`
+| Standardschreiben | Vorlage für den Inhalt eines Schreibens mit Platzhaltern; ihr ist genau ein Briefpapier zugewiesen. | `Standardschreiben`
+| Schreiben | Ein aus einem Standardschreiben mit konkreten Daten erzeugtes und gespeichertes Dokument (PDF). Im Issue „gespeichertes Standardschreiben“. | `Schreiben`
+| Vorlagenversion | Unveränderlicher Stand eines Briefpapiers oder Standardschreibens; Zustand Entwurf, veröffentlicht oder zurückgezogen. | `Vorlagenversion`, Zustand `Vorlagenzustand`, Verweis `Versionsverweis`
+| Baustein | Abgegrenzter Teil eines Briefpapiers oder Standardschreibens (z. B. Anschriftfeld, Betreff, Wiederholungsblock). |
+| Platzhalter | Ausdruck wie `${empfaenger.name}`, der beim Zusammenführen durch einen Wert aus dem Datenkontext ersetzt wird; optional mit Defaultwert. |
+| Datenkontext | Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert. | `Datenkontext`
+| Fachlicher Bezug | Das Domänenobjekt, zu dem ein Schreiben erzeugt wird (z. B. Kunde, Vorgang), als Typ und ID. | `FachlicherBezug`
+| Vorschau | Paginierte HTML-Darstellung eines befüllten Standardschreibens vor dem Speichern. |
+| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird. | `Snapshot`
+| Prüfsumme | SHA-256-Prüfsumme, etwa eines gespeicherten PDFs oder eines Datenkontexts. Mit ihr erkennt das Speichern einen seit der Vorschau geänderten Datenkontext. | `Pruefsumme`
+| Benutzerkennung | Kennung des angemeldeten Benutzers, wie sie die Host-Anwendung liefert. Die Bibliothek verwaltet keine Benutzer. | `BenutzerKennung`
+| Dokumentverweis | Verweis auf das abgelegte PDF eines Schreibens; seine Bedeutung kennt nur die Dokumentablage. | `Dokumentverweis`
+| Host-Anwendung | Die Spring-Boot-/React-Anwendung, in die Standardschreiben eingebettet ist. |
+| SPI | Service Provider Interface: die Schnittstellen und Datentypen im Modul `spi`, die die Host-Anwendung implementiert bzw. liefert (Platzhalterdaten, Berechtigung, Löschrichtlinie). Einziger Teil der Bibliothek, gegen den der Host kompiliert. |
+| Sachbearbeiter | Benutzer, der Schreiben erzeugt, speichert, herunterlädt und löscht. |
+| Vorlagenverwalter | Fachanwender, der Briefpapier und Standardschreiben pflegt. |
+| Form A / Form B | Varianten des DIN-5008-Geschäftsbriefs mit unterschiedlicher Höhe des Anschriftfelds; Default Form B. | `Briefpapiertyp.GESCHAEFTLICH_FORM_A`, `GESCHAEFTLICH_FORM_B`
+| PDF/A | ISO-Norm für langzeitarchivierbare PDFs; hier Teil 2, Stufe b. |
+| PDF/UA | ISO-Norm für barrierefreie PDFs; hier PDF/UA-1. |
 |===
