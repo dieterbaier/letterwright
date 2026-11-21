@@ -75,7 +75,7 @@ Rel(ren, schriften, "liest Schriftdateien")
 [cols="2,4,3,3", options="header"]
 |===
 | Baustein | Verantwortung | Technologie und Bibliotheken | Ablage im Repository
-| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] | Java 21, JSpecify, jMolecules DDD (nur Annotationen) | `src/application/backend/domaene/modell`
+| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]. Ein Paket je Aggregat (`vorlage`, `snapshot`, `schreiben`), geteilte Werttypen im Wurzelpaket (xref:crosscutting-concepts[Querschnittskonzept Fachmodell]) | Java 21, JSpecify, jMolecules DDD (nur Annotationen) | `src/application/backend/domaene/modell`
 | validierung | Allgemeine Prüfungen (Pflichtwert, nicht leer, nicht blank, Untergrenze) mit einheitlichem Fehlervertrag; kennt kein anderes Modul, das SPI nutzt es nicht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | Java 21, JSpecify | `src/application/backend/validierung`
 | domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | Java 21, JSpecify | `src/application/backend/domaene/service`
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | Java 21, JSpecify | `src/application/backend/usecases/in`
