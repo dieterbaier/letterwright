@@ -32,9 +32,21 @@ metadata_version: '1.0'
 == Sicherheit
 
 Authentifizierung und Autorisierung kommen aus der Spring Security des Hosts. Die
-Bibliothek ruft für jede Aktion den Port `Berechtigungspruefung` auf. Ein
-Default-Adapter bildet Aktionen auf konfigurierbare Rollen ab (z. B.
-`SSW_VORLAGEN_PFLEGEN`, `SSW_SCHREIBEN_ERZEUGEN`).
+Bibliothek fragt für jede Aktion die `Berechtigungspruefung` des SPI
+(xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Aktionen sind
+`VORLAGEN_PFLEGEN`, `SCHREIBEN_ERZEUGEN`, `SCHREIBEN_ANSEHEN`,
+`SCHREIBEN_HERUNTERLADEN` und `SCHREIBEN_LOESCHEN`; alle außer der Vorlagenpflege
+beziehen sich auf einen fachlichen Bezug.
+
+Stellt der Host keine eigene `Berechtigungspruefung` bereit, gilt die
+Default-Implementierung des Starters. Sie erlaubt eine Aktion, wenn der angemeldete
+Benutzer der angefragte ist und die Authority `ROLE_SSW_<AKTION>` hat, etwa
+`ROLE_SSW_SCHREIBEN_ERZEUGEN` (in Spring Security `roles("SSW_SCHREIBEN_ERZEUGEN")`).
+Abweichende Authorities setzt der Host mit
+`standardschreiben.berechtigung.rollen.<AKTION>`. Den fachlichen Bezug wertet die
+Default-Implementierung nicht aus. Wer Schreiben nach Bezug sichtbar machen will
+(Q-PO-003), stellt eine eigene Bean bereit; dann tritt die Default-Implementierung
+zurück.
 
 == Test
 

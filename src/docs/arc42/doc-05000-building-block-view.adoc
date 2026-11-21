@@ -85,8 +85,8 @@ Rel(ren, schriften, "liest Schriftdateien")
 | adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | _Spring MVC_ | `src/application/backend/adapter/in/adapter-web`
 | adapter-rendering | Ausgehender Adapter: Zusammenführen, HTML-Bereinigung, Schriftauflösung, PDF-Erzeugung und Konformitätsprüfung; Whitebox in xref:bausteine-ebene-2-adapter-rendering[Ebene 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox und FontBox, veraPDF_, freie OFL-Ersatzschriften | `src/application/backend/adapter/out/adapter-rendering`
 | adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006]) | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
-| adapter-host | Ausgehender Adapter: ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab | Java 21, JSpecify | `src/application/backend/adapter/out/adapter-host`
-| spring-boot-starter | Autokonfiguration, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security; exportiert nur `spi` | Spring Boot Autoconfigure 4.1, _Spring Security_ | `src/application/backend/spring-boot-starter`
+| adapter-host | Ausgehender Adapter: implementiert die Ports `Platzhalterdatenquelle`, `Berechtigungen` und `Loeschregeln`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostVertragVerletzt` | Java 21, JSpecify | `src/application/backend/adapter/out/adapter-host`
+| spring-boot-starter | Autokonfiguration `StandardschreibenAutoKonfiguration`, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi`. Fehlt `PlatzhalterdatenAnbieter` oder `Loeschrichtlinie`, startet der Kontext nicht | Spring Boot Autoconfigure 4.1, _Spring Security_ | `src/application/backend/spring-boot-starter`
 | Frontend-Paket | Vorschau, Übersicht, Editor. Die Vorschau soll barrierefrei sein (xref:qs-003-barrierefreie-vorschau[QS-003]); der Nachweis ist in #3 noch offen (VoiceOver am Seitenwechsel, Reflow bei 200 %, NVDA). | React 19, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | `src/application/frontend`
 |===
 
@@ -97,7 +97,9 @@ Querschnittlich, ohne eigenen Baustein:
   (xref:adr-009-build-monorepo-und-versionen[ADR-009]); JUnit 5, Mockito, AssertJ,
   JaCoCo als Abdeckungs-Gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
   ArchUnit im Modul `architekturtests`
-  (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); für die
+  (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); im Modul
+  `host-vertragstest` der Nachweis, dass ein Host mit dem Starter nur das SPI
+  kompiliert sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]); für die
   Persistenz _Testcontainers_ mit PostgreSQL und MariaDB.
 * *Frontend-Build und Tests:* npm-Workspaces, Vitest mit V8-Abdeckung, React
   Testing Library, jsdom, axe-core, ESLint
