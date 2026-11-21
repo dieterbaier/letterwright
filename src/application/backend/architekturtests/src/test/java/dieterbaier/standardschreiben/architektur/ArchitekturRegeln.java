@@ -172,6 +172,28 @@ final class ArchitekturRegeln {
                 .because("Domänenservices arbeiten auf dem Modell, nicht umgekehrt (ADR-015)");
     }
 
+    /**
+     * Die Pakete der Aggregate im Fachmodell bilden keinen Zyklus (ADR-018). Ein Aggregat darf ein anderes über dessen
+     * Identität oder Werttypen kennen, aber nicht umgekehrt zugleich.
+     */
+    static ArchRule aggregatpaketeSindZyklenfrei(String basis) {
+        return slices().matching(basis + ".domaene.modell.(*)..")
+                .should().beFreeOfCycles()
+                .because("jedes Aggregat soll für sich verständlich und änderbar bleiben (ADR-018)");
+    }
+
+    /**
+     * Das Wurzelpaket des Fachmodells enthält die Werttypen, die mehrere Aggregate und die Ports teilen. Es kennt keines
+     * der Aggregatpakete, sonst hinge jedes Aggregat über die geteilten Typen an allen anderen (ADR-018).
+     */
+    static ArchRule geteilteWerttypenKennenKeineAggregate(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + ".domaene.modell")
+                .should().dependOnClassesThat(resideInAPackage(basis + ".domaene.modell..")
+                        .and(resideOutsideOfPackage(basis + ".domaene.modell")))
+                .because("geteilte Werttypen gehören keinem Aggregat (ADR-018)");
+    }
+
     /** Ports und Adapter kennen keine Domänenservices; nur die Implementierung der Anwendungsfälle nutzt sie. */
     static ArchRule nurDieAnwendungsfaelleKennenDomaenenservices(String basis) {
         return noClasses()

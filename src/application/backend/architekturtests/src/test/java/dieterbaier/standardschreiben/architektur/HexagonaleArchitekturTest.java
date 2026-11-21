@@ -31,6 +31,16 @@ class HexagonaleArchitekturTest {
     }
 
     @Test
+    void aggregatpaketeSindZyklenfrei() {
+        ArchitekturRegeln.aggregatpaketeSindZyklenfrei(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void geteilteWerttypenKennenKeineAggregate() {
+        ArchitekturRegeln.geteilteWerttypenKennenKeineAggregate(BASIS).check(produktionsCode);
+    }
+
+    @Test
     void aggregateUndEntitaetenKennzeichnenIhreIdentitaet() {
         ArchitekturRegeln.aggregateUndEntitaetenKennzeichnenIhreIdentitaet(BASIS).check(produktionsCode);
     }
