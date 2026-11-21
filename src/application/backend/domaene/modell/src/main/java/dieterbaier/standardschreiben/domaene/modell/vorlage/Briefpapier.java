@@ -1,4 +1,4 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.vorlage;
 
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import java.util.List;

@@ -1,5 +1,9 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.snapshot;
 
+import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
+import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import java.time.Duration;
 import java.time.Instant;

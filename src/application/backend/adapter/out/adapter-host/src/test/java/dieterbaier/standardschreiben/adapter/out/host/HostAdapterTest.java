@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dieterbaier.standardschreiben.domaene.modell.Aktion;
-import dieterbaier.standardschreiben.domaene.modell.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.spi.Berechtigungsanfrage;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
 import dieterbaier.standardschreiben.spi.Datenkontext;

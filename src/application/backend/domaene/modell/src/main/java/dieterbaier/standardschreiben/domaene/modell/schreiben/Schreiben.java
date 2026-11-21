@@ -1,5 +1,9 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.schreiben;
 
+import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import java.time.Instant;
 import org.jmolecules.ddd.annotation.AggregateRoot;

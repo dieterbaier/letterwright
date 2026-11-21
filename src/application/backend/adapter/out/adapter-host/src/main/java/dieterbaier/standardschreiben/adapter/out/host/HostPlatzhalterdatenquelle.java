@@ -3,7 +3,7 @@ package dieterbaier.standardschreiben.adapter.out.host;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
-import dieterbaier.standardschreiben.domaene.modell.Standardschreiben;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.spi.PlatzhalterdatenAnbieter;
 import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.validierung.Pruefe;

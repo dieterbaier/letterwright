@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.FieldSource;
  */
 class PortsTest {
 
+    private static final String MODELL = "dieterbaier.standardschreiben.domaene.modell";
+
     static final List<Class<?>> PORTS = List.of(Platzhalterdatenquelle.class, Berechtigungen.class, Loeschregeln.class);
 
     @ParameterizedTest
@@ -31,7 +33,7 @@ class PortsTest {
                         Arrays.stream(methode.getParameterTypes()), java.util.stream.Stream.of(methode.getReturnType())))
                 .filter(typ -> !typ.isPrimitive())
                 .map(Class::getPackageName))
-                .allMatch(paket -> paket.equals("dieterbaier.standardschreiben.domaene.modell"));
+                .allMatch(paket -> paket.equals(MODELL) || paket.startsWith(MODELL + "."));
     }
 
     private static boolean hatRumpf(Method methode) {

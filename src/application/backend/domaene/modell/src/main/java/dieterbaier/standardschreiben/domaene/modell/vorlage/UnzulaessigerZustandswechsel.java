@@ -1,4 +1,4 @@
-package dieterbaier.standardschreiben.domaene.modell;
+package dieterbaier.standardschreiben.domaene.modell.vorlage;
 
 import java.io.Serial;
 
