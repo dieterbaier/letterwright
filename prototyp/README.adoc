@@ -348,9 +348,8 @@ Prototyps fällt auf:
   positioniertes Element auf die nächste Seite. Deshalb schreibt `FusszeileTaggen` das fertige
   PDF nach: Artefakt-Abschnitte mit Text ganz im unteren Seitenrand werden je Textblock zu
   `/P <</MCID n>>`, und je Block hängt ein `P` am Ende des Strukturbaums. Kopfzeilen wie
-  „Seite x von y“ bleiben Artefakte. Das weicht vom Antwortmaß in QS-002 ab (Kopf- und
-  Fußzeilen als Artefakt); der Owner hat das im Review zu PR #47 so entschieden. Bei jeder Erzeugung prüft der Prototyp, dass
-  genau die Fußzeilentexte aus dem HTML in dieser Reihenfolge am Ende des Strukturbaums stehen.
+  „Seite x von y“ bleiben Artefakte. Das entspricht dem im Review zu PR #47 beschlossenen und
+  in QS-002 übernommenen Antwortmaß. Bei jeder Erzeugung prüft der Prototyp, dass genau die Fußzeilentexte aus dem HTML in dieser Reihenfolge am Ende des Strukturbaums stehen.
   Preis: Der Schritt hängt davon ab, wie openhtmltopdf den
   Content-Stream schreibt (Artefakt-Abschnitte, ein Textblock je Spalte), und muss bei jedem
   Update von openhtmltopdf mitgeprüft werden. Im Produkt läge er vor einer Signatur des PDFs.
