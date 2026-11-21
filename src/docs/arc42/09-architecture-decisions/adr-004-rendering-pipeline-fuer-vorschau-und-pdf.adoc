@@ -19,49 +19,49 @@ tags:
 relations:
 - type: depends_on
   target: ADR-003-vorlagenformat-fuer-fachanwender
-  status: proposed
+  status: accepted
   rationale: 'Die Pipeline setzt HTML mit Paged-Media-CSS als Vorlagenformat voraus.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-004-wiedergabetreue-vorschau-und-pdf
-  status: proposed
+  status: accepted
   rationale: 'Beide Ausgaben entstehen aus demselben HTML.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
-  status: proposed
+  status: accepted
   rationale: 'Die Vorschau bleibt echtes HTML und damit für Hilfstechnologien zugänglich.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-012-erzeugungsdauer
-  status: proposed
+  status: accepted
   rationale: 'Die PDF-Erzeugung läuft in der JVM ohne externen Prozess.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
-  status: proposed
+  status: accepted
   rationale: 'Die Rendering-Bibliothek muss PDF/A-2b erzeugen; Abnahmekriterium des Prototyps.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-002-barrierefreies-pdf
-  status: proposed
+  status: accepted
   rationale: 'Die Rendering-Bibliothek muss getaggtes PDF/UA-1 erzeugen; Abnahmekriterium des Prototyps.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
-  status: proposed
+  status: accepted
   rationale: 'Die Rendering-Bibliothek muss die Stilvorgaben exakt umsetzen; Abnahmekriterium des Prototyps.'
-  reviewed: false
+  reviewed: true
 - type: introduces_risk
   target: R-002-abweichung-zweier-render-engines
-  status: proposed
+  status: accepted
   rationale: 'Paged.js und openhtmltopdf sind zwei verschiedene Layout-Engines.'
-  reviewed: false
+  reviewed: true
 - type: introduces_risk
   target: R-003-reife-der-html-zu-pdf-bibliothek
-  status: proposed
+  status: accepted
   rationale: 'openhtmltopdf ist ein Community-Projekt mit begrenzter Wartungskapazität.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-004-rendering-pipeline-fuer-vorschau-und-pdf]]
@@ -289,5 +289,5 @@ include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability
 
 * Der Owner hat die Entscheidung am 2026-11-21 angenommen, nach dem Prototyp und
   der Sichtprobe zu QS-004.
-* Die Relationen im Front Matter sind noch nicht einzeln geprüft und bleiben
-  `proposed`.
+* Der Owner hat am 2026-11-21 auch die neun Relationen im Front Matter
+  angenommen: zu ADR-003, QS-001 bis QS-004, QS-012, QS-013, R-002 und R-003.
