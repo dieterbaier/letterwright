@@ -48,7 +48,9 @@ Default-Implementierung des Starters. Sie erlaubt eine Aktion, wenn der angemeld
 Benutzer der angefragte ist und die Authority `ROLE_SSW_<AKTION>` hat, etwa
 `ROLE_SSW_SCHREIBEN_ERZEUGEN` (in Spring Security `roles("SSW_SCHREIBEN_ERZEUGEN")`).
 Abweichende Authorities setzt der Host mit
-`standardschreiben.berechtigung.rollen.<AKTION>`. Den fachlichen Bezug wertet die
+`standardschreiben.berechtigung.rollen.<AKTION>`. Ein anonymer Zugriff zählt nicht als
+Anmeldung, auch wenn Spring Security ihn als authentifiziert führt und seine
+Authority (`ROLE_ANONYMOUS`) auf eine Aktion abgebildet ist. Den fachlichen Bezug wertet die
 Default-Implementierung nicht aus. Wer Schreiben nach Bezug sichtbar machen will
 (Q-PO-003), stellt eine eigene Bean bereit; dann tritt die Default-Implementierung
 zurück.

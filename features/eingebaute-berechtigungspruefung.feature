@@ -20,10 +20,16 @@ Funktionalität: Eingebaute Berechtigungsprüfung
     Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
     Dann ist es nicht erlaubt
 
-  Szenario: Ohne Anmeldung ist nichts erlaubt
-    Angenommen niemand ist angemeldet
+  Szenariogrundriss: Ohne Anmeldung ist nichts erlaubt
+    Angenommen der Host hat für das Erzeugen von Schreiben die Rolle "ROLE_ANONYMOUS" konfiguriert
+    Und <zugriff>
     Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
     Dann ist es nicht erlaubt
+
+    Beispiele:
+      | zugriff                                                           |
+      | niemand ist angemeldet                                            |
+      | Erika greift nur anonym zu, mit der Rolle "ROLE_ANONYMOUS"        |
 
   Szenario: Für einen anderen als den angemeldeten Benutzer ist nichts erlaubt
     Angenommen Max ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
