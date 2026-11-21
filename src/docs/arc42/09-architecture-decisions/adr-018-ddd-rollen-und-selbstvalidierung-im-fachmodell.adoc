@@ -2,10 +2,10 @@
 id: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
 type: ADR
 title: 'DDD-Rollen und Selbstvalidierung im Fachmodell'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-21'
-reviewed: false
+reviewed: true
 summary: 'Die DDD-Rollen im Fachmodell sind mit den Annotationen von jMolecules gekennzeichnet. Briefpapier und Standardschreiben sind Aggregate über ihre Versionen. Aggregate und Entitäten sind über ihre Identität gleich, Value Objects über ihren Wert. Jeder Typ prüft seine Pflichtattribute im Konstruktor mit den allgemeinen Prüfungen aus dem Modul validierung.'
 derived_from:
 - type: external
@@ -19,19 +19,19 @@ tags:
 relations:
 - type: refines
   target: ADR-002-hexagonale-architektur-und-ports
-  status: proposed
+  status: accepted
   rationale: 'ADR-002 verlangt eine frameworkfreie Domäne nach DDD. Dieser ADR legt fest, wie die DDD-Rollen sichtbar werden und welche Bibliotheken die Domäne dafür nutzen darf.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
-  status: proposed
+  status: accepted
   rationale: 'ADR-007 legt Versionen, Zustände und Snapshot fest. Dieser ADR legt fest, wer die Regeln über alle Versionen einer Vorlage sichert: das Aggregat der Vorlage.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-008-unveraenderliche-schreiben
-  status: proposed
+  status: accepted
   rationale: 'Veröffentlichte Versionen lassen sich nur über das Aggregat ihrer Vorlage ändern, und das lässt es nicht zu. Ungültige Modellobjekte entstehen gar nicht erst.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell]]
@@ -39,12 +39,12 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-21.
 
 Der Owner hat die vier Einzelentscheidungen am 2026-11-21 nach dem Review von
 PR #57 getroffen: jMolecules-Annotationen, die Version als Teil der Vorlage,
-Gleichheit über die Identität und leerer Inhalt nur im Entwurf. Dieser ADR ist
-KI-gestützt formuliert und wartet auf die Annahme im Review.
+Gleichheit über die Identität und leerer Inhalt nur im Entwurf. Der ADR ist
+KI-gestützt formuliert; der Owner hat ihn im Review von PR #57 angenommen.
 
 === Entscheidung
 
@@ -67,6 +67,8 @@ KI-gestützt formuliert und wartet auf die Annahme im Review.
 * **Gleichheit.** Aggregate und Entitäten sind finale Klassen und über ihre
   Identität gleich. Zwei Stände desselben Briefpapiers sind also gleich. Value
   Objects sind Records, Enums oder unveränderliche Klassen mit Wertgleichheit.
+  Die Identität ist mit `@Identity` markiert: bei den Aggregaten das ID-Feld, bei
+  `Vorlagenversion` die Methode `verweis()`, die Vorlage und Nummer liefert.
 * **Selbstvalidierung.**
 ** Jeder Typ prüft jedes Pflichtattribut im Konstruktor, auch zusammengesetzte
    Typen. Dass ein enthaltener Value Object sich selbst prüft, ersetzt nicht die
@@ -207,4 +209,5 @@ include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-tracea
 
 === Review Notes
 
-Wird erst nach Annahme durch den Owner als reviewed markiert.
+Der Owner hat den ADR und seine drei Relationen am 2026-11-21 im Review von
+PR #57 angenommen, ebenso die Präzisierung von ADR-002.
