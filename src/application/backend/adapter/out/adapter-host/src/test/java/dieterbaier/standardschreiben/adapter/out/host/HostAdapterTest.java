@@ -54,22 +54,32 @@ class HostAdapterTest {
 
         assertThat(berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_ERZEUGEN, KUNDE)).isTrue();
         assertThat(berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_LOESCHEN, KUNDE)).isFalse();
-        assertThat(berechtigungen.darfVorlagenPflegen(ERIKA)).isFalse();
+        assertThat(berechtigungen.darf(ERIKA, Aktion.VORLAGEN_VEROEFFENTLICHEN)).isFalse();
         assertThat(anfragen).containsExactly(
                 new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN,
                         Abbildung.zumSpi(KUNDE)),
                 new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_LOESCHEN,
                         Abbildung.zumSpi(KUNDE)),
-                new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_PFLEGEN, null));
+                new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_VEROEFFENTLICHEN,
+                        null));
     }
 
     @Test
-    void diePflegeDerVorlagenGehtNichtMitBezug() {
+    void aktionenFuerVorlagenGehenNichtMitBezug() {
         var berechtigungen = new HostBerechtigungen(anfrage -> true);
 
-        assertThatThrownBy(() -> berechtigungen.darf(ERIKA, Aktion.VORLAGEN_PFLEGEN, KUNDE))
+        assertThatThrownBy(() -> berechtigungen.darf(ERIKA, Aktion.VORLAGEN_BEARBEITEN, KUNDE))
                 .isInstanceOf(Validierungsfehler.class)
-                .hasMessageContaining("VORLAGEN_PFLEGEN");
+                .hasMessageContaining("VORLAGEN_BEARBEITEN");
+    }
+
+    @Test
+    void aktionenFuerSchreibenGehenNichtOhneBezug() {
+        var berechtigungen = new HostBerechtigungen(anfrage -> true);
+
+        assertThatThrownBy(() -> berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_ANSEHEN))
+                .isInstanceOf(Validierungsfehler.class)
+                .hasMessageContaining("SCHREIBEN_ANSEHEN");
     }
 
     @Test

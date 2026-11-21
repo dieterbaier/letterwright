@@ -28,8 +28,11 @@ public final class HostBerechtigungen implements Berechtigungen {
     }
 
     @Override
-    public boolean darfVorlagenPflegen(BenutzerKennung benutzer) {
+    public boolean darf(BenutzerKennung benutzer, Aktion aktion) {
+        if (Pruefe.pflicht(aktion, "Die Aktion").brauchtBezug()) {
+            throw new Validierungsfehler("Die Aktion " + aktion + " braucht einen fachlichen Bezug");
+        }
         return pruefung.istErlaubt(new Berechtigungsanfrage(Pruefe.pflicht(benutzer, "Der Benutzer").wert(),
-                dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_PFLEGEN, null));
+                Abbildung.zumSpi(aktion), null));
     }
 }

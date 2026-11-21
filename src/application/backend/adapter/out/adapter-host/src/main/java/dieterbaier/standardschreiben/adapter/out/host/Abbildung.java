@@ -31,7 +31,8 @@ final class Abbildung {
 
     static dieterbaier.standardschreiben.spi.Aktion zumSpi(Aktion aktion) {
         return switch (aktion) {
-            case VORLAGEN_PFLEGEN -> dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_PFLEGEN;
+            case VORLAGEN_BEARBEITEN -> dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_BEARBEITEN;
+            case VORLAGEN_VEROEFFENTLICHEN -> dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_VEROEFFENTLICHEN;
             case SCHREIBEN_ERZEUGEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN;
             case SCHREIBEN_ANSEHEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ANSEHEN;
             case SCHREIBEN_HERUNTERLADEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_HERUNTERLADEN;
@@ -41,7 +42,8 @@ final class Abbildung {
 
     static Aktion zurDomaene(dieterbaier.standardschreiben.spi.Aktion aktion) {
         return switch (aktion) {
-            case VORLAGEN_PFLEGEN -> Aktion.VORLAGEN_PFLEGEN;
+            case VORLAGEN_BEARBEITEN -> Aktion.VORLAGEN_BEARBEITEN;
+            case VORLAGEN_VEROEFFENTLICHEN -> Aktion.VORLAGEN_VEROEFFENTLICHEN;
             case SCHREIBEN_ERZEUGEN -> Aktion.SCHREIBEN_ERZEUGEN;
             case SCHREIBEN_ANSEHEN -> Aktion.SCHREIBEN_ANSEHEN;
             case SCHREIBEN_HERUNTERLADEN -> Aktion.SCHREIBEN_HERUNTERLADEN;

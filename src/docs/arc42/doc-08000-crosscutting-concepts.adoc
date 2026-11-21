@@ -34,9 +34,14 @@ metadata_version: '1.0'
 Authentifizierung und Autorisierung kommen aus der Spring Security des Hosts. Die
 Bibliothek fragt für jede Aktion die `Berechtigungspruefung` des SPI
 (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Aktionen sind
-`VORLAGEN_PFLEGEN`, `SCHREIBEN_ERZEUGEN`, `SCHREIBEN_ANSEHEN`,
-`SCHREIBEN_HERUNTERLADEN` und `SCHREIBEN_LOESCHEN`; alle außer der Vorlagenpflege
-beziehen sich auf einen fachlichen Bezug.
+`VORLAGEN_BEARBEITEN`, `VORLAGEN_VEROEFFENTLICHEN`, `SCHREIBEN_ERZEUGEN`,
+`SCHREIBEN_ANSEHEN`, `SCHREIBEN_HERUNTERLADEN` und `SCHREIBEN_LOESCHEN`. Die
+Aktionen für Schreiben beziehen sich auf einen fachlichen Bezug, die für Vorlagen
+nicht. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
+Vier-Augen-Prinzip abbilden kann: Was veröffentlicht ist, geht in alle neuen
+Schreiben ein. Zurückziehen gehört zum Veröffentlichen; Vorlagen löschen gibt es
+nicht, weil Versionen unveränderlich sind
+(xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
 
 Stellt der Host keine eigene `Berechtigungspruefung` bereit, gilt die
 Default-Implementierung des Starters. Sie erlaubt eine Aktion, wenn der angemeldete

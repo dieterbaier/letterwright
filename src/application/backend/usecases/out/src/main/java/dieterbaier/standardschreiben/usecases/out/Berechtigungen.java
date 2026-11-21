@@ -14,6 +14,10 @@ public interface Berechtigungen {
      */
     boolean darf(BenutzerKennung benutzer, Aktion aktion, FachlicherBezug bezug);
 
-    /** Ob der Benutzer Briefpapier und Standardschreiben pflegen darf. */
-    boolean darfVorlagenPflegen(BenutzerKennung benutzer);
+    /**
+     * Ob der Benutzer eine Aktion ohne fachlichen Bezug ausführen darf, also eine Aktion für Vorlagen.
+     *
+     * @throws IllegalArgumentException wenn die Aktion sich auf einen Bezug bezieht
+     */
+    boolean darf(BenutzerKennung benutzer, Aktion aktion);
 }

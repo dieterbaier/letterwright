@@ -9,8 +9,14 @@ import org.jmolecules.ddd.annotation.ValueObject;
 @ValueObject
 public enum Aktion {
 
-    /** Briefpapier und Standardschreiben pflegen. Bezieht sich auf keinen fachlichen Bezug. */
-    VORLAGEN_PFLEGEN(false),
+    /** Briefpapier und Standardschreiben anlegen, Entwürfe ändern und neue Entwürfe anlegen. Ohne fachlichen Bezug. */
+    VORLAGEN_BEARBEITEN(false),
+
+    /**
+     * Entwürfe veröffentlichen und veröffentlichte Versionen zurückziehen. Ohne fachlichen Bezug. Getrennt vom Bearbeiten,
+     * damit der Host ein Vier-Augen-Prinzip abbilden kann: Was veröffentlicht ist, geht in alle neuen Schreiben ein.
+     */
+    VORLAGEN_VEROEFFENTLICHEN(false),
 
     /** Zu einem fachlichen Bezug eine Vorschau erzeugen und ein Schreiben speichern. */
     SCHREIBEN_ERZEUGEN(true),

@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 class AktionTest {
 
     @Test
-    void nurDiePflegeDerVorlagenHatKeinenFachlichenBezug() {
+    void nurDieAktionenFuerVorlagenHabenKeinenFachlichenBezug() {
         assertThat(Arrays.stream(Aktion.values()).filter(aktion -> !aktion.brauchtBezug()))
-                .containsExactly(Aktion.VORLAGEN_PFLEGEN);
+                .containsExactly(Aktion.VORLAGEN_BEARBEITEN, Aktion.VORLAGEN_VEROEFFENTLICHEN);
     }
 }
