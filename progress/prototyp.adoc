@@ -4,23 +4,25 @@ Wegwerf-Prototyp, der ADR-003 bis ADR-005, ADR-014 und ADR-017 an realen
 DOCX-Vorgaben belegt oder widerlegt (Epic #3).
 
 *Status:* aktiv seit 2026-11-19. Der Spike ist gebaut (PR #45 und #47 gemergt).
-Jetzt warten vier Entscheidungen beim Owner, danach gehen die Ergebnisse in die
-ADRs. Die Liste steht im Kommentar zu #3 vom 2026-11-20.
+Die vier Entscheidungen des Owners stehen im abschließenden Review zu PR #47.
+Jetzt gehen sie und die Messergebnisse in die ADRs und Qualitätsszenarien; die
+Abnahmen aus der zweiten offenen Zeile laufen parallel.
 
 == The plan
 
-Erst die Entscheidungen des Owners, weil von ihnen abhängt, was in ADR-004,
-ADR-005 und QS-002 steht. Chromium kommt nur, wenn der Owner die beobachteten
-Abweichungen von Option 1 nicht hinnimmt.
+Erst die Übernahme in die ADRs, weil die Entscheidungen jetzt feststehen und
+Epic #7 darauf aufbaut. Chromium ist zurückgestellt und kommt nur wieder, wenn
+die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und PDFBox nicht
+zuverlässig lösen.
 
 [options="checklist"]
 * [x] Schriftquelle und Ersatzschriften festlegen (ADR-017, PR #40): #39, Q-PO-010
 * [x] Referenzschreiben ein- und mehrseitig nachbauen (PR #45): #3
 * [x] Vorschau im sandboxed iframe mit CSP, HTML-Allowlist, Links in neuem Tab (PR #45, #47): #3, ADR-014
 * [x] Ersatzschriften setzen und messen; Arial Narrow → PT Sans Narrow (PR #47): #3, ADR-017
-* [ ] Entscheidungen des Owners in #3: Chromium prüfen oder nicht, Fußzeilen-Semantik für QS-002, Nachbearbeitungsschritt als Preis, „Trotzdem akzeptieren“
+* [x] Entscheidungen des Owners: Chromium zurückgestellt, inhaltliche Fußzeile einmal nach dem Brieftext, PDFBox-Nachbearbeitung mit Ausweichweg, „Trotzdem akzeptieren“ mit Bereinigung vor jeder Ausgabe (Review zu PR #47)
 * [ ] Manuelle PDF/UA-Stichprobe (Owner), QS-013 (zentrale Abteilung), Freigabe der Originalschriften für Einbettung und Webfont: #3, ADR-004, ADR-017
-* [ ] Nur wenn der Owner es entscheidet: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
+* [ ] Nur wenn die PDF/UA-Stichprobe es verlangt: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
 * [ ] Ergebnisse in ADR-003, -004, -005, -014, -017 und QS-002, QS-004 eintragen; Q-PO-004 in `doc-005` nachziehen: #3
 
 ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
