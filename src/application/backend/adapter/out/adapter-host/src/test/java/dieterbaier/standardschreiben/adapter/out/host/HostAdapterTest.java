@@ -87,10 +87,11 @@ class HostAdapterTest {
         List<Loeschanfrage> anfragen = new ArrayList<>();
         var regeln = new HostLoeschregeln(anfrage -> {
             anfragen.add(anfrage);
-            return dieterbaier.standardschreiben.spi.Loeschentscheidung.LOGISCH;
+            return dieterbaier.standardschreiben.spi.Loeschentscheidung.gesperrt("Aufbewahrungsfrist bis 2036");
         });
 
-        assertThat(regeln.entscheide(ERIKA, SCHREIBEN)).isEqualTo(Loeschentscheidung.LOGISCH);
+        assertThat(regeln.entscheide(ERIKA, SCHREIBEN))
+                .isEqualTo(Loeschentscheidung.gesperrt("Aufbewahrungsfrist bis 2036"));
         assertThat(anfragen).containsExactly(Abbildung.loeschanfrage(ERIKA, SCHREIBEN));
     }
 

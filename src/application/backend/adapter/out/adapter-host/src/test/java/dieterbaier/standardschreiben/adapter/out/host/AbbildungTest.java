@@ -19,6 +19,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.FieldSource;
 
 class AbbildungTest {
 
@@ -40,20 +41,29 @@ class AbbildungTest {
         assertThat(Abbildung.zurDomaene(imSpi)).isEqualTo(aktion);
     }
 
+    static final List<Loeschentscheidung> LOESCHENTSCHEIDUNGEN = List.of(Loeschentscheidung.hart(),
+            Loeschentscheidung.logisch(), Loeschentscheidung.gesperrt("Aufbewahrungsfrist bis 2036"));
+
     @ParameterizedTest
-    @EnumSource(Loeschentscheidung.class)
-    void jedeLoeschentscheidungGehtInBeideRichtungenAufDieGleichnamige(Loeschentscheidung entscheidung) {
+    @FieldSource("LOESCHENTSCHEIDUNGEN")
+    void jedeLoeschentscheidungGehtInBeideRichtungenVerlustfrei(Loeschentscheidung entscheidung) {
         dieterbaier.standardschreiben.spi.Loeschentscheidung imSpi = Abbildung.zumSpi(entscheidung);
 
-        assertThat(imSpi.name()).isEqualTo(entscheidung.name());
+        assertThat(imSpi.getClass().getSimpleName()).isEqualTo(entscheidung.getClass().getSimpleName());
         assertThat(Abbildung.zurDomaene(imSpi)).isEqualTo(entscheidung);
+    }
+
+    @Test
+    void derGrundDerSperreBleibtErhalten() {
+        assertThat(Abbildung.zumSpi(Loeschentscheidung.gesperrt("Frist")))
+                .isEqualTo(dieterbaier.standardschreiben.spi.Loeschentscheidung.gesperrt("Frist"));
     }
 
     @Test
     void beideSeitenKennenDieselbenWerte() {
         assertThat(namen(dieterbaier.standardschreiben.spi.Aktion.values())).isEqualTo(namen(Aktion.values()));
-        assertThat(namen(dieterbaier.standardschreiben.spi.Loeschentscheidung.values()))
-                .isEqualTo(namen(Loeschentscheidung.values()));
+        assertThat(arten(dieterbaier.standardschreiben.spi.Loeschentscheidung.class))
+                .isEqualTo(arten(Loeschentscheidung.class));
     }
 
     @Test
@@ -95,6 +105,10 @@ class AbbildungTest {
         assertThat(anfrage.schreiben()).isEqualTo(SCHREIBEN.id().wert());
         assertThat(anfrage.bezug()).isEqualTo(Abbildung.zumSpi(KUNDE));
         assertThat(anfrage.erstellt()).isEqualTo(SCHREIBEN.erstellt());
+    }
+
+    private static List<String> arten(Class<?> versiegelt) {
+        return Arrays.stream(versiegelt.getPermittedSubclasses()).map(Class::getSimpleName).toList();
     }
 
     private static List<String> namen(Enum<?>[] werte) {

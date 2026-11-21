@@ -28,6 +28,6 @@ final class BeispielHost implements PlatzhalterdatenAnbieter, Berechtigungspruef
 
     @Override
     public Loeschentscheidung entscheide(Loeschanfrage anfrage) {
-        return Loeschentscheidung.LOGISCH;
+        return Loeschentscheidung.logisch();
     }
 }

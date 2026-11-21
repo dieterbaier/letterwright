@@ -53,17 +53,19 @@ final class Abbildung {
 
     static dieterbaier.standardschreiben.spi.Loeschentscheidung zumSpi(Loeschentscheidung entscheidung) {
         return switch (entscheidung) {
-            case HART -> dieterbaier.standardschreiben.spi.Loeschentscheidung.HART;
-            case LOGISCH -> dieterbaier.standardschreiben.spi.Loeschentscheidung.LOGISCH;
-            case GESPERRT -> dieterbaier.standardschreiben.spi.Loeschentscheidung.GESPERRT;
+            case Loeschentscheidung.Hart hart -> dieterbaier.standardschreiben.spi.Loeschentscheidung.hart();
+            case Loeschentscheidung.Logisch logisch -> dieterbaier.standardschreiben.spi.Loeschentscheidung.logisch();
+            case Loeschentscheidung.Gesperrt gesperrt ->
+                    dieterbaier.standardschreiben.spi.Loeschentscheidung.gesperrt(gesperrt.grund());
         };
     }
 
     static Loeschentscheidung zurDomaene(dieterbaier.standardschreiben.spi.Loeschentscheidung entscheidung) {
         return switch (entscheidung) {
-            case HART -> Loeschentscheidung.HART;
-            case LOGISCH -> Loeschentscheidung.LOGISCH;
-            case GESPERRT -> Loeschentscheidung.GESPERRT;
+            case dieterbaier.standardschreiben.spi.Loeschentscheidung.Hart hart -> Loeschentscheidung.hart();
+            case dieterbaier.standardschreiben.spi.Loeschentscheidung.Logisch logisch -> Loeschentscheidung.logisch();
+            case dieterbaier.standardschreiben.spi.Loeschentscheidung.Gesperrt gesperrt ->
+                    Loeschentscheidung.gesperrt(gesperrt.grund());
         };
     }
 

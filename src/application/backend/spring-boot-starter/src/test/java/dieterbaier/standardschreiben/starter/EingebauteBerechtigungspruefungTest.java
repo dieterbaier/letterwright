@@ -118,7 +118,7 @@ class EingebauteBerechtigungspruefungTest {
 
         @Bean
         Loeschrichtlinie loeschrichtlinie() {
-            return anfrage -> Loeschentscheidung.GESPERRT;
+            return anfrage -> Loeschentscheidung.gesperrt("Aufbewahrungsfrist");
         }
     }
 
