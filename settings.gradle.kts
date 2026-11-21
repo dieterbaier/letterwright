@@ -28,6 +28,7 @@ val backendModule = mapOf(
     "adapter-host" to "adapter/out/adapter-host",
     "spring-boot-starter" to "spring-boot-starter",
     "architekturtests" to "architekturtests",
+    "host-vertragstest" to "host-vertragstest",
 )
 
 backendModule.forEach { (modul, verzeichnis) ->
