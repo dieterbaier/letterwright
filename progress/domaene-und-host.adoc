@@ -1,0 +1,53 @@
+= Domänenmodell und Ports zur Host-Anwendung
+
+Das Fachmodell, die Anwendungsfälle und der Vertrag mit der Host-Anwendung, so
+dass ein Host die Bibliothek nur über das SPI einbindet (Epic #5).
+
+*Status:* aktiv seit 2026-11-21. Fachmodell (#51) und SPI-Vertrag (#30) sind
+gemergt. Als Nächstes kommen die Anwendungsfälle.
+
+== The plan
+
+Das Modell und der Vertrag mit dem Host kamen zuerst, weil jeder Anwendungsfall
+beides braucht. Die Anwendungsfälle folgen dem Weg eines Schreibens: Ohne
+Vorschau gibt es keinen Snapshot, ohne Snapshot kein Speichern, ohne
+gespeicherte Schreiben keine Übersicht. Das Veröffentlichen von Vorlagen ist
+davon unabhängig, braucht aber die Antwort auf die offene Frage in #55. Mit den
+Anwendungsfällen kommen die Gherkin-Szenarien für Endbenutzer; für Modell und
+SPI hat der Owner darauf verzichtet.
+
+[options="checklist"]
+* [x] Fachmodell mit DDD-Rollen und Selbstvalidierung (PR #57, ADR-018): #51
+* [x] SPI-Vertrag, `adapter-host`, Default-Berechtigungsprüfung, Pakete je Aggregat (PR #59): #30
+* [ ] Anwendungsfall Vorschau erzeugen: #52
+* [ ] Anwendungsfall Schreiben speichern: #53
+* [ ] Anwendungsfälle Schreiben auflisten, herunterladen, löschen: #54
+* [ ] Anwendungsfall Vorlagenversion veröffentlichen, nach Klärung der offenen Frage: #55
+* [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60
+* [ ] Spring-Boot-BOM schmal exportieren: #32
+
+== Where we are
+
+`domaene-modell` hat ein Paket je Aggregat (`vorlage`, `snapshot`, `schreiben`)
+und die geteilten Werttypen im Wurzelpaket; ArchUnit hält die Struktur. Der Host
+implementiert `PlatzhalterdatenAnbieter` und `Loeschrichtlinie` (Pflicht) und
+optional `Berechtigungspruefung`. Ein Host mit nur dem Starter sieht beim
+Kompilieren nur das SPI (`host-vertragstest`). Die eingebaute
+Berechtigungsprüfung ist als Feature in `features/` beschrieben.
+
+== Open in this topic
+
+* #55: Gibt es je Vorlage höchstens eine veröffentlichte Version, oder bleiben
+  ältere veröffentlicht, bis sie zurückgezogen werden?
+* #60: Ablage beim Host wäre eine vierte, optionale Schnittstelle; QS-007 erlaubt
+  höchstens drei, die der Host implementieren muss.
+* `features/` ist als Ort für Features vorgeschlagen, aber noch nicht als
+  Konvention festgehalten.
+
+== Checks
+
+[source,sh]
+----
+./gradlew check                       # Tests, Abdeckungs-Gate, ArchUnit, Host-Vertragstest
+./build.sh validate && ./build.sh build
+----

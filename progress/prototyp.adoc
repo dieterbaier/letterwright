@@ -3,27 +3,33 @@
 Wegwerf-Prototyp, der ADR-003 bis ADR-005, ADR-014 und ADR-017 an realen
 DOCX-Vorgaben belegt oder widerlegt (Epic #3).
 
-*Status:* aktiv seit 2026-11-19. Der Spike ist gebaut (PR #45 und #47 gemergt).
-Die vier Entscheidungen des Owners stehen im abschließenden Review zu PR #47.
-Jetzt gehen sie und die Messergebnisse in die ADRs und Qualitätsszenarien; die
-Abnahmen aus der zweiten offenen Zeile laufen parallel.
+*Status:* aktiv seit 2026-11-19. Die Ergebnisse stehen in den ADRs und
+Qualitätsszenarien (PR #49, #58). ADR-004 und ADR-017 sind angenommen. Offen
+sind die Annahme von ADR-003, ADR-005 und ADR-014 durch den Owner sowie die
+manuellen Prüfungen, die nur der Owner machen kann.
 
 == The plan
 
-Erst die Übernahme in die ADRs, weil die Entscheidungen jetzt feststehen und
-Epic #7 darauf aufbaut. Chromium ist zurückgestellt und kommt nur wieder, wenn
-die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und PDFBox nicht
-zuverlässig lösen.
+Erst die manuellen Prüfungen, weil die Annahme von ADR-005 (PDF/UA) und
+ADR-014 (Barrierefreiheit der Vorschau) davon abhängt. Chromium kommt nur
+wieder, wenn die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und
+PDFBox nicht zuverlässig lösen. Apache FOP mit XSLT ist der Ausweichweg, falls
+Kunden openhtmltopdf nicht akzeptieren (ADR-004, Owner 2026-11-21), aber kein
+geplanter Schritt.
 
 [options="checklist"]
 * [x] Schriftquelle und Ersatzschriften festlegen (ADR-017, PR #40): #39, Q-PO-010
 * [x] Referenzschreiben ein- und mehrseitig nachbauen (PR #45): #3
 * [x] Vorschau im sandboxed iframe mit CSP, HTML-Allowlist, Links in neuem Tab (PR #45, #47): #3, ADR-014
 * [x] Ersatzschriften setzen und messen; Arial Narrow → PT Sans Narrow (PR #47): #3, ADR-017
-* [x] Entscheidungen des Owners: Chromium zurückgestellt, inhaltliche Fußzeile einmal nach dem Brieftext, PDFBox-Nachbearbeitung mit Ausweichweg, „Trotzdem akzeptieren“ mit Bereinigung vor jeder Ausgabe (Review zu PR #47)
-* [ ] Manuelle PDF/UA-Stichprobe (Owner), QS-013 (zentrale Abteilung), Freigabe der Originalschriften für Einbettung und Webfont: #3, ADR-004, ADR-017
-* [ ] Nur wenn die PDF/UA-Stichprobe es verlangt: Option 2 (Chromium) gegen dieselben Kriterien prüfen: #3
-* [ ] Ergebnisse in ADR-003, -004, -005, -014, -017 und QS-002, QS-004 eintragen; Q-PO-004 in `doc-005` nachziehen: #3
+* [x] Entscheidungen des Owners aus dem Review zu PR #47
+* [x] Ergebnisse in ADR-003, -004, -005, -014, -017 und QS-002, QS-004 eintragen; Q-PO-004 nachziehen (PR #49)
+* [x] QS-013 als Annahme festhalten, Originalschriften nur vom Host (Owner, Kommentar in #3 vom 2026-11-21; PR #58)
+* [x] QS-004 Sichtprobe Vorschau gegen PDF (Owner); ADR-004 angenommen (PR #58)
+* [ ] Manuelle PDF/UA-Stichprobe (Owner): #3, ADR-005
+* [ ] NVDA auf einem Windows-Rechner (Owner): #3, ADR-014
+* [ ] Annahme von ADR-003, ADR-005, ADR-014 durch den Owner
+* [ ] Nur wenn die PDF/UA-Stichprobe es verlangt: Option 2 (Chromium) prüfen: #3
 
 ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 (Owner, 2026-11-15).
@@ -33,21 +39,14 @@ ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 Der Prototyp liegt in `prototyp/`, außerhalb des Gradle- und npm-Builds. Sein
 README beginnt mit einer Tabelle „Funktionen und Grenzen“, je Funktion mit
 Nachweis und ADR. Messwerte stehen dort und kommen aus den Befehlen unten, nicht
-aus dieser Datei. Bekannte Abweichungen: VoiceOver braucht am Seitenwechsel einen
-neuen Einstieg in den Frame, bei 200 % Zoom scrollt die Vorschau statt
-umzubrechen, die Fußzeile im PDF wird nur per PDFBox-Nachbearbeitung lesbar und
-widerspricht damit dem Antwortmaß von QS-002, QS-004 ist nur am Chrome-Druck-PDF
-gemessen.
+aus dieser Datei. Die genaue Messung der Bildschirmdarstellung (QS-004, 1-mm-Grenze)
+kommt als automatischer Test in #7.
 
 == Open in this topic
 
-* Q-PO-004: Die Antwort in `doc-005` sagt noch „liefert nach“; mit der Übernahme
-  in die ADRs nachziehen.
-* NVDA: Kein Windows-Gerät; braucht eine Windows-Prüfumgebung.
-* Hinweis aus dem Re-Review von PR #17: Nachrichten aus dem iframe zusätzlich mit
-  einem Korrelationswert je Vorschau-Instanz absichern. Der Prototyp prüft nur
-  Quelle und Schema. In ADR-014 aufnehmen.
-* Ligatur „ﬁ“ im Text des PDFs mit PT Sans Narrow: Abhilfe fürs Produkt offen.
+* Ligatur „ﬁ“ im Text des PDFs mit PT Sans Narrow: Abhilfe fürs Produkt offen
+  (ADR-017, Konsequenzen).
+* Die Ergebnisse von PDF/UA-Stichprobe und NVDA trägt der Owner in #3 ein.
 
 == Checks
 

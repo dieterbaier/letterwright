@@ -1,0 +1,113 @@
+= Projekttagebuch 2026-11-21
+
+Achter Arbeitstag. Zwei Themen: der Prototyp (Epic #3) kam in den ADRs an,
+und Epic #5 begann mit Fachmodell und SPI-Vertrag. Rekonstruiert aus
+Commit-Historie, Issues und Pull Requests.
+
+== Was geschah
+
+* **PR #48, Bausteinsicht Ebene 2** (`e044e2d` bis `6a99808`): `adapter-rendering`
+  als Whitebox, mit den Entscheidungen aus PR #47. Nach Review gemergt.
+* **PR #49, Ergebnisse des Prototyps** (`f2b803c` bis `cb7f037`): Befunde in
+  ADR-003, -004, -005, -014, -017, QS-002, QS-004 und R-003. Gemergt.
+* **Font-Cache des Doku-Builds:** PR #50 (nur `.gitignore`) geschlossen. Die
+  Ursache liegt im Toolkit: Java nimmt `user.home` aus dem passwd-Eintrag, und
+  Podman setzt dort das Projekt. Toolkit-PR #115 (Issue #114) gibt
+  `JAVA_TOOL_OPTIONS=-Duser.home=/tmp` mit und hat nach Review ein
+  Gherkin-Szenario. PR #56 zieht Submodul und `build.sh` nach (`1f0fcc9`).
+* **PR #58, Annahme von ADR-004** (`fec46c4`, `a27995f`): ADR-004 mit seinen neun
+  Relationen angenommen. QS-013 steht als Annahme, die Originalschriften liefert
+  nur der Host, QS-004 hat eine Sichtprobe.
+* **PR #57, Fachmodell** (#51, `4a3f95e` bis `3fc36dd`): Modul `validierung`,
+  selbstvalidierende Typen, jMolecules-Annotationen, ArchUnit-Regeln für
+  erlaubte Bibliotheken und `@Identity`. ADR-018 und die Präzisierung von
+  ADR-002 angenommen.
+* **PR #59, SPI-Vertrag** (#30, `4f5f823` bis `f70c542`):
+** SPI mit eigenen Typen, Ports in `usecases-out`, Mapping in `adapter-host`,
+   Autokonfiguration mit Pflicht-Beans und Default-Berechtigungsprüfung.
+** Modul `host-vertragstest`: Ein Host mit nur dem Starter kompiliert gegen das
+   SPI und gegen nichts sonst. Der Test fand, dass Klassen des Starters
+   öffentlich waren.
+** Erstes Feature `features/eingebaute-berechtigungspruefung.feature` mit
+   Testbrücke.
+** Domäne in Pakete je Aggregat aufgeteilt, mit zwei ArchUnit-Regeln.
+** Review: Not converged. P1 tiefe Kopie des SPI-Datenkontexts, P2 `toString`
+   ohne Werte, P2 anonymer Zugriff. Alle drei behoben (`e4feb53`, `f70c542`),
+   danach Converged with recorded waivers. Gemergt.
+* **Issues:** #60 angelegt (Ablage im DMS des Hosts, ADR). Frage zu mehreren
+  veröffentlichten Versionen in #55 eingetragen. Gegenvorschlag zu #46
+  kommentiert.
+
+== Entscheidungen des Owners
+
+* QS-013: kein Zugriff auf die zentrale Abteilung; Annahme, dass das Briefbild
+  passt. Der erste echte Kundeneinsatz entscheidet.
+* Originalschriften werden nicht von uns eingebettet. Stellt der Host sie
+  bereit, ist das in Ordnung.
+* QS-004: Sichtprobe ohne sichtbaren Unterschied; der genaue Nachweis kommt
+  automatisch in #7.
+* ADR-004 angenommen. Apache FOP mit XSLT ist Ausweichweg, falls Kunden
+  openhtmltopdf ablehnen, für jetzt zu schwergewichtig.
+* #51: jMolecules-Annotationen, Version als Teil der Vorlage, Gleichheit über
+  die Identität, leerer Inhalt nur im Entwurf. ADR-018 angenommen.
+* #30: drei Löschentscheidungen genügen, `GESPERRT` mit Grund; Aktionen
+  `VORLAGEN_BEARBEITEN` und `VORLAGEN_VEROEFFENTLICHEN`; Rollen
+  `ROLE_SSW_<AKTION>`; Feature für die eingebaute Berechtigungsprüfung, sonst
+  vorerst kein Gherkin; DMS-Ablage als eigenes Issue.
+* Domäne nach Aggregaten, interne Typen gekapselt, keine Unterteilung nach
+  Rollen, kein Gradle-Modul je Aggregat.
+
+== Gelernt
+
+* **Ein Symptom zu ignorieren verschiebt das Problem.** Der `.gitignore`-Eintrag
+  in PR #50 hätte den Font-Cache versteckt; die Ursache lag in Podman und
+  `user.home`.
+* **Ein Kompiliernachweis findet, was ein Review übersieht.** Erst der Test mit
+  dem Klassenpfad eines Hosts zeigte, dass der Starter mehr als das SPI zeigte.
+* **Ein Record ist nicht automatisch unveränderlich und nicht automatisch
+  diskret.** Er kopiert nichts tief, und sein `toString` gibt alles aus
+  (Review von PR #59).
+* **Spring Security führt anonyme Zugriffe als authentifiziert.**
+  `isAuthenticated()` allein reicht für eine Berechtigungsprüfung nicht.
+* **Eine Modul-Prüfung, die Tests verlangt, trifft auch reine Schnittstellen.**
+  Der Test in `usecases-out` hält jetzt fest, dass die Ports keine Logik haben.
+* **Ein Commit, der allein nicht kompiliert, fällt erst beim Aufteilen auf.**
+  Die Commits wurden mit Freigabe des Owners per Force-Push ersetzt.
+
+== Offen
+
+* #3: PDF/UA-Stichprobe und NVDA (Owner), Annahme von ADR-003, -005, -014.
+* #46: Antwort des Owners auf den Gegenvorschlag; danach Issue für einen
+  Generator im Toolkit.
+* #55: höchstens eine veröffentlichte Version je Vorlage?
+* #60: ADR zur Ablage beim Host, Verhältnis zu QS-007.
+* Nächstes Issue in Epic #5: #52.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Toolkit: Skills `clock-in`, `clock-out`, `implement-issue-workflow`,
+  `slice-issues`, `convergence-check`, `bdd-specification`, BDD-Schreibhilfe,
+  Vorlage `progress.adoc`; Toolkit-PR #115 mit Review.
+* Doku: ADR-002, ADR-004, ADR-016 (Entscheidung, Konsequenzen, Annahmen),
+  ADR-018, Querschnittskonzept (Sicherheit, Fachmodell), Bausteinsicht, Glossar,
+  Laufzeitsicht (Speichern), QS-009, `doc-005` (Q-PO-003, Q-ARCH-004).
+* GitHub: Issues #3, #5, #30, #46, #51, #55; PR #48, #49, #50, #56, #57, #58,
+  #59 mit Reviews, Inline-Kommentaren und Checks; Issues und PRs seit
+  2026-11-21.
+* Code: `domaene-modell`, `spi`, `usecases-out`, `adapter-host`, Starter,
+  `architekturtests`, Build-Logik (`standardschreiben.java-modul`,
+  `PruefeTestsVorhanden`), Versionskatalog, `settings.gradle.kts`.
+* Clock-out: `git status`, `gh pr list`, Branch-Sweep über alle Refs,
+  `git log main --since=2026-11-21`, `progress/prototyp.adoc`,
+  `diary/2026-11-20.adoc`.
+
+Fehlgeschlagen:
+
+* Ein Force-Push wurde zunächst von der Berechtigungsprüfung blockiert; erst
+  nach Freigabe des Owners ausgeführt.
+* zsh `noclobber` verhinderte mehrmals das Überschreiben von Dateien mit
+  `cat >`; wiederholt mit `>|`.
+* Ein `git checkout` bei einer Gegenprobe setzte eine noch nicht committete
+  Korrektur zurück; sie wurde neu eingespielt und geprüft.
