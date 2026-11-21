@@ -112,7 +112,8 @@ xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
   Objekte, `wiederherstellen` stellt gespeicherte her. Beide prüfen alle Regeln.
 * **Zeit.** Das Modell liest keine Uhr. Methoden, die eine Zeit brauchen,
   bekommen `jetzt` als Parameter.
-* **Personenbezogene Daten.** `toString` gibt keinen Datenkontext aus.
+* **Personenbezogene Daten.** `toString` gibt keinen Datenkontext aus, weder im
+  Fachmodell noch im SPI.
 * **Pakete je Aggregat.** Innerhalb von `domaene-modell` gibt es je Aggregat ein
   Paket: `vorlage` (Briefpapier und Standardschreiben), `snapshot` und
   `schreiben`. Briefpapier und Standardschreiben teilen sich ein Paket, weil sie
