@@ -7,7 +7,7 @@ owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Ebene-1-Bausteine der Bibliothek innerhalb der Host-Anwendung.'
+summary: 'Ebene-1-Bausteine der Bibliothek innerhalb der Host-Anwendung mit ihren Technologien und Bibliotheken; Ebene 2 für adapter-rendering.'
 tags:
 - arc42
 - building-blocks
@@ -17,6 +17,12 @@ metadata_version: '1.0'
 [[building-block-view]]
 = Bausteinsicht
 
+Die Bausteinsicht nennt je Baustein die Technologien und Bibliotheken, die er
+einsetzt. Viele Module sind noch Gerüste. _Kursiv_ steht deshalb eine
+Technologie, die durch einen ADR festgelegt, aber noch nicht im Build
+eingebunden ist. Was im Prototyp (`prototyp/`) erprobt ist, steht bei
+xref:bausteine-ebene-2-adapter-rendering[adapter-rendering].
+
 == Ebene 1
 
 [plantuml,bausteine-ebene-1,svg]
@@ -25,9 +31,9 @@ metadata_version: '1.0'
 !include <C4/C4_Component>
 System_Boundary(host, "Host-Anwendung") {
   Container_Boundary(fe, "Frontend (npm-Paket)") {
-    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte, barrierefreie Vorschau")
+    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte, barrierefreie Vorschau im sandboxed iframe")
     Component(ui_uebersicht, "Übersicht", "React", "Gespeicherte Schreiben listen, laden, löschen")
-    Component(ui_editor, "Vorlagen-Editor", "React, ProseMirror", "Briefpapier und Standardschreiben pflegen")
+    Component(ui_editor, "Vorlagen-Editor", "React, ProseMirror/TipTap", "Briefpapier und Standardschreiben pflegen")
   }
   Container_Boundary(be, "Backend (Spring-Boot-Starter)") {
     Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
@@ -37,12 +43,13 @@ System_Boundary(host, "Host-Anwendung") {
     Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
     Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Schreiben")
     Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
-    Component(ren, "adapter-rendering", "FreeMarker, openhtmltopdf, veraPDF", "Zusammenführen, PDF, Konformität")
+    Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Zusammenführen, Bereinigen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
     Component(ahost, "adapter-host", "Java", "Bildet interne Ports auf das SPI ab")
   }
   Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie")
   ContainerDb_Ext(db, "Host-Datenbank", "SQL")
+  ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType", "Lizenzierte Schriften der DOCX-Vorgabe")
 }
 Rel(ui_vorschau, web, "REST/JSON, HTML")
 Rel(ui_uebersicht, web, "REST/JSON, PDF")
@@ -53,30 +60,231 @@ Rel(app, uout, "nutzt")
 Rel(app, dom, "nutzt")
 Rel(app, dsvc, "nutzt")
 Rel(dsvc, dom, "arbeitet auf")
-Rel(ren, uout, "implementiert Renderer")
+Rel(ren, uout, "implementiert Renderer, KonformitaetsPruefer")
 Rel(per, uout, "implementiert Repository, DokumentAblage")
 Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie")
 Rel(ahost, spiapi, "ruft, bildet ab")
 Rel(spi, spiapi, "implementiert")
 Rel(per, db, "JDBC")
+Rel(ren, schriften, "liest Schriftdateien")
 @enduml
 ----
 
-[cols="1,3,2", options="header"]
+[cols="2,4,3,3", options="header"]
 |===
-| Baustein | Verantwortung | Ablage im Repository
-| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | `src/application/backend/domaene/modell`
-| domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | `src/application/backend/domaene/service`
-| usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | `src/application/backend/usecases/in`
-| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert | `src/application/backend/usecases/out`
-| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; einziges Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]) | `src/application/backend/spi`
-| usecases-service | Implementierung der Anwendungsfälle | `src/application/backend/usecases/service`
-| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | `src/application/backend/adapter/in/adapter-web`
-| adapter-rendering | Ausgehender Adapter: Zusammenführen (FreeMarker), PDF (openhtmltopdf), Konformität (veraPDF) | `src/application/backend/adapter/out/adapter-rendering`
-| adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
-| adapter-host | Ausgehender Adapter: ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab | `src/application/backend/adapter/out/adapter-host`
-| spring-boot-starter | Autokonfiguration, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security; exportiert nur `spi` | `src/application/backend/spring-boot-starter`
-| Frontend-Paket | Vorschau, Übersicht, Editor | `src/application/frontend`
+| Baustein | Verantwortung | Technologie und Bibliotheken | Ablage im Repository
+| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | Java 21, JSpecify | `src/application/backend/domaene/modell`
+| domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | Java 21, JSpecify | `src/application/backend/domaene/service`
+| usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | Java 21, JSpecify | `src/application/backend/usecases/in`
+| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert | Java 21, JSpecify | `src/application/backend/usecases/out`
+| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; einziges Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]) | Java 21, JSpecify | `src/application/backend/spi`
+| usecases-service | Implementierung der Anwendungsfälle | Java 21, JSpecify | `src/application/backend/usecases/service`
+| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | _Spring MVC_ | `src/application/backend/adapter/in/adapter-web`
+| adapter-rendering | Ausgehender Adapter: Zusammenführen, HTML-Bereinigung, Schriftauflösung, PDF-Erzeugung und Konformitätsprüfung; Whitebox in xref:bausteine-ebene-2-adapter-rendering[Ebene 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox und FontBox, veraPDF_, freie OFL-Ersatzschriften | `src/application/backend/adapter/out/adapter-rendering`
+| adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006]) | `src/application/backend/adapter/out/adapter-persistenz-jdbc`
+| adapter-host | Ausgehender Adapter: ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab | Java 21, JSpecify | `src/application/backend/adapter/out/adapter-host`
+| spring-boot-starter | Autokonfiguration, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security; exportiert nur `spi` | Spring Boot Autoconfigure 4.1, _Spring Security_ | `src/application/backend/spring-boot-starter`
+| Frontend-Paket | Vorschau, Übersicht, Editor | React 19, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | `src/application/frontend`
 |===
 
+Querschnittlich, ohne eigenen Baustein:
+
+* *Backend-Build und Tests:* Gradle mit Kotlin DSL und Versionskatalog
+  `gradle/libs.versions.toml`, Versionen über die Spring-Boot-BOM
+  (xref:adr-009-build-monorepo-und-versionen[ADR-009]); JUnit 5, Mockito, AssertJ,
+  JaCoCo als Abdeckungs-Gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
+  ArchUnit im Modul `architekturtests`
+  (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); für die
+  Persistenz _Testcontainers_ mit PostgreSQL und MariaDB.
+* *Frontend-Build und Tests:* npm-Workspaces, Vitest mit V8-Abdeckung, React
+  Testing Library, jsdom, axe-core, ESLint
+  (xref:adr-010-frontend-tests-mit-vitest[ADR-010]); _Playwright_ für E2E-Tests
+  in der Beispielanwendung.
+
 Die Grenze entspricht der xref:system-scope-and-context[Kontextabgrenzung].
+
+[[bausteine-ebene-2]]
+== Ebene 2
+
+[[bausteine-ebene-2-adapter-rendering]]
+=== adapter-rendering (Whitebox)
+
+Die Implementierungen in `adapter-rendering` sind der Kern des Werkzeugs: Aus
+Vorlagenversionen und Datenkontext entstehen hier Vorschau-HTML und PDF
+(xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]). Das Modul
+kennt nur `usecases-out` und implementiert zwei Ports: `Renderer` und
+`KonformitaetsPruefer` (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]).
+
+Der Schnitt ist ein Entwurf. Er folgt dem Wegwerf-Prototyp aus #3
+(`prototyp/README.adoc`), dessen Code nicht übernommen wird. Die Unterpakete
+sind ein Vorschlag, bis das Epic #7 das Modul umsetzt.
+
+[plantuml,bausteine-ebene-2-adapter-rendering,svg]
+----
+@startuml
+!include <C4/C4_Component>
+Component_Ext(uout, "usecases-out", "Java", "Ports Renderer und KonformitaetsPruefer")
+ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType")
+Container_Boundary(ren, "adapter-rendering") {
+  Component(steuerung, "Rendering-Steuerung", "Java", "Implementiert Renderer; steuert die Pipeline für Vorschau und PDF")
+  Component(zus, "Zusammenführung", "Apache FreeMarker, abgesichert", "Briefpapier, Standardschreiben und Datenkontext zu einem HTML-Dokument")
+  Component(ber, "HTML-Bereinigung", "jsoup", "Allowlist für Elemente, Attribute, URLs und CSS; meldet Befunde; gibt XHTML aus")
+  Component(schr, "Schriftauflösung", "Apache FontBox", "Familie zu Schriftdatei: Ordner des Hosts, Ersatzschrift, Standardschrift")
+  ComponentDb(ersatz, "Ersatzschriften", "OFL-Schriften, Zuordnungstabelle", "Liberation Sans, PT Sans Narrow u. a.")
+  Component(vor, "Vorschau-Aufbereitung", "Java", "Ergänzt CSP, @font-face und Bildschirmdarstellung, ohne das Layout zu ändern")
+  Component(pdf, "PDF-Erzeugung", "openhtmltopdf mit PDFBox-Backend", "PDF/A-2b mit PDF/UA-1-Tagging, Schriften eingebettet")
+  Component(nach, "PDF-Nachbearbeitung", "Apache PDFBox", "Taggt die Fußzeile und weist das Ergebnis nach; vorbehaltlich #3")
+  Component(kon, "Konformitätsprüfung", "veraPDF, Greenfield-Modell", "Implementiert KonformitaetsPruefer: PDF/A-2b und PDF/UA-1")
+}
+Rel(steuerung, uout, "implementiert Renderer")
+Rel(kon, uout, "implementiert KonformitaetsPruefer")
+Rel(steuerung, zus, "1. zusammenführen")
+Rel(steuerung, ber, "2. bereinigen")
+Rel(steuerung, vor, "3a. Vorschau")
+Rel(steuerung, pdf, "3b. PDF")
+Rel(steuerung, nach, "4b. nachbearbeiten")
+Rel(vor, schr, "Schriften für @font-face")
+Rel(pdf, schr, "Schriften zum Einbetten")
+Rel(schr, schriften, "liest")
+Rel(schr, ersatz, "fällt zurück auf")
+@enduml
+----
+
+Vorschau und PDF entstehen aus demselben bereinigten HTML. Die Vorschau bekommt
+nur Zusätze im Kopf, die das Layout nicht ändern; paginiert wird sie im Browser
+mit Paged.js in der Vorschau-Komponente des Frontends
+(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). Die
+Konformitätsprüfung ruft `usecases-service` vor jedem Speichern über den Port
+auf, nicht die Rendering-Steuerung
+(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]).
+
+[cols="2,4,3,3,3", options="header"]
+|===
+| Baustein | Verantwortung | Schnittstelle | Technologie und Bibliotheken | Ablage (Vorschlag)
+
+| Rendering-Steuerung
+| Führt die Schritte für Vorschau und PDF in fester Reihenfolge aus. Bricht ab,
+  wenn ein Schritt fehlschlägt; nichts wird still repariert.
+| Implementiert `Renderer` aus `usecases-out`
+| Java 21
+| `…adapter.out.rendering`
+
+| Zusammenführung
+| Führt Briefpapier, Standardschreiben und Datenkontext in zwei Durchläufen zu
+  einem vollständigen HTML-Dokument mit Paged-Media-CSS zusammen. Escaped
+  Platzhalterwerte; fehlende Werte erscheinen sichtbar als Platzhalter.
+| Intern: Vorlagenversionen und Datenkontext rein, HTML raus
+| Apache FreeMarker mit abgesicherter Konfiguration
+  (xref:adr-008-platzhaltersprache[ADR-008])
+| `…rendering.zusammenfuehrung`
+
+| HTML-Bereinigung
+| Bereinigt das zusammengeführte Dokument nach Allowlist: Elemente, Attribute,
+  URL-Schemata und CSS. Meldet jede Entfernung als Befund. Gibt wohlgeformtes
+  XHTML ohne zusätzlichen Leerraum aus, weil openhtmltopdf XML braucht.
+| Intern: HTML rein, XHTML und Befunde raus
+| jsoup (xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014])
+| `…rendering.bereinigung`
+
+| Schriftauflösung
+| Löst jede Schriftfamilie der Vorlage in fester Reihenfolge zu einer Datei auf:
+  Ordner des Hosts, sonst Ersatzschrift aus der Zuordnungstabelle, sonst
+  Standardschrift. Liest Familie, Gewicht und Stil aus der Datei, nicht aus dem
+  Dateinamen. Meldet jede ersetzte Familie.
+| Intern: Familie rein, Schriftdatei raus; liest den konfigurierten Schriftordner
+| Apache FontBox (xref:adr-017-bereitstellung-der-schriften[ADR-017])
+| `…rendering.schriften`
+
+| Ersatzschriften
+| Freie Ersatzschriften, eine freie Standardschrift und die Zuordnungstabelle.
+  Keine lizenzpflichtigen Schriften.
+| Klassenpfad-Ressourcen
+| Liberation Sans 2.1.5 für Arial, PT Sans Narrow für Arial Narrow, weitere
+  laut ADR-017; alle SIL OFL 1.1
+| Ressourcen des Moduls
+
+| Vorschau-Aufbereitung
+| Ergänzt das bereinigte HTML um eine Content Security Policy, die Schriften als
+  `@font-face` und eine Bildschirmdarstellung der Seiten.
+| Intern: XHTML rein, Vorschau-HTML raus; geht über `Renderer` an `adapter-web`
+| Java 21; CSP mit SHA-256-Hash für das Skript von Paged.js
+| `…rendering.vorschau`
+
+| PDF-Erzeugung
+| Rendert das bereinigte XHTML zu einem PDF/A-2b mit PDF/UA-1-Tagging und bettet
+  die aufgelösten Schriften ein. Läuft in der JVM des Hosts, ohne externen
+  Prozess.
+| Intern: XHTML und Schriften rein, PDF raus
+| openhtmltopdf mit PDFBox-Backend (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004])
+| `…rendering.pdf`
+
+| PDF-Nachbearbeitung
+| Taggt die Fußzeile, die openhtmltopdf als Artefakt ausgibt, als lesbaren
+  Inhalt. Prüft bei jeder Erzeugung, dass genau die Fußzeilentexte aus dem HTML
+  in dieser Reihenfolge am Ende des Strukturbaums stehen, sonst Abbruch. Ob es
+  den Schritt gibt, entscheidet der Owner in #3.
+| Intern: PDF rein, PDF raus
+| Apache PDFBox
+| `…rendering.pdf`
+
+| Konformitätsprüfung
+| Prüft ein PDF gegen PDF/A-2b und PDF/UA-1. Default-Prüfer, den der Starter
+  automatisch konfiguriert.
+| Implementiert `KonformitaetsPruefer` aus `usecases-out`
+| veraPDF-Bibliothek mit Greenfield-Modell (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005])
+| `…rendering.konformitaet`
+|===
+
+`…` steht für `dieterbaier.standardschreiben.adapter.out`.
+
+==== Bibliotheken
+
+Die Versionen hat der Prototyp erprobt. Ins Produkt kommen sie über den
+Versionskatalog, wenn Epic #7 das Modul umsetzt.
+
+[cols="2,2,3,2", options="header"]
+|===
+| Bibliothek | Lizenz | Zweck | Im Prototyp erprobt
+| Apache FreeMarker | Apache-2.0 | Zusammenführung, Platzhaltersprache | 2.3.35
+| jsoup | MIT | HTML-Bereinigung nach Allowlist, XHTML-Ausgabe | 1.24.1
+| openhtmltopdf (`openhtmltopdf-pdfbox`) | LGPL-2.1 | HTML mit Paged-Media-CSS zu PDF/A und PDF/UA | 1.1.114
+| Apache PDFBox und FontBox | Apache-2.0 | Backend von openhtmltopdf, Nachbearbeitung, Schriftdateien lesen | 3.x, transitiv über openhtmltopdf
+| veraPDF (`validation-model`) | MPL-2.0 oder GPL-3.0 | Konformitätsprüfung PDF/A-2b und PDF/UA-1 | 1.30.4
+|===
+
+Nur Werkzeuge des Prototyps, nicht Teil des Moduls: Jackson für die
+Testdaten und Playwright für die Prüfung der Vorschau. Lage, Text und Bild der
+PDFs vergleichen dort eigene Werkzeuge auf Basis von PDFBox; ob sie als
+Testwerkzeuge für QS-004 ins Produkt wandern, ist offen.
+
+==== Betroffen von
+
+[cols="2,5", options="header"]
+|===
+| Baustein | Betroffen von
+| Rendering-Steuerung | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-012-erzeugungsdauer[QS-012], xref:r-002-abweichung-zweier-render-engines[R-002]
+| Zusammenführung | xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003], xref:adr-008-platzhaltersprache[ADR-008], xref:qs-010-fehlende-platzhalter-sichtbar[QS-010], xref:r-004-template-injection-durch-vorlagen[R-004]
+| HTML-Bereinigung | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:r-004-template-injection-durch-vorlagen[R-004]
+| Schriftauflösung, Ersatzschriften | xref:adr-017-bereitstellung-der-schriften[ADR-017], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]
+| Vorschau-Aufbereitung | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]
+| PDF-Erzeugung | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
+| PDF-Nachbearbeitung | xref:qs-002-barrierefreies-pdf[QS-002], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
+| Konformitätsprüfung | xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002]
+|===
+
+==== Offene Punkte
+
+* *PDF-Nachbearbeitung:* Ob der Schritt bleibt, hängt an der Entscheidung zur
+  Fußzeilen-Semantik in #3. Er widerspricht dem Antwortmaß von QS-002 und muss
+  bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
+* *Befunde der Bereinigung:* Die Vorlagenpflege braucht sie beim Speichern
+  (Ablehnen, Trotzdem akzeptieren, Bereinigen; #46). Über welchen Port sie den
+  Kern erreichen, ist offen.
+* *Schriften für die Vorschau:* Ob sie eingebettet als `data:`-URI oder vom
+  Ressourcen-Endpunkt in `adapter-web` kommen, ist offen (ADR-014). Im zweiten
+  Fall braucht `adapter-web` die aufgelösten Dateien über einen Port.
+* *Paged.js im iframe:* Im Prototyp fügt das Backend das Skript inline ein. Ob
+  im Produkt die Vorschau-Aufbereitung oder die Vorschau-Komponente es
+  einbringt, ist offen. Die CSP muss in beiden Fällen den Hash kennen.
+* *Chromium (Option 2 aus ADR-004):* Würde die PDF-Erzeugung ersetzen; ob es
+  geprüft wird, entscheidet der Owner in #3.
