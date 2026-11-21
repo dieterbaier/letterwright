@@ -79,7 +79,7 @@ Wir setzen eine **hexagonale Architektur** (Ports and Adapters) nach DDD ein:
 Schnitt und Datentypen des SPI begründet
 xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016].
 
-**Frameworkfreiheit der Domäne** (präzisiert am 2026-11-21, Review zu PR #57):
+**Frameworkfreiheit der Domäne** (präzisiert am 2026-11-21 im Review zu PR #57, vom Owner angenommen):
 Die Domäne bleibt unabhängig von Anwendungs-, DI- und Persistenzframeworks. Ihr
 fachliches Verhalten muss ohne Container, Proxies und Technologieintegration
 ausführbar und testbar sein. Externe Bibliotheken werden einzeln anhand von Zweck,

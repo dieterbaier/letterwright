@@ -71,7 +71,8 @@ xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
 
 * **Rolle sichtbar machen.** Jeder Typ trägt eine jMolecules-Annotation:
   `@AggregateRoot`, `@Entity` oder `@ValueObject`. Die Identität eines Aggregats
-  oder einer Entität ist mit `@Identity` markiert. Der Name ist der Begriff aus dem
+  oder einer Entität ist mit `@Identity` markiert, am Feld oder an der Methode, die
+  sie liefert. Der Name ist der Begriff aus dem
   Glossar, ohne technisches Suffix.
 * **Gleichheit.** Aggregate und Entitäten sind finale Klassen, gleich über ihre
   Identität. Value Objects sind Records, Enums oder unveränderliche Klassen mit
