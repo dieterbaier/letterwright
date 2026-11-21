@@ -42,6 +42,7 @@ System_Boundary(host, "Host-Anwendung") {
     Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
     Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
     Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben")
+    Component(val, "validierung", "Java, ohne Spring", "Allgemeine Prüfungen für selbstvalidierende Typen")
     Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
     Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Zusammenführen, Bereinigen, PDF, Konformität")
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
@@ -60,6 +61,7 @@ Rel(app, uout, "nutzt")
 Rel(app, dom, "nutzt")
 Rel(app, dsvc, "nutzt")
 Rel(dsvc, dom, "arbeitet auf")
+Rel(dom, val, "prüft mit")
 Rel(ren, uout, "implementiert Renderer, KonformitaetsPruefer")
 Rel(per, uout, "implementiert Repository, DokumentAblage")
 Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie")
@@ -73,7 +75,8 @@ Rel(ren, schriften, "liest Schriftdateien")
 [cols="2,4,3,3", options="header"]
 |===
 | Baustein | Verantwortung | Technologie und Bibliotheken | Ablage im Repository
-| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices | Java 21, JSpecify | `src/application/backend/domaene/modell`
+| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] | Java 21, JSpecify, jMolecules DDD (nur Annotationen) | `src/application/backend/domaene/modell`
+| validierung | Allgemeine Prüfungen (Pflichtwert, nicht leer, nicht blank, Untergrenze) mit einheitlichem Fehlervertrag; kennt kein anderes Modul, das SPI nutzt es nicht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | Java 21, JSpecify | `src/application/backend/validierung`
 | domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | Java 21, JSpecify | `src/application/backend/domaene/service`
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | Java 21, JSpecify | `src/application/backend/usecases/in`
 | usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert | Java 21, JSpecify | `src/application/backend/usecases/out`

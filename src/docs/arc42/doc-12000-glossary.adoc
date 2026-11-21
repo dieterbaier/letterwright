@@ -17,22 +17,27 @@ metadata_version: '1.0'
 [[glossary]]
 = Glossar
 
+Die Spalte „Im Code“ nennt den Bezeichner und seine DDD-Rolle
+(xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]). Value
+Objects ohne eigenen Fachbegriff wie `Versionsnummer` oder die IDs stehen nur im
+Code.
+
 [cols="2,5,2", options="header"]
 |===
 | Begriff | Definition | Im Code
-| Briefpapier | Vorlage für das Seitenlayout eines Schreibens (Header mit Logo und Slogan, Absender, Anschriftfeld, Informationsblock, Fußzeile, Seitenzahlen). Typ privat oder geschäftlich (DIN 5008 Form A oder B). | `Briefpapier`, Typ `Briefpapiertyp`
-| Standardschreiben | Vorlage für den Inhalt eines Schreibens mit Platzhaltern; ihr ist genau ein Briefpapier zugewiesen. | `Standardschreiben`
-| Schreiben | Ein aus einem Standardschreiben mit konkreten Daten erzeugtes und gespeichertes Dokument (PDF). Im Issue „gespeichertes Standardschreiben“. | `Schreiben`
-| Vorlagenversion | Unveränderlicher Stand eines Briefpapiers oder Standardschreibens; Zustand Entwurf, veröffentlicht oder zurückgezogen. | `Vorlagenversion`, Zustand `Vorlagenzustand`, Verweis `Versionsverweis`
+| Briefpapier | Vorlage für das Seitenlayout eines Schreibens (Header mit Logo und Slogan, Absender, Anschriftfeld, Informationsblock, Fußzeile, Seitenzahlen). Typ privat oder geschäftlich (DIN 5008 Form A oder B). | `Briefpapier` (Aggregate Root), Typ `Briefpapiertyp`
+| Standardschreiben | Vorlage für den Inhalt eines Schreibens mit Platzhaltern; ihr ist genau ein Briefpapier zugewiesen. | `Standardschreiben` (Aggregate Root)
+| Schreiben | Ein aus einem Standardschreiben mit konkreten Daten erzeugtes und gespeichertes Dokument (PDF). Im Issue „gespeichertes Standardschreiben“. | `Schreiben` (Aggregate Root)
+| Vorlagenversion | Unveränderlicher Stand eines Briefpapiers oder Standardschreibens; Zustand Entwurf, veröffentlicht oder zurückgezogen. | `Vorlagenversion` (Entität im Aggregat der Vorlage), Zustand `Vorlagenzustand`, Verweis `Versionsverweis`
 | Baustein | Abgegrenzter Teil eines Briefpapiers oder Standardschreibens (z. B. Anschriftfeld, Betreff, Wiederholungsblock). |
 | Platzhalter | Ausdruck wie `${empfaenger.name}`, der beim Zusammenführen durch einen Wert aus dem Datenkontext ersetzt wird; optional mit Defaultwert. |
-| Datenkontext | Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert. | `Datenkontext`
-| Fachlicher Bezug | Das Domänenobjekt, zu dem ein Schreiben erzeugt wird (z. B. Kunde, Vorgang), als Typ und ID. | `FachlicherBezug`
+| Datenkontext | Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert. | `Datenkontext` (Value Object)
+| Fachlicher Bezug | Das Domänenobjekt, zu dem ein Schreiben erzeugt wird (z. B. Kunde, Vorgang), als Typ und ID. | `FachlicherBezug` (Value Object)
 | Vorschau | Paginierte HTML-Darstellung eines befüllten Standardschreibens vor dem Speichern. |
-| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird. | `Snapshot`
-| Prüfsumme | SHA-256-Prüfsumme, etwa eines gespeicherten PDFs oder eines Datenkontexts. Mit ihr erkennt das Speichern einen seit der Vorschau geänderten Datenkontext. | `Pruefsumme`
-| Benutzerkennung | Kennung des angemeldeten Benutzers, wie sie die Host-Anwendung liefert. Die Bibliothek verwaltet keine Benutzer. | `BenutzerKennung`
-| Dokumentverweis | Verweis auf das abgelegte PDF eines Schreibens; seine Bedeutung kennt nur die Dokumentablage. | `Dokumentverweis`
+| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird. | `Snapshot` (Aggregate Root)
+| Prüfsumme | SHA-256-Prüfsumme, etwa eines gespeicherten PDFs oder eines Datenkontexts. Mit ihr erkennt das Speichern einen seit der Vorschau geänderten Datenkontext. | `Pruefsumme` (Value Object)
+| Benutzerkennung | Kennung des angemeldeten Benutzers, wie sie die Host-Anwendung liefert. Die Bibliothek verwaltet keine Benutzer. | `BenutzerKennung` (Value Object)
+| Dokumentverweis | Verweis auf das abgelegte PDF eines Schreibens; seine Bedeutung kennt nur die Dokumentablage. | `Dokumentverweis` (Value Object)
 | Host-Anwendung | Die Spring-Boot-/React-Anwendung, in die Standardschreiben eingebettet ist. |
 | SPI | Service Provider Interface: die Schnittstellen und Datentypen im Modul `spi`, die die Host-Anwendung implementiert bzw. liefert (Platzhalterdaten, Berechtigung, Löschrichtlinie). Einziger Teil der Bibliothek, gegen den der Host kompiliert. |
 | Sachbearbeiter | Benutzer, der Schreiben erzeugt, speichert, herunterlädt und löscht. |

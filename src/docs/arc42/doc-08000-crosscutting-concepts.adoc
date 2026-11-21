@@ -64,6 +64,29 @@ Vorlagen tragen Semantik (Überschriften, Listen, Tabellen, Alternativtexte,
 Dokumentsprache). Der Editor erzwingt Alternativtexte. Die Vorschau ist HTML mit
 Landmarken und Tastaturbedienung; das PDF ist nach PDF/UA-1 getaggt.
 
+== Fachmodell
+
+Die Konventionen für Typen im Fachmodell legt
+xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
+
+* **Rolle sichtbar machen.** Jeder Typ trägt eine jMolecules-Annotation:
+  `@AggregateRoot`, `@Entity` oder `@ValueObject`. Die Identität eines Aggregats
+  oder einer Entität ist mit `@Identity` markiert. Der Name ist der Begriff aus dem
+  Glossar, ohne technisches Suffix.
+* **Gleichheit.** Aggregate und Entitäten sind finale Klassen, gleich über ihre
+  Identität. Value Objects sind Records, Enums oder unveränderliche Klassen mit
+  Wertgleichheit.
+* **Unveränderlich.** Jeder Zustandswechsel liefert eine neue Instanz.
+* **Selbstvalidierung.** Der Konstruktor prüft jedes Pflichtattribut mit
+  `Pruefe` aus dem Modul `validierung`. Fehlende oder ungültige Werte ergeben
+  `Validierungsfehler` mit dem Attributnamen, fachlich verbotene Schritte
+  `UnzulaessigerZustandswechsel`.
+* **Erzeugen und Wiederherstellen.** Fabrikmethoden wie `anlegen` erzeugen neue
+  Objekte, `wiederherstellen` stellt gespeicherte her. Beide prüfen alle Regeln.
+* **Zeit.** Das Modell liest keine Uhr. Methoden, die eine Zeit brauchen,
+  bekommen `jetzt` als Parameter.
+* **Personenbezogene Daten.** `toString` gibt keinen Datenkontext aus.
+
 == Platzhalter
 
 Syntax `${pfad.zum.wert}`, Defaults, Wiederholungs- und Bedingungsblöcke; fehlende
