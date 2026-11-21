@@ -2,10 +2,10 @@
 id: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
 type: ADR
 title: 'Rendering-Pipeline für Vorschau und PDF'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-14'
-reviewed: false
+reviewed: true
 summary: 'Vorlage und Daten werden im Backend zu einem HTML-Dokument zusammengeführt; die Vorschau paginiert es im Browser mit Paged.js, das PDF erzeugt openhtmltopdf aus demselben HTML. Ein Wiedergabetreue-Test sichert die Gleichheit.'
 derived_from:
 - type: external
@@ -69,10 +69,11 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-21.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn nach dem Prototyp (#3)
+geprüft und angenommen. Offen sind die PDF/UA-Stichprobe und der Test mit NVDA;
+beide macht der Owner (siehe Ergebnis des Prototyps).
 
 === Entscheidung
 
@@ -145,6 +146,13 @@ Sehr ausgereift für PDF/A und Tagged PDF. Vorschau und PDF entstehen aus
 verschiedenen Transformationen, Abweichungen sind wahrscheinlich; passt nicht zu
 ADR-003.
 
+*Rückfallebene* (Owner, 2026-11-21): Kunden akzeptieren Apache FOP mit
+XSLT-Transformation meist. Akzeptiert ein Kunde openhtmltopdf nicht, kommt Option 3
+wieder infrage. Für diese Bibliothek wählt der Owner sie vorerst nicht, sie ist ihm
+zu schwergewichtig. Ein Wechsel träfe den Port `Renderer` und das Vorlagenformat
+(ADR-003): Vorschau und PDF entstünden nicht mehr aus demselben HTML, QS-004 wäre
+neu nachzuweisen (R-003).
+
 ==== Option 4: Vorschau zeigt das erzeugte PDF (pdf.js)
 
 Exakte Gleichheit, aber die Vorschau ist für Hilfstechnologien schlechter
@@ -184,6 +192,7 @@ Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prot
 
 * Wiedergabetreue muss aktiv getestet werden (R-002).
 * Abhängigkeit von einem Community-Projekt (R-003); LGPL ist mit MIT als Abhängigkeit vereinbar, muss aber in der Lizenzdokumentation stehen.
+* Kunden können openhtmltopdf ablehnen. Dann wäre Option 3 die Rückfallebene, mit dem oben beschriebenen Preis.
 
 ==== Neutral oder Folgearbeiten
 
@@ -203,8 +212,8 @@ Referenzschreiben geprüft. Stand der Abnahmekriterien:
 | PDF/A-2b (QS-001) | erfüllt | veraPDF ohne Verstöße, auch mit Ersatzschriften und für ein bösartiges Testschreiben.
 | PDF/UA-1 (QS-002) | teilweise | veraPDF ohne Verstöße. Die manuelle Stichprobe steht aus. Die inhaltliche Fußzeile wird erst durch einen Nachbearbeitungsschritt mit PDFBox lesbar (siehe unten).
 | Barrierefreie Vorschau (QS-003) | mit Grenzen | axe-core ohne Verstöße der Stufen serious und critical, keine Fokusfalle, Statusmeldungen über `aria-live`. VoiceOver liest das Schreiben vollständig, braucht am Ende der ersten Seite aber einen neuen Einstieg in den Frame. Bei 200 % Zoom scrollt die Vorschau statt umzubrechen. NVDA ist ungeprüft.
-| Wiedergabetreue (QS-004) | Teilergebnis | Das Chrome-Druck-PDF der Vorschau weicht höchstens 0,3 mm vom PDF ab, bei gleicher Seitenzahl und gleicher erster und letzter Zeile je Seite. Die Bildschirmdarstellung ist nicht gemessen.
-| Stiltreue (QS-013) | offen | Das PDF weicht höchstens 0,1 mm vom Word-PDF ab. Die Abnahme durch die zentrale Abteilung steht aus.
+| Wiedergabetreue (QS-004) | erfüllt, Messung folgt | Das Chrome-Druck-PDF der Vorschau weicht höchstens 0,3 mm vom PDF ab, bei gleicher Seitenzahl und gleicher erster und letzter Zeile je Seite. In der Sichtprobe des Owners am Bildschirm (100 %, nebeneinander) ist kein Unterschied zu erkennen. Die genaue Messung der Bildschirmdarstellung wird ein automatischer Test in #7.
+| Stiltreue (QS-013) | angenommen | Das PDF weicht höchstens 0,1 mm vom Word-PDF ab. Eine Abnahme durch die zentrale Abteilung ist nicht möglich; das Projekt nimmt an, dass die Stiltreue passt (Owner, 2026-11-21).
 |===
 
 *Fußzeile im PDF.* openhtmltopdf gibt laufende Elemente immer als Artefakt aus;
@@ -228,8 +237,11 @@ Reihenfolge dort stehen; sonst bricht die Erzeugung ab.
   VoiceOver am Seitenwechsel treibt das Projekt nicht weiter (Owner, 2026-11-20).
 
 *Schriften.* Weg 1: Arial und Arial Narrow aus dem Schriftordner laden im
-sandboxed iframe unter der CSP, und openhtmltopdf bettet sie ein. Die Freigabe
-ihrer Lizenz für Einbettung und Webfont steht aus. Weg 2: siehe
+sandboxed iframe unter der CSP, und openhtmltopdf bettet sie ein. Zur Lizenz hat
+der Owner am 2026-11-21 entschieden: Die Bibliothek liefert keine lizenzpflichtigen
+Schriften aus. Stellt der Host sie bereit, bettet das PDF Teilmengen davon ein
+(PDF/A verlangt das), und die Vorschau erhält sie als Webfont. Das Projekt nimmt an,
+dass der Host beides darf; maßgeblich ist seine Lizenz. Weg 2: siehe
 xref:adr-017-bereitstellung-der-schriften[ADR-017].
 
 *Weitere Befunde:* Vorschau und PDF entstehen aus demselben bereinigten HTML
@@ -238,8 +250,13 @@ Zusätze im Kopf. Die Vorschau des fertigen PDFs (Option 4) wäre exakt gleich,
 bleibt aber aus den genannten Gründen ausgeschieden. Den Wartungsstand von
 openhtmltopdf (Annahme unten, R-003) hat der Prototyp nicht geprüft.
 
-Damit kann Option 1 noch nicht angenommen werden: Es fehlen die PDF/UA-Stichprobe,
-NVDA, die Messung der Bildschirmdarstellung und QS-013.
+*Annahme* (Owner, 2026-11-21): Option 1 ist angenommen. QS-013 gilt als Annahme,
+die der erste echte Kundeneinsatz bestätigen muss; der ist erst mit einem
+produktionsreifen Stand möglich. Die Wiedergabetreue am Bildschirm ist per
+Sichtprobe bestätigt und wird in #7 automatisch gemessen. Offen und beim Owner
+sind die PDF/UA-Stichprobe und der Test mit NVDA; die Anleitung steht in #3. Zeigt
+die Stichprobe ein Problem, das sich mit openhtmltopdf und PDFBox nicht zuverlässig
+lösen lässt, kommt Option 2 wieder infrage.
 
 === Impact
 
@@ -259,7 +276,7 @@ include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability
 
 === Annahmen
 
-* openhtmltopdf wird in einer aktiv gepflegten Community-Fork-Version weiterentwickelt; das ist vor Annahme zu prüfen.
+* openhtmltopdf wird in einer aktiv gepflegten Community-Fork-Version weiterentwickelt. Geprüft am 2026-11-21: `io.github.openhtmltopdf`, Release 1.1.114 vom 2026-11-16, das Repository `openhtmltopdf/openhtmltopdf` ist nicht archiviert. Der Prototyp nutzt diese Version.
 * Die Layout-Anforderungen von Briefen sind einfach genug (kein komplexer Spaltensatz), dass beide Engines gleich umbrechen.
 
 === Open Questions
@@ -270,4 +287,7 @@ include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability
 
 === Review Notes
 
-Erst nach dem Prototyp mit Messung von QS-004 akzeptieren.
+* Der Owner hat die Entscheidung am 2026-11-21 angenommen, nach dem Prototyp und
+  der Sichtprobe zu QS-004.
+* Die Relationen im Front Matter sind noch nicht einzeln geprüft und bleiben
+  `proposed`.

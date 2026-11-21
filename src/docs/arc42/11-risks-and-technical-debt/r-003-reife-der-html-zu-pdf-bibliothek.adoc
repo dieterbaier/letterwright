@@ -50,13 +50,19 @@ Weil openhtmltopdf ein Community-Projekt mit wenigen Maintainern ist, können Fe
 | Confidence | Low.
 |===
 
-Der aktuelle Wartungsstand ist vor Annahme von ADR-004 zu prüfen.
+Wartungsstand geprüft am 2026-11-21: `io.github.openhtmltopdf` hat am 2026-11-16
+Version 1.1.114 veröffentlicht, das Repository ist nicht archiviert. Das senkt die
+Wahrscheinlichkeit, ändert die Bewertung aber erst nach dem Review durch den
+Owner.
 
 === Mitigation Options
 
 * Renderer hinter dem Port `Renderer` kapseln.
 * Wartungsstand und Lizenz (LGPL) vor Annahme von ADR-004 prüfen.
-* Alternative (Apache FOP oder Chromium) als dokumentierte Rückfallebene.
+* Alternative (Apache FOP oder Chromium) als dokumentierte Rückfallebene. Apache
+  FOP mit XSLT akzeptieren Kunden meist; lehnt ein Kunde openhtmltopdf ab, ist es
+  die Rückfallebene nach ADR-004, Option 3. Der Owner wählt es vorerst nicht, weil
+  es ihm zu schwergewichtig ist (2026-11-21).
 * Die PDFBox-Nachbearbeitung der Fußzeile (ADR-004) hängt daran, wie
   openhtmltopdf den Content-Stream schreibt. Ihr Nachweis bei jeder Erzeugung
   und ein Test je Update von openhtmltopdf fangen Änderungen ab; der Ausweichweg
