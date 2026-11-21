@@ -141,6 +141,29 @@ s| Summe s| +4 s| +2 s| ?
 
 * veraPDF-Integration in Gradle/CI im ersten Build-Epic.
 
+
+=== Ergebnis des Prototyps
+
+Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) erzeugt mit openhtmltopdf
+PDF/A-2b mit PDF/UA-1-Tagging und prüft es mit der veraPDF-Bibliothek
+(`validation-model`, Greenfield-Modell) in der JVM:
+
+* Beide Referenzschreiben und das bösartige Testschreiben sind ohne Verstöße
+  gegen PDF/A-2b und PDF/UA-1, auch mit Ersatzschriften. Die Gegenprobe mit dem
+  Word-PDF und dem Chrome-PDF der Vorschau zeigt die erwarteten Verstöße.
+* Ein Link ohne `title` erzeugt einen Hinweis von openhtmltopdf, aber keinen
+  veraPDF-Verstoß. Das ist ein Hinweis für Vorlagenautoren.
+* Was veraPDF nicht prüft, zeigt ein Strukturbaum mit Text je Element. Er ist die
+  Grundlage der manuellen Stichprobe aus QS-002, die noch aussteht.
+* Kopf- und Fußzeilen: Die inhaltliche Fußzeile wird einmal nach dem Brieftext
+  vorgelesen, Seitenzahlen und Wiederholungen bleiben Artefakte (Owner,
+  QS-002). Dafür braucht es einen Nachbearbeitungsschritt mit PDFBox
+  (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]).
+
+Die Voraussetzung aus den Review Notes ist damit gezeigt: Erzeugung mit
+openhtmltopdf und Prüfung mit veraPDF. Wie lange die Prüfung beim Speichern
+dauert (QS-012), hat der Prototyp nicht gemessen.
+
 === Impact
 
 include::generated/adr-005-pdfa-und-barrierefreiheit-impact.adoc[leveloffset=+2]

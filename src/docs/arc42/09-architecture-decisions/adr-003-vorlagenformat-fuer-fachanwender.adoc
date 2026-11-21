@@ -178,6 +178,34 @@ s| Summe s| +4 s| ? s| +1 s| ?
 * Prototyp (Spike) mit realen DOCX-Vorlagen des Owners (werden nachgeliefert): Nachbau im Editor-Modell, Messung der Stiltreue (QS-013), Vergleich mit Option 2.
 * Das Ergebnis entscheidet zwischen Option 1 und Option 2; erst danach kann der ADR akzeptiert werden.
 
+
+=== Ergebnis des Prototyps
+
+Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat Option 1 am
+`Geschaeftsbrief.docx` geprüft, ein- und mehrseitig, DIN 5008 Form B.
+
+* *Nachbau im Vorlagenmodell:* Briefpapier und Standardschreiben als HTML mit
+  Paged-Media-CSS. Die Maße stammen aus der DOCX (Seitenränder, Rahmen,
+  Tabstopps, Formatvorlagen). Wo Word eigene Regeln anwendet, etwa beim
+  Zeilenabstand, sind sie an den Grundlinien des Word-PDFs abgeglichen.
+* *Abstand zum Word-PDF:* höchstens 0,1 mm, gleiche Zeilen- und
+  Seitenumbrüche. Einziger Unterschied: Word setzt in der einseitigen Vorgabe
+  eine leere zweite Seite, der Prototyp nicht.
+* *Semantik:* Der Betreff ist eine Überschrift und sieht aus wie in der Vorgabe
+  (Owner, 2026-11-20).
+* *Vorlageninhalte mit Befunden:* Die Pflege zeigt Befunde der Bereinigung an und
+  verlangt eine Wahl: Ablehnen, Trotzdem akzeptieren oder Bereinigen (Owner,
+  2026-11-20, xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). Umsetzung
+  in #8 und #9.
+
+Nicht geprüft:
+
+* Die Stiltreue aus Sicht der zentralen Abteilung (QS-013). Sie entscheidet
+  über die Annahme dieses ADR.
+* Der Editor selbst und damit die Pflegbarkeit durch Fachanwender.
+* Option 4 (DOCX-Upload mit Umwandlung) und der Vergleich mit Option 2.
+* `Formular_intern.docx`.
+
 === Impact
 
 include::generated/adr-003-vorlagenformat-fuer-fachanwender-impact.adoc[leveloffset=+2]
@@ -201,7 +229,7 @@ include::generated/adr-003-vorlagenformat-fuer-fachanwender-traceability.adoc[le
 
 === Open Questions
 
-* Kann der Owner zwei oder drei typische DOCX-Vorlagen für den Prototyp bereitstellen? (Q-PO-004)
+* Beispielvorlagen für den Prototyp (Q-PO-004): beantwortet, in `src/examples/`.
 * Wie oft ändert die zentrale Abteilung ihre DOCX-Vorgabe, und wer zieht Änderungen nach? (Q-PO-009)
 
 === Review Notes

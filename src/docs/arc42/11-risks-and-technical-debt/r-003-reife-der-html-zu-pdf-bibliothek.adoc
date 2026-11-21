@@ -57,6 +57,10 @@ Der aktuelle Wartungsstand ist vor Annahme von ADR-004 zu prüfen.
 * Renderer hinter dem Port `Renderer` kapseln.
 * Wartungsstand und Lizenz (LGPL) vor Annahme von ADR-004 prüfen.
 * Alternative (Apache FOP oder Chromium) als dokumentierte Rückfallebene.
+* Die PDFBox-Nachbearbeitung der Fußzeile (ADR-004) hängt daran, wie
+  openhtmltopdf den Content-Stream schreibt. Ihr Nachweis bei jeder Erzeugung
+  und ein Test je Update von openhtmltopdf fangen Änderungen ab; der Ausweichweg
+  ist ein regulärer, getaggter Block im Brieflayout.
 
 === Decision or Acceptance
 

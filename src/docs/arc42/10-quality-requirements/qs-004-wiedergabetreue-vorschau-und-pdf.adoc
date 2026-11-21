@@ -44,6 +44,18 @@ Der Owner verlangt, dass Vorschau und endgültiges Dokument gleich aussehen.
 === Annahmen
 
 * Gleiche eingebettete Schriften in beiden Wegen.
+* Gemessen wird die Vorschau, wie sie der Browser darstellt. Ein Druck-PDF der
+  Vorschau ist ein Hilfsmittel und belegt nur einen Teil.
+
+=== Messstand
+
+Der Prototyp aus #3 erfüllt das Antwortmaß für beide Referenzschreiben am
+Chrome-Druck-PDF der Vorschau: gleiche Seitenzahl, gleiche erste und letzte
+Zeile je Seite, höchstens 0,3 mm Abweichung. Eine Gegenprobe belegt, dass der
+Vergleich zusätzliche Seiten und Zeilen findet. Die Bildschirmdarstellung der
+Vorschau ist nicht gemessen; wie sie sich messen lässt, ist offen. Ob die
+Vergleichswerkzeuge des Prototyps als Testwerkzeuge ins Produkt wandern, ist
+ebenfalls offen.
 
 === Impact
 
