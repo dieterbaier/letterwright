@@ -43,15 +43,15 @@ Produktqualität.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
-| mit Grenze, Entscheidung in #3 offen
+| mit Grenze, vom Owner akzeptiert
 | openhtmltopdf gibt laufende Elemente immer als Artefakt aus. Ein PDFBox-Nachbearbeitungsschritt
   taggt sie; VoiceOver liest sie (Owner). Der Schritt hängt an der Ausgabe von openhtmltopdf.
   Nachweis bei jeder Erzeugung: Genau die Texte der Fußzeile aus dem HTML stehen in dieser
   Reihenfolge am Ende des Strukturbaums, sonst Abbruch; `gegenprobe` belegt, dass falsche
   Reihenfolge, Teil-Tagging und zusätzliche Blöcke abbrechen. Das widerspricht dem Antwortmaß
-  von QS-002, das Kopf- und Fußzeilen als Artefakt verlangt. Welche Fußzeilen als lesbarer
-  Inhalt gelten (Angaben der ersten Seite) und welche Wiederholungen Artefakte bleiben
-  („Seite x von y“), entscheidet der Owner in #3.
+  von QS-002 in der alten Fassung. Der Owner hat im Review zu PR #47 entschieden: Die
+  Angaben der ersten Seite werden einmal nach dem Brieftext vorgelesen, „Seite x von y“ und
+  Wiederholungen bleiben Artefakte; der Schritt ist mit Ausweichweg akzeptiert (ADR-004).
 | ADR-004, ADR-005, QS-002
 
 | Vorschau als HTML statt als PDF
@@ -114,11 +114,11 @@ Produktqualität.
 | ADR-017
 
 | Chromium als Alternative (Option 2 aus ADR-004)
-| ungeprüft, Entscheidung in #3 offen
-| ADR-004 bindet den Verzicht auf Option 2 an den Ausgang der Prüfung von Option 1. Option 1
-  weicht in beobachteten Punkten von den Kriterien aus ADR-014 ab (VoiceOver am Seitenwechsel,
-  Reflow bei 200 %), und NVDA, die manuelle PDF/UA-Stichprobe und QS-013 sind offen. Ob
-  Chromium geprüft wird, entscheidet der Owner in #3.
+| ungeprüft, vom Owner zurückgestellt
+| Option 1 weicht in beobachteten Punkten von den Kriterien aus ADR-014 ab (VoiceOver am
+  Seitenwechsel, Reflow bei 200 %). Ein anderer PDF-Renderer behebt diese Grenzen der
+  Vorschau nicht. Chromium kommt wieder infrage, wenn die PDF/UA-Stichprobe ein Problem zeigt,
+  das openhtmltopdf und PDFBox nicht zuverlässig lösen (Review zu PR #47, ADR-004).
 | ADR-004, ADR-014
 |===
 
@@ -349,7 +349,7 @@ Prototyps fällt auf:
   PDF nach: Artefakt-Abschnitte mit Text ganz im unteren Seitenrand werden je Textblock zu
   `/P <</MCID n>>`, und je Block hängt ein `P` am Ende des Strukturbaums. Kopfzeilen wie
   „Seite x von y“ bleiben Artefakte. Das weicht vom Antwortmaß in QS-002 ab (Kopf- und
-  Fußzeilen als Artefakt); entschieden wird in #3. Bei jeder Erzeugung prüft der Prototyp, dass
+  Fußzeilen als Artefakt); der Owner hat das im Review zu PR #47 so entschieden. Bei jeder Erzeugung prüft der Prototyp, dass
   genau die Fußzeilentexte aus dem HTML in dieser Reihenfolge am Ende des Strukturbaums stehen.
   Preis: Der Schritt hängt davon ab, wie openhtmltopdf den
   Content-Stream schreibt (Artefakt-Abschnitte, ein Textblock je Spalte), und muss bei jedem
