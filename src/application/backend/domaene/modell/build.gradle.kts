@@ -2,4 +2,11 @@ plugins {
     id("standardschreiben.java-modul")
 }
 
-description = "Fachmodell: Briefpapier, Standardschreiben, Vorlagenversion, Schreiben. Frei von Frameworks."
+description = "Fachmodell: Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben. Frei von Frameworks."
+
+dependencies {
+    // Die Konstruktoren werfen Validierungsfehler; der Fehlervertrag gehört zur API des Modells.
+    api(project(":validierung"))
+    // Nur Annotationen, die die DDD-Rollen kennzeichnen (ADR-018).
+    api(libs.jmolecules.ddd)
+}

@@ -4,6 +4,7 @@ spring-boot = "4.1.2"
 archunit = "1.5.1"
 jspecify = "1.0.1"
 jacoco = "0.8.16"
+jmolecules = "2.0.1"
 
 [libraries]
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
@@ -15,3 +16,4 @@ assertj-core = { module = "org.assertj:assertj-core" }
 archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
 spring-context = { module = "org.springframework:spring-context" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+jmolecules-ddd = { module = "org.jmolecules:jmolecules-ddd", version.ref = "jmolecules" }
