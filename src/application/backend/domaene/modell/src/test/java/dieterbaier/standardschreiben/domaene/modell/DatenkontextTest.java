@@ -1,7 +1,7 @@
 package dieterbaier.standardschreiben.domaene.modell;
 
+import static dieterbaier.standardschreiben.domaene.modell.Pruefungen.lehntAb;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
@@ -101,32 +101,45 @@ class DatenkontextTest {
 
     @Test
     void lehntAndereTypenAbUndNenntDenPfad() {
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> Datenkontext.aus(Map.of("betrag", Map.of("netto", 12))))
-                .withMessageContaining("betrag.netto")
-                .withMessageContaining("java.lang.Integer");
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> Datenkontext.aus(Map.of("posten", List.of("a", List.of(1)))))
-                .withMessageContaining("posten[1][0]");
+        lehntAb(() -> Datenkontext.aus(Map.of("betrag", Map.of("netto", 12))), "betrag.netto");
+        lehntAb(() -> Datenkontext.aus(Map.of("betrag", Map.of("netto", 12))), "java.lang.Integer");
+        lehntAb(() -> Datenkontext.aus(Map.of("posten", List.of("a", List.of(1)))), "posten[1][0]");
     }
 
     @Test
-    void lehntNullWerteAb() {
+    void lehntFehlendeWerteAb() {
         Map<String, Object> quelle = new HashMap<>();
         quelle.put("name", null);
 
-        assertThatIllegalArgumentException().isThrownBy(() -> Datenkontext.aus(quelle))
-                .withMessageContaining("name");
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> Datenkontext.aus(Map.of("posten", Arrays.asList("a", null))))
-                .withMessageContaining("posten[1]");
+        lehntAb(() -> Datenkontext.aus(null), "Werte des Datenkontexts");
+        lehntAb(() -> Datenkontext.aus(quelle), "name");
+        lehntAb(() -> Datenkontext.aus(Map.of("posten", Arrays.asList("a", null))), "posten[1]");
     }
 
     @Test
     void lehntSchluesselAbDieKeinTextSind() {
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> Datenkontext.aus(Map.of("unter", Map.of(1, "x"))))
-                .withMessageContaining("unter");
+        lehntAb(() -> Datenkontext.aus(Map.of("unter", Map.of(1, "x"))), "unter");
+    }
+
+    @Test
+    void lehntEinzelneSurrogateInWertenAbUndNenntDenPfad() {
+        // Ohne diese Prüfung kodierte UTF-8 das Surrogat als '?', und beide Kontexte hätten dieselbe Prüfsumme.
+        lehntAb(() -> Datenkontext.aus(Map.of("x", "\uD800")), "x");
+        lehntAb(() -> Datenkontext.aus(Map.of("posten", List.of("a\uDC00b"))), "posten[0]");
+    }
+
+    @Test
+    void lehntEinzelneSurrogateInSchluesselnAb() {
+        lehntAb(() -> Datenkontext.aus(Map.of("unter", Map.of("k\uD800", "x"))), "Schlüssel unter.k");
+    }
+
+    @Test
+    void gueltigeSurrogatpaareSindErlaubtUndUnterscheidbar() {
+        Datenkontext emoji = Datenkontext.aus(Map.of("gruss", "Hallo \uD83D\uDE00"));
+        Datenkontext fragezeichen = Datenkontext.aus(Map.of("gruss", "Hallo ?"));
+
+        assertThat(emoji.werte()).containsEntry("gruss", "Hallo 😀");
+        assertThat(emoji.pruefsumme()).isNotEqualTo(fragezeichen.pruefsumme());
     }
 
     @Test

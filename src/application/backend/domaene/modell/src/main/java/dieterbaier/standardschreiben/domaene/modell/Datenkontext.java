@@ -1,6 +1,12 @@
 package dieterbaier.standardschreiben.domaene.modell;
 
+import dieterbaier.standardschreiben.validierung.Pruefe;
+import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -9,6 +15,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
  * Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert, bereits formatiert (ADR-008).
@@ -19,7 +26,11 @@ import java.util.TreeMap;
  * <p>Die {@link #pruefsumme() Prüfsumme} hängt nur vom Inhalt ab, nicht von der Reihenfolge, in der der Host die
  * Schlüssel einer Map liefert. Die Reihenfolge von Listen zählt. Mit ihr erkennt das Speichern, ob sich der
  * Datenkontext seit der Vorschau geändert hat (ADR-007).
+ *
+ * <p>Texte und Schlüssel müssen gültiges Unicode sein. Ein einzelnes Surrogat ließe sich nicht eindeutig als UTF-8
+ * kodieren; zwei verschiedene Datenkontexte bekämen sonst dieselbe Prüfsumme.
  */
+@ValueObject
 public final class Datenkontext {
 
     private static final byte TEXT = 'T';
@@ -36,7 +47,7 @@ public final class Datenkontext {
 
     /** Übernimmt eine tiefe, unveränderliche Kopie der Werte. */
     public static Datenkontext aus(Map<String, ?> werte) {
-        return new Datenkontext(kopiereMap(werte, ""));
+        return new Datenkontext(kopiereMap(Pruefe.pflicht(werte, "Die Werte des Datenkontexts"), ""));
     }
 
     /** Die Werte: unveränderliche, nach Schlüssel sortierte Map aus Texten, Listen und Maps. */
@@ -69,9 +80,10 @@ public final class Datenkontext {
         TreeMap<String, Object> kopie = new TreeMap<>();
         for (Map.Entry<?, ?> eintrag : quelle.entrySet()) {
             if (!(eintrag.getKey() instanceof String schluessel)) {
-                throw new IllegalArgumentException("Schlüssel unter '" + pfad + "' ist kein Text: " + eintrag.getKey());
+                throw new Validierungsfehler("Schlüssel unter '" + pfad + "' ist kein Text: " + eintrag.getKey());
             }
             String unterpfad = pfad.isEmpty() ? schluessel : pfad + "." + schluessel;
+            pruefeUnicode(schluessel, "Schlüssel " + unterpfad);
             kopie.put(schluessel, kopiereWert(eintrag.getValue(), unterpfad));
         }
         return Collections.unmodifiableMap(kopie);
@@ -79,7 +91,7 @@ public final class Datenkontext {
 
     private static Object kopiereWert(Object wert, String pfad) {
         return switch (wert) {
-            case String text -> text;
+            case String text -> pruefeUnicode(text, "Wert unter '" + pfad + "'");
             case Map<?, ?> map -> kopiereMap(map, pfad);
             case List<?> liste -> {
                 List<Object> kopie = new ArrayList<>(liste.size());
@@ -88,11 +100,23 @@ public final class Datenkontext {
                 }
                 yield Collections.unmodifiableList(kopie);
             }
-            case null -> throw new IllegalArgumentException(
+            case null -> throw new Validierungsfehler(
                     "Wert unter '" + pfad + "' fehlt; ein fehlender Wert wird weggelassen, nicht als null geliefert");
-            default -> throw new IllegalArgumentException("Wert unter '" + pfad + "' ist weder Text, Liste noch Map: "
+            default -> throw new Validierungsfehler("Wert unter '" + pfad + "' ist weder Text, Liste noch Map: "
                     + wert.getClass().getName());
         };
+    }
+
+    private static String pruefeUnicode(String text, String bezeichnung) {
+        CharsetEncoder streng = StandardCharsets.UTF_8.newEncoder()
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT);
+        try {
+            streng.encode(CharBuffer.wrap(text));
+        } catch (CharacterCodingException e) {
+            throw new Validierungsfehler(bezeichnung + " ist kein gültiges Unicode (einzelnes Surrogat)", e);
+        }
+        return text;
     }
 
     private static Pruefsumme berechnePruefsumme(Map<String, Object> werte) {
