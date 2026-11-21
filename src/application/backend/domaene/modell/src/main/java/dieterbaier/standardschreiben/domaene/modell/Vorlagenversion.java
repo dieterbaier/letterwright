@@ -2,6 +2,7 @@ package dieterbaier.standardschreiben.domaene.modell;
 
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import org.jmolecules.ddd.annotation.Entity;
+import org.jmolecules.ddd.annotation.Identity;
 
 /**
  * Ein Stand eines Briefpapiers oder Standardschreibens (ADR-007). Der Inhalt ist semantisches HTML mit CSS Paged Media
@@ -65,7 +66,10 @@ public final class Vorlagenversion {
         return inhalt;
     }
 
-    /** Der Verweis auf diese Version, wie ihn Snapshot und Schreiben speichern. */
+    /**
+     * Die Identität der Version: Vorlage und Nummer. Snapshot und Schreiben speichern genau diesen Verweis.
+     */
+    @Identity
     public Versionsverweis verweis() {
         return new Versionsverweis(vorlage, nummer);
     }

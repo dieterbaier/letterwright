@@ -53,6 +53,20 @@ class ArchitekturRegelnErkennenVerstoesseTest {
     }
 
     @Test
+    void entitaetOhneIdentitaetVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.aggregateUndEntitaetenKennzeichnenIhreIdentitaet(FIXTURE),
+                "EntitaetOhneIdentitaet");
+    }
+
+    @Test
+    void identitaetAmFeldOderAnDerMethodeErfuelltDieRegel() {
+        assertThatThrownBy(() -> ArchitekturRegeln.aggregateUndEntitaetenKennzeichnenIhreIdentitaet(FIXTURE)
+                        .check(fixtures))
+                .hasMessageNotContaining("AggregatMitIdentitaetAmFeld")
+                .hasMessageNotContaining("EntitaetMitIdentitaetAnMethode");
+    }
+
+    @Test
     void validierungMitDomaenenabhaengigkeitVerletztDieRegel() {
         erkenntVerstoss(ArchitekturRegeln.validierungIstEigenstaendig(FIXTURE), "ValidierungMitDomaene");
     }
