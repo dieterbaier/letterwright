@@ -26,6 +26,16 @@ class HexagonaleArchitekturTest {
     }
 
     @Test
+    void domaeneNutztNurZugelasseneBibliotheken() {
+        ArchitekturRegeln.domaeneNutztNurZugelasseneBibliotheken(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void validierungIstEigenstaendig() {
+        ArchitekturRegeln.validierungIstEigenstaendig(BASIS).check(produktionsCode);
+    }
+
+    @Test
     void portsKennenNurDieDomaene() {
         ArchitekturRegeln.portsKennenNurDieDomaene(BASIS).check(produktionsCode);
     }

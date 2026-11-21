@@ -2,6 +2,7 @@ package dieterbaier.standardschreiben.architektur;
 
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideOutsideOfPackage;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
@@ -38,6 +39,34 @@ final class ArchitekturRegeln {
                         basis + ".adapter..",
                         basis + ".starter..")
                 .because("die Domäne ist der frameworkfreie Kern (ADR-002)");
+    }
+
+    /**
+     * Die Domäne benutzt außer dem JDK nur ausdrücklich zugelassene Bibliotheken: JSpecify (ADR-015), die
+     * DDD-Annotationen von jMolecules (ADR-018) und das eigene Prüfmodul. Jede weitere braucht eine Entscheidung
+     * nach ADR-002.
+     */
+    static ArchRule domaeneNutztNurZugelasseneBibliotheken(String basis) {
+        return classes()
+                .that().resideInAPackage(basis + ".domaene..")
+                .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "java..",
+                        "org.jspecify.annotations..",
+                        "org.jmolecules.ddd.annotation..",
+                        basis + ".domaene..",
+                        basis + ".validierung..")
+                .because("jede Bibliothek in der Domäne ist eine einzelne Entscheidung (ADR-002, ADR-018)");
+    }
+
+    /** Das Prüfmodul ist allgemein und kennt kein anderes Paket der Bibliothek. */
+    static ArchRule validierungIstEigenstaendig(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + ".validierung..")
+                .should().dependOnClassesThat(
+                        resideInAPackage("org.springframework..")
+                                .or(resideInAPackage(basis + "..")
+                                        .and(resideOutsideOfPackage(basis + ".validierung.."))))
+                .because("die Prüfungen sind allgemein; fachliche Regeln bleiben in der Domäne (ADR-018)");
     }
 
     /** Die Ports sind frameworkfrei und kennen nur die Domäne, nicht Service, Adapter oder Starter. */
