@@ -1,10 +1,11 @@
 package dieterbaier.standardschreiben.spi;
 
-/** Eine Handlung an den Schreiben zu einem {@link FachlicherBezug}. */
-public enum SchreibenAktion implements Aktion {
-
-    /** Eine Vorschau erzeugen und ein Schreiben speichern. */
-    ERZEUGEN,
+/**
+ * Eine Handlung an den gespeicherten Schreiben zu einem {@link FachlicherBezug}. Das Erzeugen eines Schreibens ist
+ * keine {@code SchreibenAktion}: Es braucht zusätzlich das Standardschreiben, siehe
+ * {@link Berechtigungsanfrage#zumErzeugen(String, FachlicherBezug, Standardschreibenkennung)}.
+ */
+public enum SchreibenAktion {
 
     /** Die Schreiben in der Übersicht sehen. */
     ANSEHEN,

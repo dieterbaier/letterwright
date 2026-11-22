@@ -49,15 +49,14 @@ class HostAdapterTest {
         List<Berechtigungsanfrage> anfragen = new ArrayList<>();
         var berechtigungen = new HostBerechtigungen(anfrage -> {
             anfragen.add(anfrage);
-            return anfrage.aktion() == dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN;
+            return anfrage instanceof Berechtigungsanfrage.ZumErzeugen;
         });
 
-        assertThat(berechtigungen.darf(ERIKA, SchreibenAktion.ERZEUGEN, KUNDE)).isTrue();
+        assertThat(berechtigungen.darfErzeugen(ERIKA, KUNDE, MAHNUNG)).isTrue();
         assertThat(berechtigungen.darf(ERIKA, SchreibenAktion.LOESCHEN, KUNDE)).isFalse();
         assertThat(berechtigungen.darf(ERIKA, VorlagenAktion.VEROEFFENTLICHEN)).isFalse();
         assertThat(anfragen).containsExactly(
-                Berechtigungsanfrage.zuSchreiben("erika", dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN,
-                        Abbildung.zumSpi(KUNDE)),
+                Berechtigungsanfrage.zumErzeugen("erika", Abbildung.zumSpi(KUNDE), Abbildung.kennung(MAHNUNG)),
                 Berechtigungsanfrage.zuSchreiben("erika", dieterbaier.standardschreiben.spi.SchreibenAktion.LOESCHEN,
                         Abbildung.zumSpi(KUNDE)),
                 Berechtigungsanfrage.zuVorlagen("erika",

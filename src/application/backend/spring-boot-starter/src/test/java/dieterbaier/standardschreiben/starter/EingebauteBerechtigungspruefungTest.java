@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
-import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
 import dieterbaier.standardschreiben.spi.Berechtigungspruefung;
 import dieterbaier.standardschreiben.spi.Datenkontext;
 import dieterbaier.standardschreiben.spi.Loeschentscheidung;
@@ -37,6 +38,8 @@ class EingebauteBerechtigungspruefungTest {
 
     private static final BenutzerKennung ERIKA = new BenutzerKennung("erika");
     private static final FachlicherBezug KUNDE_4711 = new FachlicherBezug("Kunde", "4711");
+    private static final Standardschreiben MAHNUNG =
+            Standardschreiben.anlegen(VorlagenId.neu(), "Mahnung", VorlagenId.neu(), "Kunde", "<p>Mahnung</p>");
 
     // Grundlage: Die Host-Anwendung stellt keine eigene Berechtigungsprüfung bereit.
     private final ApplicationContextRunner ohneEigenePruefung = new ApplicationContextRunner()
@@ -126,7 +129,7 @@ class EingebauteBerechtigungspruefungTest {
     }
 
     private static boolean darfErikaErzeugen(Berechtigungen berechtigungen) {
-        return berechtigungen.darf(ERIKA, SchreibenAktion.ERZEUGEN, KUNDE_4711);
+        return berechtigungen.darfErzeugen(ERIKA, KUNDE_4711, MAHNUNG);
     }
 
     private static void anmelden(String name, String rolle) {

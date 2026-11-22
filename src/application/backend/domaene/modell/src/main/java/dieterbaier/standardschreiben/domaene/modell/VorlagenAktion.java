@@ -4,7 +4,7 @@ import org.jmolecules.ddd.annotation.ValueObject;
 
 /** Eine Handlung an Briefpapier und Standardschreiben, ohne fachlichen Bezug. */
 @ValueObject
-public enum VorlagenAktion implements Aktion {
+public enum VorlagenAktion {
 
     /** Umfasst Anlegen, Entwürfe ändern und neue Entwürfe anlegen. */
     BEARBEITEN,

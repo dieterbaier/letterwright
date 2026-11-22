@@ -35,7 +35,7 @@ final class RollenBerechtigungspruefung implements Berechtigungspruefung {
                 || !anfrage.benutzerkennung().equals(anmeldung.getName())) {
             return false;
         }
-        String rolle = eigenschaften.rolle(anfrage.aktion());
+        String rolle = eigenschaften.rolle(anfrage);
         return anmeldung.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(rolle::equals);
     }
 }
