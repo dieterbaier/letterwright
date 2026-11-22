@@ -11,6 +11,7 @@ import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
+import dieterbaier.standardschreiben.spi.Standardschreibenkennung;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
@@ -27,6 +28,22 @@ final class Testdaten {
             new Versionsverweis(MAHNUNG.id(), Versionsnummer.ERSTE), new Dokumentverweis("ablage/1.pdf"),
             Pruefsumme.ueber("pdf".getBytes(StandardCharsets.UTF_8)), ERSTELLT);
 
+    /**
+     * So sehen Benutzer, Bezug und Mahnung im SPI aus. Von Hand aufgebaut und nicht über {@link Abbildung}, damit ein
+     * Fehler in der Abbildung in den Adaptertests sichtbar wird.
+     */
+    static final String ERIKA_IM_SPI = "erika";
+    static final dieterbaier.standardschreiben.spi.FachlicherBezug KUNDE_IM_SPI =
+            new dieterbaier.standardschreiben.spi.FachlicherBezug("Kunde", "4711");
+    static final Standardschreibenkennung MAHNUNG_IM_SPI =
+            new Standardschreibenkennung(MAHNUNG.id().wert(), "Mahnung");
+
     private Testdaten() {
+    }
+
+    /** Ein Host, der sich nicht an den Null-Vertrag hält. */
+    @SuppressWarnings({"NullAway", "unchecked"})
+    static <T> T nullVomHost() {
+        return (T) null;
     }
 }
