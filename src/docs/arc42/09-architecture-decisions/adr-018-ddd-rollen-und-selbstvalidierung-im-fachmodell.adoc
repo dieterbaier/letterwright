@@ -185,7 +185,7 @@ Option dieselben. Die Matrix vergleicht nur die Kennzeichnung.
   Änderungen derselben Vorlage regelt sie, etwa über eine Versionsspalte.
 * Ob es neben der neuesten veröffentlichten Version weitere gültige geben darf,
   legt #55 fest. Das Modell erlaubt mehrere veröffentlichte Versionen.
-  Nachtrag 2026-11-22: Vorgeschlagen ist höchstens eine, siehe
+  Nachtrag 2026-11-22: höchstens eine, entschieden in
   xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
 
 === Impact
@@ -208,7 +208,7 @@ include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-tracea
 
 * Gibt es höchstens eine veröffentlichte Version je Vorlage, oder bleiben ältere
   veröffentlicht, bis sie zurückgezogen werden? Das klärt #55. Der Owner hat am
-  2026-11-22 entschieden: höchstens eine; festgehalten im Vorschlag
+  2026-11-22 entschieden: höchstens eine; festgehalten in
   xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
 
 === Review Notes
