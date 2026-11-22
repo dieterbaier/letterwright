@@ -1,7 +1,9 @@
 package dieterbaier.standardschreiben.domaene.modell.schreiben;
 
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
 import dieterbaier.standardschreiben.validierung.Pruefe;
+import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
@@ -14,5 +16,12 @@ public record SchreibenAusSnapshot(Schreiben schreiben, Snapshot verbrauchterSna
     public SchreibenAusSnapshot {
         Pruefe.pflicht(schreiben, "Das Schreiben");
         Pruefe.pflicht(verbrauchterSnapshot, "Der verbrauchte Snapshot");
+        if (!(verbrauchterSnapshot.zustand() instanceof Snapshotzustand.Verbraucht)) {
+            throw new Validierungsfehler("Der Snapshot " + verbrauchterSnapshot.id().wert() + " ist nicht verbraucht");
+        }
+        if (!schreiben.snapshot().equals(verbrauchterSnapshot.id())) {
+            throw new Validierungsfehler("Das Schreiben " + schreiben.id().wert() + " entstand nicht aus Snapshot "
+                    + verbrauchterSnapshot.id().wert());
+        }
     }
 }

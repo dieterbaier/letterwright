@@ -4,7 +4,6 @@ import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
-import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Vorlagenversion;
@@ -56,8 +55,7 @@ public final class Vorschauerzeugung implements VorschauErzeugen {
         if (ergebnis instanceof Vorschauergebnis.Erzeugt) {
             snapshots.lade(bisheriger)
                     .filter(snapshot -> snapshot.benutzer().equals(benutzer))
-                    .filter(snapshot -> snapshot.zustand() instanceof Snapshotzustand.Offen)
-                    .ifPresent(eigener -> snapshots.loesche(eigener.id()));
+                    .ifPresent(eigener -> snapshots.loescheWennOffen(eigener.id()));
         }
         return ergebnis;
     }
