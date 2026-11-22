@@ -214,6 +214,19 @@ class SchreibenSpeichernTest {
     }
 
     @Test
+    void ersetztEineGleichzeitigeVorschauDenSnapshotWirdNichtsGespeichert() {
+        // Given: Während Erika speichert, ersetzt sie die Vorschau in einem anderen Tab
+        schreiben.zuvor = () -> vorschau.aktualisiere(ERIKA, KUNDE_4711, mahnung.id(), vorschauVonErika);
+
+        var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        // Then: kein Schreiben, kein verwaistes PDF; gespeichert wird aus der neuen Vorschau
+        assertThat(ergebnis).isInstanceOf(Speicherergebnis.SnapshotUnbekannt.class);
+        assertThat(schreiben.gespeichert).isEmpty();
+        assertThat(dokumente.abgelegt).isEmpty();
+    }
+
+    @Test
     void gleichzeitigesSpeichernDerselbenVorschauErgibtEinSchreiben() {
         // Given: Eine zweite Anfrage verbraucht den Snapshot, während diese ihr PDF erzeugt
         SchreibenAusSnapshot derZweitenAnfrage = Schreiben.ausSnapshot(SchreibenId.neu(),

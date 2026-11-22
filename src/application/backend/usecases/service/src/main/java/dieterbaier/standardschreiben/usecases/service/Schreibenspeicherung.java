@@ -105,6 +105,11 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
         // Wirft speichere, ist der Ausgang ungewiss; das PDF bleibt, weil ein Schreiben darauf verweisen kann.
         return switch (schreiben.speichere(neu)) {
             case Speicherausgang.Gespeichert gespeichert -> new Speicherergebnis.Gespeichert(neu.schreiben().id());
+            case Speicherausgang.SnapshotNichtMehrVorhanden entfernt -> {
+                // Eine neue Vorschau hat den Snapshot inzwischen ersetzt; gespeichert wurde sicher nichts.
+                dokumente.entferne(dokument);
+                yield new Speicherergebnis.SnapshotUnbekannt();
+            }
             case Speicherausgang.SnapshotBereitsVerbraucht bereits -> {
                 // Eine gleichzeitige Anfrage war schneller; ihr PDF gilt, auf dieses verweist sicher nichts.
                 dokumente.entferne(dokument);

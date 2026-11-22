@@ -238,6 +238,9 @@ final class Attrappen {
         Speicherausgang uebernimm(SchreibenAusSnapshot neu) {
             SnapshotId id = neu.verbrauchterSnapshot().id();
             Snapshot aktuell = snapshots.snapshots.get(id);
+            if (aktuell == null) {
+                return new Speicherausgang.SnapshotNichtMehrVorhanden();
+            }
             if (aktuell.zustand() instanceof Snapshotzustand.Verbraucht) {
                 return new Speicherausgang.SnapshotBereitsVerbraucht(gespeichert.get(id));
             }
