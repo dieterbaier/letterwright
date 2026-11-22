@@ -7,7 +7,8 @@ Funktionalität: Vorschau erzeugen
   Ein Sachbearbeiter wählt zu einem fachlichen Bezug ein Standardschreiben und
   sieht eine Vorschau, bevor er das Schreiben speichert. Die Bibliothek prüft
   zuerst selbst, ob das Standardschreiben zum Bezug passt (ADR-020), und fragt
-  dann den Host nach der Berechtigung. Erst danach liefert der Host den
+  dann den Host nach der Berechtigung. Erst mit ihr prüft sie, ob es
+  veröffentlichte Versionen gibt, und erst dann liefert der Host den
   Datenkontext. Jede Vorschau hält ihren Stand in einem Snapshot fest, der
   30 Minuten verwendbar ist (ADR-007).
 
@@ -29,6 +30,7 @@ Funktionalität: Vorschau erzeugen
     Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
     Dann ist die Vorschau nicht erlaubt
     Und der Host wurde nicht nach dem Datenkontext gefragt
+    Und nichts wurde gerendert
     Und kein Snapshot ist gespeichert
 
   Szenario: Zu einem Bezug anderen Typs wird der Host nicht gefragt
@@ -47,7 +49,22 @@ Funktionalität: Vorschau erzeugen
     Und Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
     Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
     Dann hat die Vorschau keine veröffentlichte Version
-    Und der Host wurde weder nach der Berechtigung noch nach dem Datenkontext gefragt
+    Und der Host wurde nach der Berechtigung, aber nicht nach dem Datenkontext gefragt
+    Und kein Snapshot ist gespeichert
+
+    Beispiele:
+      | vorlage                |
+      | das Standardschreiben  |
+      | das Briefpapier        |
+
+  Szenariogrundriss: Ohne Berechtigung bleibt verborgen, ob eine Version veröffentlicht ist
+    Angenommen <vorlage> hat keine veröffentlichte Version
+    Und Erika darf zum Kunden 4711 aus der "Mahnung" kein Schreiben erzeugen
+    Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
+    Dann ist die Vorschau nicht erlaubt
+    Und der Host wurde nicht nach dem Datenkontext gefragt
+    Und nichts wurde gerendert
+    Und kein Snapshot ist gespeichert
 
     Beispiele:
       | vorlage                |

@@ -49,8 +49,8 @@ class VorschauErzeugenTest {
     private final Host host = new Host();
     private final Ablage ablage = new Ablage();
     private final Uhr uhr = new Uhr();
-    private final Vorschauerzeugung vorschau =
-            new Vorschauerzeugung(vorlagen, host, host, new HtmlRenderer(), ablage, uhr);
+    private final HtmlRenderer renderer = new HtmlRenderer();
+    private final Vorschauerzeugung vorschau = new Vorschauerzeugung(vorlagen, host, host, renderer, ablage, uhr);
 
     // Grundlage: "Mahnung" zum Bezugstyp Kunde, veröffentlicht bis Version 2, Entwurf 3; Briefpapier in Version 1;
     // der Host liefert zum Kunden 4711 den Datenkontext "name" = "Erika Mustermann GmbH".
@@ -94,6 +94,7 @@ class VorschauErzeugenTest {
         assertThat(ergebnis).isInstanceOf(Vorschauergebnis.NichtErlaubt.class);
         assertThat(host.erzeugenAngefragt).containsExactly(mahnung);
         assertThat(host.datenkontextAngefragt).isZero();
+        assertThat(renderer.aufrufe).isZero();
         assertThat(ablage.snapshots).isEmpty();
     }
 
@@ -121,18 +122,40 @@ class VorschauErzeugenTest {
     @ParameterizedTest
     @ValueSource(strings = {"das Standardschreiben", "das Briefpapier"})
     void ohneVeroeffentlichteVersionGibtEsKeineVorschau(String vorlage) {
-        // Given: <vorlage> hat keine veröffentlichte Version; Erika dürfte erzeugen
-        if (vorlage.equals("das Standardschreiben")) {
-            vorlagen.ablegen(mahnung.zurueckziehen(Versionsnummer.ERSTE).zurueckziehen(new Versionsnummer(2)));
-        } else {
-            vorlagen.ablegen(briefpapier.zurueckziehen(Versionsnummer.ERSTE));
-        }
+        // Given: <vorlage> hat keine veröffentlichte Version; Erika darf erzeugen
+        ohneVeroeffentlichteVersion(vorlage);
         host.erlaubt = true;
 
         var ergebnis = vorschau.erzeuge(ERIKA, KUNDE_4711, mahnung.id());
 
         assertThat(ergebnis).isInstanceOf(Vorschauergebnis.KeineVeroeffentlichteVersion.class);
-        assertThat(host.wurdeGefragt()).isFalse();
+        assertThat(host.erzeugenAngefragt).containsExactly(mahnung);
+        assertThat(host.datenkontextAngefragt).isZero();
+        assertThat(ablage.snapshots).isEmpty();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"das Standardschreiben", "das Briefpapier"})
+    void ohneBerechtigungBleibtVerborgenObEineVersionVeroeffentlichtIst(String vorlage) {
+        // Given: <vorlage> hat keine veröffentlichte Version; Erika darf nicht erzeugen
+        ohneVeroeffentlichteVersion(vorlage);
+        host.erlaubt = false;
+
+        var ergebnis = vorschau.erzeuge(ERIKA, KUNDE_4711, mahnung.id());
+
+        // Then: nicht erlaubt, wie mit veröffentlichter Version; kein Datenkontext, kein Rendering, kein Snapshot
+        assertThat(ergebnis).isInstanceOf(Vorschauergebnis.NichtErlaubt.class);
+        assertThat(host.datenkontextAngefragt).isZero();
+        assertThat(renderer.aufrufe).isZero();
+        assertThat(ablage.snapshots).isEmpty();
+    }
+
+    private void ohneVeroeffentlichteVersion(String vorlage) {
+        if (vorlage.equals("das Standardschreiben")) {
+            vorlagen.ablegen(mahnung.zurueckziehen(Versionsnummer.ERSTE).zurueckziehen(new Versionsnummer(2)));
+        } else {
+            vorlagen.ablegen(briefpapier.zurueckziehen(Versionsnummer.ERSTE));
+        }
     }
 
     @Test
@@ -262,8 +285,11 @@ class VorschauErzeugenTest {
     /** Ersetzt nur {@code {{name}}}; wie wirklich zusammengeführt wird, prüft {@code adapter-rendering}. */
     private static final class HtmlRenderer implements Renderer {
 
+        private int aufrufe;
+
         @Override
         public String zusammenfuehren(Vorlagenversion briefpapier, Vorlagenversion inhalt, Datenkontext daten) {
+            aufrufe++;
             return briefpapier.inhalt() + inhalt.inhalt().replace("{{name}}", String.valueOf(daten.werte().get("name")));
         }
     }
