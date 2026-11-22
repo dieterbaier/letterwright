@@ -32,14 +32,18 @@ laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
    `boolean` oder einem `@Nullable`-Feld, welche anderen Werte gültig sind, entwirf
    stattdessen einen Sealed Type mit einem Record je Fall. Vorbild:
    `Berechtigungsanfrage` mit `ZuVorlagen`, `ZuSchreiben` und `ZumErzeugen`.
-3. **Kein `null` als Ergebnis.** Darf ein Ergebnis fehlen, gib ein `Optional`
+3. **Eine fachliche Ablehnung ist ein Ergebnis.** Gibt ein Anwendungsfall
+   erwartbar „nicht erlaubt“, „unbekannt“ o. Ä. zurück, ist das ein Fall seines
+   Sealed-Ergebnistyps (Vorbild `Vorschauergebnis`), keine Ausnahme. Unterscheide
+   die Fälle mit `switch` ohne `default`. Technische Fehler bleiben Ausnahmen.
+4. **Kein `null` als Ergebnis.** Darf ein Ergebnis fehlen, gib ein `Optional`
    zurück. `Optional` ist kein Feld und kein Parameter.
-4. **Die Grenze bleibt geprüft.** Werte vom Host (SPI-Rückgaben) sind nicht
+5. **Die Grenze bleibt geprüft.** Werte vom Host (SPI-Rückgaben) sind nicht
    vertrauenswürdig. Prüfe sie in `adapter-host` und melde Verstöße als
    `HostVertragVerletzt`.
-5. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `anlegen`,
+6. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `anlegen`,
    `ausSnapshot`, `neu()`, `wiederherstellen`.
-6. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
+7. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
    Fachbegriff kommt zuerst ins Glossar.
 
 ## Ausnahmen vom Linting

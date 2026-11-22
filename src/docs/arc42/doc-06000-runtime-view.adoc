@@ -31,9 +31,10 @@ participant "adapter-rendering" as Ren
 SB -> UI: Standardschreiben für Bezug wählen
 UI -> Web: POST /vorschau (Standardschreiben, Bezug,\nggf. bisherige Snapshot-ID)
 Web -> App: Vorschau erzeugen
-App -> App: Standardschreiben laden; passt sein Bezugstyp zum Bezug?\nNeueste veröffentlichte Versionen von Standardschreiben und Briefpapier
+App -> App: Standardschreiben laden; passt sein Bezugstyp zum Bezug?
 App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ZumErzeugen)
 Host --> App: erlaubt
+App -> App: Neueste veröffentlichte Versionen\nvon Standardschreiben und Briefpapier
 App -> Host: Datenkontext anfragen
 Host --> App: Datenkontext (formatiert)
 App -> Ren: Vorlagenversionen + Daten zusammenführen
@@ -83,9 +84,10 @@ Web --> UI: 200, PDF
 ----
 
 Die Vorschau nimmt die neuesten veröffentlichten Versionen von Standardschreiben
-und Briefpapier. Passt der Bezugstyp nicht oder fehlt eine veröffentlichte Version,
-fragt die Bibliothek den Host gar nicht; ohne Berechtigung fragt sie ihn nicht nach
-dem Datenkontext
+und Briefpapier. Passt der Bezugstyp nicht, fragt die Bibliothek den Host gar
+nicht. Ob es veröffentlichte Versionen gibt, prüft sie erst mit der Berechtigung;
+ein Unberechtigter bekommt immer „nicht erlaubt“. Ohne Berechtigung oder ohne
+veröffentlichte Version fragt sie den Host nicht nach dem Datenkontext
 (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
 Eine aktualisierte Vorschau legt einen neuen Snapshot an, dessen 30 Minuten neu
 beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört. Einen fremden
