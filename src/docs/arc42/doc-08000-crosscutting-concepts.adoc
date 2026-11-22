@@ -47,7 +47,10 @@ xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]):
 
 Bevor die Bibliothek den Host zum Erzeugen fragt, prüft sie selbst, ob der
 Bezugstyp des Standardschreibens zum Bezug passt. Erst mit der Berechtigung
-fragt sie den Datenkontext an. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
+prüft sie, ob es veröffentlichte Versionen gibt, damit ein Unberechtigter deren
+Stand nicht erfährt, und fragt den Datenkontext an. Dass es ein Standardschreiben
+gibt und zu welchem Bezugstyp es gehört, bleibt dagegen auch für Unberechtigte
+unterscheidbar. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
 Vier-Augen-Prinzip abbilden kann: Was veröffentlicht ist, geht in alle neuen
 Schreiben ein. Zurückziehen gehört zum Veröffentlichen; Vorlagen löschen gibt es
 nicht, weil Versionen unveränderlich sind
@@ -95,7 +98,9 @@ ohne personenbezogene Inhalte. Die Metriken laufen in das Monitoring des Hosts.
 == Fehlerbehandlung
 
 Fachliche Fehler (fehlende Berechtigung, abgelaufener Snapshot, nicht konformes
-PDF) werden als RFC-9457-Problem-Details an das Frontend gegeben und dort
+PDF) gibt ein Anwendungsfall als Fall seines Ergebnistyps zurück, nicht als
+Ausnahme (xref:loesungsstrategie-code-stil[Code-Stil]). `adapter-web` bildet
+jeden Fall ab; sie werden als RFC-9457-Problem-Details an das Frontend gegeben und dort
 barrierefrei angezeigt. Technische Fehler brechen das Speichern ab, ohne
 Teilergebnisse zu persistieren.
 

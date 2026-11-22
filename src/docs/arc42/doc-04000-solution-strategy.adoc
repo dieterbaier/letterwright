@@ -60,6 +60,14 @@ auf die Quelle, statt sie nachzuerzählen:
   Kompilieren durch. Ein optionales Ergebnis ist ein `Optional`, nie `null`;
   `Optional` ist kein Feld und kein Parameter
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
+* *Fachliche Ablehnungen sind Ergebnisse, keine Ausnahmen* (Scott Wlaschin,
+  „Railway Oriented Programming“): Ein Anwendungsfall gibt jede erwartbare
+  Ablehnung, etwa „nicht erlaubt“ oder „unbekannt“, als eigenen Fall eines Sealed
+  Type zurück, Vorbild `Vorschauergebnis`. Der eingehende Adapter unterscheidet sie
+  mit einem `switch` ohne `default`, damit der Compiler einen neuen Fall meldet.
+  Technische Fehler wie ein ausgefallener Speicher oder ein verletzter
+  Host-Vertrag bleiben Ausnahmen und werden nicht zu fachlichen Ablehnungen
+  umetikettiert. Entschieden vom Owner im Review von PR #63.
 
 * *Linting in Backend und Frontend:* Im Frontend prüft ESLint, im Backend Error
   Prone mit seinen standardmäßig aktiven Prüfungen. Eine Ausnahme wird einzeln

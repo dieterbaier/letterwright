@@ -2,11 +2,11 @@
 id: ADR-020-zulaessige-kombination-aus-standardschreiben-und-bezug
 type: ADR
 title: 'Wie die Kombination aus Standardschreiben und fachlichem Bezug geprüft wird'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-22'
-reviewed: false
-summary: 'Ein Standardschreiben gehört zu genau einem Bezugstyp; zu einem Bezug anderen Typs lehnt die Bibliothek selbst ab. Danach fragt sie den Host mit einer eigenen Berechtigungsanfrage zum Erzeugen, die das Standardschreiben enthält, damit der Host je Einstiegspunkt feiner einschränken kann. Erst mit dieser Berechtigung liefert der Host Platzhalterdaten.'
+reviewed: true
+summary: 'Ein Standardschreiben gehört zu genau einem Bezugstyp; zu einem Bezug anderen Typs lehnt die Bibliothek selbst ab. Danach fragt sie den Host mit einer eigenen Berechtigungsanfrage zum Erzeugen, die das Standardschreiben enthält, damit der Host je Einstiegspunkt feiner einschränken kann. Erst mit dieser Berechtigung prüft sie die veröffentlichten Versionen und fragt Platzhalterdaten an.'
 derived_from:
 - type: conversation
   description: 'Entscheidung des Owners am 2026-11-22 zu #52: „Beides“ – Bezugstyp am Standardschreiben und Standardschreiben in der Berechtigungsanfrage.'
@@ -23,24 +23,24 @@ tags:
 relations:
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Die Berechtigungsprüfung des SPI bekommt eine dritte Anfrageart, ZumErzeugen, mit fachlichem Bezug und Standardschreiben.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-019-validierung-in-den-typen-und-null-vertrag
-  status: proposed
+  status: accepted
   rationale: 'Die Berechtigungsanfrage ist ein Sealed Type mit drei statt zwei Arten; das Erzeugen ist keine SchreibenAktion mehr, weil es andere Daten braucht.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-009-zugriffsschutz-beim-download
-  status: proposed
-  rationale: 'Daten eines fachlichen Bezugs fließen nur in ein Standardschreiben, das zu diesem Bezug passt und das der Host für den Benutzer freigibt.'
-  reviewed: false
+  status: accepted
+  rationale: 'Beitrag zum Zugriffsschutz: Daten eines fachlichen Bezugs fließen nur in ein Standardschreiben, das zu diesem Bezug passt und das der Host für den Benutzer freigibt. Die Prüfungen beim Download, Löschen und in der Übersicht belegt das nicht.'
+  reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Der Host bestimmt zulässige Standardschreiben je Einstiegspunkt mit einer Fallunterscheidung im switch, ohne eigene Konfiguration der Bibliothek.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug]]
@@ -48,11 +48,13 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed) am 2026-11-22.
+Angenommen (accepted) am 2026-11-22.
 
 Der Owner hat die Richtung am 2026-11-22 bei #52 vorgegeben: Bezugstyp am
 Standardschreiben **und** das Standardschreiben in der Berechtigungsanfrage. Der
-ADR ist KI-gestützt formuliert und wartet auf das Review.
+ADR ist KI-gestützt formuliert; der Owner hat ihn und seine vier Relationen am
+selben Tag im Review von PR #63 angenommen, mit korrigierter Reihenfolge der
+Prüfungen.
 
 === Entscheidung
 
@@ -65,11 +67,18 @@ ADR ist KI-gestützt formuliert und wartet auf das Review.
   Standardschreiben. `ERZEUGEN` ist keine `SchreibenAktion` mehr. Der Host kann so
   festlegen, welche Standardschreiben an welchem Einstiegspunkt zulässig sind
   (#11), etwa nur Mahnungen zu Kunden mit offenem Posten.
-* **Reihenfolge.** Erst prüft die Bibliothek, was sie selbst weiß: ob es das
-  Standardschreiben gibt, ob der Bezugstyp passt und ob Standardschreiben und
-  Briefpapier eine veröffentlichte Version haben. Dann fragt sie den Host nach der
-  Berechtigung und erst mit ihr nach dem Datenkontext. Beim Speichern wird die
-  Berechtigung erneut mit `ZumErzeugen` gefragt.
+* **Reihenfolge.**
+  1. Gibt es das Standardschreiben?
+  2. Passt sein Bezugstyp zum Bezug?
+  3. Erlaubt der Host das Erzeugen (`ZumErzeugen`)?
+  4. Haben Standardschreiben und Briefpapier eine veröffentlichte Version?
+  5. Erst dann fragt die Bibliothek den Datenkontext an.
++
+Ein Unberechtigter bekommt so immer „nicht erlaubt“ und erfährt nicht, ob eine
+Version veröffentlicht ist. Ob es das Standardschreiben gibt und ob sein
+Bezugstyp passt, bleibt für ihn dagegen unterscheidbar; dieser ADR schützt nur
+den Veröffentlichungsstatus. Beim Speichern wird die Berechtigung erneut mit
+`ZumErzeugen` gefragt.
 * **Default-Berechtigungsprüfung.** Der Starter bildet `ZumErzeugen` weiter auf die
   Rolle `ROLE_SSW_SCHREIBEN_ERZEUGEN` ab; die Konfiguration bleibt unverändert.
   Das Standardschreiben wertet er nicht aus.
@@ -157,7 +166,10 @@ Hosts geändert werden kann.
 ==== Neutral oder Folgearbeiten
 
 * Die Vorlagenverwaltung muss den Bezugstyp beim Anlegen eines Standardschreibens
-  erfassen; welche Typen ein Host kennt, liefert heute niemand.
+  erfassen; welche Typen ein Host kennt, liefert heute niemand. Wie sie zur
+  Auswahl kommen, klärt die Vorlagenverwaltung als Folgearbeit. Eine weitere
+  verpflichtende Host-Schnittstelle entsteht dabei nicht beiläufig: QS-007 erlaubt
+  höchstens drei.
 * Die Persistenz muss den Bezugstyp speichern.
 
 === Impact
@@ -178,9 +190,17 @@ include::generated/adr-020-zulaessige-kombination-aus-standardschreiben-und-bezu
 
 === Open Questions
 
-* Soll die Bibliothek die Bezugstypen kennen, die ein Host anbietet, etwa über
-  eine weitere SPI-Methode, damit die Vorlagenverwaltung sie zur Auswahl anbietet?
+* Keine. Die Auswahl der Bezugstypen ist Folgearbeit der Vorlagenverwaltung
+  (siehe Folgearbeiten).
 
 === Review Notes
 
-* Noch kein Review.
+Der Owner hat am 2026-11-22 im Review von PR #63 entschieden:
+
+* ADR-020 und seine vier Relationen sind angenommen. Die Relation zu QS-009 ist ein
+  Beitrag zum Zugriffsschutz, kein Beleg für die Prüfungen beim Download, Löschen
+  und in der Übersicht.
+* Die Berechtigung wird vor den veröffentlichten Versionen geprüft, damit
+  Unberechtigte deren Stand nicht erfahren. Der erste Entwurf prüfte die Versionen
+  vorher.
+* Genau ein Bezugstyp je Standardschreiben trägt für diesen Stand.
