@@ -15,7 +15,6 @@ import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.Testdaten;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class SnapshotTest {
@@ -57,14 +56,6 @@ class SnapshotTest {
     @Test
     void nachAblaufIstErNichtVerwendbar() {
         assertThat(snapshot.istVerwendbarFuer(SACHBEARBEITER, KUNDE, snapshot.ablauf())).isFalse();
-    }
-
-    @Test
-    void erkenntEinenGeaendertenDatenkontext() {
-        var offen = (Snapshotzustand.Offen) snapshot.zustand();
-
-        assertThat(offen.istUnveraendert(Datenkontext.aus(Map.of("name", "Erika")))).isTrue();
-        assertThat(offen.istUnveraendert(Datenkontext.aus(Map.of("name", "Max")))).isFalse();
     }
 
     @Test

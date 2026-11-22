@@ -7,7 +7,7 @@ import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** Die Versionsregeln selbst prüft {@link VorlageTest}; hier geht es um das, was das Standardschreiben ausmacht. */
+/** Die Versionsregeln selbst prüft {@link BriefpapierTest}; hier geht es um das, was das Standardschreiben ausmacht. */
 class StandardschreibenTest {
 
     private final VorlagenId id = VorlagenId.neu();

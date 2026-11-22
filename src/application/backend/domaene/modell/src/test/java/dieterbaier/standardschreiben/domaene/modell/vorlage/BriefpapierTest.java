@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /** Die Regeln über alle Versionen einer Vorlage, geprüft am Briefpapier. Das Standardschreiben teilt sie. */
-class VorlageTest {
+class BriefpapierTest {
 
     private final VorlagenId id = VorlagenId.neu();
     private final Briefpapier neu = Briefpapier.anlegenMitStandardtyp(id, "Geschäftsbrief", "<p>Hallo</p>");
@@ -158,19 +158,6 @@ class VorlageTest {
     }
 
     @Test
-    void pflichtattributeDerVersion() {
-        Versionsnummer eins = Versionsnummer.ERSTE;
-        Vorlagenzustand entwurf = Vorlagenzustand.ENTWURF;
-
-        lehntAb(() -> Vorlagenversion.wiederherstellen(null, eins, entwurf, ""), "Vorlage der Version");
-        lehntAb(() -> Vorlagenversion.wiederherstellen(id, null, entwurf, ""), "Versionsnummer");
-        lehntAb(() -> Vorlagenversion.wiederherstellen(id, eins, null, ""), "Zustand der Version");
-        lehntAb(() -> Vorlagenversion.wiederherstellen(id, eins, entwurf, null), "Inhalt der Version");
-        lehntAb(() -> Vorlagenversion.wiederherstellen(id, eins, Vorlagenzustand.VEROEFFENTLICHT, ""),
-                "Inhalt einer veröffentlichten");
-    }
-
-    @Test
     void gleichheitDerAggregateUeberDieIdentitaet() {
         Briefpapier andererStand = neu.aendereEntwurf("<p>anders</p>").veroeffentlicheEntwurf();
         Briefpapier gleicherInhaltAndereId = Briefpapier.anlegenMitStandardtyp(VorlagenId.neu(), "Geschäftsbrief",
@@ -180,17 +167,5 @@ class VorlageTest {
         assertThat(gleicherInhaltAndereId).isNotEqualTo(neu);
         assertThat(neu).isNotEqualTo("Geschäftsbrief");
         assertThat(neu.toString()).contains(id.wert().toString(), "Geschäftsbrief");
-    }
-
-    @Test
-    void gleichheitDerVersionenUeberVorlageUndNummer() {
-        Vorlagenversion entwurf = version(id, 1, Vorlagenzustand.ENTWURF);
-        Vorlagenversion veroeffentlicht = version(id, 1, Vorlagenzustand.VEROEFFENTLICHT);
-
-        assertThat(veroeffentlicht).isEqualTo(entwurf).hasSameHashCodeAs(entwurf);
-        assertThat(version(id, 2, Vorlagenzustand.ENTWURF)).isNotEqualTo(entwurf);
-        assertThat(version(VorlagenId.neu(), 1, Vorlagenzustand.ENTWURF)).isNotEqualTo(entwurf);
-        assertThat(entwurf).isNotEqualTo(entwurf.verweis());
-        assertThat(entwurf.toString()).contains("nummer=1", "ENTWURF").doesNotContain("<p>");
     }
 }

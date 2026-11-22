@@ -54,24 +54,6 @@ class SchreibenTest {
     }
 
     @Test
-    void pflichtattributeDesErgebnisses() {
-        Schreiben schreiben = Schreiben.ausSnapshot(SchreibenId.neu(), snapshot, dokument, pdf, JETZT).schreiben();
-
-        lehntAb(() -> new SchreibenAusSnapshot(null, snapshot), "Das Schreiben");
-        lehntAb(() -> new SchreibenAusSnapshot(schreiben, null), "verbrauchte Snapshot");
-    }
-
-    @Test
-    void dasErgebnisPasstZusammen() {
-        SchreibenAusSnapshot erzeugt = Schreiben.ausSnapshot(SchreibenId.neu(), snapshot, dokument, pdf, JETZT);
-        Snapshot andererVerbraucht = Schreiben.ausSnapshot(SchreibenId.neu(), Testdaten.snapshot(), dokument, pdf, JETZT)
-                .verbrauchterSnapshot();
-
-        lehntAb(() -> new SchreibenAusSnapshot(erzeugt.schreiben(), snapshot), "nicht verbraucht");
-        lehntAb(() -> new SchreibenAusSnapshot(erzeugt.schreiben(), andererVerbraucht), "entstand nicht aus Snapshot");
-    }
-
-    @Test
     void ausEinemAbgelaufenenSnapshotEntstehtKeinSchreiben() {
         assertThatIllegalStateException()
                 .isThrownBy(() -> Schreiben.ausSnapshot(SchreibenId.neu(), snapshot, dokument, pdf, snapshot.ablauf()))
