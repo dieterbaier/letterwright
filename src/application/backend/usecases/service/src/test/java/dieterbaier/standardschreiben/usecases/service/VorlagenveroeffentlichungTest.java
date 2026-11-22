@@ -21,7 +21,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Brücke zu {@code features/vorlagen/vorlagenversion-veroeffentlichen.feature}: ein Test je Szenario, benannt nach dem
@@ -188,6 +191,29 @@ class VorlagenveroeffentlichungTest {
         assertThat(gespeicherteMahnung().entwurf()).get().extracting(Vorlagenversion::inhalt)
                 .isEqualTo("<p>ungeprüft</p>");
         assertThat(vorlagen.ersetzungen).isZero();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = {"durch Version 2 abgelöst", "zurückgezogen"})
+    void wirdDasBriefpapierWaehrendDerPruefungGeaendertZaehltDerPruefzeitpunkt(String aenderung) {
+        Briefpapier geaendert = aenderung.equals("zurückgezogen")
+                ? briefpapier.zurueckziehen()
+                : briefpapier.neuerEntwurf("<header>2</header>").veroeffentlicheEntwurf();
+        List<String> geprueft = new ArrayList<>();
+        pruefer.ergebnis = pdf -> {
+            geprueft.add(new String(pdf, StandardCharsets.UTF_8));
+            vorlagen.ablegen(geaendert);
+            return Konformitaet.konform();
+        };
+
+        var ergebnis = veroeffentlichung.veroeffentliche(VERA, mahnung.id());
+
+        assertThat(geprueft).singleElement().asString().startsWith("<header/>");
+        assertThat(ergebnis).isEqualTo(
+                new Veroeffentlichungsergebnis.Veroeffentlicht(new Versionsverweis(mahnung.id(), ZWEI)));
+        assertThat(vorlagen.briefpapier(briefpapier.id()).orElseThrow().veroeffentlichteVersion())
+                .map(Vorlagenversion::nummer)
+                .isEqualTo(aenderung.equals("zurückgezogen") ? Optional.empty() : Optional.of(ZWEI));
     }
 
     @Test
