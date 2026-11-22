@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
-import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
-import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Briefpapier;
@@ -14,29 +12,17 @@ import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
-import dieterbaier.standardschreiben.domaene.modell.vorlage.Vorlagenversion;
 import dieterbaier.standardschreiben.usecases.in.Vorschauergebnis;
-import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
-import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.usecases.out.Renderer;
-import dieterbaier.standardschreiben.usecases.out.Snapshotablage;
-import dieterbaier.standardschreiben.usecases.out.VorlagenRepository;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Brücke zu {@code features/schreiben/vorschau-erzeugen.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind Attrappen, die festhalten, was gefragt wurde.
+ * Szenariotitel. Die ausgehenden Ports sind {@link Attrappen}, die festhalten, was gefragt wurde.
  */
 class VorschauErzeugenTest {
 
@@ -45,11 +31,11 @@ class VorschauErzeugenTest {
     private static final BenutzerKennung MAX = new BenutzerKennung("max");
     private static final FachlicherBezug KUNDE_4711 = new FachlicherBezug("Kunde", "4711");
 
-    private final Vorlagen vorlagen = new Vorlagen();
-    private final Host host = new Host();
-    private final Ablage ablage = new Ablage();
-    private final Uhr uhr = new Uhr();
-    private final HtmlRenderer renderer = new HtmlRenderer();
+    private final Attrappen.Vorlagen vorlagen = new Attrappen.Vorlagen();
+    private final Attrappen.Host host = new Attrappen.Host();
+    private final Attrappen.Snapshots ablage = new Attrappen.Snapshots();
+    private final Attrappen.Uhr uhr = new Attrappen.Uhr(JETZT);
+    private final Attrappen.Renderer renderer = new Attrappen.Renderer();
     private final Vorschauerzeugung vorschau = new Vorschauerzeugung(vorlagen, host, host, renderer, ablage, uhr);
 
     // Grundlage: "Mahnung" zum Bezugstyp Kunde, veröffentlicht bis Version 2, Entwurf 3; Briefpapier in Version 1;
@@ -220,119 +206,5 @@ class VorschauErzeugenTest {
 
         assertThat(ergebnis).isInstanceOf(Vorschauergebnis.NichtErlaubt.class);
         assertThat(ablage.snapshots).containsOnlyKeys(bisherige.snapshot());
-    }
-
-    private static final class Vorlagen implements VorlagenRepository {
-
-        private final Map<VorlagenId, Standardschreiben> standardschreiben = new HashMap<>();
-        private final Map<VorlagenId, Briefpapier> briefpapiere = new HashMap<>();
-
-        Standardschreiben ablegen(Standardschreiben vorlage) {
-            standardschreiben.put(vorlage.id(), vorlage);
-            return vorlage;
-        }
-
-        Briefpapier ablegen(Briefpapier vorlage) {
-            briefpapiere.put(vorlage.id(), vorlage);
-            return vorlage;
-        }
-
-        @Override
-        public Optional<Standardschreiben> standardschreiben(VorlagenId id) {
-            return Optional.ofNullable(standardschreiben.get(id));
-        }
-
-        @Override
-        public Optional<Briefpapier> briefpapier(VorlagenId id) {
-            return Optional.ofNullable(briefpapiere.get(id));
-        }
-    }
-
-    private static final class Host implements Berechtigungen, Platzhalterdatenquelle {
-
-        private final Datenkontext datenkontext = Datenkontext.aus(Map.of("name", "Erika Mustermann GmbH"));
-        private final List<Standardschreiben> erzeugenAngefragt = new ArrayList<>();
-        private boolean erlaubt;
-        private int datenkontextAngefragt;
-
-        boolean wurdeGefragt() {
-            return !erzeugenAngefragt.isEmpty() || datenkontextAngefragt > 0;
-        }
-
-        @Override
-        public boolean darf(BenutzerKennung benutzer, VorlagenAktion aktion) {
-            throw new AssertionError("Vorlagenaktionen gehören nicht zur Vorschau");
-        }
-
-        @Override
-        public boolean darf(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
-            throw new AssertionError("Aktionen an gespeicherten Schreiben gehören nicht zur Vorschau");
-        }
-
-        @Override
-        public boolean darfErzeugen(BenutzerKennung benutzer, FachlicherBezug bezug, Standardschreiben vorlage) {
-            erzeugenAngefragt.add(vorlage);
-            return erlaubt;
-        }
-
-        @Override
-        public Datenkontext liesDatenkontext(BenutzerKennung benutzer, FachlicherBezug bezug, Standardschreiben vorlage) {
-            datenkontextAngefragt++;
-            return datenkontext;
-        }
-    }
-
-    /** Ersetzt nur {@code {{name}}}; wie wirklich zusammengeführt wird, prüft {@code adapter-rendering}. */
-    private static final class HtmlRenderer implements Renderer {
-
-        private int aufrufe;
-
-        @Override
-        public String zusammenfuehren(Vorlagenversion briefpapier, Vorlagenversion inhalt, Datenkontext daten) {
-            aufrufe++;
-            return briefpapier.inhalt() + inhalt.inhalt().replace("{{name}}", String.valueOf(daten.werte().get("name")));
-        }
-    }
-
-    private static final class Ablage implements Snapshotablage {
-
-        private final Map<SnapshotId, Snapshot> snapshots = new HashMap<>();
-        private final List<SnapshotId> geloescht = new ArrayList<>();
-
-        @Override
-        public void speichere(Snapshot snapshot) {
-            snapshots.put(snapshot.id(), snapshot);
-        }
-
-        @Override
-        public Optional<Snapshot> lade(SnapshotId id) {
-            return Optional.ofNullable(snapshots.get(id));
-        }
-
-        @Override
-        public void loesche(SnapshotId id) {
-            snapshots.remove(id);
-            geloescht.add(id);
-        }
-    }
-
-    private static final class Uhr extends Clock {
-
-        private Instant jetzt = JETZT;
-
-        @Override
-        public Instant instant() {
-            return jetzt;
-        }
-
-        @Override
-        public ZoneOffset getZone() {
-            return ZoneOffset.UTC;
-        }
-
-        @Override
-        public Clock withZone(java.time.ZoneId zone) {
-            throw new UnsupportedOperationException();
-        }
     }
 }
