@@ -73,6 +73,16 @@ class SchreibenuebersichtTest {
     }
 
     @Test
+    void eineSeiteHinterDemEndeIstLeerUndZaehltDieSichtbarenSchreiben() {
+        var ergebnis = uebersicht.liste(ERIKA, KUNDE_4711, new Seitenanfrage(2, 2));
+
+        Seite<Schreiben> seite = ((Uebersichtsergebnis.Gefunden) ergebnis).seite();
+        assertThat(seite.eintraege()).isEmpty();
+        assertThat(seite.gesamtzahl()).isEqualTo(3);
+        assertThat(seite.anzahlSeiten()).isEqualTo(2);
+    }
+
+    @Test
     void ohneBerechtigungZumAnsehenWirdNichtsGelesen() {
         host.verbiete(ERIKA, SchreibenAktion.ANSEHEN, KUNDE_4711);
 
