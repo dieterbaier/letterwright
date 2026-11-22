@@ -12,12 +12,13 @@ hier.
 Die Regeln und ihre Begründung stehen in der Architekturdokumentation, nicht hier:
 
 - `src/docs/arc42/doc-04000-solution-strategy.adoc`, Abschnitt „Code-Stil“
-- ADR-018 (DDD-Rollen und Selbstvalidierung) und ADR-019 (Validierung in den
-  Typen und Null-Vertrag) unter `src/docs/arc42/09-architecture-decisions/`
+- ADR-018 (DDD-Rollen und Selbstvalidierung), ADR-019 (Validierung in den
+  Typen und Null-Vertrag) und ADR-011 (Qualitätsgates, Linting) unter
+  `src/docs/arc42/09-architecture-decisions/`
 - Querschnittskonzept „Fachmodell“ in `src/docs/arc42/doc-08000-crosscutting-concepts.adoc`
 
 Was der Build durchsetzt, steht hier nicht: Modulgrenzen und Paketregeln
-(ArchUnit), den Null-Vertrag (NullAway), Abdeckung (JaCoCo) und den
+(ArchUnit), Linting (Error Prone), den Null-Vertrag (NullAway), Abdeckung (JaCoCo) und den
 Kompilier-Klassenpfad des Hosts (`host-vertragstest`). Lass `./gradlew check`
 laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
 
@@ -40,6 +41,14 @@ laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
    `ausSnapshot`, `neu()`, `wiederherstellen`.
 6. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
    Fachbegriff kommt zuerst ins Glossar.
+
+## Ausnahmen vom Linting
+
+Meldet Error Prone einen Befund, behebe ihn. Ist er an dieser Stelle falsch,
+schalte genau diese Prüfung an der kleinsten möglichen Stelle ab, mit
+`@SuppressWarnings("<Prüfung>")` und einem Kommentar daneben, der begründet,
+warum (ADR-011). Eine Prüfung im ganzen Build abzuschalten, entscheidet der
+Owner.
 
 ## Javadoc
 

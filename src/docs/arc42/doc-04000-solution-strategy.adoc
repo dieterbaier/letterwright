@@ -61,5 +61,10 @@ auf die Quelle, statt sie nachzuerzählen:
   `Optional` ist kein Feld und kein Parameter
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
 
+* *Linting in Backend und Frontend:* Im Frontend prüft ESLint, im Backend Error
+  Prone mit seinen standardmäßig aktiven Prüfungen. Eine Ausnahme wird einzeln
+  und mit Begründung abgeschaltet
+  (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+
 Wie ein Agent diese Regeln beim Schreiben von Code anwendet, beschreibt der Skill
 `skills/code-stil/SKILL.md`.

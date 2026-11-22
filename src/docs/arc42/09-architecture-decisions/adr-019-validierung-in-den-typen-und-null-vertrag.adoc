@@ -2,11 +2,11 @@
 id: ADR-019-validierung-in-den-typen-und-null-vertrag
 type: ADR
 title: 'Wo validiert wird und wie der Null-Vertrag durchgesetzt wird'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-22'
-reviewed: false
-summary: 'Nur die Typen validieren, beim Erzeugen. Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht. Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit. NullAway setzt den Null-Vertrag aus @NullMarked beim Kompilieren durch; ein optionales Ergebnis ist ein Optional.'
+reviewed: true
+summary: 'Nur die Typen validieren, beim Erzeugen. Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht. Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit. NullAway setzt den Null-Vertrag aus @NullMarked beim Kompilieren durch; ein optionales Ergebnis ist ein Optional. Die Zusage, nie eine NullPointerException, gilt an den Grenzen.'
 derived_from:
 - type: conversation
   description: 'TODOs und Gespräch mit dem Owner am 2026-11-22 nach PR #59 (#30): „Die Typen sollen validieren. Usecases brauchen nicht.“'
@@ -21,24 +21,24 @@ tags:
 relations:
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
-  status: proposed
+  status: accepted
   rationale: 'ADR-018 legt fest, dass jeder Typ seine Pflichtattribute prüft und nie eine NullPointerException entsteht. Dieser ADR legt fest, dass nur die Typen prüfen, und beschränkt die Zusage zur NullPointerException auf die Grenze: Typen beim Erzeugen und Werte, die der Host liefert.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Die SPI-Typen drücken über Sealed Types aus, ob eine Aktion einen fachlichen Bezug hat. Der Host unterscheidet die Anfragen per switch statt über ein optionales Feld.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-011-qualitaetsgates-im-build
-  status: proposed
+  status: accepted
   rationale: 'NullAway kommt als weiteres Gate in den Build: Eine Verletzung des Null-Vertrags im Produktionscode bricht die Kompilierung ab.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Der Host sieht an der Signatur, welche Anfrage einen fachlichen Bezug trägt, und der Compiler prüft, dass er beide Arten behandelt.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-019-validierung-in-den-typen-und-null-vertrag]]
@@ -46,15 +46,14 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-22.
 
 Der Owner hat die Richtung am 2026-11-22 vorgegeben: „Die Typen sollen
-validieren. Usecases brauchen nicht.“ Der ADR ist KI-gestützt formuliert und
-wartet auf das Review in dem Pull Request zu #61.
+validieren. Usecases brauchen nicht.“ Der ADR ist KI-gestützt formuliert; der
+Owner hat ihn und seine vier Relationen am selben Tag im Review von PR #62
+angenommen.
 
 === Entscheidung
-
-Wir schlagen vor:
 
 * **Nur die Typen validieren.** Value Objects, Aggregate, Entitäten und die
   Datentypen des SPI prüfen ihre Pflichtattribute im Konstruktor oder in der
@@ -67,17 +66,31 @@ Wir schlagen vor:
   `SchreibenAktion` statt `Aktion` mit `brauchtBezug`, und im SPI die
   `Berechtigungsanfrage` als Sealed Type mit `ZuVorlagen` und `ZuSchreiben`.
 * **Null-Vertrag beim Kompilieren.** Jedes Paket ist `@NullMarked` (JSpecify).
-  NullAway prüft das beim Kompilieren des Produktionscodes; eine Verletzung bricht
-  den Build ab. Tests sind ausgenommen, weil sie absichtlich `null` übergeben, um
-  die Selbstvalidierung der Typen zu prüfen.
+  NullAway prüft das beim Kompilieren des Produktionscodes im JSpecify-Modus, also
+  auch die Nullbarkeit von Typargumenten; eine Verletzung bricht den Build ab.
+  `RequireExplicitNullMarking` lässt keine Klasse ohne Markierung zu, damit ein
+  neues Paket das Gate nicht still umgeht. Tests sind ausgenommen, weil sie
+  absichtlich `null` übergeben, um die Selbstvalidierung der Typen zu prüfen.
+* **Nachweis, dass das Gate greift.** Die Aufgabe `pruefeNullVertrag` im Modul
+  `architekturtests` kompiliert kleine Proben mit genau den Argumenten des
+  Produktionscodes: Eine unmarkierte Klasse, eine `null`-Rückgabe und ein
+  nullbares Typargument müssen scheitern, eine korrekte Klasse muss kompilieren.
+  Sie ist Teil von `check`.
 * **Optionale Ergebnisse.** Kein Rückgabewert ist `null`. Ein Ergebnis, das fehlen
   darf, ist ein `Optional`. `Optional` ist kein Feld und kein Parameter.
-* **Die Grenze bleibt geprüft.** Die Zusage aus ADR-018 „nie eine
-  `NullPointerException`“ gilt an der Grenze: beim Erzeugen eines Typs und für
+* **Die Zusage gilt an den Grenzen.** Die Zusage aus ADR-018 „nie eine
+  `NullPointerException`“ gilt an den Grenzen: beim Erzeugen eines Typs und für
   Werte, die der Host liefert. Liefert eine SPI-Implementierung `null`, meldet
   `adapter-host` weiter `HostVertragVerletzt`. Wer eine interne Signatur falsch
-  benutzt, bekommt eine `NullPointerException`; NullAway verhindert das im
-  Produktionscode.
+  benutzt, bekommt eine `NullPointerException`.
+* **Was NullAway nicht garantiert.** NullAway ist eine statische Analyse und
+  verhindert die meisten solchen Fehler im Produktionscode, aber nicht jeden.
+  Bibliotheken ohne JSpecify-Annotationen gelten als nicht annotiert, ihre
+  Rückgaben also als vorhanden. Und die Analyse ist nicht in jedem Fall
+  vollständig, etwa bei Feldern, die ein Framework per Reflection setzt.
+* **Error Prone als Linter.** NullAway läuft als Plugin von Error Prone. Die
+  standardmäßig aktiven Prüfungen von Error Prone bleiben eingeschaltet; das ist
+  das Linting des Backends (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
 
 === Kontext
 
@@ -193,9 +206,14 @@ include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-traceabilit
 
 === Review Notes
 
-Vor der Annahme zu bestätigen:
+Der Owner hat am 2026-11-22 im Review von PR #62 entschieden:
 
-* die vier Relationen, besonders die Einschränkung der Zusage aus ADR-018 auf die
-  Grenze;
-* die neuen Namen der Rollen-Properties;
-* dass Error Prone mit allen Standardprüfungen läuft und nicht nur mit NullAway.
+* Die Zusage „nie eine `NullPointerException`“ gilt an den Grenzen.
+* Die standardmäßig aktiven Prüfungen von Error Prone bleiben zusätzlich zu
+  NullAway eingeschaltet; einzelne Ausnahmen werden gezielt begründet
+  (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+* Die neuen Namen der Rollen-Properties passen.
+* ADR-019 und seine vier Relationen sind angenommen.
+
+Aus dem Review kamen dazu `RequireExplicitNullMarking`, der JSpecify-Modus, die
+Proben in `pruefeNullVertrag` und der Abschnitt „Was NullAway nicht garantiert“.

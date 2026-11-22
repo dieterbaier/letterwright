@@ -108,9 +108,10 @@ Querschnittlich, ohne eigenen Baustein:
   (xref:adr-009-build-monorepo-und-versionen[ADR-009]); JUnit 5, Mockito, AssertJ,
   JaCoCo als Abdeckungs-Gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
   ArchUnit im Modul `architekturtests`
-  (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); NullAway
-  setzt den Null-Vertrag beim Kompilieren durch
-  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]); im Modul
+  (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); Error Prone
+  als Linter, mit NullAway für den Null-Vertrag
+  (xref:adr-011-qualitaetsgates-im-build[ADR-011],
+  xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]); im Modul
   `host-vertragstest` der Nachweis, dass ein Host mit dem Starter nur das SPI
   kompiliert sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]); für die
   Persistenz _Testcontainers_ mit PostgreSQL und MariaDB.
