@@ -93,7 +93,7 @@ veröffentlichte Version fragt sie den Host nicht nach dem Datenkontext
 (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
 Eine aktualisierte Vorschau legt einen neuen Snapshot an, dessen 30 Minuten neu
 beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört und noch offen
-ist. Einen fremden
+ist. Ob er offen ist, prüft die Persistenz im selben Schritt wie das Löschen. Einen fremden
 oder unbekannten bisherigen Snapshot übergeht sie, als wäre keiner angegeben. Das
 Verhalten ist in `features/schreiben/vorschau-erzeugen.feature` spezifiziert.
 

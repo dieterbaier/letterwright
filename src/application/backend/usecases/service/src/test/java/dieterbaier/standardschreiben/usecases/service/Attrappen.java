@@ -126,6 +126,8 @@ final class Attrappen {
 
         final Map<SnapshotId, Snapshot> snapshots = new HashMap<>();
         final List<SnapshotId> geloescht = new ArrayList<>();
+        /** Läuft vor dem bedingten Löschen und simuliert eine gleichzeitige Anfrage. */
+        Runnable vorDemLoeschen = () -> { };
 
         @Override
         public void speichere(Snapshot snapshot) {
@@ -138,9 +140,13 @@ final class Attrappen {
         }
 
         @Override
-        public void loesche(SnapshotId id) {
-            snapshots.remove(id);
-            geloescht.add(id);
+        public void loescheWennOffen(SnapshotId id) {
+            vorDemLoeschen.run();
+            Snapshot aktuell = snapshots.get(id);
+            if (aktuell != null && aktuell.zustand() instanceof Snapshotzustand.Offen) {
+                snapshots.remove(id);
+                geloescht.add(id);
+            }
         }
     }
 

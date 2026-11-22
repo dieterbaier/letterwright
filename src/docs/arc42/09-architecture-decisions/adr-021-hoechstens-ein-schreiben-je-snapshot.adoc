@@ -84,6 +84,9 @@ freizugeben.
   (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
 * **Eine aktualisierte Vorschau** löscht nur einen offenen eigenen Snapshot.
   Einen verbrauchten lässt sie stehen, damit eine Wiederholung ihn noch findet.
+  Ob er offen ist, entscheidet die Persistenz beim Löschen selbst, im selben
+  Schritt (bedingtes Löschen). Eine Prüfung vorher genügt nicht: Dazwischen kann
+  eine gleichzeitige Anfrage ihn verbrauchen.
 * **Bewusst neu erzeugen** heißt: neue Vorschau, also neuer Snapshot, also neues
   Schreiben.
 * **Geänderter Datenkontext.** Es entsteht kein PDF, und der Snapshot bleibt
@@ -167,7 +170,10 @@ s| Summe s| +4 s| +2 s| +2
 
 * #6: Zustand des Snapshots mit bedingtem Update von offen auf verbraucht, Spalte
   für die Snapshot-ID am Schreiben mit Unique Constraint, beides in einer
-  Transaktion. Der Datenkontext wird beim Verbrauchen entfernt.
+  Transaktion. Der Datenkontext wird beim Verbrauchen entfernt. Das Löschen beim
+  Aktualisieren ist ebenfalls bedingt (nur solange offen); ein Test gegen beide
+  Datenbanken weist nach, dass es einen gleichzeitig verbrauchten Snapshot nicht
+  löscht.
 * #10: Die Oberfläche zeigt bei `BereitsGespeichert` denselben Download-Link wie
   bei `Gespeichert`.
 * Ob verwaiste Dokumente aufgeräumt werden müssen, hängt von der Ablage ab (#60).
@@ -203,5 +209,10 @@ Der Owner hat am 2026-11-22 im Review von PR #64 entschieden:
 * Nach erfolgreichem Speichern wird kein Datenkontext allein für die
   Wiederholung aufbewahrt. Die Metadaten für die Wiederholung bleiben.
 
-Aus dem Review kam außerdem: Bei ungewissem Ausgang des Speicherns wird das PDF
-nicht entfernt. Der erste Entwurf entfernte es bei jeder Ausnahme.
+Aus dem Review kam außerdem:
+
+* Bei ungewissem Ausgang des Speicherns wird das PDF nicht entfernt. Der erste
+  Entwurf entfernte es bei jeder Ausnahme.
+* Das Löschen beim Aktualisieren ist bedingt und atomar. Der zweite Entwurf
+  prüfte den Zustand vorher und löschte dann unbedingt; eine gleichzeitige
+  Speicherung dazwischen hätte die Wiederholung unmöglich gemacht.

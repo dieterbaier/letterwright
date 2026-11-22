@@ -91,6 +91,13 @@ Funktionalität: Schreiben speichern
     Wenn Erika die Vorschau erneut speichert
     Dann erhält sie das gespeicherte Schreiben mit genau diesem PDF
 
+  Szenario: Speichert Erika, während sie die Vorschau aktualisiert, findet eine Wiederholung das Schreiben
+    Angenommen Erika aktualisiert ihre Vorschau, und der bisherige Snapshot ist dabei schon gelesen
+    Und bevor er gelöscht wird, speichert eine andere Anfrage diese Vorschau
+    Wenn das Aktualisieren den bisherigen Snapshot löschen will
+    Dann bleibt der verbrauchte Snapshot bestehen
+    Und eine Wiederholung des Speicherns erhält das gespeicherte Schreiben
+
   Szenario: Gleichzeitiges Speichern derselben Vorschau ergibt ein Schreiben
     Angenommen eine zweite Anfrage zur selben Vorschau verbraucht den Snapshot, während diese ihr PDF erzeugt
     Wenn Erika die Vorschau speichert

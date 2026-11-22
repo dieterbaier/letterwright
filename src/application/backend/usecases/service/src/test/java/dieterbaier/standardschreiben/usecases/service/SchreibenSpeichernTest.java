@@ -198,6 +198,22 @@ class SchreibenSpeichernTest {
     }
 
     @Test
+    void speichertErikaWaehrendSieDieVorschauAktualisiertFindetEineWiederholungDasSchreiben() {
+        // Given: Das Aktualisieren hat den offenen Snapshot gelesen; vor dem Löschen speichert eine andere Anfrage
+        Speicherergebnis[] gleichzeitig = new Speicherergebnis[1];
+        snapshots.vorDemLoeschen = () -> gleichzeitig[0] = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        // When: Das Aktualisieren will den bisherigen Snapshot löschen
+        vorschau.aktualisiere(ERIKA, KUNDE_4711, mahnung.id(), vorschauVonErika);
+
+        // Then: Der verbrauchte Snapshot bleibt; eine Wiederholung des Speicherns findet das Schreiben
+        var gespeichert = (Speicherergebnis.Gespeichert) gleichzeitig[0];
+        assertThat(snapshots.geloescht).isEmpty();
+        assertThat(speicherung.speichere(ERIKA, vorschauVonErika))
+                .isEqualTo(new Speicherergebnis.BereitsGespeichert(gespeichert.schreiben()));
+    }
+
+    @Test
     void gleichzeitigesSpeichernDerselbenVorschauErgibtEinSchreiben() {
         // Given: Eine zweite Anfrage verbraucht den Snapshot, während diese ihr PDF erzeugt
         SchreibenAusSnapshot derZweitenAnfrage = Schreiben.ausSnapshot(SchreibenId.neu(),
