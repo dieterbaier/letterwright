@@ -35,7 +35,7 @@ Code.
 | Datenkontext | Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert, bereits formatiert. | `Datenkontext` (Value Object); im SPI `spi.Datenkontext`, angefragt mit `Datenanfrage`
 | Fachlicher Bezug | Das Domänenobjekt, zu dem ein Schreiben erzeugt wird (z. B. Kunde, Vorgang), als Typ und ID. | `FachlicherBezug` (Value Object); im SPI `spi.FachlicherBezug`
 | Vorschau | Paginierte HTML-Darstellung eines befüllten Standardschreibens vor dem Speichern. Eine aktualisierte Vorschau ersetzt den Snapshot der bisherigen. | Anwendungsfall `VorschauErzeugen`, Ergebnis `Vorschauergebnis`
-| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird. | `Snapshot` (Aggregate Root)
+| Snapshot | Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird. Offen, bis daraus ein Schreiben entsteht; danach verbraucht und ohne Datenkontext. | `Snapshot` (Aggregate Root), Zustand `Snapshotzustand` (`Offen`, `Verbraucht`)
 | Prüfsumme | SHA-256-Prüfsumme, etwa eines gespeicherten PDFs oder eines Datenkontexts. Mit ihr erkennt das Speichern einen seit der Vorschau geänderten Datenkontext. | `Pruefsumme` (Value Object)
 | Benutzerkennung | Kennung des angemeldeten Benutzers, wie sie die Host-Anwendung liefert. Die Bibliothek verwaltet keine Benutzer. | `BenutzerKennung` (Value Object); im SPI das Attribut `benutzerkennung` der Anfragen
 | Dokumentverweis | Verweis auf das abgelegte PDF eines Schreibens; seine Bedeutung kennt nur die Dokumentablage. | `Dokumentverweis` (Value Object)
