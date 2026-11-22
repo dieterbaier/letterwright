@@ -104,7 +104,7 @@ final class Versionsfolge {
     }
 
     Versionsfolge zurueckziehen(Versionsnummer nummer) {
-        Vorlagenversion version = version(Pruefe.pflicht(nummer, "Die Versionsnummer"))
+        Vorlagenversion version = version(nummer)
                 .orElseThrow(() -> new Validierungsfehler("Version " + nummer.wert() + " gibt es nicht"));
         if (version.zustand() != Vorlagenzustand.VEROEFFENTLICHT) {
             throw new UnzulaessigerZustandswechsel(vorlage, "Version " + nummer.wert() + " ist " + version.zustand()

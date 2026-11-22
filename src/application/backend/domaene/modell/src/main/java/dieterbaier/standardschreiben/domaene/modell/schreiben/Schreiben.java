@@ -48,14 +48,13 @@ public final class Schreiben {
     public static Schreiben ausSnapshot(
             SchreibenId id, Snapshot snapshot, Dokumentverweis dokument, Pruefsumme pdfPruefsumme, Instant jetzt) {
         Pruefe.pflicht(snapshot, "Der Snapshot");
-        if (snapshot.istAbgelaufen(jetzt)) {
+        if (snapshot.istAbgelaufen(Pruefe.pflicht(jetzt, "Der Zeitpunkt"))) {
             throw new IllegalStateException("Snapshot " + snapshot.id().wert() + " ist abgelaufen");
         }
         return new Schreiben(id, snapshot.bezug(), snapshot.briefpapier(), snapshot.standardschreiben(), dokument,
                 pdfPruefsumme, jetzt);
     }
 
-    /** Stellt ein gespeichertes Schreiben wieder her. */
     public static Schreiben wiederherstellen(SchreibenId id, FachlicherBezug bezug, Versionsverweis briefpapier,
             Versionsverweis standardschreiben, Dokumentverweis dokument, Pruefsumme pdfPruefsumme, Instant erstellt) {
         return new Schreiben(id, bezug, briefpapier, standardschreiben, dokument, pdfPruefsumme, erstellt);
