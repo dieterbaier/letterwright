@@ -31,6 +31,12 @@ Funktionalität: Eingebaute Berechtigungsprüfung
       | niemand ist angemeldet                                            |
       | Erika greift nur anonym zu, mit der Rolle "ROLE_ANONYMOUS"        |
 
+  Szenario: Was als anonymer Zugriff gilt, bestimmt der Host
+    Angenommen der Host stuft mit einem eigenen AuthenticationTrustResolver jede Anmeldung als anonym ein
+    Und Erika ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
+    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
+    Dann ist es nicht erlaubt
+
   Szenario: Für einen anderen als den angemeldeten Benutzer ist nichts erlaubt
     Angenommen Max ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
     Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf

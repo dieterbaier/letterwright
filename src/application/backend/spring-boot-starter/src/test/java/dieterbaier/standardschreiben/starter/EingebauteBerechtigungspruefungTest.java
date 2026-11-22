@@ -20,8 +20,12 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -80,6 +84,17 @@ class EingebauteBerechtigungspruefungTest {
     }
 
     @Test
+    void wasAlsAnonymerZugriffGiltBestimmtDerHost() {
+        // Given: Der Host stuft mit einem eigenen AuthenticationTrustResolver jede Anmeldung als anonym ein,
+        // Erika ist angemeldet und hat die Rolle ROLE_SSW_SCHREIBEN_ERZEUGEN
+        anmelden("erika", "ROLE_SSW_SCHREIBEN_ERZEUGEN");
+
+        // When / Then: Erzeugen ist nicht erlaubt; ohne diesen Resolver wäre es erlaubt (erstes Szenario)
+        ohneEigenePruefung.withUserConfiguration(AllesIstAnonym.class)
+                .run(kontext -> assertThat(darfErikaErzeugen(kontext.getBean(Berechtigungen.class))).isFalse());
+    }
+
+    @Test
     void fuerEinenAnderenAlsDenAngemeldetenBenutzerIstNichtsErlaubt() {
         // Given: Max ist angemeldet und hat die Rolle ROLE_SSW_SCHREIBEN_ERZEUGEN
         anmelden("max", "ROLE_SSW_SCHREIBEN_ERZEUGEN");
@@ -129,6 +144,20 @@ class EingebauteBerechtigungspruefungTest {
         @Bean
         Loeschrichtlinie loeschrichtlinie() {
             return anfrage -> Loeschentscheidung.gesperrt("Aufbewahrungsfrist");
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class AllesIstAnonym {
+
+        @Bean
+        AuthenticationTrustResolver allesIstAnonym() {
+            return new AuthenticationTrustResolverImpl() {
+                @Override
+                public boolean isAnonymous(@Nullable Authentication anmeldung) {
+                    return true;
+                }
+            };
         }
     }
 
