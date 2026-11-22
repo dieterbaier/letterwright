@@ -412,6 +412,38 @@ Noch offen, bevor die Regel als ADR festgehalten wird:
   Dateiname und technischen Schlüssel fehlschlägt? Vorschlag: Das Schreiben bleibt
   gespeichert, und die Benachrichtigung wird wiederholt. Alternativ läuft sie in
   derselben Transaktion, und ein Fehler verhindert das Speichern.
+* *Speichern in einer Transaktion des Hosts:* Der Host muss das Speichern
+  zusammen mit eigenen Datenbankaktionen atomar ausführen können, etwa mit dem
+  Abschließen eines Human Task. Heute löst er das Speichern nur über die
+  React-Komponenten und REST aus. Die Vorschau bleibt dort, denn gespeichert wird
+  der Snapshot, den der Benutzer gesehen hat (ADR-007).
++
+Tendenz (Owner, 2026-11-22): Die Bibliothek bietet beides an:
++
+--
+.. eine öffentliche Java-API, über die der Host das Speichern eines Snapshots in
+   seiner eigenen Transaktion auslöst. Das ist eine API, die der Host aufruft,
+   kein SPI, das er implementiert.
+.. die Benachrichtigung nach dem Speichern als Rückruf in derselben Transaktion,
+   in dem der Host eigene Aktionen ausführt.
+--
++
+Offen dazu:
++
+--
+* Die Bibliothek muss sich einer laufenden Transaktion anschließen (Spring
+  `REQUIRED`, nie `REQUIRES_NEW`).
+* Die PDF-Ablage ist nicht unbedingt transaktional (#60). Rollt die Transaktion
+  des Hosts nach dem Ablegen zurück, bleibt ein verwaistes Dokument. Nach
+  ADR-021 ist das eine Ausnahme; hier wird es zum regulären Fall.
+* Rendering und PDF/A-Prüfung verlängern die Transaktion des Hosts. Muss das PDF
+  vorher erzeugt und in der Transaktion nur noch festgeschrieben werden?
+* Eine gemeinsame Transaktion gibt es nur mit einer eingebetteten Process Engine
+  auf derselben Datenquelle. Bei einer entfernten Engine bleiben dem Host
+  Idempotenz oder ein Outbox-Muster.
+* Berechtigung (`ZumErzeugen`) und Idempotenz (ADR-021) gelten für beide Wege
+  gleich.
+--
 
 Betroffen sind voraussichtlich ADR-002 und ADR-016: Schlüssel und Dateiname
 übergibt der Host nach der Annahme in ADR-016 über die React-Komponenten und
