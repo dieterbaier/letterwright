@@ -15,7 +15,6 @@ public final class Pruefe {
     private Pruefe() {
     }
 
-    /** Der Wert muss vorhanden sein. */
     public static <T> T pflicht(@Nullable T wert, String bezeichnung) {
         if (wert == null) {
             throw new Validierungsfehler(bezeichnung + " fehlt");
@@ -41,7 +40,6 @@ public final class Pruefe {
         return vorhanden;
     }
 
-    /** Die Zahl muss mindestens {@code minimum} sein. */
     public static int mindestens(int wert, int minimum, String bezeichnung) {
         if (wert < minimum) {
             throw new Validierungsfehler(bezeichnung + " muss mindestens " + minimum + " sein, war " + wert);

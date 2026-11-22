@@ -50,7 +50,6 @@ public final class Datenkontext {
         return new Datenkontext(kopiereMap(Pruefe.pflicht(werte, "Die Werte des Datenkontexts"), ""));
     }
 
-    /** Die Werte: unveränderliche, nach Schlüssel sortierte Map aus Texten, Listen und Maps. */
     public Map<String, Object> werte() {
         return werte;
     }

@@ -48,7 +48,6 @@ public final class Standardschreiben {
         return name;
     }
 
-    /** Das zugewiesene Briefpapier. */
     public VorlagenId briefpapier() {
         return briefpapier;
     }
@@ -62,12 +61,10 @@ public final class Standardschreiben {
         return versionen.version(nummer);
     }
 
-    /** Der Entwurf, falls es einen gibt. Es gibt höchstens einen, und er ist die neueste Version. */
     public Optional<Vorlagenversion> entwurf() {
         return versionen.entwurf();
     }
 
-    /** Die veröffentlichte Version mit der höchsten Nummer, falls es eine gibt. */
     public Optional<Vorlagenversion> neuesteVeroeffentlichteVersion() {
         return versionen.neuesteVeroeffentlichte();
     }
@@ -87,7 +84,6 @@ public final class Standardschreiben {
         return mit(versionen.neuerEntwurf(inhalt));
     }
 
-    /** Zieht eine veröffentlichte Version zurück. */
     public Standardschreiben zurueckziehen(Versionsnummer nummer) {
         return mit(versionen.zurueckziehen(nummer));
     }

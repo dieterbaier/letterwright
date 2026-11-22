@@ -22,17 +22,14 @@ public sealed interface Loeschentscheidung {
         return new Gesperrt(grund);
     }
 
-    /** Siehe {@link #hart()}. */
     @ValueObject
     record Hart() implements Loeschentscheidung {
     }
 
-    /** Siehe {@link #logisch()}. */
     @ValueObject
     record Logisch() implements Loeschentscheidung {
     }
 
-    /** Siehe {@link #gesperrt(String)}. */
     @ValueObject
     record Gesperrt(String grund) implements Loeschentscheidung {
 

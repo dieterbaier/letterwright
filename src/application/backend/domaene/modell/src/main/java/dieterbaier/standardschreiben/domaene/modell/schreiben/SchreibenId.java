@@ -16,7 +16,6 @@ public record SchreibenId(UUID wert) {
         Pruefe.pflicht(wert, "Der Wert der SchreibenId");
     }
 
-    /** Vergibt eine neue, zufällige Identität. */
     public static SchreibenId neu() {
         return new SchreibenId(UUID.randomUUID());
     }

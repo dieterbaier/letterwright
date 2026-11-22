@@ -7,6 +7,5 @@ import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 /** Fragt die Löschrichtlinie des Hosts. Implementiert von {@code adapter-host} (ADR-016). */
 public interface Loeschregeln {
 
-    /** Wie das Schreiben gelöscht wird, wenn der Benutzer es löschen will. */
     Loeschentscheidung entscheide(BenutzerKennung benutzer, Schreiben schreiben);
 }

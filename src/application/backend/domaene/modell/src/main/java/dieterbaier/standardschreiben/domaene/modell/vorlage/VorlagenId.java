@@ -16,7 +16,6 @@ public record VorlagenId(UUID wert) {
         Pruefe.pflicht(wert, "Der Wert der VorlagenId");
     }
 
-    /** Vergibt eine neue, zufällige Identität. */
     public static VorlagenId neu() {
         return new VorlagenId(UUID.randomUUID());
     }

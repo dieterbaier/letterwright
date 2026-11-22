@@ -32,7 +32,6 @@ public final class Vorlagenversion {
         }
     }
 
-    /** Stellt eine gespeicherte Version wieder her, etwa beim Laden aus der Persistenz. */
     public static Vorlagenversion wiederherstellen(
             VorlagenId vorlage, Versionsnummer nummer, Vorlagenzustand zustand, String inhalt) {
         return new Vorlagenversion(vorlage, nummer, zustand, inhalt);
