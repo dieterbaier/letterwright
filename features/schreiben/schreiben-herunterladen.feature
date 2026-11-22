@@ -1,6 +1,6 @@
 # language: de
 # Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenHerunterladenTest im Modul usecases-service, ein Test je Szenario,
+# SchreibenabrufTest im Modul usecases-service, ein Test je Szenario,
 # benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
 Funktionalität: Schreiben herunterladen
   Ein Sachbearbeiter lädt das PDF eines gespeicherten Schreibens herunter. Er

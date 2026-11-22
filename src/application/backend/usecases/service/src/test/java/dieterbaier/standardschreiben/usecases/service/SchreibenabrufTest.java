@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * Brücke zu {@code features/schreiben/schreiben-herunterladen.feature}: ein Test je Szenario, benannt nach dem
  * Szenariotitel. Die ausgehenden Ports sind {@link Attrappen}.
  */
-class SchreibenHerunterladenTest {
+class SchreibenabrufTest {
 
     private static final Instant GESPEICHERT = Instant.parse("2026-11-20T09:00:00Z");
     private static final BenutzerKennung ERIKA = new BenutzerKennung("erika");

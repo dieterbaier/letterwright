@@ -1,6 +1,6 @@
 # language: de
 # Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenAuflistenTest im Modul usecases-service, ein Test je Szenario,
+# SchreibenuebersichtTest im Modul usecases-service, ein Test je Szenario,
 # benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
 # Gefiltert, sortiert und gezählt wird im SchreibenRepository; die Attrappe
 # hält dessen Vertrag ein. Den Nachweis für die Datenbank führt der Adapter (#6).

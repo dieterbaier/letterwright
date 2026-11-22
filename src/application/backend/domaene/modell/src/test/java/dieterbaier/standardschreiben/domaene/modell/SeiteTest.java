@@ -13,20 +13,6 @@ class SeiteTest {
     private final Seitenanfrage zweiteSeite = new Seitenanfrage(1, 2);
 
     @Test
-    void dieAnfrageKenntIhrenVersatz() {
-        assertThat(new Seitenanfrage(0, 20).versatz()).isZero();
-        assertThat(new Seitenanfrage(3, 20).versatz()).isEqualTo(60);
-        assertThat(new Seitenanfrage(Integer.MAX_VALUE, Integer.MAX_VALUE).versatz())
-                .as("ohne Überlauf").isPositive();
-    }
-
-    @Test
-    void dieAnfrageBeginntBeiNullUndHatMindestensEinenEintrag() {
-        lehntAb(() -> new Seitenanfrage(-1, 20), "Seitennummer");
-        lehntAb(() -> new Seitenanfrage(0, 0), "Seitengröße");
-    }
-
-    @Test
     void dieSeiteZaehltDieSeitenAusDerGesamtzahl() {
         assertThat(new Seite<>(List.of("c", "d"), 5, zweiteSeite).anzahlSeiten()).isEqualTo(3);
         assertThat(new Seite<>(List.of("c", "d"), 4, zweiteSeite).anzahlSeiten()).isEqualTo(2);

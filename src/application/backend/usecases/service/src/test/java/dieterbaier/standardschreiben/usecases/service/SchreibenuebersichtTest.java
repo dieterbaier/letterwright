@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
  * Brücke zu {@code features/schreiben/schreiben-auflisten.feature}: ein Test je Szenario, benannt nach dem
  * Szenariotitel. Die ausgehenden Ports sind {@link Attrappen}.
  */
-class SchreibenAuflistenTest {
+class SchreibenuebersichtTest {
 
     private static final Instant MONTAG = Instant.parse("2026-11-16T09:00:00Z");
     private static final BenutzerKennung ERIKA = new BenutzerKennung("erika");
