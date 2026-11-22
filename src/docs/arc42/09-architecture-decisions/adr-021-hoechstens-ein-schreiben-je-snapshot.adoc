@@ -2,11 +2,11 @@
 id: ADR-021-hoechstens-ein-schreiben-je-snapshot
 type: ADR
 title: 'Höchstens ein Schreiben je Snapshot'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-22'
-reviewed: false
-summary: 'Die Snapshot-ID ist der Schlüssel gegen doppeltes Speichern: Zu einem Snapshot gibt es höchstens ein Schreiben. Wer dieselbe Vorschau erneut speichert, bekommt das vorhandene Schreiben zurück, auch nach einer verlorenen Antwort. Die Persistenz setzt die Eindeutigkeit atomar durch; die unterlegene Anfrage entfernt ihr PDF. Ein neues Schreiben entsteht nur aus einer neuen Vorschau.'
+reviewed: true
+summary: 'Aus einem Snapshot entsteht höchstens ein Schreiben. Die Domäne verantwortet die Regel: Ein Snapshot ist offen, bis ein Schreiben aus ihm entsteht, dann verbraucht und ohne Datenkontext. Die Persistenz speichert Schreiben und verbrauchten Snapshot atomar und nur bei noch offenem Snapshot. Eine Wiederholung bekommt das vorhandene Schreiben. Bei ungewissem Ausgang wird nichts zurückgenommen. Ein neues Schreiben entsteht nur aus einer neuen Vorschau.'
 derived_from:
 - type: conversation
   description: 'Entscheidung des Owners am 2026-11-22 zu #53: „Snapshot = Schlüssel“; bei geändertem Datenkontext bleibt der Snapshot, eine neue Vorschau ist nötig.'
@@ -23,19 +23,19 @@ tags:
 relations:
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
-  status: proposed
+  status: accepted
   rationale: 'ADR-007 bindet das Speichern an den Snapshot der Vorschau. Dieser ADR legt fest, dass aus einem Snapshot höchstens ein Schreiben entsteht und was ein wiederholtes Speichern zurückgibt.'
-  reviewed: false
+  reviewed: true
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
-  status: proposed
-  rationale: 'Die Persistenz speichert die Snapshot-ID am Schreiben und setzt ihre Eindeutigkeit atomar durch, etwa mit einem Unique Constraint, auf allen unterstützten Datenbanken.'
-  reviewed: false
+  status: accepted
+  rationale: 'Technische Absicherung einer Domänenregel: Die Persistenz speichert Schreiben und verbrauchten Snapshot in einer Transaktion, nur wenn der gespeicherte Snapshot noch offen ist (bedingtes Update), und sichert die Snapshot-ID am Schreiben zusätzlich mit einem Unique Constraint ab, auf allen unterstützten Datenbanken.'
+  reviewed: true
 - type: addresses
   target: QS-008-unveraenderliche-schreiben
-  status: proposed
+  status: accepted
   rationale: 'Ein Retry ersetzt kein gespeichertes Schreiben und legt kein zweites mit abweichendem PDF an; das zuerst gespeicherte bleibt das einzige.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-021-hoechstens-ein-schreiben-je-snapshot]]
@@ -43,35 +43,51 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed) am 2026-11-22.
+Angenommen (accepted) am 2026-11-22.
 
 Der Owner hat die Richtung am 2026-11-22 bei #53 vorgegeben: Die Snapshot-ID ist
-der Schlüssel. Der ADR ist KI-gestützt formuliert und wartet auf das Review.
+der Schlüssel. Der ADR ist KI-gestützt formuliert; der Owner hat ihn und seine
+drei Relationen am selben Tag im Review von PR #64 angenommen, mit der Vorgabe,
+die Regel in der Domäne zu verantworten und den Datenkontext nach dem Speichern
+freizugeben.
 
 === Entscheidung
 
-* **Ein Schreiben kennt seinen Snapshot.** Die Snapshot-ID wird mit dem Schreiben
-  gespeichert. Zu einem Snapshot gibt es höchstens ein Schreiben.
-* **Wiederholtes Speichern ist idempotent.** Speichert der Benutzer denselben
-  Snapshot erneut, nach einem Doppelklick oder einem Retry nach verlorener
-  Antwort, bekommt er das schon gespeicherte Schreiben zurück
-  (`BereitsGespeichert`). Es entsteht kein weiteres PDF.
-* **Der Snapshot bleibt nach dem Speichern bis zu seinem Ablauf.** Nur so findet
-  eine Wiederholung ihn noch und kann den Besitzer prüfen. Nach dem Ablauf
-  verlangt sie eine neue Vorschau.
-* **Gleichzeitiges Speichern.** Die Persistenz speichert ein Schreiben nur, wenn
-  es zum Snapshot noch keines gibt, und tut das atomar. Die unterlegene Anfrage
-  bekommt das Schreiben der anderen zurück und entfernt ihr eigenes, schon
-  abgelegtes PDF.
-* **Reihenfolge.** Erst Snapshot, Besitzer, Ablauf und Berechtigung, dann die
-  Suche nach einem vorhandenen Schreiben. Ein Unberechtigter erfährt so nicht, ob
-  schon gespeichert wurde
+* **Die Domäne verantwortet die Regel.** Ein Snapshot ist *offen*, solange aus
+  ihm kein Schreiben entstanden ist, danach *verbraucht*. `Schreiben.ausSnapshot`
+  nimmt nur einen offenen Snapshot und liefert das neue Schreiben zusammen mit
+  dem verbrauchten Snapshot. Ein verbrauchter Snapshot lässt sich nicht noch
+  einmal verbrauchen. Das ist im Fachmodell ohne Datenbank getestet.
+* **Die Persistenz sichert die Regel technisch ab.** Sie speichert Schreiben und
+  verbrauchten Snapshot in einem Schritt und nur, wenn der gespeicherte Snapshot
+  noch offen ist. Sonst speichert sie nichts und meldet das vorhandene Schreiben.
+  Eine bloße Vorabprüfung genügt nicht, weil gleichzeitige Anfragen beide einen
+  offenen Snapshot lesen.
+* **Ein verbrauchter Snapshot hat keinen Datenkontext mehr.** Er behält, was eine
+  Wiederholung braucht: Besitzer, fachlichen Bezug, Vorlagenversionen (für die
+  Berechtigungsprüfung) und Ablauf. Das Schreiben kennt die Snapshot-ID. Scheitert
+  das Speichern fachlich, bleibt der Snapshot offen mit seinem Datenkontext.
+* **Wiederholtes Speichern ist idempotent.** Nach einem Doppelklick oder einem
+  Retry nach verlorener Antwort bekommt der Benutzer das schon gespeicherte
+  Schreiben zurück (`BereitsGespeichert`), ohne dass der Datenkontext gelesen
+  oder ein PDF erzeugt wird. Die Befristung bleibt: Nach dem Ablauf verlangt auch
+  eine Wiederholung eine neue Vorschau.
+* **Gleichzeitiges Speichern.** Meldet die Persistenz, dass der Snapshot schon
+  verbraucht ist, ist sicher, dass auf das eigene PDF kein Schreiben verweist.
+  Nur dann entfernt die Anfrage ihr PDF und liefert das Schreiben der anderen.
+* **Ungewisser Ausgang.** Wirft die Persistenz eine Ausnahme, ist offen, ob
+  gespeichert wurde. Dann wird nichts zurückgenommen, auch das PDF nicht. Eine
+  Wiederholung klärt den Ausgang.
+* **Reihenfolge.** Erst Snapshot, Besitzer, Ablauf und Berechtigung, dann der
+  Zustand des Snapshots. Ein Unberechtigter erfährt so nicht, ob schon
+  gespeichert wurde
   (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
-  Erst dann liest die Bibliothek den Datenkontext erneut und erzeugt das PDF.
+* **Eine aktualisierte Vorschau** löscht nur einen offenen eigenen Snapshot.
+  Einen verbrauchten lässt sie stehen, damit eine Wiederholung ihn noch findet.
 * **Bewusst neu erzeugen** heißt: neue Vorschau, also neuer Snapshot, also neues
   Schreiben.
-* **Geänderter Datenkontext.** Es entsteht kein PDF, und der Snapshot bleibt, bis
-  eine neue Vorschau ihn ersetzt oder er abläuft.
+* **Geänderter Datenkontext.** Es entsteht kein PDF, und der Snapshot bleibt
+  offen, bis eine neue Vorschau ihn ersetzt oder er abläuft.
 
 === Kontext
 
@@ -97,7 +113,8 @@ Eindeutigkeitsregel in der Datenbank verlangt.
 ==== Option 1: Die Snapshot-ID ist der Schlüssel (gewählt)
 
 Wie oben. Der Snapshot ist ohnehin eindeutig, an den Benutzer gebunden und
-befristet; er taugt als natürlicher Idempotenzschlüssel.
+befristet; er taugt als natürlicher Idempotenzschlüssel. Sein Zustandswechsel
+von offen zu verbraucht macht die Regel zu einer Regel des Fachmodells.
 
 ==== Option 2: Der Snapshot wird beim Speichern verbraucht
 
@@ -132,21 +149,25 @@ s| Summe s| +4 s| +2 s| +2
 ==== Positiv
 
 * Die Oberfläche kann Speichern gefahrlos wiederholen.
-* Die Persistenz braucht nur eine zusätzliche Spalte mit Eindeutigkeitsregel.
+* Die Regel steht im Fachmodell und ist ohne Datenbank prüfbar; die Persistenz
+  setzt sie nur gegen gleichzeitige Zugriffe durch.
+* Nach dem Speichern liegt kein Datenkontext mehr im Snapshot.
 
 ==== Negativ
 
 * Gewinnt eine gleichzeitige Anfrage, wurde ein PDF umsonst erzeugt und geprüft.
   Das ist selten und kostet nur Rechenzeit.
-* Ein Snapshot bleibt nach dem Speichern bis zu 30 Minuten liegen, mit seinem
-  Datenkontext.
-* Scheitert das Entfernen eines unterlegenen PDFs, bleibt ein verwaistes Dokument
-  in der Ablage.
+* Bei ungewissem Ausgang oder wenn das Entfernen eines unterlegenen PDFs scheitert,
+  kann ein verwaistes Dokument in der Ablage bleiben. Das ist der Preis dafür, nie
+  das PDF eines gespeicherten Schreibens zu löschen.
+* Der Zustandswechsel und das Schreiben müssen in einer Transaktion gespeichert
+  werden; Snapshot und Schreiben liegen deshalb in derselben Persistenz.
 
 ==== Neutral oder Folgearbeiten
 
-* #6: Spalte für die Snapshot-ID am Schreiben mit Unique Constraint;
-  `speichereEinmalig` wertet die Verletzung als „schon vorhanden“ aus.
+* #6: Zustand des Snapshots mit bedingtem Update von offen auf verbraucht, Spalte
+  für die Snapshot-ID am Schreiben mit Unique Constraint, beides in einer
+  Transaktion. Der Datenkontext wird beim Verbrauchen entfernt.
 * #10: Die Oberfläche zeigt bei `BereitsGespeichert` denselben Download-Link wie
   bei `Gespeichert`.
 * Ob verwaiste Dokumente aufgeräumt werden müssen, hängt von der Ablage ab (#60).
@@ -173,4 +194,14 @@ include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-traceability.ado
 
 === Review Notes
 
-* Noch kein Review.
+Der Owner hat am 2026-11-22 im Review von PR #64 entschieden:
+
+* ADR-021 und seine drei Relationen sind in der Richtung angenommen.
+* Die Regel „höchstens ein Schreiben je Snapshot“ verantwortet die Domäne als
+  Zustandswechsel. Die Persistenz setzt sie zusätzlich atomar durch; eine bloße
+  Vorabprüfung oder ein Unique Constraint allein genügt nicht.
+* Nach erfolgreichem Speichern wird kein Datenkontext allein für die
+  Wiederholung aufbewahrt. Die Metadaten für die Wiederholung bleiben.
+
+Aus dem Review kam außerdem: Bei ungewissem Ausgang des Speicherns wird das PDF
+nicht entfernt. Der erste Entwurf entfernte es bei jeder Ausnahme.

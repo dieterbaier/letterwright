@@ -64,8 +64,7 @@ Web -> App: Schreiben speichern (Snapshot-ID)
 App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?\nIst er noch nicht abgelaufen?
 App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ZumErzeugen, erneut)
 Host --> App: erlaubt
-App -> Per: Gibt es zum Snapshot schon ein Schreiben?
-Per --> App: nein (sonst: vorhandenes Schreiben zurück)
+App -> App: Snapshot offen? (verbraucht: vorhandenes Schreiben zurück,\nohne Datenkontext und ohne PDF)
 App -> Host: Datenkontext anfragen (erneut)
 Host --> App: Datenkontext (formatiert)
 App -> App: Hash vergleichen: unverändert
@@ -73,7 +72,8 @@ App -> Ren: PDF aus Snapshot erzeugen\n(mit den im Snapshot fixierten Vorlagenve
 Ren --> App: PDF
 App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
 Ren --> App: konform
-App -> Per: PDF ablegen; Schreiben mit SHA-256, Vorlagenversionen\nund Snapshot-ID einmalig speichern
+App -> App: Schreiben aus Snapshot erzeugen; Snapshot wird verbraucht
+App -> Per: PDF ablegen; Schreiben und verbrauchten Snapshot\natomar speichern, nur wenn der Snapshot noch offen ist
 App --> Web: Schreiben-ID
 Web --> UI: 201, Download-Link
 SB -> UI: Download
@@ -92,7 +92,8 @@ ein Unberechtigter bekommt immer „nicht erlaubt“. Ohne Berechtigung oder ohn
 veröffentlichte Version fragt sie den Host nicht nach dem Datenkontext
 (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
 Eine aktualisierte Vorschau legt einen neuen Snapshot an, dessen 30 Minuten neu
-beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört. Einen fremden
+beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört und noch offen
+ist. Einen fremden
 oder unbekannten bisherigen Snapshot übergeht sie, als wäre keiner angegeben. Das
 Verhalten ist in `features/schreiben/vorschau-erzeugen.feature` spezifiziert.
 
@@ -102,17 +103,18 @@ die Bibliothek die Erzeugungsberechtigung **erneut** über den Host. Wurde die
 Berechtigung nach der Vorschau entzogen, wird nicht gespeichert. Ein Snapshot eines
 anderen Benutzers wird wie ein nicht vorhandener behandelt (404).
 
-Zu einem Snapshot gibt es höchstens ein Schreiben
-(xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021]). Speichert der
-Benutzer dieselbe Vorschau erneut, etwa nach einem Doppelklick oder weil die
-Antwort verloren ging, bekommt er das schon gespeicherte Schreiben zurück, ohne
-dass ein weiteres PDF entsteht. Speichern zwei Anfragen gleichzeitig, setzt die
-Persistenz die Eindeutigkeit durch; die unterlegene Anfrage entfernt ihr
-abgelegtes PDF und bekommt das Schreiben der anderen. Ein neues Schreiben
-entsteht nur aus einer neuen Vorschau. Hat sich der Datenkontext geändert,
-entsteht kein PDF; der Snapshot bleibt, bis eine neue Vorschau ihn ersetzt oder
-er abläuft. Ein nicht konformes oder nicht prüfbares PDF wird nicht gespeichert
-(fail-closed). Das Verhalten ist in
+Aus einem Snapshot entsteht höchstens ein Schreiben
+(xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021]). Das Speichern
+verbraucht den Snapshot; danach hält er keinen Datenkontext mehr, nur noch, was
+eine Wiederholung braucht. Speichert der Benutzer dieselbe Vorschau erneut, etwa
+nach einem Doppelklick oder weil die Antwort verloren ging, bekommt er das schon
+gespeicherte Schreiben zurück, ohne dass Daten gelesen oder ein PDF erzeugt wird.
+Speichern zwei Anfragen gleichzeitig, speichert die Persistenz nur die erste; die
+andere entfernt ihr PDF und bekommt das Schreiben der ersten. Bleibt der Ausgang
+ungewiss, wird nichts zurückgenommen. Ein neues Schreiben entsteht nur aus einer
+neuen Vorschau. Hat sich der Datenkontext geändert, entsteht kein PDF; der
+Snapshot bleibt offen, bis eine neue Vorschau ihn ersetzt oder er abläuft. Ein
+nicht konformes oder nicht prüfbares PDF wird nicht gespeichert (fail-closed). Das Verhalten ist in
 `features/schreiben/schreiben-speichern.feature` spezifiziert.
 
 == Gespeichertes Schreiben drucken
