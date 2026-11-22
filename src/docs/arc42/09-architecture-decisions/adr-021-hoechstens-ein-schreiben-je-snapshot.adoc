@@ -1,0 +1,176 @@
+---
+id: ADR-021-hoechstens-ein-schreiben-je-snapshot
+type: ADR
+title: 'Höchstens ein Schreiben je Snapshot'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-22'
+reviewed: false
+summary: 'Die Snapshot-ID ist der Schlüssel gegen doppeltes Speichern: Zu einem Snapshot gibt es höchstens ein Schreiben. Wer dieselbe Vorschau erneut speichert, bekommt das vorhandene Schreiben zurück, auch nach einer verlorenen Antwort. Die Persistenz setzt die Eindeutigkeit atomar durch; die unterlegene Anfrage entfernt ihr PDF. Ein neues Schreiben entsteht nur aus einer neuen Vorschau.'
+derived_from:
+- type: conversation
+  description: 'Entscheidung des Owners am 2026-11-22 zu #53: „Snapshot = Schlüssel“; bei geändertem Datenkontext bleibt der Snapshot, eine neue Vorschau ist nötig.'
+- type: external
+  description: 'Issue #53: Regel für wiederholtes und paralleles Speichern derselben Snapshot-ID, vor dem Persistenzentwurf (#6)'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/53
+- type: external
+  description: 'Issue #10: Wiederholung nach einer verlorenen Antwort durchgängig geprüft'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/10
+tags:
+- decision
+- schreiben
+- persistenz
+relations:
+- type: refines
+  target: ADR-007-versionierung-und-unveraenderlichkeit
+  status: proposed
+  rationale: 'ADR-007 bindet das Speichern an den Snapshot der Vorschau. Dieser ADR legt fest, dass aus einem Snapshot höchstens ein Schreiben entsteht und was ein wiederholtes Speichern zurückgibt.'
+  reviewed: false
+- type: constrains
+  target: ADR-006-datenbankagnostische-persistenz
+  status: proposed
+  rationale: 'Die Persistenz speichert die Snapshot-ID am Schreiben und setzt ihre Eindeutigkeit atomar durch, etwa mit einem Unique Constraint, auf allen unterstützten Datenbanken.'
+  reviewed: false
+- type: addresses
+  target: QS-008-unveraenderliche-schreiben
+  status: proposed
+  rationale: 'Ein Retry ersetzt kein gespeichertes Schreiben und legt kein zweites mit abweichendem PDF an; das zuerst gespeicherte bleibt das einzige.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-021-hoechstens-ein-schreiben-je-snapshot]]
+== ADR-021: Höchstens ein Schreiben je Snapshot
+
+=== Status
+
+Vorgeschlagen (proposed) am 2026-11-22.
+
+Der Owner hat die Richtung am 2026-11-22 bei #53 vorgegeben: Die Snapshot-ID ist
+der Schlüssel. Der ADR ist KI-gestützt formuliert und wartet auf das Review.
+
+=== Entscheidung
+
+* **Ein Schreiben kennt seinen Snapshot.** Die Snapshot-ID wird mit dem Schreiben
+  gespeichert. Zu einem Snapshot gibt es höchstens ein Schreiben.
+* **Wiederholtes Speichern ist idempotent.** Speichert der Benutzer denselben
+  Snapshot erneut, nach einem Doppelklick oder einem Retry nach verlorener
+  Antwort, bekommt er das schon gespeicherte Schreiben zurück
+  (`BereitsGespeichert`). Es entsteht kein weiteres PDF.
+* **Der Snapshot bleibt nach dem Speichern bis zu seinem Ablauf.** Nur so findet
+  eine Wiederholung ihn noch und kann den Besitzer prüfen. Nach dem Ablauf
+  verlangt sie eine neue Vorschau.
+* **Gleichzeitiges Speichern.** Die Persistenz speichert ein Schreiben nur, wenn
+  es zum Snapshot noch keines gibt, und tut das atomar. Die unterlegene Anfrage
+  bekommt das Schreiben der anderen zurück und entfernt ihr eigenes, schon
+  abgelegtes PDF.
+* **Reihenfolge.** Erst Snapshot, Besitzer, Ablauf und Berechtigung, dann die
+  Suche nach einem vorhandenen Schreiben. Ein Unberechtigter erfährt so nicht, ob
+  schon gespeichert wurde
+  (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
+  Erst dann liest die Bibliothek den Datenkontext erneut und erzeugt das PDF.
+* **Bewusst neu erzeugen** heißt: neue Vorschau, also neuer Snapshot, also neues
+  Schreiben.
+* **Geänderter Datenkontext.** Es entsteht kein PDF, und der Snapshot bleibt, bis
+  eine neue Vorschau ihn ersetzt oder er abläuft.
+
+=== Kontext
+
+Speichern ist teuer: Es rendert ein PDF, prüft es auf PDF/A-2b und PDF/UA-1 und
+legt es ab. Ein Doppelklick, ein Retry des Browsers nach einem Timeout oder zwei
+offene Tabs schicken dieselbe Anfrage mehrfach. Ohne Regel entstünden mehrere
+Schreiben zur selben Vorschau, und der Benutzer wüsste nicht, welches gilt. Nach
+einer verlorenen Antwort muss die Wiederholung trotzdem die ID des Schreibens
+liefern, damit die Oberfläche den Download-Link zeigen kann (#10). Die Regel muss
+vor dem Persistenzentwurf (#6) feststehen, weil sie eine Spalte und eine
+Eindeutigkeitsregel in der Datenbank verlangt.
+
+=== Entscheidungstreiber
+
+* Ein Doppelklick oder Retry erzeugt kein zweites Schreiben.
+* Eine Wiederholung nach verlorener Antwort bekommt das Ergebnis des ersten
+  Versuchs.
+* Eine bewusst neue Erzeugung bleibt möglich.
+* Kein zusätzliches Konzept, das Frontend und Persistenz mittragen müssen.
+
+=== Betrachtete Optionen
+
+==== Option 1: Die Snapshot-ID ist der Schlüssel (gewählt)
+
+Wie oben. Der Snapshot ist ohnehin eindeutig, an den Benutzer gebunden und
+befristet; er taugt als natürlicher Idempotenzschlüssel.
+
+==== Option 2: Der Snapshot wird beim Speichern verbraucht
+
+Speichern löscht den Snapshot, ein zweites Speichern findet ihn nicht. Einfach,
+aber eine Wiederholung nach verlorener Antwort bekommt nur „unbekannt“ statt der
+ID des Schreibens. Gleichzeitige Anfragen brauchen trotzdem eine atomare Regel.
+
+==== Option 3: Idempotenzschlüssel des Clients
+
+Das Frontend schickt je Speicherversuch einen Schlüssel, die Bibliothek merkt sich
+Schlüssel und Ergebnis. Flexibel, aber ein weiteres Konzept mit eigener Ablage und
+eigener Lebensdauer, das jeder Aufrufer richtig benutzen muss.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
+Unterstützung. Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Kein zweites Schreiben bei Doppelklick oder Retry | +1 | +1 | +1
+| Wiederholung bekommt das Ergebnis des ersten Versuchs | +1 | -1 | +1
+| Bewusst neue Erzeugung möglich | +1 | +1 | +1
+| Kein zusätzliches Konzept | +1 | +1 | -1
+s| Summe s| +4 s| +2 s| +2
+|===
+
+=== Konsequenzen
+
+==== Positiv
+
+* Die Oberfläche kann Speichern gefahrlos wiederholen.
+* Die Persistenz braucht nur eine zusätzliche Spalte mit Eindeutigkeitsregel.
+
+==== Negativ
+
+* Gewinnt eine gleichzeitige Anfrage, wurde ein PDF umsonst erzeugt und geprüft.
+  Das ist selten und kostet nur Rechenzeit.
+* Ein Snapshot bleibt nach dem Speichern bis zu 30 Minuten liegen, mit seinem
+  Datenkontext.
+* Scheitert das Entfernen eines unterlegenen PDFs, bleibt ein verwaistes Dokument
+  in der Ablage.
+
+==== Neutral oder Folgearbeiten
+
+* #6: Spalte für die Snapshot-ID am Schreiben mit Unique Constraint;
+  `speichereEinmalig` wertet die Verletzung als „schon vorhanden“ aus.
+* #10: Die Oberfläche zeigt bei `BereitsGespeichert` denselben Download-Link wie
+  bei `Gespeichert`.
+* Ob verwaiste Dokumente aufgeräumt werden müssen, hängt von der Ablage ab (#60).
+
+=== Impact
+
+include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+* Noch kein Review.

@@ -61,9 +61,11 @@ participant "adapter-persistenz-jdbc" as Per
 SB -> UI: Speichern
 UI -> Web: POST /schreiben (Snapshot-ID)
 Web -> App: Schreiben speichern (Snapshot-ID)
-App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?
+App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?\nIst er noch nicht abgelaufen?
 App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ZumErzeugen, erneut)
 Host --> App: erlaubt
+App -> Per: Gibt es zum Snapshot schon ein Schreiben?
+Per --> App: nein (sonst: vorhandenes Schreiben zurück)
 App -> Host: Datenkontext anfragen (erneut)
 Host --> App: Datenkontext (formatiert)
 App -> App: Hash vergleichen: unverändert
@@ -71,7 +73,7 @@ App -> Ren: PDF aus Snapshot erzeugen\n(mit den im Snapshot fixierten Vorlagenve
 Ren --> App: PDF
 App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
 Ren --> App: konform
-App -> Per: PDF, SHA-256, Vorlagenversionen speichern
+App -> Per: PDF ablegen; Schreiben mit SHA-256, Vorlagenversionen\nund Snapshot-ID einmalig speichern
 App --> Web: Schreiben-ID
 Web --> UI: 201, Download-Link
 SB -> UI: Download
@@ -99,6 +101,19 @@ Vorlagenversionen (Briefpapier und Standardschreiben) gebunden. Beim Speichern p
 die Bibliothek die Erzeugungsberechtigung **erneut** über den Host. Wurde die
 Berechtigung nach der Vorschau entzogen, wird nicht gespeichert. Ein Snapshot eines
 anderen Benutzers wird wie ein nicht vorhandener behandelt (404).
+
+Zu einem Snapshot gibt es höchstens ein Schreiben
+(xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021]). Speichert der
+Benutzer dieselbe Vorschau erneut, etwa nach einem Doppelklick oder weil die
+Antwort verloren ging, bekommt er das schon gespeicherte Schreiben zurück, ohne
+dass ein weiteres PDF entsteht. Speichern zwei Anfragen gleichzeitig, setzt die
+Persistenz die Eindeutigkeit durch; die unterlegene Anfrage entfernt ihr
+abgelegtes PDF und bekommt das Schreiben der anderen. Ein neues Schreiben
+entsteht nur aus einer neuen Vorschau. Hat sich der Datenkontext geändert,
+entsteht kein PDF; der Snapshot bleibt, bis eine neue Vorschau ihn ersetzt oder
+er abläuft. Ein nicht konformes oder nicht prüfbares PDF wird nicht gespeichert
+(fail-closed). Das Verhalten ist in
+`features/schreiben/schreiben-speichern.feature` spezifiziert.
 
 == Gespeichertes Schreiben drucken
 
