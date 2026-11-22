@@ -26,16 +26,19 @@ actor Sachbearbeiter as SB
 participant "Vorschau (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: PlatzhalterdatenAnbieter" as Host
+participant "Host: Berechtigungspruefung,\nPlatzhalterdatenAnbieter" as Host
 participant "adapter-rendering" as Ren
 SB -> UI: Standardschreiben für Bezug wählen
-UI -> Web: POST /vorschau (Standardschreiben, Bezug)
+UI -> Web: POST /vorschau (Standardschreiben, Bezug,\nggf. bisherige Snapshot-ID)
 Web -> App: Vorschau erzeugen
-App -> Host: Berechtigung und Datenkontext anfragen
+App -> App: Standardschreiben laden; passt sein Bezugstyp zum Bezug?\nNeueste veröffentlichte Versionen von Standardschreiben und Briefpapier
+App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ZumErzeugen)
+Host --> App: erlaubt
+App -> Host: Datenkontext anfragen
 Host --> App: Datenkontext (formatiert)
-App -> Ren: Vorlagenversion + Daten zusammenführen
+App -> Ren: Vorlagenversionen + Daten zusammenführen
 Ren --> App: HTML
-App -> App: Snapshot speichern (läuft nach 30 Minuten ab; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version;\nmit Hash des Datenkontexts). Ersetzter Snapshot wird gelöscht
+App -> App: Snapshot speichern (läuft nach 30 Minuten ab; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version;\nmit Hash des Datenkontexts). Eigenen bisherigen Snapshot löschen
 App --> Web: HTML, Snapshot-ID
 Web --> UI: 200
 UI -> UI: Paged.js paginiert
@@ -58,7 +61,7 @@ SB -> UI: Speichern
 UI -> Web: POST /schreiben (Snapshot-ID)
 Web -> App: Schreiben speichern (Snapshot-ID)
 App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?
-App -> Host: Darf Benutzer für diesen Bezug erzeugen? (erneut)
+App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ZumErzeugen, erneut)
 Host --> App: erlaubt
 App -> Host: Datenkontext anfragen (erneut)
 Host --> App: Datenkontext (formatiert)
@@ -78,6 +81,16 @@ App --> Web: PDF (unverändert)
 Web --> UI: 200, PDF
 @enduml
 ----
+
+Die Vorschau nimmt die neuesten veröffentlichten Versionen von Standardschreiben
+und Briefpapier. Passt der Bezugstyp nicht oder fehlt eine veröffentlichte Version,
+fragt die Bibliothek den Host gar nicht; ohne Berechtigung fragt sie ihn nicht nach
+dem Datenkontext
+(xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
+Eine aktualisierte Vorschau legt einen neuen Snapshot an, dessen 30 Minuten neu
+beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört. Einen fremden
+oder unbekannten bisherigen Snapshot übergeht sie, als wäre keiner angegeben. Das
+Verhalten ist in `features/schreiben/vorschau-erzeugen.feature` spezifiziert.
 
 Der Snapshot ist an den angemeldeten Benutzer, den fachlichen Bezug und beide
 Vorlagenversionen (Briefpapier und Standardschreiben) gebunden. Beim Speichern prüft
