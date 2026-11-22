@@ -18,8 +18,9 @@ import java.time.Clock;
 import java.util.Optional;
 
 /**
- * Prüft erst, was die Bibliothek selbst weiß (Standardschreiben, Bezugstyp, veröffentlichte Versionen), und fragt den
- * Host erst danach: zuerst nach der Berechtigung, nur mit ihr nach dem Datenkontext.
+ * Prüft erst, ob es das Standardschreiben gibt und ob sein Bezugstyp passt, und fragt dann den Host nach der
+ * Berechtigung. Erst mit ihr prüft sie die veröffentlichten Versionen, damit ein Unberechtigter deren Stand nicht
+ * erfährt, und fragt den Datenkontext an (ADR-020).
  */
 public final class Vorschauerzeugung implements VorschauErzeugen {
 
@@ -63,14 +64,14 @@ public final class Vorschauerzeugung implements VorschauErzeugen {
         if (!vorlage.passtZu(bezug)) {
             return new Vorschauergebnis.BezugPasstNicht();
         }
+        if (!berechtigungen.darfErzeugen(benutzer, bezug, vorlage)) {
+            return new Vorschauergebnis.NichtErlaubt();
+        }
         Optional<Vorlagenversion> inhalt = vorlage.neuesteVeroeffentlichteVersion();
         Optional<Vorlagenversion> briefpapier = vorlagen.briefpapier(vorlage.briefpapier())
                 .flatMap(gefunden -> gefunden.neuesteVeroeffentlichteVersion());
         if (inhalt.isEmpty() || briefpapier.isEmpty()) {
             return new Vorschauergebnis.KeineVeroeffentlichteVersion();
-        }
-        if (!berechtigungen.darfErzeugen(benutzer, bezug, vorlage)) {
-            return new Vorschauergebnis.NichtErlaubt();
         }
         var datenkontext = daten.liesDatenkontext(benutzer, bezug, vorlage);
         var snapshot = Snapshot.anlegen(SnapshotId.neu(), benutzer, bezug, briefpapier.get().verweis(),
