@@ -17,7 +17,9 @@ class SeiteTest {
         assertThat(new Seite<>(List.of("c", "d"), 5, zweiteSeite).anzahlSeiten()).isEqualTo(3);
         assertThat(new Seite<>(List.of("c", "d"), 4, zweiteSeite).anzahlSeiten()).isEqualTo(2);
         assertThat(new Seite<>(List.of(), 0, new Seitenanfrage(0, 2)).anzahlSeiten()).isZero();
-        assertThat(new Seite<>(List.of(), 2, zweiteSeite).anzahlSeiten()).as("hinter dem Ende").isEqualTo(1);
+        assertThat(new Seite<>(List.of(), 2, zweiteSeite).anzahlSeiten()).as("direkt hinter dem Ende").isEqualTo(1);
+        assertThat(new Seite<>(List.of(), 3, new Seitenanfrage(2, 2)).anzahlSeiten())
+                .as("weiter hinter dem Ende").isEqualTo(2);
     }
 
     @Test
@@ -37,5 +39,7 @@ class SeiteTest {
         lehntAb(() -> new Seite<>(List.of("c"), 3, null), "Seitenanfrage");
         lehntAb(() -> new Seite<>(List.of("c", "d", "e"), 5, zweiteSeite), "höchstens 2");
         lehntAb(() -> new Seite<>(List.of("c", "d"), 3, zweiteSeite), "Gesamtzahl 3");
+        lehntAb(() -> new Seite<>(List.of("e"), 3, new Seitenanfrage(3, 2)), "Gesamtzahl 3");
+        lehntAb(() -> new Seite<>(List.of(), -1, zweiteSeite), "nicht negativ");
     }
 }

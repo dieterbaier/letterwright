@@ -26,6 +26,11 @@ Funktionalität: Schreiben auflisten
     Dann sieht sie die 2 übrigen Schreiben zum Kunden 4711
     Und die Gesamtzahl ist 2 auf 1 Seite
 
+  Szenario: Eine Seite hinter dem Ende ist leer und zählt die sichtbaren Schreiben
+    Wenn Erika die dritte Seite mit 2 Einträgen zum Kunden 4711 abruft
+    Dann sieht sie keine Schreiben
+    Und die Gesamtzahl ist 3 auf 2 Seiten
+
   Szenario: Ohne Berechtigung zum Ansehen wird nichts gelesen
     Angenommen Erika darf die Schreiben zum Kunden 4711 nicht ansehen
     Wenn Erika die erste Seite mit 2 Einträgen zum Kunden 4711 abruft
