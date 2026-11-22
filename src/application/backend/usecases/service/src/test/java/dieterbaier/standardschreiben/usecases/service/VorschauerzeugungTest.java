@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  * Brücke zu {@code features/schreiben/vorschau-erzeugen.feature}: ein Test je Szenario, benannt nach dem
  * Szenariotitel. Die ausgehenden Ports sind {@link Attrappen}, die festhalten, was gefragt wurde.
  */
-class VorschauErzeugenTest {
+class VorschauerzeugungTest {
 
     private static final Instant JETZT = Instant.parse("2026-11-22T10:00:00Z");
     private static final BenutzerKennung ERIKA = new BenutzerKennung("erika");

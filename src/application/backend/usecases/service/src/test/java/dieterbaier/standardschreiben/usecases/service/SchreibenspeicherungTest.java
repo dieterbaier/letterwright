@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  * Szenariotitel. Die Vorschau entsteht mit dem echten Anwendungsfall, damit Snapshot und Speichern zusammenpassen; die
  * ausgehenden Ports sind {@link Attrappen}.
  */
-class SchreibenSpeichernTest {
+class SchreibenspeicherungTest {
 
     private static final Instant VORSCHAU = Instant.parse("2026-11-22T10:00:00Z");
     private static final BenutzerKennung ERIKA = new BenutzerKennung("erika");
