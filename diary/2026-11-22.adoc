@@ -1,0 +1,112 @@
+= Projekttagebuch 2026-11-22
+
+Neunter Arbeitstag. Zuerst der Code-Stil (#61, aus den TODOs des Owners), danach
+der erste Anwendungsfall in Epic #5 (#52). Rekonstruiert aus Commit-Historie,
+Issues und Pull Requests.
+
+== Was geschah
+
+* **Issue #61 angelegt und PR #62 gemergt** (`3400580` bis `419bc93`):
+** NullAway (JSpecify-Modus) und Error Prone im Build. `RequireExplicitNullMarking`
+   verhindert, dass ein Paket ohne `@NullMarked` das Gate umgeht.
+** Die Aufgabe `pruefeNullVertrag` beweist mit vier Proben, dass das Gate greift.
+** `Aktion` und `Berechtigungsanfrage` sind Sealed Types. Parameterprüfungen
+   außerhalb der Typen sind entfernt, die Javadoc ist auf das Warum reduziert.
+** Die Default-Berechtigungsprüfung nimmt den `AuthenticationTrustResolver` des
+   Hosts.
+** ADR-019 angenommen; ADR-011 hat jetzt das Gate „Linting“. Kapitel 4 hat den
+   Abschnitt Code-Stil.
+** Neuer projektlokaler Skill `skills/code-stil/SKILL.md`.
+** Review mit Ergänzungen: Gate-Umgehung, Grenzen von NullAway, Szenario zum
+   Resolver. Convergence Check: konvergiert.
+* **PR #63 gemergt** (#52, `2766ee2` bis `eb6f3c8`):
+** `Standardschreiben` hat jetzt einen Bezugstyp.
+** Das SPI hat die neue Anfrageart `ZumErzeugen` mit dem Standardschreiben.
+** Anwendungsfall `VorschauErzeugen` mit Ergebnistyp `Vorschauergebnis`, neue
+   Ports `VorlagenRepository`, `Snapshotablage` und `Renderer`.
+** Spezifikation `features/schreiben/vorschau-erzeugen.feature` mit acht
+   Szenarien und Testbrücke.
+** ADR-020 angenommen.
+** Review: P1 (Berechtigung vor Veröffentlichungsstatus) behoben, P2
+   (Convergence Check) nachgetragen. Ergebnis: konvergiert.
+* **Issues:**
+** #5: Die Vertragsfrage ist als beantwortet kommentiert.
+** Folgearbeiten kommentiert: #6 (Persistenz-Ports, Bezugstyp), #7 (Renderer),
+   #9 (Auswahl des Bezugstyps), #10 (REST und Verdrahtung).
+
+== Entscheidungen des Owners
+
+* Die Typen validieren, die Anwendungsfälle nicht. Javadoc nur für das Warum und
+  für den SPI-Vertrag. Die Architekturdoku beschreibt Architektur; Muster stehen
+  in der Lösungsstrategie, mit Verweis auf die Quelle.
+* Die Zusage „nie eine NullPointerException“ gilt an den Grenzen.
+* Die Standardprüfungen von Error Prone bleiben aktiv. Ausnahmen werden einzeln
+  begründet; Error Prone ist das Linting des Backends.
+* Die Kombination aus Standardschreiben und Bezug wird doppelt geprüft:
+  Bezugstyp am Standardschreiben und Standardschreiben in der
+  Berechtigungsanfrage (ADR-020).
+* Die Berechtigung wird vor dem Veröffentlichungsstatus geprüft. Unberechtigte
+  erfahren nicht, ob eine Version veröffentlicht ist.
+* Eine aktualisierte Vorschau ersetzt den eigenen Snapshot, und die Laufzeit
+  beginnt neu. Ein fremder Snapshot wird wie ein nicht vorhandener behandelt.
+* Die Vorschau nutzt die neuesten veröffentlichten Versionen.
+* Fachliche Ablehnungen sind Ergebnistypen, `switch` ohne `default`; technische
+  Fehler bleiben Ausnahmen.
+* Spezifikationen liegen unter `features/<bereich>/`.
+
+== Gelernt
+
+* **Ein Gate braucht einen Nachweis, dass es scheitern kann.** `@NullMarked`
+  allein war Dokumentation. Erst die Proben zeigen, dass NullAway eine Verletzung
+  erkennt, und erst `RequireExplicitNullMarking` schließt die stille Umgehung.
+* **Error Prone fand beim Einführen gleich einen echten Fehler:** einen
+  Referenzvergleich in `Versionsfolge`.
+* **Die Reihenfolge von Prüfungen kann Informationen preisgeben.** Eine Prüfung,
+  die vor der Berechtigung läuft, verrät Unberechtigten Internes. Aufgefallen ist
+  das erst durch die Review-Frage und nicht durch einen Test, weil es kein
+  Szenario dafür gab.
+* **Ein Regressionstest zählt erst, wenn er gegen den alten Code scheitert.** Mit
+  der alten Reihenfolge schlugen die vier neuen bzw. geänderten Tests fehl.
+* **Ein Abdeckungs-Gate je Modul trifft auch Records ohne Logik.** `usecases-in`
+  brauchte einen Test, der die Ergebnisfälle per `switch` unterscheidet.
+
+== Offen
+
+* #53 als Nächstes: Schreiben speichern, mit erneuter Prüfung über `ZumErzeugen`.
+* #6, #7, #10: Adapter und Verdrahtung, damit die Vorschau Ende-zu-Ende läuft.
+* #9: Auswahl der Bezugstypen ohne zusätzliche Host-Schnittstelle.
+* #46: Ort und Form der Features noch nicht entschieden.
+* #55, #60 unverändert offen.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat:
+
+* Toolkit: Skills `clock-in`, `clock-out`, `implement-issue-workflow`,
+  `convergence-check`, `commit-message`, `adr`, `architecture-impact`,
+  `bdd-specification`; projektlokal `skills/code-stil/SKILL.md`.
+* Doku: ADR-011, ADR-018, ADR-019, ADR-020 (selbst erstellt), Kapitel 3, 4, 5,
+  6 (Vorschau, Speichern), 8 (Sicherheit, Fachmodell, Fehlerbehandlung),
+  Kapitel 9 (Kopf), Glossar, `features/eingebaute-berechtigungspruefung.feature`,
+  `doc-005` (Überschriften).
+* GitHub: Issues #5, #11, #46, #52, #61, Liste der offenen Issues; PR #62 und #63
+  mit Reviews, Inline-Kommentaren und Checks; mobile Inbox (Blob `4c334fb…`).
+* Code: `domaene-modell` (Standardschreiben, Snapshot, Versionsverweis,
+  SnapshotId, Briefpapier, Vorlagenversion, Datenkontext), `spi`,
+  `usecases-in`, `usecases-out`, `usecases-service`, `adapter-host`, Starter,
+  `host-vertragstest`, `architekturtests` (ArchitekturRegeln), Build-Logik,
+  JaCoCo-Berichte von `usecases-service` und `usecases-in`.
+* Clock-in und Clock-out: `git status`, `gh pr list`, Branch-Sweep über alle
+  Refs, `progress/domaene-und-host.adoc`, `diary/2026-11-21.adoc`,
+  `git log` der Commits von #61 und #52.
+
+Fehlgeschlagen:
+
+* Der Branch-Sweep scheiterte unter zsh an der Wortaufteilung; mit `bash`
+  wiederholt.
+* `xargs` brach mit „command line too long“ ab; mit einer Schleife wiederholt.
+* zsh `noclobber` verhinderte mehrmals `cat >`; wiederholt mit `>|`.
+* `cp` fragte interaktiv nach (Alias `cp -i`) und stellte eine Datei bei der
+  Gegenprobe nicht wieder her; mit `command cp -f` wiederholt und geprüft.
+* Das Handoff `agent/diary-2026-11-21` im privaten Journal ist noch offen (siehe
+  Clock-out).

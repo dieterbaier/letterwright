@@ -3,8 +3,9 @@
 Das Fachmodell, die Anwendungsfälle und der Vertrag mit der Host-Anwendung, so
 dass ein Host die Bibliothek nur über das SPI einbindet (Epic #5).
 
-*Status:* aktiv seit 2026-11-21. Fachmodell (#51) und SPI-Vertrag (#30) sind
-gemergt. Als Nächstes kommen die Anwendungsfälle.
+*Status:* aktiv seit 2026-11-21. Fachmodell (#51), SPI-Vertrag (#30), Code-Stil
+(#61) und der erste Anwendungsfall „Vorschau erzeugen“ (#52) sind gemergt. Als
+Nächstes kommt „Schreiben speichern“ (#53).
 
 == The plan
 
@@ -19,7 +20,8 @@ SPI hat der Owner darauf verzichtet.
 [options="checklist"]
 * [x] Fachmodell mit DDD-Rollen und Selbstvalidierung (PR #57, ADR-018): #51
 * [x] SPI-Vertrag, `adapter-host`, Default-Berechtigungsprüfung, Pakete je Aggregat (PR #59): #30
-* [ ] Anwendungsfall Vorschau erzeugen: #52
+* [x] Code-Stil: Typen validieren, NullAway und Error Prone (PR #62, ADR-019): #61
+* [x] Anwendungsfall Vorschau erzeugen, Bezugstyp und `ZumErzeugen` (PR #63, ADR-020): #52
 * [ ] Anwendungsfall Schreiben speichern: #53
 * [ ] Anwendungsfälle Schreiben auflisten, herunterladen, löschen: #54
 * [ ] Anwendungsfall Vorlagenversion veröffentlichen, nach Klärung der offenen Frage: #55
@@ -28,10 +30,18 @@ SPI hat der Owner darauf verzichtet.
 
 == Where we are
 
+Die Vorschau ist als Anwendungsfall `VorschauErzeugen` in `usecases-in` und
+`usecases-service` umgesetzt, getestet gegen Attrappen der Ports. Ende-zu-Ende
+läuft sie noch nicht: Die Adapter für `VorlagenRepository`, `Snapshotablage`
+und `Renderer` fehlen (#6, #7), ebenso REST-Endpunkt und Verdrahtung im Starter
+(#10). Fachliche Ablehnungen sind Fälle eines Sealed-Ergebnistyps; #53 folgt
+diesem Muster und fragt die Berechtigung erneut mit `ZumErzeugen`.
+
 `domaene-modell` hat ein Paket je Aggregat (`vorlage`, `snapshot`, `schreiben`)
 und die geteilten Werttypen im Wurzelpaket; ArchUnit hält die Struktur. Der Host
 implementiert `PlatzhalterdatenAnbieter` und `Loeschrichtlinie` (Pflicht) und
-optional `Berechtigungspruefung`. Ein Host mit nur dem Starter sieht beim
+optional `Berechtigungspruefung` mit drei Anfragearten (`ZuVorlagen`,
+`ZuSchreiben`, `ZumErzeugen`). Ein Host mit nur dem Starter sieht beim
 Kompilieren nur das SPI (`host-vertragstest`). Die eingebaute
 Berechtigungsprüfung ist als Feature in `features/` beschrieben.
 
@@ -41,8 +51,10 @@ Berechtigungsprüfung ist als Feature in `features/` beschrieben.
   ältere veröffentlicht, bis sie zurückgezogen werden?
 * #60: Ablage beim Host wäre eine vierte, optionale Schnittstelle; QS-007 erlaubt
   höchstens drei, die der Host implementieren muss.
-* `features/` ist als Ort für Features vorgeschlagen, aber noch nicht als
-  Konvention festgehalten.
+* `features/<bereich>/` wird nach dem Vorschlag in #46 genutzt
+  (`features/schreiben/`), ist aber noch nicht als Konvention entschieden.
+* #9: Wie die Bezugstypen eines Hosts zur Auswahl kommen, ohne neue
+  verpflichtende Host-Schnittstelle (QS-007).
 
 == Checks
 
