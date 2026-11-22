@@ -21,6 +21,7 @@ import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Vorlagenversion;
 import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
 import dieterbaier.standardschreiben.usecases.out.DokumentAblage;
+import dieterbaier.standardschreiben.usecases.out.Ersetzungsausgang;
 import dieterbaier.standardschreiben.usecases.out.Konformitaet;
 import dieterbaier.standardschreiben.usecases.out.KonformitaetsPruefer;
 import dieterbaier.standardschreiben.usecases.out.Loeschregeln;
@@ -69,9 +70,45 @@ final class Attrappen {
             return Optional.ofNullable(standardschreiben.get(id));
         }
 
+        /** Läuft unmittelbar vor dem bedingten Ersetzen, etwa als gleichzeitige Änderung eines anderen Benutzers. */
+        Runnable zuvor = () -> { };
+        int ersetzungen;
+
         @Override
         public Optional<Briefpapier> briefpapier(VorlagenId id) {
             return Optional.ofNullable(briefpapiere.get(id));
+        }
+
+        @Override
+        public Ersetzungsausgang ersetze(Standardschreiben geladen, Standardschreiben geaendert) {
+            zuvor.run();
+            Standardschreiben gespeichert = standardschreiben.get(geladen.id());
+            if (gespeichert == null || !stand(gespeichert.versionen()).equals(stand(geladen.versionen()))) {
+                return new Ersetzungsausgang.Veraltet();
+            }
+            ersetzungen++;
+            ablegen(geaendert);
+            return new Ersetzungsausgang.Ersetzt();
+        }
+
+        @Override
+        public Ersetzungsausgang ersetze(Briefpapier geladen, Briefpapier geaendert) {
+            zuvor.run();
+            Briefpapier gespeichert = briefpapiere.get(geladen.id());
+            if (gespeichert == null || !stand(gespeichert.versionen()).equals(stand(geladen.versionen()))) {
+                return new Ersetzungsausgang.Veraltet();
+            }
+            ersetzungen++;
+            ablegen(geaendert);
+            return new Ersetzungsausgang.Ersetzt();
+        }
+
+        /** Vorlagenversionen sind über ihren Verweis gleich; der Vergleich braucht den ganzen Stand. */
+        private static List<List<Object>> stand(List<Vorlagenversion> versionen) {
+            return versionen.stream()
+                    .map(version -> List.<Object>of(version.verweis(), version.zustand(), version.inhalt(),
+                            version.beispieldaten()))
+                    .toList();
         }
     }
 
@@ -81,11 +118,14 @@ final class Attrappen {
         final List<Standardschreiben> erzeugenAngefragt = new ArrayList<>();
         final List<Erlaubnis> schreibenAktionAngefragt = new ArrayList<>();
         final Set<Erlaubnis> schreibenAktionen = new java.util.HashSet<>();
+        final Set<BenutzerKennung> duerfenVeroeffentlichen = new java.util.HashSet<>();
+        final List<VorlagenAktion> vorlagenAktionAngefragt = new ArrayList<>();
         boolean erlaubt;
         int datenkontextAngefragt;
 
         boolean wurdeGefragt() {
-            return !erzeugenAngefragt.isEmpty() || datenkontextAngefragt > 0 || !schreibenAktionAngefragt.isEmpty();
+            return !erzeugenAngefragt.isEmpty() || datenkontextAngefragt > 0 || !schreibenAktionAngefragt.isEmpty()
+                    || !vorlagenAktionAngefragt.isEmpty();
         }
 
         void erlaube(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
@@ -96,9 +136,11 @@ final class Attrappen {
             schreibenAktionen.remove(new Erlaubnis(benutzer, aktion, bezug));
         }
 
+        /** Erlaubt ist nur das Veröffentlichen, und nur den Benutzern in {@link #duerfenVeroeffentlichen}. */
         @Override
         public boolean darf(BenutzerKennung benutzer, VorlagenAktion aktion) {
-            throw new AssertionError("Vorlagenaktionen gehören nicht zur Vorschau");
+            vorlagenAktionAngefragt.add(aktion);
+            return aktion == VorlagenAktion.VEROEFFENTLICHEN && duerfenVeroeffentlichen.contains(benutzer);
         }
 
         /** Erlaubt ist, was {@link #erlaube} freigegeben hat. */
@@ -142,6 +184,7 @@ final class Attrappen {
 
         int aufrufe;
         int pdfs;
+        final List<Datenkontext> pdfDaten = new ArrayList<>();
 
         @Override
         public String zusammenfuehren(Vorlagenversion briefpapier, Vorlagenversion inhalt, Datenkontext daten) {
@@ -153,7 +196,16 @@ final class Attrappen {
         @Override
         public byte[] erzeugePdf(Vorlagenversion briefpapier, Vorlagenversion inhalt, Datenkontext daten) {
             pdfs++;
+            pdfDaten.add(daten);
             return zusammenfuehren(briefpapier, inhalt, daten).getBytes(StandardCharsets.UTF_8);
+        }
+
+        /** Wie {@link #erzeugePdf}, mit „Beispielinhalt“ an der Stelle des Standardschreibens. */
+        @Override
+        public byte[] erzeugeProbePdf(Vorlagenversion briefpapier, Datenkontext beispieldaten) {
+            pdfs++;
+            pdfDaten.add(beispieldaten);
+            return (briefpapier.inhalt() + "Beispielinhalt").getBytes(StandardCharsets.UTF_8);
         }
     }
 

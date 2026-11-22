@@ -11,4 +11,10 @@ public interface Renderer {
 
     /** Das PDF desselben Inhalts, ohne Konformitätsprüfung; die macht der {@link KonformitaetsPruefer}. */
     byte[] erzeugePdf(Vorlagenversion briefpapier, Vorlagenversion standardschreiben, Datenkontext datenkontext);
+
+    /**
+     * Das Probe-PDF eines Briefpapiers vor dem Veröffentlichen: mit einem eingebauten Beispielinhalt an der Stelle des
+     * Standardschreibens und den Beispieldaten des Briefpapiers (ADR-022). Ohne Konformitätsprüfung.
+     */
+    byte[] erzeugeProbePdf(Vorlagenversion briefpapier, Datenkontext beispieldaten);
 }
