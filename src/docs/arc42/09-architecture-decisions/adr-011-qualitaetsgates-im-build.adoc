@@ -59,6 +59,13 @@ fehlschlägt, wenn eines dieser Gates verletzt ist:
   `jacocoTestCoverageVerification`) und **jedes** Frontend-Paket (Vitest
   `coverage.thresholds`). Generierter Code ist ausgenommen.
 * **ArchUnit**-Regeln für die hexagonale Struktur.
+* **Linting**, im Frontend mit ESLint, im Backend mit Error Prone. Error Prone
+  läuft beim Kompilieren des Produktionscodes mit seinen standardmäßig aktiven
+  Prüfungen, dazu NullAway für den Null-Vertrag
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]). Eine
+  Ausnahme schaltet eine einzelne Prüfung an der kleinsten möglichen Stelle mit
+  `@SuppressWarnings("<Prüfung>")` ab und begründet sie im Kommentar daneben. Eine
+  Prüfung im ganzen Build abzuschalten, entscheidet der Owner.
 * **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1). Geplant: Der Schritt
   kommt mit der Rendering-Pipeline (#7). Heute gibt es ihn in `build.yml` nicht.
 * **axe-core** ohne Verstöße der Stufen *serious* und *critical*.
@@ -71,7 +78,8 @@ Umsetzung (#14): Der Workflow `.github/workflows/build.yml` läuft bei jedem Pul
 Request auf `main` und bei jedem Push auf `main`, mit zwei Jobs:
 
 * *Backend:* `./gradlew build` mit dem validierten Wrapper auf Java 21 (Baseline)
-  und Java 25. Der Build umfasst Tests, das JaCoCo-Gate je Modul und ArchUnit.
+  und Java 25. Der Build umfasst Tests, das JaCoCo-Gate je Modul, ArchUnit und
+  Error Prone mit NullAway.
   Test- und Abdeckungsberichte werden als Artefakt gesichert.
 * *Frontend:* `npm ci`, `npm run lint`, `npm run build` und `npm test` auf
   Node 22.22.2 (Untergrenze aus `engines.node`) sowie den neuesten Versionen der
@@ -162,6 +170,10 @@ include::generated/adr-011-qualitaetsgates-im-build-traceability.adoc[leveloffse
 * Keine.
 
 === Review Notes
+
+Das Linting im Backend mit Error Prone hat der Owner am 2026-11-22 im Review
+von PR #62 als Gate festgelegt: Die standardmäßig aktiven Prüfungen bleiben
+eingeschaltet, Ausnahmen werden einzeln begründet.
 
 Der Owner hat die Gates inhaltlich bestätigt und den ADR am 2026-11-18
 angenommen (Issue #37), mit dem Umfang der Entscheidung oben. Dazu gehört die
