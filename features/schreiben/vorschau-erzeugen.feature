@@ -14,7 +14,7 @@ Funktionalität: Vorschau erzeugen
 
   Grundlage:
     Angenommen das Standardschreiben "Mahnung" gehört zum Bezugstyp "Kunde"
-    Und seine neueste veröffentlichte Version ist 2, und es hat einen Entwurf 3
+    Und seine veröffentlichte Version ist 2, Version 1 ist abgelöst, und es hat einen Entwurf 3
     Und sein Briefpapier hat die veröffentlichte Version 1
     Und der Host liefert zum Kunden 4711 den Datenkontext "name" = "Erika Mustermann GmbH"
 

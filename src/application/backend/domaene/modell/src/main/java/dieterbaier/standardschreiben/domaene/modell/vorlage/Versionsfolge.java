@@ -1,10 +1,12 @@
 package dieterbaier.standardschreiben.domaene.modell.vorlage;
 
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -16,7 +18,11 @@ import java.util.Optional;
  *   <li>Mindestens eine Version; alle gehören zur selben Vorlage.</li>
  *   <li>Die Nummern laufen lückenlos von 1 an, jede gibt es genau einmal.</li>
  *   <li>Höchstens ein Entwurf, und wenn, dann ist er die neueste Version.</li>
+ *   <li>Höchstens eine veröffentlichte Version, und wenn, dann ist sie die neueste freigegebene (ADR-022).</li>
+ *   <li>Eine abgelöste Version hat eine neuere freigegebene Version.</li>
  * </ul>
+ *
+ * <p>Freigegeben heißt: kein Entwurf mehr, also veröffentlicht, abgelöst oder zurückgezogen.
  */
 final class Versionsfolge {
 
@@ -29,7 +35,8 @@ final class Versionsfolge {
     }
 
     static Versionsfolge erste(VorlagenId vorlage, String inhalt) {
-        return new Versionsfolge(vorlage, List.of(Vorlagenversion.entwurf(vorlage, Versionsnummer.ERSTE, inhalt)));
+        return new Versionsfolge(vorlage, List.of(
+                Vorlagenversion.entwurf(vorlage, Versionsnummer.ERSTE, inhalt, Datenkontext.aus(Map.of()))));
     }
 
     static Versionsfolge wiederherstellen(VorlagenId vorlage, List<Vorlagenversion> versionen) {
@@ -39,6 +46,8 @@ final class Versionsfolge {
         }
         List<Vorlagenversion> sortiert = new ArrayList<>(versionen);
         sortiert.sort(Comparator.comparing(Vorlagenversion::nummer));
+        boolean mitEntwurf = sortiert.getLast().zustand() == Vorlagenzustand.ENTWURF;
+        int neuesteFreigegebene = sortiert.size() - (mitEntwurf ? 2 : 1);
         Versionsnummer erwartet = Versionsnummer.ERSTE;
         for (int position = 0; position < sortiert.size(); position++) {
             Vorlagenversion version = sortiert.get(position);
@@ -54,6 +63,14 @@ final class Versionsfolge {
             if (version.zustand() == Vorlagenzustand.ENTWURF && !istNeueste) {
                 throw new Validierungsfehler("Version " + version.nummer().wert()
                         + " ist ein Entwurf, aber nicht die neueste Version");
+            }
+            if (version.zustand() == Vorlagenzustand.VEROEFFENTLICHT && position != neuesteFreigegebene) {
+                throw new Validierungsfehler("Version " + version.nummer().wert() + " ist veröffentlicht, aber nicht "
+                        + "die neueste freigegebene Version; je Vorlage ist höchstens eine veröffentlicht");
+            }
+            if (version.zustand() == Vorlagenzustand.ABGELOEST && position == neuesteFreigegebene) {
+                throw new Validierungsfehler("Version " + version.nummer().wert()
+                        + " ist abgelöst, aber keine neuere Version ist freigegeben");
             }
             erwartet = erwartet.naechste();
         }
@@ -73,23 +90,31 @@ final class Versionsfolge {
         return neueste.zustand() == Vorlagenzustand.ENTWURF ? Optional.of(neueste) : Optional.empty();
     }
 
-    Optional<Vorlagenversion> neuesteVeroeffentlichte() {
-        return versionen.reversed().stream()
+    Optional<Vorlagenversion> veroeffentlichte() {
+        return versionen.stream()
                 .filter(version -> version.zustand() == Vorlagenzustand.VEROEFFENTLICHT)
                 .findFirst();
     }
 
     Versionsfolge aendereEntwurf(String inhalt) {
-        return ersetze(verlangeEntwurf("Ändern").mitInhalt(inhalt));
+        Vorlagenversion entwurf = verlangeEntwurf("Ändern");
+        return ersetze(entwurf.mitInhalt(inhalt, entwurf.beispieldaten()));
+    }
+
+    Versionsfolge aendereEntwurf(String inhalt, Datenkontext beispieldaten) {
+        return ersetze(verlangeEntwurf("Ändern").mitInhalt(inhalt, beispieldaten));
     }
 
     Versionsfolge veroeffentlicheEntwurf() {
         Vorlagenversion entwurf = verlangeEntwurf("Veröffentlichen");
-        if (entwurf.inhalt().isBlank()) {
+        if (!entwurf.istVeroeffentlichbar()) {
             throw new UnzulaessigerZustandswechsel(vorlage,
                     "Ein Entwurf ohne Inhalt kann nicht veröffentlicht werden");
         }
-        return ersetze(entwurf.imZustand(Vorlagenzustand.VEROEFFENTLICHT));
+        Versionsfolge abgeloest = veroeffentlichte()
+                .map(bisherige -> ersetze(bisherige.imZustand(Vorlagenzustand.ABGELOEST)))
+                .orElse(this);
+        return abgeloest.ersetze(entwurf.imZustand(Vorlagenzustand.VEROEFFENTLICHT));
     }
 
     Versionsfolge neuerEntwurf(String inhalt) {
@@ -97,20 +122,16 @@ final class Versionsfolge {
             throw new UnzulaessigerZustandswechsel(vorlage, "Version " + vorhanden.nummer().wert()
                     + " ist schon ein Entwurf; es gibt höchstens einen");
         });
-        Versionsnummer naechste = versionen.getLast().nummer().naechste();
+        Vorlagenversion neueste = versionen.getLast();
         List<Vorlagenversion> neu = new ArrayList<>(versionen);
-        neu.add(Vorlagenversion.entwurf(vorlage, naechste, inhalt));
+        neu.add(Vorlagenversion.entwurf(vorlage, neueste.nummer().naechste(), inhalt, neueste.beispieldaten()));
         return new Versionsfolge(vorlage, neu);
     }
 
-    Versionsfolge zurueckziehen(Versionsnummer nummer) {
-        Vorlagenversion version = version(nummer)
-                .orElseThrow(() -> new Validierungsfehler("Version " + nummer.wert() + " gibt es nicht"));
-        if (version.zustand() != Vorlagenzustand.VEROEFFENTLICHT) {
-            throw new UnzulaessigerZustandswechsel(vorlage, "Version " + nummer.wert() + " ist " + version.zustand()
-                    + "; zurückziehen lässt sich nur eine veröffentlichte Version");
-        }
-        return ersetze(version.imZustand(Vorlagenzustand.ZURUECKGEZOGEN));
+    Versionsfolge zurueckziehen() {
+        Vorlagenversion veroeffentlicht = veroeffentlichte().orElseThrow(() -> new UnzulaessigerZustandswechsel(
+                vorlage, "Zurückziehen braucht eine veröffentlichte Version; es gibt keine"));
+        return ersetze(veroeffentlicht.imZustand(Vorlagenzustand.ZURUECKGEZOGEN));
     }
 
     private Vorlagenversion verlangeEntwurf(String vorgang) {

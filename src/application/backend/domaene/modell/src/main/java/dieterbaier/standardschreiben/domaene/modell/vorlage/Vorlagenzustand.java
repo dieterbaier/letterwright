@@ -9,9 +9,18 @@ public enum Vorlagenzustand {
     /** In Bearbeitung, änderbar, für Sachbearbeiter nicht sichtbar. Je Vorlage gibt es höchstens einen. */
     ENTWURF,
 
-    /** Freigegeben und unveränderlich. */
+    /** Freigegeben und unveränderlich. Neue Schreiben entstehen mit ihr; je Vorlage gibt es höchstens eine (ADR-022). */
     VEROEFFENTLICHT,
 
-    /** Nicht mehr für neue Schreiben verwendbar. Bestehende Schreiben verweisen weiter darauf. */
+    /**
+     * Durch eine neuere veröffentlichte Version ersetzt. Nicht mehr für neue Schreiben verwendbar; bestehende Schreiben
+     * verweisen weiter darauf.
+     */
+    ABGELOEST,
+
+    /**
+     * Ohne Nachfolger zurückgenommen. Nicht mehr für neue Schreiben verwendbar; bestehende Schreiben verweisen weiter
+     * darauf.
+     */
     ZURUECKGEZOGEN
 }

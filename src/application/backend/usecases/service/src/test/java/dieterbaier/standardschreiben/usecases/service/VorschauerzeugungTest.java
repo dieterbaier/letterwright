@@ -39,7 +39,7 @@ class VorschauerzeugungTest {
     private final Attrappen.Renderer renderer = new Attrappen.Renderer();
     private final Vorschauerzeugung vorschau = new Vorschauerzeugung(vorlagen, host, host, renderer, ablage, uhr);
 
-    // Grundlage: "Mahnung" zum Bezugstyp Kunde, veröffentlicht bis Version 2, Entwurf 3; Briefpapier in Version 1;
+    // Grundlage: "Mahnung" zum Bezugstyp Kunde, Version 1 abgelöst, veröffentlicht ist Version 2, Entwurf 3; Briefpapier in Version 1;
     // der Host liefert zum Kunden 4711 den Datenkontext "name" = "Erika Mustermann GmbH".
     private final Briefpapier briefpapier =
             vorlagen.ablegen(Briefpapier.anlegenMitStandardtyp(VorlagenId.neu(), "Standard", "<header/>")
@@ -139,9 +139,9 @@ class VorschauerzeugungTest {
 
     private void ohneVeroeffentlichteVersion(String vorlage) {
         if (vorlage.equals("das Standardschreiben")) {
-            vorlagen.ablegen(mahnung.zurueckziehen(Versionsnummer.ERSTE).zurueckziehen(new Versionsnummer(2)));
+            vorlagen.ablegen(mahnung.zurueckziehen());
         } else {
-            vorlagen.ablegen(briefpapier.zurueckziehen(Versionsnummer.ERSTE));
+            vorlagen.ablegen(briefpapier.zurueckziehen());
         }
     }
 

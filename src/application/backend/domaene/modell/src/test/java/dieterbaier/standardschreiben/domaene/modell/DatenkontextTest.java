@@ -143,6 +143,20 @@ class DatenkontextTest {
     }
 
     @Test
+    void ergaenztUmEinenAnderenDessenWerteVorgehen() {
+        Datenkontext briefpapier = Datenkontext.aus(Map.of("absender", "Muster GmbH", "betreff", "Allgemein"));
+        Datenkontext standardschreiben = Datenkontext.aus(Map.of("betreff", "Mahnung", "betrag", "12,00 €"));
+
+        Datenkontext zusammen = briefpapier.ergaenztUm(standardschreiben);
+
+        assertThat(zusammen).isEqualTo(Datenkontext.aus(
+                Map.of("absender", "Muster GmbH", "betreff", "Mahnung", "betrag", "12,00 €")));
+        assertThat(zusammen.werte()).isUnmodifiable();
+        assertThat(zusammen.pruefsumme()).isEqualTo(Datenkontext.aus(zusammen.werte()).pruefsumme());
+        lehntAb(() -> briefpapier.ergaenztUm(null), "vorrangige Datenkontext");
+    }
+
+    @Test
     void toStringZeigtKeineWerte() {
         assertThat(Datenkontext.aus(KUNDE).toString()).doesNotContain("Erika").contains("pruefsumme=");
     }
