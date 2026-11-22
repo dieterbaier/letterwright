@@ -20,9 +20,10 @@ final class Pflicht {
     }
 
     static String text(@Nullable String text, String bezeichnung) {
-        if (wert(text, bezeichnung).isBlank()) {
+        String vorhanden = wert(text, bezeichnung);
+        if (vorhanden.isBlank()) {
             throw new IllegalArgumentException(bezeichnung + " darf nicht leer sein oder nur aus Leerraum bestehen");
         }
-        return text;
+        return vorhanden;
     }
 }
