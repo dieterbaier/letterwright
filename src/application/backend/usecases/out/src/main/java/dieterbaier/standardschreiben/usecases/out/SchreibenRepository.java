@@ -36,7 +36,8 @@ public interface SchreibenRepository {
     /**
      * Speichert das Schreiben und ersetzt den Snapshot durch den verbrauchten, beides in einem Schritt und nur, wenn der
      * gespeicherte Snapshot noch offen ist. Ist er schon verbraucht, auch durch eine gleichzeitige Anfrage, speichert
-     * es nichts und liefert das vorhandene Schreiben. Gibt es ihn nicht mehr, speichert es ebenfalls nichts.
+     * es nichts und liefert das vorhandene Schreiben, auch ein logisch gelöschtes. Ist dieses inzwischen hart gelöscht,
+     * meldet es das. Gibt es den Snapshot nicht mehr, speichert es ebenfalls nichts.
      *
      * <p>Eine Ausnahme heißt: Ob gespeichert wurde, ist ungewiss. Der Aufrufer darf dann nichts zurücknehmen.
      */

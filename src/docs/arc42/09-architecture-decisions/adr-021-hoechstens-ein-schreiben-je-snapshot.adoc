@@ -92,8 +92,12 @@ freizugeben.
   eine gleichzeitige Anfrage ihn verbrauchen.
 * **Gelöschtes Schreiben.** Ist das Schreiben eines verbrauchten Snapshots
   inzwischen hart oder logisch gelöscht, findet eine Wiederholung nichts mehr und
-  bekommt „Snapshot unbekannt“. Ein verbrauchter Snapshot ohne sichtbares
-  Schreiben ist damit kein defekter Bestand. Das Schreiben wird nicht neu
+  bekommt „Snapshot unbekannt“. Das gilt auch für eine gleichzeitige Anfrage, die
+  den Snapshot noch offen gelesen hat: Meldet die Persistenz ein logisch
+  gelöschtes vorhandenes Schreiben oder ein hart gelöschtes
+  (`SchreibenEntfernt`), entfernt die Anfrage ihr PDF und meldet den Snapshot als
+  unbekannt. Ein verbrauchter Snapshot ohne sichtbares Schreiben ist damit kein
+  defekter Bestand. Das Schreiben wird nicht neu
   erzeugt; dazu braucht es eine neue Vorschau. Ergänzt am 2026-11-22 mit #54.
 * **Bewusst neu erzeugen** heißt: neue Vorschau, also neuer Snapshot, also neues
   Schreiben.

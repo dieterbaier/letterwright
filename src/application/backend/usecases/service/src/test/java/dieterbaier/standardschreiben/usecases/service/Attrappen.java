@@ -327,7 +327,10 @@ final class Attrappen {
                 return new Speicherausgang.SnapshotNichtMehrVorhanden();
             }
             if (aktuell.zustand() instanceof Snapshotzustand.Verbraucht) {
-                return new Speicherausgang.SnapshotBereitsVerbraucht(gespeichert.get(id));
+                Schreiben vorhandenes = gespeichert.get(id);
+                return vorhandenes == null
+                        ? new Speicherausgang.SchreibenEntfernt()
+                        : new Speicherausgang.SnapshotBereitsVerbraucht(vorhandenes);
             }
             gespeichert.put(id, neu.schreiben());
             snapshots.snapshots.put(id, neu.verbrauchterSnapshot());

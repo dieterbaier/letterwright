@@ -121,7 +121,9 @@ neuen Vorschau. Hat sich der Datenkontext geändert, entsteht kein PDF; der
 Snapshot bleibt offen, bis eine neue Vorschau ihn ersetzt oder er abläuft. Ein
 nicht konformes oder nicht prüfbares PDF wird nicht gespeichert (fail-closed). Ist
 das Schreiben inzwischen hart oder logisch gelöscht, findet eine Wiederholung
-nichts mehr und bekommt „Snapshot unbekannt“. Das Verhalten ist in
+nichts mehr und bekommt „Snapshot unbekannt“. Ebenso eine gleichzeitige Anfrage,
+deren Snapshot erst nach dem Löschen als verbraucht erkannt wird; sie entfernt
+ihr PDF. Das Verhalten ist in
 `features/schreiben/schreiben-speichern.feature` spezifiziert.
 
 Herunterladen liefert das PDF nur, wenn seine SHA-256-Prüfsumme der vom Speichern

@@ -127,3 +127,15 @@ Funktionalität: Schreiben speichern
       | Art     |
       | hart    |
       | logisch |
+
+  Szenariogrundriss: Wird das Schreiben einer gleichzeitigen Anfrage gelöscht, bevor diese speichert, wird nichts gespeichert
+    Angenommen eine zweite Anfrage zur selben Vorschau verbraucht den Snapshot, während diese ihr PDF erzeugt
+    Und das Schreiben der zweiten Anfrage wird danach <Art> gelöscht
+    Wenn Erika die Vorschau speichert
+    Dann ist der Snapshot unbekannt
+    Und ihr eigenes PDF ist nicht mehr abgelegt
+
+    Beispiele:
+      | Art     |
+      | hart    |
+      | logisch |

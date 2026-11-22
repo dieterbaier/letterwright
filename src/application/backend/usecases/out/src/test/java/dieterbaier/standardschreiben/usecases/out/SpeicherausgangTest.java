@@ -29,6 +29,7 @@ class SpeicherausgangTest {
         assertThat(new Speicherausgang.SnapshotBereitsVerbraucht(vorhandenes).vorhandenes()).isEqualTo(vorhandenes);
         assertThat(new Speicherausgang.Gespeichert()).isInstanceOf(Speicherausgang.class);
         assertThat(new Speicherausgang.SnapshotNichtMehrVorhanden()).isInstanceOf(Speicherausgang.class);
+        assertThat(new Speicherausgang.SchreibenEntfernt()).isInstanceOf(Speicherausgang.class);
         assertThatThrownBy(() -> new Speicherausgang.SnapshotBereitsVerbraucht(null))
                 .hasMessageContaining("vorhandene Schreiben");
     }
