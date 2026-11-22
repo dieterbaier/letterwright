@@ -7,7 +7,9 @@ import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
@@ -27,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Brücke zu {@code features/schreiben/schreiben-speichern.feature}: ein Test je Szenario, benannt nach dem
@@ -260,12 +264,19 @@ class SchreibenspeicherungTest {
         assertThat(speicherung.speichere(ERIKA, vorschauVonErika)).isInstanceOf(Speicherergebnis.NichtErlaubt.class);
     }
 
-    @Test
-    void einVerbrauchterSnapshotOhneSchreibenIstEinDefekterBestand() {
-        snapshots.speichere(snapshots.lade(vorschauVonErika).orElseThrow().verbraucht());
+    @ParameterizedTest(name = "{0} gelöscht")
+    @ValueSource(strings = {"hart", "logisch"})
+    void istDasSchreibenGeloeschtFindetEineWiederholungDesSpeichernsNichtsMehr(String art) {
+        var gespeichert = (Speicherergebnis.Gespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
+        var richtlinie = new Attrappen.Loeschrichtlinie();
+        richtlinie.entscheidung = art.equals("hart") ? Loeschentscheidung.hart() : Loeschentscheidung.logisch();
+        host.erlaube(ERIKA, SchreibenAktion.LOESCHEN, KUNDE_4711);
+        new Schreibenloeschung(schreiben, host, richtlinie, dokumente, uhr).loesche(ERIKA, gespeichert.schreiben());
 
-        assertThatThrownBy(() -> speicherung.speichere(ERIKA, vorschauVonErika))
-                .isInstanceOf(IllegalStateException.class).hasMessageContaining("kein Schreiben");
+        var erneut = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        assertThat(erneut).isInstanceOf(Speicherergebnis.SnapshotUnbekannt.class);
+        assertThat(renderer.pdfs).as("kein weiteres PDF").isEqualTo(1);
     }
 
     @Test

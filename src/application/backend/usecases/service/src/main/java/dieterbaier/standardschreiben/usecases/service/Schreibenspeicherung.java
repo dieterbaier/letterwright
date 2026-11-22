@@ -77,10 +77,11 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
             return new Speicherergebnis.NichtErlaubt();
         }
         return switch (snapshot.zustand()) {
-            case Snapshotzustand.Verbraucht verbraucht -> new Speicherergebnis.BereitsGespeichert(schreiben
-                    .zuSnapshot(id).orElseThrow(() -> new IllegalStateException(
-                            "Snapshot " + id.wert() + " ist verbraucht, aber kein Schreiben verweist auf ihn"))
-                    .id());
+            // Ist das Schreiben inzwischen gelöscht, gibt es für den Benutzer nichts mehr zu finden.
+            case Snapshotzustand.Verbraucht verbraucht -> schreiben.zuSnapshot(id)
+                    .filter(Schreiben::istSichtbar)
+                    .<Speicherergebnis>map(vorhandenes -> new Speicherergebnis.BereitsGespeichert(vorhandenes.id()))
+                    .orElseGet(Speicherergebnis.SnapshotUnbekannt::new);
             case Snapshotzustand.Offen offen -> speichere(benutzer, snapshot, offen, vorlage, jetzt);
         };
     }

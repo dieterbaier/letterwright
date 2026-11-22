@@ -115,3 +115,15 @@ Funktionalität: Schreiben speichern
     Und Erika erzeugt eine neue Vorschau der "Mahnung" zum Kunden 4711
     Wenn Erika die neue Vorschau speichert
     Dann ist ein zweites Schreiben gespeichert
+
+  Szenariogrundriss: Ist das Schreiben gelöscht, findet eine Wiederholung des Speicherns nichts mehr
+    Angenommen Erika hat die Vorschau bereits gespeichert
+    Und das Schreiben ist danach <Art> gelöscht worden
+    Wenn Erika die Vorschau erneut speichert
+    Dann ist der Snapshot unbekannt
+    Und es wurde kein weiteres PDF erzeugt
+
+    Beispiele:
+      | Art     |
+      | hart    |
+      | logisch |
