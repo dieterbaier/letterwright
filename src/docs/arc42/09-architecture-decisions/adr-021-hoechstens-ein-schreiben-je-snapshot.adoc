@@ -75,6 +75,9 @@ freizugeben.
 * **Gleichzeitiges Speichern.** Meldet die Persistenz, dass der Snapshot schon
   verbraucht ist, ist sicher, dass auf das eigene PDF kein Schreiben verweist.
   Nur dann entfernt die Anfrage ihr PDF und liefert das Schreiben der anderen.
+  Hat eine neue Vorschau den offenen Snapshot inzwischen gelöscht, speichert die
+  Persistenz ebenfalls nichts; die Anfrage entfernt ihr PDF und meldet den
+  Snapshot als unbekannt.
 * **Ungewisser Ausgang.** Wirft die Persistenz eine Ausnahme, ist offen, ob
   gespeichert wurde. Dann wird nichts zurückgenommen, auch das PDF nicht. Eine
   Wiederholung klärt den Ausgang.

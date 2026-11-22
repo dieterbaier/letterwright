@@ -98,6 +98,12 @@ Funktionalität: Schreiben speichern
     Dann bleibt der verbrauchte Snapshot bestehen
     Und eine Wiederholung des Speicherns erhält das gespeicherte Schreiben
 
+  Szenario: Ersetzt eine gleichzeitige Vorschau den Snapshot, wird nichts gespeichert
+    Angenommen Erika ersetzt die Vorschau in einem anderen Tab, während sie speichert
+    Wenn das Speichern den Snapshot verbrauchen will
+    Dann ist der Snapshot unbekannt
+    Und nichts ist gespeichert oder abgelegt
+
   Szenario: Gleichzeitiges Speichern derselben Vorschau ergibt ein Schreiben
     Angenommen eine zweite Anfrage zur selben Vorschau verbraucht den Snapshot, während diese ihr PDF erzeugt
     Wenn Erika die Vorschau speichert
