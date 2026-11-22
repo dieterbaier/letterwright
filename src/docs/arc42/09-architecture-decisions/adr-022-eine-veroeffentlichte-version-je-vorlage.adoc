@@ -2,10 +2,10 @@
 id: ADR-022-eine-veroeffentlichte-version-je-vorlage
 type: ADR
 title: 'Eine veröffentlichte Version je Vorlage, geprüft mit Beispieldaten'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-22'
-reviewed: false
+reviewed: true
 summary: 'Je Briefpapier und Standardschreiben gibt es höchstens eine veröffentlichte Version; neue Schreiben entstehen mit ihr. Eine neu veröffentlichte Version löst die bisherige ab (Zustand abgelöst). Veröffentlicht wird nur, wenn ein Probe-PDF mit den Beispieldaten der Version konform ist. Die Beispieldaten pflegt der Vorlagenverwalter an der Vorlagenversion; sie werden mit ihr unveränderlich.'
 derived_from:
 - type: conversation
@@ -20,29 +20,29 @@ tags:
 relations:
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
-  status: proposed
+  status: accepted
   rationale: 'ADR-007 führt die Zustände Entwurf, veröffentlicht und zurückgezogen ein. Dieser ADR legt fest, dass höchstens eine Version veröffentlicht ist, und ergänzt den Zustand abgelöst.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-005-pdfa-und-barrierefreiheit
-  status: proposed
+  status: accepted
   rationale: 'ADR-005 verlangt beim Veröffentlichen ein geprüftes Probe-PDF mit Beispieldaten. Dieser ADR legt fest, woher die Beispieldaten kommen und mit welchem Gegenstück das Probe-PDF entsteht.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
-  status: proposed
+  status: accepted
   rationale: 'Beantwortet die offene Frage aus ADR-018, ob neben der neuesten veröffentlichten Version weitere gültig sein dürfen: nein; das Aggregat der Vorlage setzt es durch.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
-  status: proposed
+  status: accepted
   rationale: 'Eine Vorlage, deren Probe-PDF nicht PDF/A-2b-konform ist, wird nicht veröffentlicht; der Fehler fällt vor dem ersten Speichern eines Schreibens auf.'
-  reviewed: false
+  reviewed: true
 - type: addresses
   target: QS-002-barrierefreies-pdf
-  status: proposed
+  status: accepted
   rationale: 'Ebenso für PDF/UA-1: Das Probe-PDF wird mit demselben Prüfer geprüft wie jedes gespeicherte Schreiben.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-022-eine-veroeffentlichte-version-je-vorlage]]
@@ -50,10 +50,12 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-22.
 
 Der Owner hat am 2026-11-22 bei #55 die Richtung vorgegeben (siehe Abgeleitet
-aus). Der ADR ist KI-gestützt formuliert und wartet auf das Review.
+aus). Der ADR ist KI-gestützt formuliert; der Owner hat ihn und seine fünf
+Relationen am selben Tag im Review von PR #68 angenommen, nachdem er den
+Prüfzeitpunkt für das Gegenstück entschieden hatte.
 
 === Entscheidung
 
@@ -223,3 +225,6 @@ Briefpapier zählt, wenn es sich während der Prüfung eines Standardschreibens
 Briefpapier beim Ersetzen nicht mit; Entscheidung „Für das Gegenstück zählt der
 Prüfzeitpunkt“ und das Szenario dazu in
 `features/vorlagen/vorlagenversion-veroeffentlichen.feature`.
+
+Danach hat der Owner den ADR und seine fünf Relationen am 2026-11-22 im Review
+von PR #68 angenommen.
