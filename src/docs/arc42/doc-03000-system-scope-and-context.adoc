@@ -49,6 +49,11 @@ Rel(sb, emp, "Versendet Schreiben (außerhalb des Systems)")
 | Spring Security des Hosts | Authentifizierter Benutzer, Rollen | Bibliothek liest
 |===
 
+Voraussetzung beim Host ist Java 21 oder neuer; die Bibliothek wird mit
+`--release 21` gebaut (xref:adr-009-build-monorepo-und-versionen[ADR-009]). Ab
+welcher Spring-Boot-Version der Starter läuft, weist #32 nach. Alle weiteren
+Versionen steuert der Versionskatalog; sie sind keine Architekturentscheidung.
+
 Systemgrenze: Alles innerhalb von *Standardschreiben* liefert die Bibliothek;
 Domänendaten, Identitäten, Datenbank und Betrieb gehören dem Host. Dieselbe Grenze
 zeigt die xref:building-block-view[Bausteinsicht].

@@ -31,3 +31,35 @@ metadata_version: '1.0'
 Vor der Umsetzung klärt ein *Prototyp* die beiden kritischen, offenen Punkte:
 Pflegbarkeit des Vorlagenformats durch Fachanwender und Wiedergabetreue zweier
 Render-Engines.
+
+[[loesungsstrategie-code-stil]]
+== Code-Stil
+
+Die Architektur gibt vor, wie der Code entsteht. Für bekannte Muster verweist sie
+auf die Quelle, statt sie nachzuerzählen:
+
+* *Der Code sagt das Wie, die Dokumentation das Warum* (Robert C. Martin,
+  _Clean Code_). Namen und Signaturen tragen die Bedeutung. Am SPI beschreibt die
+  Javadoc vollständig, wie die Schnittstelle zu benutzen ist, denn sie ist der
+  Vertrag mit dem Host. Im übrigen Code steht sie nur, wo sie einen Grund oder eine
+  Regel erklärt, die die Signatur nicht ausdrücken kann.
+* *Ubiquitous Language* (Eric Evans, _Domain-Driven Design_): Typen und Methoden
+  heißen wie im xref:glossary[Glossar]. Die DDD-Rollen legt
+  xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest.
+* *Statische Fabrikmethoden statt Konstruktoren* (Joshua Bloch, _Effective Java_,
+  Item 1): `anlegen`, `ausSnapshot`, `neu()` und `wiederherstellen` sagen, wofür
+  ein Objekt entsteht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
+* *Illegale Zustände sind nicht darstellbar* (Yaron Minsky, „Make illegal states
+  unrepresentable“): Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit.
+  Sealed Types und Records ersetzen Flags und optionale Felder
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
+* *Validieren, wo der Wert entsteht* (Alexis King, „Parse, don't validate“): Der
+  Typ prüft sich beim Erzeugen. Anwendungsfälle und Adapter vertrauen ihm
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
+* *Null-Vertrag:* Jedes Paket ist `@NullMarked` (JSpecify), NullAway setzt das beim
+  Kompilieren durch. Ein optionales Ergebnis ist ein `Optional`, nie `null`;
+  `Optional` ist kein Feld und kein Parameter
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
+
+Wie ein Agent diese Regeln beim Schreiben von Code anwendet, beschreibt der Skill
+`skills/code-stil/SKILL.md`.
