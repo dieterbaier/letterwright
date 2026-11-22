@@ -20,7 +20,7 @@ final class Testdaten {
     static final FachlicherBezug KUNDE = new FachlicherBezug("Kunde", "4711");
     static final Instant ERSTELLT = Instant.parse("2026-11-21T10:00:00Z");
     static final Standardschreiben MAHNUNG =
-            Standardschreiben.anlegen(VorlagenId.neu(), "Mahnung", VorlagenId.neu(), "Sehr geehrte {{name}}");
+            Standardschreiben.anlegen(VorlagenId.neu(), "Mahnung", VorlagenId.neu(), "Kunde", "Sehr geehrte {{name}}");
     static final Schreiben SCHREIBEN = Schreiben.wiederherstellen(SchreibenId.neu(), KUNDE,
             new Versionsverweis(VorlagenId.neu(), Versionsnummer.ERSTE),
             new Versionsverweis(MAHNUNG.id(), Versionsnummer.ERSTE), new Dokumentverweis("ablage/1.pdf"),
