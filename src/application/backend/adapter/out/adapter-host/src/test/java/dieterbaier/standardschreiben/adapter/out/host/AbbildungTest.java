@@ -7,7 +7,8 @@ import static dieterbaier.standardschreiben.adapter.out.host.Testdaten.SCHREIBEN
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import dieterbaier.standardschreiben.domaene.modell.Aktion;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
@@ -32,13 +33,15 @@ class AbbildungTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Aktion.class)
-    void jedeAktionGehtInBeideRichtungenAufDieGleichnamige(Aktion aktion) {
-        dieterbaier.standardschreiben.spi.Aktion imSpi = Abbildung.zumSpi(aktion);
+    @EnumSource(VorlagenAktion.class)
+    void jedeAktionAnVorlagenGehtAufDieGleichnamige(VorlagenAktion aktion) {
+        assertThat(Abbildung.zumSpi(aktion).name()).isEqualTo(aktion.name());
+    }
 
-        assertThat(imSpi.name()).isEqualTo(aktion.name());
-        assertThat(imSpi.hatBezug()).isEqualTo(aktion.brauchtBezug());
-        assertThat(Abbildung.zurDomaene(imSpi)).isEqualTo(aktion);
+    @ParameterizedTest
+    @EnumSource(SchreibenAktion.class)
+    void jedeAktionAnSchreibenGehtAufDieGleichnamige(SchreibenAktion aktion) {
+        assertThat(Abbildung.zumSpi(aktion).name()).isEqualTo(aktion.name());
     }
 
     static final List<Loeschentscheidung> LOESCHENTSCHEIDUNGEN = List.of(Loeschentscheidung.hart(),
@@ -61,7 +64,10 @@ class AbbildungTest {
 
     @Test
     void beideSeitenKennenDieselbenWerte() {
-        assertThat(namen(dieterbaier.standardschreiben.spi.Aktion.values())).isEqualTo(namen(Aktion.values()));
+        assertThat(namen(dieterbaier.standardschreiben.spi.VorlagenAktion.values()))
+                .isEqualTo(namen(VorlagenAktion.values()));
+        assertThat(namen(dieterbaier.standardschreiben.spi.SchreibenAktion.values()))
+                .isEqualTo(namen(SchreibenAktion.values()));
         assertThat(arten(dieterbaier.standardschreiben.spi.Loeschentscheidung.class))
                 .isEqualTo(arten(Loeschentscheidung.class));
     }

@@ -9,6 +9,8 @@ import dieterbaier.standardschreiben.spi.Datenkontext;
 import dieterbaier.standardschreiben.spi.Loeschentscheidung;
 import dieterbaier.standardschreiben.spi.Loeschrichtlinie;
 import dieterbaier.standardschreiben.spi.PlatzhalterdatenAnbieter;
+import dieterbaier.standardschreiben.spi.SchreibenAktion;
+import dieterbaier.standardschreiben.spi.VorlagenAktion;
 import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
 import dieterbaier.standardschreiben.usecases.out.Loeschregeln;
 import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
@@ -41,8 +43,8 @@ class StandardschreibenAutoKonfigurationTest {
             assertThat(laufend).hasSingleBean(Berechtigungspruefung.class);
             assertThat(laufend).doesNotHaveBean(RollenBerechtigungspruefung.class);
             assertThat(laufend.getBean(Berechtigungen.class)
-                    .darf(new BenutzerKennung("erika"), dieterbaier.standardschreiben.domaene.modell.Aktion
-                            .SCHREIBEN_LOESCHEN, new FachlicherBezug("Kunde", "4711")))
+                    .darf(new BenutzerKennung("erika"), dieterbaier.standardschreiben.domaene.modell.SchreibenAktion
+                            .LOESCHEN, new FachlicherBezug("Kunde", "4711")))
                     .isTrue();
         });
     }
@@ -64,13 +66,15 @@ class StandardschreibenAutoKonfigurationTest {
     @Test
     void dieRollenSindKonfigurierbar() {
         kontext.withUserConfiguration(PflichtSpi.class)
-                .withPropertyValues("standardschreiben.berechtigung.rollen.SCHREIBEN_ERZEUGEN=ROLE_SACHBEARBEITUNG")
+                .withPropertyValues("standardschreiben.berechtigung.rollen.schreiben.ERZEUGEN=ROLE_SACHBEARBEITUNG",
+                        "standardschreiben.berechtigung.rollen.vorlagen.BEARBEITEN=ROLE_REDAKTION")
                 .run(laufend -> {
                     Berechtigungseigenschaften eigenschaften = laufend.getBean(Berechtigungseigenschaften.class);
-                    assertThat(eigenschaften.rolle(dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN))
-                            .isEqualTo("ROLE_SACHBEARBEITUNG");
-                    assertThat(eigenschaften.rolle(dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_LOESCHEN))
-                            .isEqualTo("ROLE_SSW_SCHREIBEN_LOESCHEN");
+                    assertThat(eigenschaften.rolle(SchreibenAktion.ERZEUGEN)).isEqualTo("ROLE_SACHBEARBEITUNG");
+                    assertThat(eigenschaften.rolle(SchreibenAktion.LOESCHEN)).isEqualTo("ROLE_SSW_SCHREIBEN_LOESCHEN");
+                    assertThat(eigenschaften.rolle(VorlagenAktion.BEARBEITEN)).isEqualTo("ROLE_REDAKTION");
+                    assertThat(eigenschaften.rolle(VorlagenAktion.VEROEFFENTLICHEN))
+                            .isEqualTo("ROLE_SSW_VORLAGEN_VEROEFFENTLICHEN");
                 });
     }
 

@@ -9,10 +9,13 @@ import dieterbaier.standardschreiben.spi.PlatzhalterdatenAnbieter;
 import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
 import dieterbaier.standardschreiben.usecases.out.Loeschregeln;
 import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 
 /**
  * Verdrahtet die Bibliothek mit den SPI-Implementierungen des Hosts (ADR-016).
@@ -27,8 +30,10 @@ public class StandardschreibenAutoKonfiguration {
 
     @Bean
     @ConditionalOnMissingBean(Berechtigungspruefung.class)
-    RollenBerechtigungspruefung rollenBerechtigungspruefung(Berechtigungseigenschaften eigenschaften) {
-        return new RollenBerechtigungspruefung(eigenschaften);
+    RollenBerechtigungspruefung rollenBerechtigungspruefung(Berechtigungseigenschaften eigenschaften,
+            ObjectProvider<AuthenticationTrustResolver> vertrauen) {
+        return new RollenBerechtigungspruefung(eigenschaften,
+                vertrauen.getIfAvailable(AuthenticationTrustResolverImpl::new));
     }
 
     @Bean

@@ -1,9 +1,10 @@
 package dieterbaier.standardschreiben.adapter.out.host;
 
-import dieterbaier.standardschreiben.domaene.modell.Aktion;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
@@ -29,25 +30,19 @@ final class Abbildung {
         return new FachlicherBezug(bezug.typ(), bezug.id());
     }
 
-    static dieterbaier.standardschreiben.spi.Aktion zumSpi(Aktion aktion) {
+    static dieterbaier.standardschreiben.spi.VorlagenAktion zumSpi(VorlagenAktion aktion) {
         return switch (aktion) {
-            case VORLAGEN_BEARBEITEN -> dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_BEARBEITEN;
-            case VORLAGEN_VEROEFFENTLICHEN -> dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_VEROEFFENTLICHEN;
-            case SCHREIBEN_ERZEUGEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN;
-            case SCHREIBEN_ANSEHEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ANSEHEN;
-            case SCHREIBEN_HERUNTERLADEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_HERUNTERLADEN;
-            case SCHREIBEN_LOESCHEN -> dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_LOESCHEN;
+            case BEARBEITEN -> dieterbaier.standardschreiben.spi.VorlagenAktion.BEARBEITEN;
+            case VEROEFFENTLICHEN -> dieterbaier.standardschreiben.spi.VorlagenAktion.VEROEFFENTLICHEN;
         };
     }
 
-    static Aktion zurDomaene(dieterbaier.standardschreiben.spi.Aktion aktion) {
+    static dieterbaier.standardschreiben.spi.SchreibenAktion zumSpi(SchreibenAktion aktion) {
         return switch (aktion) {
-            case VORLAGEN_BEARBEITEN -> Aktion.VORLAGEN_BEARBEITEN;
-            case VORLAGEN_VEROEFFENTLICHEN -> Aktion.VORLAGEN_VEROEFFENTLICHEN;
-            case SCHREIBEN_ERZEUGEN -> Aktion.SCHREIBEN_ERZEUGEN;
-            case SCHREIBEN_ANSEHEN -> Aktion.SCHREIBEN_ANSEHEN;
-            case SCHREIBEN_HERUNTERLADEN -> Aktion.SCHREIBEN_HERUNTERLADEN;
-            case SCHREIBEN_LOESCHEN -> Aktion.SCHREIBEN_LOESCHEN;
+            case ERZEUGEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN;
+            case ANSEHEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.ANSEHEN;
+            case HERUNTERLADEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.HERUNTERLADEN;
+            case LOESCHEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.LOESCHEN;
         };
     }
 

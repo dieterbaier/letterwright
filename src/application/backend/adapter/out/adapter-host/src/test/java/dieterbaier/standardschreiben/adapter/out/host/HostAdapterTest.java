@@ -7,13 +7,13 @@ import static dieterbaier.standardschreiben.adapter.out.host.Testdaten.SCHREIBEN
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import dieterbaier.standardschreiben.domaene.modell.Aktion;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.spi.Berechtigungsanfrage;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
 import dieterbaier.standardschreiben.spi.Datenkontext;
 import dieterbaier.standardschreiben.spi.Loeschanfrage;
-import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,37 +49,19 @@ class HostAdapterTest {
         List<Berechtigungsanfrage> anfragen = new ArrayList<>();
         var berechtigungen = new HostBerechtigungen(anfrage -> {
             anfragen.add(anfrage);
-            return anfrage.aktion() == dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN;
+            return anfrage.aktion() == dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN;
         });
 
-        assertThat(berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_ERZEUGEN, KUNDE)).isTrue();
-        assertThat(berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_LOESCHEN, KUNDE)).isFalse();
-        assertThat(berechtigungen.darf(ERIKA, Aktion.VORLAGEN_VEROEFFENTLICHEN)).isFalse();
+        assertThat(berechtigungen.darf(ERIKA, SchreibenAktion.ERZEUGEN, KUNDE)).isTrue();
+        assertThat(berechtigungen.darf(ERIKA, SchreibenAktion.LOESCHEN, KUNDE)).isFalse();
+        assertThat(berechtigungen.darf(ERIKA, VorlagenAktion.VEROEFFENTLICHEN)).isFalse();
         assertThat(anfragen).containsExactly(
-                new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_ERZEUGEN,
+                Berechtigungsanfrage.zuSchreiben("erika", dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN,
                         Abbildung.zumSpi(KUNDE)),
-                new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.SCHREIBEN_LOESCHEN,
+                Berechtigungsanfrage.zuSchreiben("erika", dieterbaier.standardschreiben.spi.SchreibenAktion.LOESCHEN,
                         Abbildung.zumSpi(KUNDE)),
-                new Berechtigungsanfrage("erika", dieterbaier.standardschreiben.spi.Aktion.VORLAGEN_VEROEFFENTLICHEN,
-                        null));
-    }
-
-    @Test
-    void aktionenFuerVorlagenGehenNichtMitBezug() {
-        var berechtigungen = new HostBerechtigungen(anfrage -> true);
-
-        assertThatThrownBy(() -> berechtigungen.darf(ERIKA, Aktion.VORLAGEN_BEARBEITEN, KUNDE))
-                .isInstanceOf(Validierungsfehler.class)
-                .hasMessageContaining("VORLAGEN_BEARBEITEN");
-    }
-
-    @Test
-    void aktionenFuerSchreibenGehenNichtOhneBezug() {
-        var berechtigungen = new HostBerechtigungen(anfrage -> true);
-
-        assertThatThrownBy(() -> berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_ANSEHEN))
-                .isInstanceOf(Validierungsfehler.class)
-                .hasMessageContaining("SCHREIBEN_ANSEHEN");
+                Berechtigungsanfrage.zuVorlagen("erika",
+                        dieterbaier.standardschreiben.spi.VorlagenAktion.VEROEFFENTLICHEN));
     }
 
     @Test
@@ -102,14 +84,6 @@ class HostAdapterTest {
         assertThatThrownBy(() -> regeln.entscheide(ERIKA, SCHREIBEN))
                 .isInstanceOf(HostVertragVerletzt.class)
                 .hasMessageContaining("null");
-    }
-
-    @Test
-    void ohneSpiImplementierungLaesstSichKeinAdapterBauen() {
-        assertThatThrownBy(() -> new HostPlatzhalterdatenquelle(nullVomHost()))
-                .isInstanceOf(Validierungsfehler.class);
-        assertThatThrownBy(() -> new HostBerechtigungen(nullVomHost())).isInstanceOf(Validierungsfehler.class);
-        assertThatThrownBy(() -> new HostLoeschregeln(nullVomHost())).isInstanceOf(Validierungsfehler.class);
     }
 
     /** Ein Host, der sich nicht an den Null-Vertrag hält. */

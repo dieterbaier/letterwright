@@ -1,6 +1,8 @@
 package dieterbaier.standardschreiben.starter;
 
 import dieterbaier.standardschreiben.spi.Aktion;
+import dieterbaier.standardschreiben.spi.SchreibenAktion;
+import dieterbaier.standardschreiben.spi.VorlagenAktion;
 import java.util.EnumMap;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,28 +10,42 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * Rollen der Default-{@link dieterbaier.standardschreiben.spi.Berechtigungspruefung}. Ohne Eintrag gilt für eine Aktion die
- * Authority {@code ROLE_SSW_<AKTION>}, etwa {@code ROLE_SSW_SCHREIBEN_ERZEUGEN}; ein Host vergibt sie in Spring Security mit
+ * Authority {@code ROLE_SSW_VORLAGEN_<AKTION>} oder {@code ROLE_SSW_SCHREIBEN_<AKTION>}, etwa
+ * {@code ROLE_SSW_SCHREIBEN_ERZEUGEN}; ein Host vergibt sie in Spring Security mit
  * {@code roles("SSW_SCHREIBEN_ERZEUGEN")}. Abweichend:
  *
- * <pre>standardschreiben.berechtigung.rollen.SCHREIBEN_ERZEUGEN=ROLE_SACHBEARBEITUNG</pre>
+ * <pre>standardschreiben.berechtigung.rollen.schreiben.ERZEUGEN=ROLE_SACHBEARBEITUNG</pre>
  *
- * @param rollen die Authority je Aktion, wo sie vom Default abweicht
+ * @param vorlagen die Authority je Aktion an Vorlagen, wo sie vom Default abweicht
+ * @param schreiben die Authority je Aktion an Schreiben, wo sie vom Default abweicht
  */
-@ConfigurationProperties("standardschreiben.berechtigung")
-record Berechtigungseigenschaften(@DefaultValue Map<Aktion, String> rollen) {
+@ConfigurationProperties("standardschreiben.berechtigung.rollen")
+record Berechtigungseigenschaften(
+        @DefaultValue Map<VorlagenAktion, String> vorlagen, @DefaultValue Map<SchreibenAktion, String> schreiben) {
+
+    private static final String PRAEFIX = "standardschreiben.berechtigung.rollen.";
 
     Berechtigungseigenschaften {
-        rollen = rollen.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(rollen));
-        rollen.forEach((aktion, rolle) -> {
-            if (rolle.isBlank()) {
-                throw new IllegalArgumentException("standardschreiben.berechtigung.rollen." + aktion
-                        + " darf nicht leer sein");
-            }
-        });
+        vorlagen = geprueft(vorlagen, PRAEFIX + "vorlagen.");
+        schreiben = geprueft(schreiben, PRAEFIX + "schreiben.");
     }
 
     /** Die Authority, die ein Benutzer für die Aktion braucht. */
     String rolle(Aktion aktion) {
-        return rollen.getOrDefault(aktion, "ROLE_SSW_" + aktion.name());
+        return switch (aktion) {
+            case VorlagenAktion vorlagenAktion ->
+                    vorlagen.getOrDefault(vorlagenAktion, "ROLE_SSW_VORLAGEN_" + vorlagenAktion.name());
+            case SchreibenAktion schreibenAktion ->
+                    schreiben.getOrDefault(schreibenAktion, "ROLE_SSW_SCHREIBEN_" + schreibenAktion.name());
+        };
+    }
+
+    private static <A extends Enum<A>> Map<A, String> geprueft(Map<A, String> rollen, String schluessel) {
+        rollen.forEach((aktion, rolle) -> {
+            if (rolle.isBlank()) {
+                throw new IllegalArgumentException(schluessel + aktion.name() + " darf nicht leer sein");
+            }
+        });
+        return rollen.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(rollen));
     }
 }

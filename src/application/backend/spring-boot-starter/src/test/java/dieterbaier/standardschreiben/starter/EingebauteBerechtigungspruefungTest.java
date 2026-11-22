@@ -2,9 +2,9 @@ package dieterbaier.standardschreiben.starter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dieterbaier.standardschreiben.domaene.modell.Aktion;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.spi.Berechtigungspruefung;
 import dieterbaier.standardschreiben.spi.Datenkontext;
 import dieterbaier.standardschreiben.spi.Loeschentscheidung;
@@ -75,7 +75,7 @@ class EingebauteBerechtigungspruefungTest {
 
         // When / Then: Erzeugen ist nicht erlaubt
         ohneEigenePruefung
-                .withPropertyValues("standardschreiben.berechtigung.rollen.SCHREIBEN_ERZEUGEN=ROLE_ANONYMOUS")
+                .withPropertyValues("standardschreiben.berechtigung.rollen.schreiben.ERZEUGEN=ROLE_ANONYMOUS")
                 .run(kontext -> assertThat(darfErikaErzeugen(kontext.getBean(Berechtigungen.class))).isFalse());
     }
 
@@ -97,7 +97,7 @@ class EingebauteBerechtigungspruefungTest {
 
         // When / Then: Erzeugen ist nicht erlaubt
         ohneEigenePruefung
-                .withPropertyValues("standardschreiben.berechtigung.rollen.SCHREIBEN_ERZEUGEN=ROLE_SACHBEARBEITUNG")
+                .withPropertyValues("standardschreiben.berechtigung.rollen.schreiben.ERZEUGEN=ROLE_SACHBEARBEITUNG")
                 .run(kontext -> assertThat(darfErikaErzeugen(kontext.getBean(Berechtigungen.class))).isFalse());
     }
 
@@ -111,7 +111,7 @@ class EingebauteBerechtigungspruefungTest {
     }
 
     private static boolean darfErikaErzeugen(Berechtigungen berechtigungen) {
-        return berechtigungen.darf(ERIKA, Aktion.SCHREIBEN_ERZEUGEN, KUNDE_4711);
+        return berechtigungen.darf(ERIKA, SchreibenAktion.ERZEUGEN, KUNDE_4711);
     }
 
     private static void anmelden(String name, String rolle) {
