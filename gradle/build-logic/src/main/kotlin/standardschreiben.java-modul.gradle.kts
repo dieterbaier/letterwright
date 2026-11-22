@@ -38,9 +38,14 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.named<JavaCompile>("compileJava") {
+    // JSpecify-Modus prüft auch die Nullbarkeit von Typargumenten. Auf JDK 21 braucht er
+    // -XDaddTypeAnnotationsToSymbol=true; neuere JDKs ignorieren die Option.
+    options.compilerArgs.add("-XDaddTypeAnnotationsToSymbol=true")
     options.errorprone {
         check("NullAway", CheckSeverity.ERROR)
+        check("RequireExplicitNullMarking", CheckSeverity.ERROR)
         option("NullAway:OnlyNullMarked", "true")
+        option("NullAway:JSpecifyMode", "true")
     }
 }
 
