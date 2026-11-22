@@ -3,56 +3,55 @@
 Das Fachmodell, die Anwendungsfälle und der Vertrag mit der Host-Anwendung, so
 dass ein Host die Bibliothek nur über das SPI einbindet (Epic #5).
 
-*Status:* aktiv seit 2026-11-21. Fachmodell (#51), SPI-Vertrag (#30), Code-Stil
-(#61) und der erste Anwendungsfall „Vorschau erzeugen“ (#52) sind gemergt. Als
-Nächstes kommt „Schreiben speichern“ (#53).
+*Status:* aktiv seit 2026-11-21. Alle Anwendungsfälle des Epics sind gemergt:
+Vorschau (#52), Speichern (#53), Auflisten, Herunterladen und Löschen (#54),
+Vorlagenversion veröffentlichen und zurückziehen (#55). Offen sind der ADR zur
+Ablage im DMS des Hosts (#60) und der schmale BOM-Export (#32).
 
 == The plan
 
 Das Modell und der Vertrag mit dem Host kamen zuerst, weil jeder Anwendungsfall
-beides braucht. Die Anwendungsfälle folgen dem Weg eines Schreibens: Ohne
-Vorschau gibt es keinen Snapshot, ohne Snapshot kein Speichern, ohne
-gespeicherte Schreiben keine Übersicht. Das Veröffentlichen von Vorlagen ist
-davon unabhängig, braucht aber die Antwort auf die offene Frage in #55. Mit den
-Anwendungsfällen kommen die Gherkin-Szenarien für Endbenutzer; für Modell und
-SPI hat der Owner darauf verzichtet.
+beides braucht. Die Anwendungsfälle folgten dem Weg eines Schreibens: Vorschau,
+Snapshot, Speichern, Übersicht. Das Veröffentlichen von Vorlagen kam nach der
+Entscheidung zur Zahl der veröffentlichten Versionen (ADR-022). Die
+Testkonvention (#65) kam dazwischen, bevor mehr Code entstand.
 
 [options="checklist"]
 * [x] Fachmodell mit DDD-Rollen und Selbstvalidierung (PR #57, ADR-018): #51
 * [x] SPI-Vertrag, `adapter-host`, Default-Berechtigungsprüfung, Pakete je Aggregat (PR #59): #30
 * [x] Code-Stil: Typen validieren, NullAway und Error Prone (PR #62, ADR-019): #61
 * [x] Anwendungsfall Vorschau erzeugen, Bezugstyp und `ZumErzeugen` (PR #63, ADR-020): #52
-* [ ] Anwendungsfall Schreiben speichern: #53
-* [ ] Anwendungsfälle Schreiben auflisten, herunterladen, löschen: #54
-* [ ] Anwendungsfall Vorlagenversion veröffentlichen, nach Klärung der offenen Frage: #55
+* [x] Anwendungsfall Schreiben speichern (PR #64, ADR-021): #53
+* [x] Eine Testklasse je Produktionsklasse (PR #67): #65
+* [x] Anwendungsfälle Schreiben auflisten, herunterladen, löschen (PR #66): #54
+* [x] Anwendungsfälle Vorlagenversion veröffentlichen und zurückziehen (PR #68, ADR-022): #55
 * [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60
 * [ ] Spring-Boot-BOM schmal exportieren: #32
 
 == Where we are
 
-Die Vorschau ist als Anwendungsfall `VorschauErzeugen` in `usecases-in` und
-`usecases-service` umgesetzt, getestet gegen Attrappen der Ports. Ende-zu-Ende
-läuft sie noch nicht: Die Adapter für `VorlagenRepository`, `Snapshotablage`
-und `Renderer` fehlen (#6, #7), ebenso REST-Endpunkt und Verdrahtung im Starter
-(#10). Fachliche Ablehnungen sind Fälle eines Sealed-Ergebnistyps; #53 folgt
-diesem Muster und fragt die Berechtigung erneut mit `ZumErzeugen`.
+Sieben Anwendungsfälle liegen in `usecases-in` und `usecases-service`, je mit
+Gherkin-Spezifikation unter `features/schreiben/` bzw. `features/vorlagen/` und
+einer gleichnamigen Testklasse als Brücke. Getestet wird gegen Attrappen der
+Ports. Ende-zu-Ende läuft noch nichts: Persistenz (#6), Rendering mit
+Konformitätsprüfung (#7) sowie REST und Verdrahtung im Starter (#10) fehlen.
 
-`domaene-modell` hat ein Paket je Aggregat (`vorlage`, `snapshot`, `schreiben`)
-und die geteilten Werttypen im Wurzelpaket; ArchUnit hält die Struktur. Der Host
-implementiert `PlatzhalterdatenAnbieter` und `Loeschrichtlinie` (Pflicht) und
-optional `Berechtigungspruefung` mit drei Anfragearten (`ZuVorlagen`,
-`ZuSchreiben`, `ZumErzeugen`). Ein Host mit nur dem Starter sieht beim
-Kompilieren nur das SPI (`host-vertragstest`). Die eingebaute
-Berechtigungsprüfung ist als Feature in `features/` beschrieben.
+Die Ports tragen Verträge, die die Adapter einlösen müssen; sie sind in den
+Issues kommentiert. #6: atomares Speichern mit verbrauchtem Snapshot und den
+Ausgängen von `Speicherausgang` (ADR-021), Filtern vor dem Paginieren (QS-009),
+Beispieldaten je Vorlagenversion und bedingtes Ersetzen von Vorlagen (ADR-022).
+#7: `erzeugeProbePdf` mit eingebautem Beispielinhalt.
+
+Fachliche Ablehnungen sind Fälle von Sealed-Ergebnistypen; technische Fehler
+bleiben Ausnahmen. Die Testkonvention steht in Kapitel 4 und im Skill
+`code-stil`.
 
 == Open in this topic
 
-* #55: Gibt es je Vorlage höchstens eine veröffentlichte Version, oder bleiben
-  ältere veröffentlicht, bis sie zurückgezogen werden?
 * #60: Ablage beim Host wäre eine vierte, optionale Schnittstelle; QS-007 erlaubt
   höchstens drei, die der Host implementieren muss.
-* `features/<bereich>/` wird nach dem Vorschlag in #46 genutzt
-  (`features/schreiben/`), ist aber noch nicht als Konvention entschieden.
+* `features/<bereich>/` wird nach dem Vorschlag in #46 genutzt, ist aber noch
+  nicht als Konvention entschieden.
 * #9: Wie die Bezugstypen eines Hosts zur Auswahl kommen, ohne neue
   verpflichtende Host-Schnittstelle (QS-007).
 
