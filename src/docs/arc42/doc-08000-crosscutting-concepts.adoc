@@ -33,11 +33,13 @@ metadata_version: '1.0'
 
 Authentifizierung und Autorisierung kommen aus der Spring Security des Hosts. Die
 Bibliothek fragt für jede Aktion die `Berechtigungspruefung` des SPI
-(xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Aktionen sind
-`VORLAGEN_BEARBEITEN`, `VORLAGEN_VEROEFFENTLICHEN`, `SCHREIBEN_ERZEUGEN`,
-`SCHREIBEN_ANSEHEN`, `SCHREIBEN_HERUNTERLADEN` und `SCHREIBEN_LOESCHEN`. Die
-Aktionen für Schreiben beziehen sich auf einen fachlichen Bezug, die für Vorlagen
-nicht. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
+(xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Es gibt zwei Arten von
+Aktionen, und ihr Typ sagt, ob sie einen fachlichen Bezug haben
+(xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]):
+`VorlagenAktion` (`BEARBEITEN`, `VEROEFFENTLICHEN`) ohne Bezug und
+`SchreibenAktion` (`ERZEUGEN`, `ANSEHEN`, `HERUNTERLADEN`, `LOESCHEN`) mit genau
+einem. Ebenso ist die `Berechtigungsanfrage` entweder `ZuVorlagen` oder
+`ZuSchreiben`; nur die zweite trägt einen Bezug. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
 Vier-Augen-Prinzip abbilden kann: Was veröffentlicht ist, geht in alle neuen
 Schreiben ein. Zurückziehen gehört zum Veröffentlichen; Vorlagen löschen gibt es
 nicht, weil Versionen unveränderlich sind
@@ -45,12 +47,15 @@ nicht, weil Versionen unveränderlich sind
 
 Stellt der Host keine eigene `Berechtigungspruefung` bereit, gilt die
 Default-Implementierung des Starters. Sie erlaubt eine Aktion, wenn der angemeldete
-Benutzer der angefragte ist und die Authority `ROLE_SSW_<AKTION>` hat, etwa
-`ROLE_SSW_SCHREIBEN_ERZEUGEN` (in Spring Security `roles("SSW_SCHREIBEN_ERZEUGEN")`).
-Abweichende Authorities setzt der Host mit
-`standardschreiben.berechtigung.rollen.<AKTION>`. Ein anonymer Zugriff zählt nicht als
-Anmeldung, auch wenn Spring Security ihn als authentifiziert führt und seine
-Authority (`ROLE_ANONYMOUS`) auf eine Aktion abgebildet ist. Den fachlichen Bezug wertet die
+Benutzer der angefragte ist und die Authority `ROLE_SSW_VORLAGEN_<AKTION>` bzw.
+`ROLE_SSW_SCHREIBEN_<AKTION>` hat, etwa `ROLE_SSW_SCHREIBEN_ERZEUGEN` (in Spring
+Security `roles("SSW_SCHREIBEN_ERZEUGEN")`). Abweichende Authorities setzt der Host
+mit `standardschreiben.berechtigung.rollen.vorlagen.<AKTION>` und
+`standardschreiben.berechtigung.rollen.schreiben.<AKTION>`. Ein anonymer Zugriff
+zählt nicht als Anmeldung, auch wenn Spring Security ihn als authentifiziert führt
+und seine Authority (`ROLE_ANONYMOUS`) auf eine Aktion abgebildet ist. Was anonym
+ist, entscheidet ein `AuthenticationTrustResolver` des Hosts, wenn er einen als
+Bean bereitstellt, sonst der von Spring Security. Den fachlichen Bezug wertet die
 Default-Implementierung nicht aus. Wer Schreiben nach Bezug sichtbar machen will
 (Q-PO-003), stellt eine eigene Bean bereit; dann tritt die Default-Implementierung
 zurück.
@@ -106,10 +111,12 @@ xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
   Identität. Value Objects sind Records, Enums oder unveränderliche Klassen mit
   Wertgleichheit.
 * **Unveränderlich.** Jeder Zustandswechsel liefert eine neue Instanz.
-* **Selbstvalidierung.** Der Konstruktor prüft jedes Pflichtattribut mit
-  `Pruefe` aus dem Modul `validierung`. Fehlende oder ungültige Werte ergeben
-  `Validierungsfehler` mit dem Attributnamen, fachlich verbotene Schritte
-  `UnzulaessigerZustandswechsel`.
+* **Selbstvalidierung.** Der Konstruktor oder die Fabrikmethode prüft jedes
+  Pflichtattribut mit `Pruefe` aus dem Modul `validierung`. Fehlende oder
+  ungültige Werte ergeben `Validierungsfehler` mit dem Attributnamen, fachlich
+  verbotene Schritte `UnzulaessigerZustandswechsel`. Nur der Typ prüft:
+  Abfragemethoden, Anwendungsfälle und Adapter prüfen ihre Parameter nicht
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
 * **Erzeugen und Wiederherstellen.** Fabrikmethoden wie `anlegen` erzeugen neue
   Objekte, `wiederherstellen` stellt gespeicherte her. Beide prüfen alle Regeln.
 * **Zeit.** Das Modell liest keine Uhr. Methoden, die eine Zeit brauchen,
@@ -123,7 +130,7 @@ xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
   so paketintern. Was nur ein Aggregat braucht, liegt in dessen Paket und ist dort
   so weit wie möglich gekapselt. Die Werttypen, die mehrere Aggregate und die
   Ports teilen (`BenutzerKennung`, `FachlicherBezug`, `Datenkontext`, `Pruefsumme`,
-  `Aktion`), liegen im Wurzelpaket `domaene.modell`. Eine weitere Unterteilung nach
+  `Aktion` mit `VorlagenAktion` und `SchreibenAktion`), liegen im Wurzelpaket `domaene.modell`. Eine weitere Unterteilung nach
   Rollen (Entitäten, Value Objects) gibt es nicht, und kein Aggregat bekommt ein
   eigenes Gradle-Modul (Owner, 2026-11-21). ArchUnit prüft, dass die Aggregatpakete
   keinen Zyklus bilden und das Wurzelpaket keines von ihnen kennt.

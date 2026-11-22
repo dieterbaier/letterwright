@@ -1,0 +1,201 @@
+---
+id: ADR-019-validierung-in-den-typen-und-null-vertrag
+type: ADR
+title: 'Wo validiert wird und wie der Null-Vertrag durchgesetzt wird'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-22'
+reviewed: false
+summary: 'Nur die Typen validieren, beim Erzeugen. Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht. Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit. NullAway setzt den Null-Vertrag aus @NullMarked beim Kompilieren durch; ein optionales Ergebnis ist ein Optional.'
+derived_from:
+- type: conversation
+  description: 'TODOs und Gespräch mit dem Owner am 2026-11-22 nach PR #59 (#30): „Die Typen sollen validieren. Usecases brauchen nicht.“'
+- type: external
+  description: 'Issue #61: Typen validieren, Anwendungsfälle nicht'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/61
+tags:
+- decision
+- domaene
+- validierung
+- code-stil
+relations:
+- type: refines
+  target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
+  status: proposed
+  rationale: 'ADR-018 legt fest, dass jeder Typ seine Pflichtattribute prüft und nie eine NullPointerException entsteht. Dieser ADR legt fest, dass nur die Typen prüfen, und beschränkt die Zusage zur NullPointerException auf die Grenze: Typen beim Erzeugen und Werte, die der Host liefert.'
+  reviewed: false
+- type: refines
+  target: ADR-016-schnittstelle-zur-host-anwendung
+  status: proposed
+  rationale: 'Die SPI-Typen drücken über Sealed Types aus, ob eine Aktion einen fachlichen Bezug hat. Der Host unterscheidet die Anfragen per switch statt über ein optionales Feld.'
+  reviewed: false
+- type: refines
+  target: ADR-011-qualitaetsgates-im-build
+  status: proposed
+  rationale: 'NullAway kommt als weiteres Gate in den Build: Eine Verletzung des Null-Vertrags im Produktionscode bricht die Kompilierung ab.'
+  reviewed: false
+- type: addresses
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Der Host sieht an der Signatur, welche Anfrage einen fachlichen Bezug trägt, und der Compiler prüft, dass er beide Arten behandelt.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-019-validierung-in-den-typen-und-null-vertrag]]
+== ADR-019: Wo validiert wird und wie der Null-Vertrag durchgesetzt wird
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Der Owner hat die Richtung am 2026-11-22 vorgegeben: „Die Typen sollen
+validieren. Usecases brauchen nicht.“ Der ADR ist KI-gestützt formuliert und
+wartet auf das Review in dem Pull Request zu #61.
+
+=== Entscheidung
+
+Wir schlagen vor:
+
+* **Nur die Typen validieren.** Value Objects, Aggregate, Entitäten und die
+  Datentypen des SPI prüfen ihre Pflichtattribute im Konstruktor oder in der
+  Fabrikmethode (wie in
+  xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
+  Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht.
+* **Illegale Zustände sind nicht darstellbar.** Was ein Typ ausdrücken kann, prüft
+  niemand zur Laufzeit und erklärt keine Javadoc. Statt eines Flags oder eines
+  optionalen Felds gibt es eigene Typen. Erstes Beispiel: `VorlagenAktion` und
+  `SchreibenAktion` statt `Aktion` mit `brauchtBezug`, und im SPI die
+  `Berechtigungsanfrage` als Sealed Type mit `ZuVorlagen` und `ZuSchreiben`.
+* **Null-Vertrag beim Kompilieren.** Jedes Paket ist `@NullMarked` (JSpecify).
+  NullAway prüft das beim Kompilieren des Produktionscodes; eine Verletzung bricht
+  den Build ab. Tests sind ausgenommen, weil sie absichtlich `null` übergeben, um
+  die Selbstvalidierung der Typen zu prüfen.
+* **Optionale Ergebnisse.** Kein Rückgabewert ist `null`. Ein Ergebnis, das fehlen
+  darf, ist ein `Optional`. `Optional` ist kein Feld und kein Parameter.
+* **Die Grenze bleibt geprüft.** Die Zusage aus ADR-018 „nie eine
+  `NullPointerException`“ gilt an der Grenze: beim Erzeugen eines Typs und für
+  Werte, die der Host liefert. Liefert eine SPI-Implementierung `null`, meldet
+  `adapter-host` weiter `HostVertragVerletzt`. Wer eine interne Signatur falsch
+  benutzt, bekommt eine `NullPointerException`; NullAway verhindert das im
+  Produktionscode.
+
+=== Kontext
+
+ADR-018 verlangt, dass jeder Typ seine Pflichtattribute prüft. Der Code nach
+PR #59 prüfte darüber hinaus Parameter in Adaptern und Abfragemethoden, etwa
+`Pruefe.pflicht(benutzer, …)` in `HostBerechtigungen` oder in
+`Snapshot.istAbgelaufen`. Diese Prüfungen wiederholen, was die Typen schon
+sichern, und machen die Signaturen unklarer statt klarer.
+
+`Aktion` trug ein Flag, ob sie einen fachlichen Bezug hat. Jeder Aufrufer musste
+es zur Laufzeit prüfen und die Prüfung in Javadoc und `@throws` dokumentieren;
+das SPI führte den Bezug als `@Nullable`.
+
+Die Pakete waren schon `@NullMarked`, aber nichts setzte das durch. Die
+Annotation war Dokumentation.
+
+=== Entscheidungstreiber
+
+* Fehler so früh wie möglich, am besten beim Kompilieren.
+* Die Signatur sagt, was gebraucht wird; Code und Javadoc wiederholen es nicht.
+* Verständliche Meldungen dort, wo fremde Werte hereinkommen.
+* Wenig zusätzlicher Aufwand im Build.
+
+=== Betrachtete Optionen
+
+==== Option 1: Jeder prüft seine Parameter
+
+Wie bisher: Typen, Adapter, Anwendungsfälle und Abfragen prüfen jeden Parameter
+zur Laufzeit. Überall verständliche Meldungen, aber dieselbe Prüfung an vielen
+Stellen, und ein Fehler fällt erst beim Aufruf auf.
+
+==== Option 2: Typen prüfen, NullAway sichert den Rest (gewählt)
+
+Nur die Typen prüfen beim Erzeugen. Für alles andere sorgt der Compiler: NullAway
+für `null`, Sealed Types für die Fallunterscheidung. Ein zusätzliches
+Compiler-Plugin im Build.
+
+==== Option 3: Typen prüfen, sonst nur Konvention
+
+Nur die Typen prüfen. `@NullMarked` bleibt Dokumentation, nichts setzt es durch.
+Kein zusätzliches Werkzeug, aber ein Fehler im Inneren fällt erst als
+`NullPointerException` ohne Attributnamen auf, irgendwo nach seiner Ursache.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
+Unterstützung. Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3
+| Fehler früh erkannt | 0 | +1 | -1
+| Signatur statt Wiederholung | -1 | +1 | +1
+| Verständliche Meldung an der Grenze | +1 | +1 | +1
+| Wenig Aufwand im Build | +1 | -1 | +1
+s| Summe s| +1 s| +2 s| +2
+|===
+
+Option 2 und 3 haben dieselbe Summe. Den Ausschlag gibt der Owner-Grundsatz „fail
+fast über den Compiler“: Ohne Werkzeug wäre der Verzicht auf Prüfungen im Inneren
+nur ein Versprechen.
+
+=== Konsequenzen
+
+==== Positiv
+
+* Anwendungsfälle und Adapter enthalten nur ihre Logik. Wer eine Signatur liest,
+  sieht, was gebraucht wird.
+* Ein Host sieht an der `Berechtigungsanfrage`, ob ein Bezug dabei ist, und der
+  Compiler prüft, dass er beide Arten behandelt.
+* `null` an einer Stelle, die es nicht erlaubt, fällt beim Kompilieren auf und
+  nicht erst im Betrieb.
+* Error Prone läuft mit seinen Standardprüfungen mit und hat beim Einführen
+  bereits einen Referenzvergleich in `Versionsfolge` gefunden.
+
+==== Negativ
+
+* Zwei Werkzeuge mehr im Build (Error Prone, NullAway), die bei Updates von JDK
+  und Gradle mitzuprüfen sind.
+* Die SPI-Änderung bricht jeden Host, der gegen die alte `Aktion` kompiliert hat.
+  Vor dem ersten Release betrifft das nur die Tests der Bibliothek.
+* Die Rollen-Properties des Starters heißen jetzt
+  `standardschreiben.berechtigung.rollen.vorlagen.<AKTION>` und
+  `….rollen.schreiben.<AKTION>`. Die Default-Authorities behalten ihre Namen.
+
+==== Neutral oder Folgearbeiten
+
+* Neue Fallunterscheidungen in Modell und SPI werden zuerst als Typ entworfen,
+  nicht als Flag.
+* Wie ein Agent die Regeln beim Schreiben von Code anwendet, beschreibt der Skill
+  `skills/code-stil/SKILL.md`; die Lösungsstrategie fasst den Code-Stil zusammen.
+
+=== Impact
+
+include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-traceability.adoc[leveloffset=+2]
+
+=== Open Questions
+
+* Keine.
+
+=== Review Notes
+
+Vor der Annahme zu bestätigen:
+
+* die vier Relationen, besonders die Einschränkung der Zusage aus ADR-018 auf die
+  Grenze;
+* die neuen Namen der Rollen-Properties;
+* dass Error Prone mit allen Standardprüfungen läuft und nicht nur mit NullAway.
