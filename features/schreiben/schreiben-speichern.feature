@@ -1,6 +1,6 @@
 # language: de
 # Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenSpeichernTest im Modul usecases-service, ein Test je Szenario,
+# SchreibenspeicherungTest im Modul usecases-service, ein Test je Szenario,
 # benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
 Funktionalität: Schreiben speichern
   Ein Sachbearbeiter speichert eine geprüfte Vorschau als Schreiben. Gespeichert

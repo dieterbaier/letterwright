@@ -1,6 +1,6 @@
 # language: de
 # Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# VorschauErzeugenTest im Modul usecases-service, ein Test je Szenario,
+# VorschauerzeugungTest im Modul usecases-service, ein Test je Szenario,
 # benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
 # Ablage nach dem Vorschlag in #46 (features/<bereich>/).
 Funktionalität: Vorschau erzeugen
