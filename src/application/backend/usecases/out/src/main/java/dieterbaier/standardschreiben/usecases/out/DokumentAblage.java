@@ -7,6 +7,13 @@ public interface DokumentAblage {
 
     Dokumentverweis lege(byte[] pdf);
 
-    /** Für ein abgelegtes PDF, zu dem kein Schreiben gespeichert wurde. */
+    /**
+     * Die Bytes, wie sie abgelegt wurden.
+     *
+     * @throws IllegalStateException wenn es zum Verweis kein PDF gibt
+     */
+    byte[] lies(Dokumentverweis dokument);
+
+    /** Für ein PDF, auf das kein Schreiben (mehr) verweist: nie gespeichert oder hart gelöscht. */
     void entferne(Dokumentverweis dokument);
 }
