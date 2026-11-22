@@ -40,7 +40,8 @@ final class Versionsfolge {
         List<Vorlagenversion> sortiert = new ArrayList<>(versionen);
         sortiert.sort(Comparator.comparing(Vorlagenversion::nummer));
         Versionsnummer erwartet = Versionsnummer.ERSTE;
-        for (Vorlagenversion version : sortiert) {
+        for (int position = 0; position < sortiert.size(); position++) {
+            Vorlagenversion version = sortiert.get(position);
             if (!version.vorlage().equals(vorlage)) {
                 throw new Validierungsfehler("Version " + version.nummer().wert() + " gehört zur Vorlage "
                         + version.vorlage().wert() + ", nicht zu " + vorlage.wert());
@@ -49,7 +50,7 @@ final class Versionsfolge {
                 throw new Validierungsfehler("Die Versionsnummern laufen nicht lückenlos von 1 an: erwartet "
                         + erwartet.wert() + ", gefunden " + version.nummer().wert());
             }
-            boolean istNeueste = version == sortiert.getLast();
+            boolean istNeueste = position == sortiert.size() - 1;
             if (version.zustand() == Vorlagenzustand.ENTWURF && !istNeueste) {
                 throw new Validierungsfehler("Version " + version.nummer().wert()
                         + " ist ein Entwurf, aber nicht die neueste Version");

@@ -25,18 +25,20 @@ public final class Pruefe {
 
     /** Der Text muss vorhanden sein und mindestens ein Zeichen haben. Leerraum zählt als Zeichen. */
     public static String nichtLeer(@Nullable String text, String bezeichnung) {
-        if (pflicht(text, bezeichnung).isEmpty()) {
+        String vorhanden = pflicht(text, bezeichnung);
+        if (vorhanden.isEmpty()) {
             throw new Validierungsfehler(bezeichnung + " darf nicht leer sein");
         }
-        return text;
+        return vorhanden;
     }
 
     /** Der Text muss vorhanden sein und mindestens ein Zeichen haben, das kein Leerraum ist. */
     public static String nichtBlank(@Nullable String text, String bezeichnung) {
-        if (pflicht(text, bezeichnung).isBlank()) {
+        String vorhanden = pflicht(text, bezeichnung);
+        if (vorhanden.isBlank()) {
             throw new Validierungsfehler(bezeichnung + " darf nicht leer sein oder nur aus Leerraum bestehen");
         }
-        return text;
+        return vorhanden;
     }
 
     /** Die Zahl muss mindestens {@code minimum} sein. */
@@ -49,12 +51,12 @@ public final class Pruefe {
 
     /** Die Sammlung muss vorhanden sein und darf kein fehlendes Element enthalten. */
     public static <C extends Collection<?>> C pflichtOhneLuecken(@Nullable C sammlung, String bezeichnung) {
-        pflicht(sammlung, bezeichnung);
+        C vorhanden = pflicht(sammlung, bezeichnung);
         int position = 0;
-        for (Object element : sammlung) {
+        for (Object element : vorhanden) {
             pflicht(element, bezeichnung + "[" + position + "]");
             position++;
         }
-        return sammlung;
+        return vorhanden;
     }
 }

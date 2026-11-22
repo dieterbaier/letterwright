@@ -5,6 +5,9 @@ archunit = "1.5.1"
 jspecify = "1.0.1"
 jacoco = "0.8.16"
 jmolecules = "2.0.1"
+errorprone = "2.53.0"
+nullaway = "0.14.4"
+errorprone-plugin = "5.2.0"
 
 [libraries]
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
@@ -19,3 +22,6 @@ spring-security-core = { module = "org.springframework.security:spring-security-
 spring-boot-test = { module = "org.springframework.boot:spring-boot-test" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jmolecules-ddd = { module = "org.jmolecules:jmolecules-ddd", version.ref = "jmolecules" }
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+errorprone-gradle-plugin = { module = "net.ltgt.gradle:gradle-errorprone-plugin", version.ref = "errorprone-plugin" }

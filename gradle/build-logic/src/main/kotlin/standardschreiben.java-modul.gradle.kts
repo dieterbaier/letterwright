@@ -11,10 +11,16 @@
 //   Die Version steht im Versionskatalog, unabhängig von der Spring-Boot-BOM.
 // - -Xpkginfo:always: Jede package-info.java wird zur Klasse, damit ArchUnit auch Pakete ohne
 //   weitere Klassen sieht und leere Selektoren auffallen (ADR-015).
+// - NullAway setzt den Null-Vertrag beim Kompilieren des Produktionscodes durch (ADR-019).
+//   Tests übergeben absichtlich null, um die Selbstvalidierung der Typen zu prüfen.
+
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     `java-library`
     jacoco
+    id("net.ltgt.errorprone")
 }
 
 val katalog = the<VersionCatalogsExtension>().named("libs")
@@ -31,10 +37,23 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror", "-parameters", "-Xpkginfo:always"))
 }
 
+tasks.named<JavaCompile>("compileJava") {
+    options.errorprone {
+        check("NullAway", CheckSeverity.ERROR)
+        option("NullAway:OnlyNullMarked", "true")
+    }
+}
+
+tasks.named<JavaCompile>("compileTestJava") {
+    options.errorprone.enabled = false
+}
+
 dependencies {
     val bom = platform(bibliothek("spring-boot-dependencies"))
     api(bom)
     api(bibliothek("jspecify"))
+    errorprone(bibliothek("errorprone-core"))
+    errorprone(bibliothek("nullaway"))
     testImplementation(bom)
     testImplementation(bibliothek("junit-jupiter"))
     testImplementation(bibliothek("mockito-junit-jupiter"))
