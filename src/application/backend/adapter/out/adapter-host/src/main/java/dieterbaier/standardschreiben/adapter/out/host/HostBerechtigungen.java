@@ -1,13 +1,12 @@
 package dieterbaier.standardschreiben.adapter.out.host;
 
-import dieterbaier.standardschreiben.domaene.modell.Aktion;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
+import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.spi.Berechtigungsanfrage;
 import dieterbaier.standardschreiben.spi.Berechtigungspruefung;
 import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
-import dieterbaier.standardschreiben.validierung.Pruefe;
-import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 
 /** Fragt die {@link Berechtigungspruefung} des Hosts, oder die Default-Implementierung des Starters. */
 public final class HostBerechtigungen implements Berechtigungen {
@@ -15,24 +14,17 @@ public final class HostBerechtigungen implements Berechtigungen {
     private final Berechtigungspruefung pruefung;
 
     public HostBerechtigungen(Berechtigungspruefung pruefung) {
-        this.pruefung = Pruefe.pflicht(pruefung, "Die Berechtigungspruefung");
+        this.pruefung = pruefung;
     }
 
     @Override
-    public boolean darf(BenutzerKennung benutzer, Aktion aktion, FachlicherBezug bezug) {
-        if (!Pruefe.pflicht(aktion, "Die Aktion").brauchtBezug()) {
-            throw new Validierungsfehler("Die Aktion " + aktion + " bezieht sich auf keinen fachlichen Bezug");
-        }
-        return pruefung.istErlaubt(new Berechtigungsanfrage(Pruefe.pflicht(benutzer, "Der Benutzer").wert(),
-                Abbildung.zumSpi(aktion), Abbildung.zumSpi(Pruefe.pflicht(bezug, "Der fachliche Bezug"))));
+    public boolean darf(BenutzerKennung benutzer, VorlagenAktion aktion) {
+        return pruefung.istErlaubt(Berechtigungsanfrage.zuVorlagen(benutzer.wert(), Abbildung.zumSpi(aktion)));
     }
 
     @Override
-    public boolean darf(BenutzerKennung benutzer, Aktion aktion) {
-        if (Pruefe.pflicht(aktion, "Die Aktion").brauchtBezug()) {
-            throw new Validierungsfehler("Die Aktion " + aktion + " braucht einen fachlichen Bezug");
-        }
-        return pruefung.istErlaubt(new Berechtigungsanfrage(Pruefe.pflicht(benutzer, "Der Benutzer").wert(),
-                Abbildung.zumSpi(aktion), null));
+    public boolean darf(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
+        return pruefung.istErlaubt(Berechtigungsanfrage.zuSchreiben(benutzer.wert(), Abbildung.zumSpi(aktion),
+                Abbildung.zumSpi(bezug)));
     }
 }

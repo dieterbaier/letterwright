@@ -1,29 +1,51 @@
 package dieterbaier.standardschreiben.spi;
 
-import java.util.Optional;
-import org.jspecify.annotations.Nullable;
-
 /**
- * Anfrage an die {@link Berechtigungspruefung}. Zu den Aktionen für Vorlagen gibt es keinen fachlichen Bezug, zu allen
- * anderen genau einen (siehe {@link Aktion#hatBezug()}).
+ * Anfrage an die {@link Berechtigungspruefung}. Es gibt genau zwei Arten, und ein Host unterscheidet sie mit
+ * {@code switch}:
  *
- * @param benutzerkennung der angemeldete Benutzer, wie ihn die Spring Security des Hosts kennt
+ * <pre>{@code
+ * return switch (anfrage) {
+ *     case Berechtigungsanfrage.ZuVorlagen vorlagen -> ...;
+ *     case Berechtigungsanfrage.ZuSchreiben schreiben -> ... schreiben.bezug() ...;
+ * };
+ * }</pre>
  */
-public record Berechtigungsanfrage(String benutzerkennung, Aktion aktion, @Nullable FachlicherBezug bezug) {
+public sealed interface Berechtigungsanfrage {
 
-    public Berechtigungsanfrage {
-        Pflicht.text(benutzerkennung, "Die Benutzerkennung");
-        Pflicht.wert(aktion, "Die Aktion");
-        if (aktion.hatBezug() && bezug == null) {
-            throw new IllegalArgumentException("Die Aktion " + aktion + " braucht einen fachlichen Bezug");
-        }
-        if (!aktion.hatBezug() && bezug != null) {
-            throw new IllegalArgumentException("Die Aktion " + aktion + " hat keinen fachlichen Bezug");
+    /** Der angemeldete Benutzer, wie ihn die Spring Security des Hosts kennt. */
+    String benutzerkennung();
+
+    /** Die Handlung, für die der Benutzer die Berechtigung braucht. */
+    Aktion aktion();
+
+    /** Darf der Benutzer diese Handlung an Briefpapier und Standardschreiben ausführen? */
+    static Berechtigungsanfrage zuVorlagen(String benutzerkennung, VorlagenAktion aktion) {
+        return new ZuVorlagen(benutzerkennung, aktion);
+    }
+
+    /** Darf der Benutzer diese Handlung an den Schreiben zu diesem fachlichen Bezug ausführen? */
+    static Berechtigungsanfrage zuSchreiben(String benutzerkennung, SchreibenAktion aktion, FachlicherBezug bezug) {
+        return new ZuSchreiben(benutzerkennung, aktion, bezug);
+    }
+
+    /** Siehe {@link #zuVorlagen(String, VorlagenAktion)}. */
+    record ZuVorlagen(String benutzerkennung, VorlagenAktion aktion) implements Berechtigungsanfrage {
+
+        public ZuVorlagen {
+            Pflicht.text(benutzerkennung, "Die Benutzerkennung");
+            Pflicht.wert(aktion, "Die Aktion");
         }
     }
 
-    /** Der fachliche Bezug, leer bei den Aktionen für Vorlagen. */
-    public Optional<FachlicherBezug> optionalerBezug() {
-        return Optional.ofNullable(bezug);
+    /** Siehe {@link #zuSchreiben(String, SchreibenAktion, FachlicherBezug)}. */
+    record ZuSchreiben(String benutzerkennung, SchreibenAktion aktion, FachlicherBezug bezug)
+            implements Berechtigungsanfrage {
+
+        public ZuSchreiben {
+            Pflicht.text(benutzerkennung, "Die Benutzerkennung");
+            Pflicht.wert(aktion, "Die Aktion");
+            Pflicht.wert(bezug, "Der fachliche Bezug");
+        }
     }
 }

@@ -23,7 +23,11 @@ final class BeispielHost implements PlatzhalterdatenAnbieter, Berechtigungspruef
 
     @Override
     public boolean istErlaubt(Berechtigungsanfrage anfrage) {
-        return anfrage.benutzerkennung().equals("erika");
+        return switch (anfrage) {
+            case Berechtigungsanfrage.ZuVorlagen vorlagen -> false;
+            case Berechtigungsanfrage.ZuSchreiben schreiben -> schreiben.benutzerkennung().equals("erika")
+                    && schreiben.bezug().typ().equals("Kunde");
+        };
     }
 
     @Override
