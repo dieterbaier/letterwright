@@ -1,6 +1,6 @@
 # language: de
 # Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenLoeschenTest im Modul usecases-service, ein Test je Szenario,
+# SchreibenloeschungTest im Modul usecases-service, ein Test je Szenario,
 # benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
 Funktionalität: Schreiben löschen
   Ein Sachbearbeiter löscht ein gespeichertes Schreiben. Ob und wie gelöscht

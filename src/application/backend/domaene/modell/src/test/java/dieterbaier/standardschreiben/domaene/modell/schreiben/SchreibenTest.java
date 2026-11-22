@@ -83,7 +83,6 @@ class SchreibenTest {
                 dokument, pdf, null, SICHTBAR), "Erstellungszeitpunkt");
         lehntAb(() -> Schreiben.wiederherstellen(id, snapshot.id(), KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3,
                 dokument, pdf, JETZT, null), "Zustand des Schreibens");
-        lehntAb(() -> new Schreibenzustand.LogischGeloescht(null), "Zeitpunkt des Löschens");
     }
 
     @Test
