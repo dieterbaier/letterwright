@@ -54,6 +54,11 @@ bleiben Ausnahmen. Die Testkonvention steht in Kapitel 4 und im Skill
   nicht als Konvention entschieden.
 * #9: Wie die Bezugstypen eines Hosts zur Auswahl kommen, ohne neue
   verpflichtende Host-Schnittstelle (QS-007).
+* #69: Der Vertrag der ID von `FachlicherBezug` (kanonisch, dauerhaft stabil,
+  vom Host kodiert) fehlt noch in Javadoc und Glossar.
+* Q-ARCH-004: Speichern in einer Transaktion des Hosts über eine Java-API und
+  einen optionalen Rückruf. Vor einem ADR braucht es den Vertrag für API und
+  Rückruf; das ändert ADR-016.
 
 == Checks
 
