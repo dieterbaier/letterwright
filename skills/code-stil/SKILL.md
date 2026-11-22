@@ -1,6 +1,6 @@
 ---
 name: code-stil
-description: "Write and review Java code in standardschreiben in the project's code style: validation only in the types, illegal states made unrepresentable with sealed types, no null outside what the type allows, static factory methods, and Javadoc only for the why or the SPI contract. Use when writing, changing or reviewing backend code, when tempted to add a parameter check, a boolean flag or a nullable field, or when writing Javadoc."
+description: "Write and review Java code in standardschreiben in the project's code style: validation only in the types, illegal states made unrepresentable with sealed types, no null outside what the type allows, static factory methods, one test class per production class, and Javadoc only for the why or the SPI contract. Use when writing, changing or reviewing backend code or tests, when tempted to add a parameter check, a boolean flag or a nullable field, or when writing Javadoc."
 ---
 
 # Code-Stil
@@ -12,6 +12,7 @@ hier.
 Die Regeln und ihre Begründung stehen in der Architekturdokumentation, nicht hier:
 
 - `src/docs/arc42/doc-04000-solution-strategy.adoc`, Abschnitt „Code-Stil“
+  (auch die Testkonvention)
 - ADR-018 (DDD-Rollen und Selbstvalidierung), ADR-019 (Validierung in den
   Typen und Null-Vertrag) und ADR-011 (Qualitätsgates, Linting) unter
   `src/docs/arc42/09-architecture-decisions/`
@@ -43,7 +44,12 @@ laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
    `HostVertragVerletzt`.
 6. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `anlegen`,
    `ausSnapshot`, `neu()`, `wiederherstellen`.
-7. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
+7. **Zu jeder Klasse mit eigenem Verhalten ihre Testklasse.** `Foo` bekommt
+   `FooTest` im selben Paket, keine Sammelklasse für mehrere Klassen. Ein
+   Anwendungsfall wird in der Testklasse seiner Implementierung geprüft, zugleich
+   die Brücke zur Feature-Datei. Baue erwartete Werte im Test selbst auf, nicht
+   mit dem Mapper oder der Fabrik, die der Produktionscode benutzt.
+8. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
    Fachbegriff kommt zuerst ins Glossar.
 
 ## Ausnahmen vom Linting

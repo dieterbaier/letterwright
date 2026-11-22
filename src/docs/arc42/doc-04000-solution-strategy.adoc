@@ -73,6 +73,28 @@ auf die Quelle, statt sie nachzuerzählen:
   Prone mit seinen standardmäßig aktiven Prüfungen. Eine Ausnahme wird einzeln
   und mit Begründung abgeschaltet
   (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+* *Tests gehören zu ihrer Klasse* (Gerard Meszaros, _xUnit Test Patterns_,
+  „Testcase Class per Class“): Wer von einer Produktionsklasse ausgeht, findet
+  ihre Tests ohne Suche. Entschieden vom Owner in #65. Im Backend gilt:
+** Jede Klasse mit eigenem fachlichem oder technischem Vertrag hat eine
+   gleichnamige Testklasse im selben Paket (`Foo` → `FooTest`). Diese prüft ihr
+   beobachtbares Verhalten. Sammelklassen für mehrere Produktionsklassen gibt es
+   nicht.
+** Ein interner Helfer, etwa eine paketprivate Klasse, wird über seine Aufrufer
+   geprüft, und zwar gezielt.
+** Reine Datenträger ohne eigenes Verhalten brauchen keine eigene Testklasse:
+   Schnittstellen, Enums ohne Logik und Ausnahmen ohne Logik. Fachliche
+   Invarianten eines Records zählen dagegen als eigenes Verhalten.
+** Ein Anwendungsfall wird in der Testklasse seiner Implementierung geprüft, etwa
+   `Schreibenspeicherung` in `SchreibenspeicherungTest`. Diese Klasse ist zugleich
+   die Brücke zur Gherkin-Spezifikation: Die Feature-Datei nennt sie im Kopf, und
+   jede Testmethode heißt wie ihr Szenario.
+** Ein Test, der mehrere Klassen gemeinsam prüft, heißt nach dem Verhalten, das er
+   prüft. Beispiele sind `EingebauteBerechtigungspruefungTest` und die
+   Architekturtests.
+** Erwartete Werte entstehen im Test unabhängig vom Produktionscode, der sie
+   berechnet. Baut ein Test etwa die erwartete SPI-Anfrage mit demselben Mapper
+   auf, den der Adapter benutzt, bleibt ein Fehler im Mapper unsichtbar.
 
 Wie ein Agent diese Regeln beim Schreiben von Code anwendet, beschreibt der Skill
 `skills/code-stil/SKILL.md`.
