@@ -8,6 +8,7 @@ import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreibenzustand;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
@@ -20,7 +21,8 @@ class SpeicherausgangTest {
     private final Schreiben vorhandenes = Schreiben.wiederherstellen(SchreibenId.neu(), SnapshotId.neu(),
             new FachlicherBezug("Kunde", "4711"), new Versionsverweis(VorlagenId.neu(), Versionsnummer.ERSTE),
             new Versionsverweis(VorlagenId.neu(), Versionsnummer.ERSTE), new Dokumentverweis("ablage/1"),
-            Pruefsumme.ueber(new byte[] {1}), Instant.parse("2026-11-22T10:00:00Z"));
+            Pruefsumme.ueber(new byte[] {1}), Instant.parse("2026-11-22T10:00:00Z"),
+            new Schreibenzustand.Sichtbar());
 
     @Test
     void einVerbrauchterSnapshotNenntDasVorhandeneSchreiben() {
