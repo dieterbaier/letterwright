@@ -418,31 +418,88 @@ Noch offen, bevor die Regel als ADR festgehalten wird:
   React-Komponenten und REST aus. Die Vorschau bleibt dort, denn gespeichert wird
   der Snapshot, den der Benutzer gesehen hat (ADR-007).
 +
-Tendenz (Owner, 2026-11-22): Die Bibliothek bietet beides an:
+Tendenz (Owner, 2026-11-22, präzisiert im Review von PR #70): Die Bibliothek
+bietet beides an. Die beiden Wege erfüllen verschiedene Integrationsbedürfnisse:
 +
 --
-.. eine öffentliche Java-API, über die der Host das Speichern eines Snapshots in
-   seiner eigenen Transaktion auslöst. Das ist eine API, die der Host aufruft,
-   kein SPI, das er implementiert.
-.. die Benachrichtigung nach dem Speichern als Rückruf in derselben Transaktion,
-   in dem der Host eigene Aktionen ausführt.
+.. *Java-API, der primäre Weg:* Der Host orchestriert in einem eigenen
+   Anwendungsfall. Er speichert das Schreiben, wertet das Ergebnis aus, ändert
+   eigene Daten oder schließt den Task ab und committet alles gemeinsam. Er
+   ruft die API auf und implementiert kein SPI. Wie in ADR-016 als
+   Erweiterungsweg vorgesehen, ist das ein eigenes API-Modul mit eigenen Typen
+   und eingehendem Adapter, ohne öffentliche Kopplung an das Domänenmodell oder
+   an die internen Use-Case-Ports. REST und Java-API nutzen denselben
+   Anwendungsfall.
+.. *Optionaler synchroner Rückruf:* Speichert der Benutzer über den Endpunkt der
+   Bibliothek, bindet der Rückruf Aktionen des Hosts ein. Er läuft nach den
+   Datenbankänderungen der Bibliothek, aber vor dem gemeinsamen Commit. Ein
+   Listener nach dem Commit (`AFTER_COMMIT`) kann die verlangte Atomarität nicht
+   liefern. Der Rückruf darf nicht noch einmal ausführen, was ein Aufrufer der
+   Java-API schon selbst erledigt hat.
+--
++
+*Verantwortungsgrenze* (Owner, im Review von PR #70):
++
+--
+* *Die Bibliothek* verantwortet ihre eigene Idempotenz nach ADR-021, also
+  höchstens ein Schreiben je Snapshot. Im Vertrag von API und Rückruf sichert
+  sie zu, wann der Rückruf läuft (bei einer Neuanlage und/oder bei
+  `BereitsGespeichert`), welche stabilen Identifikatoren er erhält, dass er vor
+  dem gemeinsamen Commit läuft und wie Fehler des Rückrufs auf die gemeinsame
+  Transaktion wirken.
+* *Der Host* verantwortet die Idempotenz seiner eigenen Fachaktionen, das
+  Zusammenspiel seiner Orchestrierung mit einem konfigurierten Rückruf sowie
+  Wiederholung, Recovery und gegebenenfalls Kompensation externer
+  Seiteneffekte, etwa beim Abschluss eines Tasks in einer entfernten Engine
+  oder bei der Ablage im eigenen DMS. Outbox und Kompensation sind mögliche
+  Muster des Hosts, keine Vorgabe und keine Aufgabe der Bibliothek. Die
+  Bibliothek übernimmt keine allgemeine Workflow- oder Kompensationssteuerung.
+* Eine idempotente Speicherung durch die Bibliothek garantiert ausdrücklich
+  nicht, dass der gesamte Anwendungsfall des Hosts idempotent ist.
+* Die Zusicherungen der Bibliothek gehören in den API- und SPI-Vertrag, die
+  Pflichten des Hosts samt Integrationsbeispielen in die Dokumentation zur
+  Host-Integration. Technische Grenzen der jeweiligen Ablage bleiben Teil des
+  Ablagevertrags (#60).
 --
 +
 Offen dazu:
 +
 --
-* Die Bibliothek muss sich einer laufenden Transaktion anschließen (Spring
-  `REQUIRED`, nie `REQUIRES_NEW`).
-* Die PDF-Ablage ist nicht unbedingt transaktional (#60). Rollt die Transaktion
-  des Hosts nach dem Ablegen zurück, bleibt ein verwaistes Dokument. Nach
-  ADR-021 ist das eine Ausnahme; hier wird es zum regulären Fall.
-* Rendering und PDF/A-Prüfung verlängern die Transaktion des Hosts. Muss das PDF
-  vorher erzeugt und in der Transaktion nur noch festgeschrieben werden?
-* Eine gemeinsame Transaktion gibt es nur mit einer eingebetteten Process Engine
-  auf derselben Datenquelle. Bei einer entfernten Engine bleiben dem Host
-  Idempotenz oder ein Outbox-Muster.
+* *Transaktionskontext:* Die Bibliothek muss sich einer laufenden Transaktion
+  anschließen (Spring `REQUIRED`, nie `REQUIRES_NEW`). Für die lokale atomare
+  Variante müssen Host, Bibliothek und gegebenenfalls eine eingebettete Engine
+  dieselbe physische Transaktion teilen. Eine gemeinsame Datenquelle allein
+  genügt nicht: Ohne passend integrierten Transaktionsmanager kann die Engine
+  schon committet haben, wenn der Host zurückrollt. Die Bibliothek bleibt für
+  Hosts ohne Process Engine verwendbar.
+* *Fehler des Rückrufs:* Welche Fehler rollen die gemeinsame Transaktion zurück?
+  Checked Exceptions und fachliche Fehler als Rückgabewert tun das nicht
+  automatisch; der Vertrag muss es festlegen.
+* *Umfang der Atomarität:* Metadaten des Schreibens, Verbrauch des Snapshots und
+  transaktionale Daten des Hosts committen oder rollen gemeinsam zurück. Eine
+  externe Ablage (#60) nimmt daran nicht automatisch teil. Ein verwaistes
+  Dokument kann deshalb auch dann entstehen, wenn das Speichern erfolgreich
+  zurückkehrt und der Host danach zurückrollt. Der Fehlerpfad aus ADR-021 wird
+  breiter; wie oft er eintritt, ist unbekannt. #60 braucht einen ausdrücklichen
+  Weg zur Recovery oder Bereinigung.
+* *Vorbereiten und Festschreiben:* Rendering und Konformitätsprüfung verlängern
+  die Transaktion des Hosts. Sie sollten möglichst vor einer kurzen
+  Schreibtransaktion liegen. Ein vorbereitetes PDF bleibt dann serverseitig an
+  genau den Snapshot und seine Prüfsumme gebunden. Beim Festschreiben werden
+  Besitzer, Berechtigung, Ablauf, aktueller Datenkontext und der atomare
+  Zustandswechsel weiter geprüft, sonst entsteht eine Lücke zur Treue des
+  Snapshots. Der heutige Anwendungsfall `Schreibenspeicherung` rendert und prüft
+  erst beim Speichern; das wäre eine bewusste Umstrukturierung.
+* *Entfernte Engine:* Die Bibliothek bekommt keine Abhängigkeit zu einer Process
+  Engine. Der Host kann in derselben lokalen Transaktion einen Outbox-Auftrag
+  schreiben und den entfernten Aufruf wiederholbar ausführen. Idempotenz
+  verhindert eine doppelte Wirkung, garantiert allein aber nicht, dass der
+  zweite Schritt nach einem Absturz überhaupt noch ausgeführt wird.
 * Berechtigung (`ZumErzeugen`) und Idempotenz (ADR-021) gelten für beide Wege
   gleich.
+* *Vor der Umsetzung* braucht es den konkreten Vertrag für API und Transaktion
+  sowie Integrationsnachweise für den gemeinsamen Commit, einen späten Rollback
+  des Hosts, Fehler des Rückrufs und eine verlorene Antwort mit Retry.
 --
 
 Betroffen sind voraussichtlich ADR-002 und ADR-016: Schlüssel und Dateiname
@@ -450,7 +507,9 @@ Betroffen sind voraussichtlich ADR-002 und ADR-016: Schlüssel und Dateiname
 REST, nicht über das SPI. Die Benachrichtigung nach dem Speichern ist ein
 eigener Rückkanal zum Host; über welchen Mechanismus sie läuft, ist offen.
 Ebenfalls betroffen sind ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
-sowie #5, #6, #10 und #11. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
+sowie #5, #6, #10 und #11. Das Speichern in einer Transaktion des Hosts betrifft
+zusätzlich ADR-006, ADR-021, die Bausteinsicht und QS-007; ein zusätzlicher
+Rückruf zählt beim Integrationsaufwand mit. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
 lassen sich als zwei Aufgaben eines Prozesses abbilden.
 
 == Beantwortete Fragen
