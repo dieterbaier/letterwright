@@ -7,7 +7,7 @@ owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Laufzeitszenarien Vorschau, Speichern, Download und Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
+summary: 'Laufzeitszenarien Vorschau, Speichern, Download, Übersicht und Löschen sowie Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
 tags:
 - arc42
 - runtime
@@ -79,7 +79,12 @@ Web --> UI: 201, Download-Link
 SB -> UI: Download
 UI -> Web: GET /schreiben/{id}/pdf
 Web -> App: Schreiben abrufen ({id})
-App -> App: Berechtigung prüfen (Host)
+App -> App: Schreiben laden; sichtbar?
+App -> Host: Darf Benutzer zu diesem Bezug herunterladen? (ZuSchreiben)
+Host --> App: erlaubt
+App -> Per: PDF lesen
+Per --> App: PDF
+App -> App: Prüfsumme gleich der vom Speichern?
 App --> Web: PDF (unverändert)
 Web --> UI: 200, PDF
 @enduml
@@ -114,8 +119,92 @@ andere entfernt ihr PDF und bekommt das Schreiben der ersten. Bleibt der Ausgang
 ungewiss, wird nichts zurückgenommen. Ein neues Schreiben entsteht nur aus einer
 neuen Vorschau. Hat sich der Datenkontext geändert, entsteht kein PDF; der
 Snapshot bleibt offen, bis eine neue Vorschau ihn ersetzt oder er abläuft. Ein
-nicht konformes oder nicht prüfbares PDF wird nicht gespeichert (fail-closed). Das Verhalten ist in
+nicht konformes oder nicht prüfbares PDF wird nicht gespeichert (fail-closed). Ist
+das Schreiben inzwischen hart oder logisch gelöscht, findet eine Wiederholung
+nichts mehr und bekommt „Snapshot unbekannt“. Das Verhalten ist in
 `features/schreiben/schreiben-speichern.feature` spezifiziert.
+
+Herunterladen liefert das PDF nur, wenn seine SHA-256-Prüfsumme der vom Speichern
+entspricht
+(xref:qs-008-unveraenderliche-schreiben[QS-008]). Weicht sie ab, ist der Bestand
+defekt: Der Download scheitert mit einem technischen Fehler, statt ein verändertes
+PDF auszuliefern. Ein nicht vorhandenes, ein logisch gelöschtes und ein nicht
+erlaubtes Schreiben sind für den Benutzer gleich „unbekannt“ (404,
+xref:qs-009-zugriffsschutz-beim-download[QS-009]). Das Verhalten ist in
+`features/schreiben/schreiben-herunterladen.feature` spezifiziert.
+
+== Schreiben auflisten
+
+[plantuml,laufzeit-auflisten,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Übersicht (React)" as UI
+participant "adapter-web" as Web
+participant "usecases-service" as App
+participant "Host: Berechtigungspruefung" as Host
+participant "adapter-persistenz-jdbc" as Per
+SB -> UI: Schreiben zum Bezug anzeigen
+UI -> Web: GET Schreiben zum Bezug (Seite, Größe)
+Web -> App: Schreiben auflisten (Bezug, Seitenanfrage)
+App -> Host: Darf Benutzer die Schreiben zu diesem Bezug ansehen? (ZuSchreiben)
+Host --> App: erlaubt
+App -> Per: sichtbare Schreiben zum Bezug,\nneueste zuerst, eine Seite
+Per -> Per: logisch gelöschte filtern,\ndann zählen und paginieren
+Per --> App: Seite mit Gesamtzahl
+App --> Web: Seite
+Web --> UI: 200, Seite
+@enduml
+----
+
+Der Host erteilt die Berechtigung zum Ansehen je Bezug. Ohne sie liest die
+Bibliothek nichts und zählt nichts; die Übersicht ist „nicht erlaubt“. Schreiben
+zu anderen Bezügen und logisch gelöschte filtert die Persistenz in der Abfrage,
+also vor dem Paginieren und Zählen. Gesamtzahl und Seitenzahl beziehen sich nur
+auf die sichtbaren Schreiben
+(xref:qs-009-zugriffsschutz-beim-download[QS-009]). Das Verhalten ist in
+`features/schreiben/schreiben-auflisten.feature` spezifiziert.
+
+== Schreiben löschen
+
+[plantuml,laufzeit-loeschen,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Übersicht (React)" as UI
+participant "adapter-web" as Web
+participant "usecases-service" as App
+participant "Host: Berechtigungspruefung" as Host
+participant "Host: Loeschrichtlinie" as Richtlinie
+participant "adapter-persistenz-jdbc" as Per
+SB -> UI: Löschen
+UI -> Web: DELETE /schreiben/{id}
+Web -> App: Schreiben löschen ({id})
+App -> App: Schreiben laden; sichtbar?
+App -> Host: Darf Benutzer zu diesem Bezug löschen? (ZuSchreiben)
+Host --> App: erlaubt
+App -> Richtlinie: Wie löschen? (Loeschanfrage)
+alt hart
+  Richtlinie --> App: hart
+  App -> Per: Schreiben entfernen, danach PDF entfernen
+else logisch
+  Richtlinie --> App: logisch
+  App -> Per: Schreiben als logisch gelöscht speichern; PDF bleibt
+else gesperrt
+  Richtlinie --> App: gesperrt (Grund)
+end
+App --> Web: gelöscht oder gesperrt mit Grund
+@enduml
+----
+
+Die Löschrichtlinie fragt die Bibliothek erst, wenn der Host das Löschen erlaubt
+hat. Ein nicht vorhandenes, ein schon logisch gelöschtes und ein nicht erlaubtes
+Schreiben sind für den Benutzer gleich „unbekannt“; die Löschrichtlinie wird dann
+nicht gefragt. Hart gelöscht wird erst das Schreiben, dann sein PDF: Scheitert das
+Entfernen des PDFs, bleibt ein PDF ohne Schreiben liegen statt eines Schreibens
+ohne PDF. Ein logisch gelöschtes Schreiben behält sein PDF, erscheint aber in
+keiner Übersicht und lässt sich nicht mehr herunterladen. Das Verhalten ist in
+`features/schreiben/schreiben-loeschen.feature` spezifiziert.
 
 == Gespeichertes Schreiben drucken
 
