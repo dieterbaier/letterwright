@@ -5,7 +5,7 @@
 Funktionalität: Schreiben speichern
   Ein Sachbearbeiter speichert eine geprüfte Vorschau als Schreiben. Gespeichert
   wird genau das PDF, das aus dem Snapshot der Vorschau entsteht, und nur, wenn es
-  konform ist (ADR-007, ADR-008). Die Bibliothek prüft die Berechtigung erneut und
+  konform ist (ADR-005, ADR-007). Die Bibliothek prüft die Berechtigung erneut und
   liest den Datenkontext erneut; hat er sich seit der Vorschau geändert, ist eine
   neue Vorschau nötig. Zu einem Snapshot gibt es höchstens ein Schreiben
   (ADR-021).
