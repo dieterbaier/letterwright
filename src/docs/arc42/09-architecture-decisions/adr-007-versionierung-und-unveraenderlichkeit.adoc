@@ -49,7 +49,9 @@ Wir schlagen vor:
 
 * Briefpapier und Standardschreiben haben **Versionen** mit Zustand *Entwurf*,
   *veröffentlicht* oder *zurückgezogen*. Veröffentlichte Versionen sind unveränderlich;
-  Änderungen erzeugen eine neue Version.
+  Änderungen erzeugen eine neue Version. Je Vorlage ist höchstens eine Version
+  veröffentlicht, die bisherige ist danach *abgelöst*; Nachtrag vom 2026-11-22,
+  siehe xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
 * Ein **gespeichertes Schreiben** speichert das erzeugte PDF, eine SHA-256-Prüfsumme
   und die IDs der verwendeten Vorlagenversionen. Es wird **nie neu gerendert**.
 * Die **Vorschau** erzeugt einen kurzlebigen **Datenstand (Snapshot)**. Speichern

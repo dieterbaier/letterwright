@@ -7,7 +7,7 @@ owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Laufzeitszenarien Vorschau, Speichern, Download, Übersicht und Löschen sowie Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
+summary: 'Laufzeitszenarien Vorschau, Speichern, Download, Übersicht, Löschen und Veröffentlichen einer Vorlagenversion sowie Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
 tags:
 - arc42
 - runtime
@@ -207,6 +207,61 @@ Entfernen des PDFs, bleibt ein PDF ohne Schreiben liegen statt eines Schreibens
 ohne PDF. Ein logisch gelöschtes Schreiben behält sein PDF, erscheint aber in
 keiner Übersicht und lässt sich nicht mehr herunterladen. Das Verhalten ist in
 `features/schreiben/schreiben-loeschen.feature` spezifiziert.
+
+== Vorlagenversion veröffentlichen
+
+[plantuml,laufzeit-veroeffentlichen,svg]
+----
+@startuml
+actor Vorlagenverwalter as VV
+participant "Editor (React)" as UI
+participant "adapter-web" as Web
+participant "usecases-service" as App
+participant "Host: Berechtigungspruefung" as Host
+participant "adapter-persistenz-jdbc" as Per
+participant "adapter-rendering" as Ren
+VV -> UI: Veröffentlichen
+UI -> Web: POST /vorlagen/{id}/veroeffentlichung
+Web -> App: Vorlagenversion veröffentlichen ({id})
+App -> Host: Darf Benutzer veröffentlichen? (VEROEFFENTLICHEN)
+Host --> App: erlaubt
+App -> Per: Vorlage laden
+Per --> App: Vorlage mit Entwurf
+alt Standardschreiben
+  App -> Per: Briefpapier laden
+  Per --> App: veröffentlichte Version des Briefpapiers
+  App -> Ren: Probe-PDF (Briefpapier, Entwurf,\nBeispieldaten beider Versionen)
+else Briefpapier
+  App -> Ren: Probe-PDF (Entwurf, eingebauter Beispielinhalt,\nBeispieldaten)
+end
+Ren --> App: PDF
+App -> Ren: PDF prüfen (PDF/A-2b, PDF/UA-1)
+Ren --> App: konform
+App -> Per: Vorlage ersetzen, nur wenn seit dem Laden unverändert:\nEntwurf veröffentlicht, bisherige Version abgelöst
+Per --> App: ersetzt
+App --> Web: veröffentlicht (Version)
+@enduml
+----
+
+Veröffentlichen verlangt die Vorlagenaktion `VEROEFFENTLICHEN`; ohne sie lädt die
+Bibliothek nichts und rendert nichts. Vor dem Veröffentlichen entsteht ein
+Probe-PDF mit den Beispieldaten der Version und wird mit demselben Prüfer geprüft
+wie jedes gespeicherte Schreiben
+(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). Ist es nicht konform, bleibt
+der Entwurf ein Entwurf, und der Vorlagenverwalter erhält die Befunde; lässt sich
+die Prüfung nicht ausführen, wird ebenfalls nichts veröffentlicht. Ein
+Standardschreiben ohne veröffentlichtes Briefpapier wird nicht veröffentlicht.
+Die Persistenz ersetzt die Vorlage nur, wenn sie seit dem Laden unverändert ist;
+sonst meldet die Bibliothek „veraltet“, und kein ungeprüfter Inhalt wird
+veröffentlicht. Danach ist die neue Version die einzige veröffentlichte, die
+bisherige ist abgelöst; gespeicherte Schreiben behalten ihre Versionen
+(xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022]).
+
+Zurückziehen verläuft ebenso, ohne Probe-PDF: Die veröffentlichte Version wird
+zurückgezogen, und bis zur nächsten Veröffentlichung entsteht mit der Vorlage
+keine Vorschau. Das Verhalten ist in
+`features/vorlagen/vorlagenversion-veroeffentlichen.feature` und
+`features/vorlagen/vorlagenversion-zurueckziehen.feature` spezifiziert.
 
 == Gespeichertes Schreiben drucken
 
