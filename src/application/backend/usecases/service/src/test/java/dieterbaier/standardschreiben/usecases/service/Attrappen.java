@@ -4,10 +4,14 @@ import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
+import dieterbaier.standardschreiben.domaene.modell.Seite;
+import dieterbaier.standardschreiben.domaene.modell.Seitenanfrage;
 import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
@@ -19,6 +23,7 @@ import dieterbaier.standardschreiben.usecases.out.Berechtigungen;
 import dieterbaier.standardschreiben.usecases.out.DokumentAblage;
 import dieterbaier.standardschreiben.usecases.out.Konformitaet;
 import dieterbaier.standardschreiben.usecases.out.KonformitaetsPruefer;
+import dieterbaier.standardschreiben.usecases.out.Loeschregeln;
 import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.usecases.out.SchreibenRepository;
 import dieterbaier.standardschreiben.usecases.out.Snapshotablage;
@@ -29,11 +34,13 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /** Attrappen der ausgehenden Ports für die Tests der Anwendungsfälle. Sie halten fest, was gefragt wurde. */
@@ -72,11 +79,21 @@ final class Attrappen {
 
         Datenkontext datenkontext = Datenkontext.aus(Map.of("name", "Erika Mustermann GmbH"));
         final List<Standardschreiben> erzeugenAngefragt = new ArrayList<>();
+        final List<Erlaubnis> schreibenAktionAngefragt = new ArrayList<>();
+        final Set<Erlaubnis> schreibenAktionen = new java.util.HashSet<>();
         boolean erlaubt;
         int datenkontextAngefragt;
 
         boolean wurdeGefragt() {
-            return !erzeugenAngefragt.isEmpty() || datenkontextAngefragt > 0;
+            return !erzeugenAngefragt.isEmpty() || datenkontextAngefragt > 0 || !schreibenAktionAngefragt.isEmpty();
+        }
+
+        void erlaube(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
+            schreibenAktionen.add(new Erlaubnis(benutzer, aktion, bezug));
+        }
+
+        void verbiete(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
+            schreibenAktionen.remove(new Erlaubnis(benutzer, aktion, bezug));
         }
 
         @Override
@@ -84,9 +101,12 @@ final class Attrappen {
             throw new AssertionError("Vorlagenaktionen gehören nicht zur Vorschau");
         }
 
+        /** Erlaubt ist, was {@link #erlaube} freigegeben hat. */
         @Override
         public boolean darf(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {
-            throw new AssertionError("Aktionen an gespeicherten Schreiben gehören nicht zur Vorschau");
+            Erlaubnis anfrage = new Erlaubnis(benutzer, aktion, bezug);
+            schreibenAktionAngefragt.add(anfrage);
+            return schreibenAktionen.contains(anfrage);
         }
 
         @Override
@@ -99,6 +119,21 @@ final class Attrappen {
         public Datenkontext liesDatenkontext(BenutzerKennung benutzer, FachlicherBezug bezug, Standardschreiben vorlage) {
             datenkontextAngefragt++;
             return datenkontext;
+        }
+    }
+
+    record Erlaubnis(BenutzerKennung benutzer, SchreibenAktion aktion, FachlicherBezug bezug) {}
+
+    /** Antwortet mit der vorgegebenen Entscheidung und hält fest, wonach gefragt wurde. */
+    static final class Loeschrichtlinie implements Loeschregeln {
+
+        Loeschentscheidung entscheidung = Loeschentscheidung.hart();
+        final List<Schreiben> angefragt = new ArrayList<>();
+
+        @Override
+        public Loeschentscheidung entscheide(BenutzerKennung benutzer, Schreiben schreiben) {
+            angefragt.add(schreiben);
+            return entscheidung;
         }
     }
 
@@ -189,12 +224,23 @@ final class Attrappen {
 
         final Map<Dokumentverweis, byte[]> abgelegt = new LinkedHashMap<>();
         int nummer;
+        int gelesen;
 
         @Override
         public Dokumentverweis lege(byte[] pdf) {
             var verweis = new Dokumentverweis("ablage/" + ++nummer);
             abgelegt.put(verweis, pdf);
             return verweis;
+        }
+
+        @Override
+        public byte[] lies(Dokumentverweis dokument) {
+            gelesen++;
+            byte[] pdf = abgelegt.get(dokument);
+            if (pdf == null) {
+                throw new IllegalStateException("Kein PDF zu " + dokument.wert());
+            }
+            return pdf.clone();
         }
 
         @Override
@@ -214,14 +260,53 @@ final class Attrappen {
         private final Snapshots snapshots;
         Runnable zuvor = () -> { };
         Optional<RuntimeException> danach = Optional.empty();
+        int abfragen;
 
         SchreibenAblage(Snapshots snapshots) {
             this.snapshots = snapshots;
         }
 
+        /** Legt ein Schreiben ab, als wäre es früher gespeichert worden. */
+        Schreiben ablegen(Schreiben schreiben) {
+            gespeichert.put(schreiben.snapshot(), schreiben);
+            return schreiben;
+        }
+
+        Optional<Schreiben> mitId(SchreibenId id) {
+            return gespeichert.values().stream().filter(schreiben -> schreiben.id().equals(id)).findFirst();
+        }
+
+        @Override
+        public Optional<Schreiben> lade(SchreibenId id) {
+            return mitId(id);
+        }
+
         @Override
         public Optional<Schreiben> zuSnapshot(SnapshotId snapshot) {
             return Optional.ofNullable(gespeichert.get(snapshot));
+        }
+
+        /** Filtert wie die Datenbankabfrage vor dem Paginieren und Zählen. */
+        @Override
+        public Seite<Schreiben> sichtbareZu(FachlicherBezug bezug, Seitenanfrage anfrage) {
+            abfragen++;
+            List<Schreiben> sichtbare = gespeichert.values().stream()
+                    .filter(schreiben -> schreiben.bezug().equals(bezug))
+                    .filter(Schreiben::istSichtbar)
+                    .sorted(Comparator.comparing(Schreiben::erstellt).reversed())
+                    .toList();
+            return new Seite<>(sichtbare.stream().skip(anfrage.versatz()).limit(anfrage.groesse()).toList(),
+                    sichtbare.size(), anfrage);
+        }
+
+        @Override
+        public void ersetze(Schreiben geaendert) {
+            gespeichert.put(geaendert.snapshot(), geaendert);
+        }
+
+        @Override
+        public void entferne(SchreibenId id) {
+            mitId(id).ifPresent(schreiben -> gespeichert.remove(schreiben.snapshot()));
         }
 
         @Override
