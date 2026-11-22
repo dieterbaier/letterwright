@@ -114,7 +114,14 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
             case Speicherausgang.SnapshotBereitsVerbraucht bereits -> {
                 // Eine gleichzeitige Anfrage war schneller; ihr PDF gilt, auf dieses verweist sicher nichts.
                 dokumente.entferne(dokument);
-                yield new Speicherergebnis.BereitsGespeichert(bereits.vorhandenes().id());
+                yield bereits.vorhandenes().istSichtbar()
+                        ? new Speicherergebnis.BereitsGespeichert(bereits.vorhandenes().id())
+                        : new Speicherergebnis.SnapshotUnbekannt();
+            }
+            case Speicherausgang.SchreibenEntfernt entfernt -> {
+                // Das Schreiben der schnelleren Anfrage ist schon gelöscht; auf dieses PDF verweist sicher nichts.
+                dokumente.entferne(dokument);
+                yield new Speicherergebnis.SnapshotUnbekannt();
             }
         };
     }

@@ -268,15 +268,41 @@ class SchreibenspeicherungTest {
     @ValueSource(strings = {"hart", "logisch"})
     void istDasSchreibenGeloeschtFindetEineWiederholungDesSpeichernsNichtsMehr(String art) {
         var gespeichert = (Speicherergebnis.Gespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
-        var richtlinie = new Attrappen.Loeschrichtlinie();
-        richtlinie.entscheidung = art.equals("hart") ? Loeschentscheidung.hart() : Loeschentscheidung.logisch();
-        host.erlaube(ERIKA, SchreibenAktion.LOESCHEN, KUNDE_4711);
-        new Schreibenloeschung(schreiben, host, richtlinie, dokumente, uhr).loesche(ERIKA, gespeichert.schreiben());
+        loesche(gespeichert.schreiben(), art);
 
         var erneut = speicherung.speichere(ERIKA, vorschauVonErika);
 
         assertThat(erneut).isInstanceOf(Speicherergebnis.SnapshotUnbekannt.class);
         assertThat(renderer.pdfs).as("kein weiteres PDF").isEqualTo(1);
+    }
+
+    @ParameterizedTest(name = "{0} gelöscht")
+    @ValueSource(strings = {"hart", "logisch"})
+    void wirdDasSchreibenEinerGleichzeitigenAnfrageGeloeschtWirdNichtsGespeichert(String art) {
+        // Given: Eine zweite Anfrage speichert dieselbe Vorschau, ihr Schreiben wird gelöscht, bevor diese speichert
+        byte[] pdfDerZweiten = {1};
+        SchreibenAusSnapshot derZweitenAnfrage = Schreiben.ausSnapshot(SchreibenId.neu(),
+                snapshots.lade(vorschauVonErika).orElseThrow(), dokumente.lege(pdfDerZweiten),
+                Pruefsumme.ueber(pdfDerZweiten), uhr.jetzt);
+        schreiben.zuvor = () -> {
+            schreiben.uebernimm(derZweitenAnfrage);
+            loesche(derZweitenAnfrage.schreiben().id(), art);
+        };
+
+        var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        // Then: kein Schreiben, und das eigene PDF ist wieder entfernt
+        assertThat(ergebnis).isInstanceOf(Speicherergebnis.SnapshotUnbekannt.class);
+        assertThat(schreiben.gespeichert.values()).noneMatch(Schreiben::istSichtbar);
+        assertThat(dokumente.abgelegt.keySet()).as("nur noch das PDF eines logisch gelöschten Schreibens")
+                .isSubsetOf(derZweitenAnfrage.schreiben().dokument());
+    }
+
+    private void loesche(SchreibenId id, String art) {
+        var richtlinie = new Attrappen.Loeschrichtlinie();
+        richtlinie.entscheidung = art.equals("hart") ? Loeschentscheidung.hart() : Loeschentscheidung.logisch();
+        host.erlaube(ERIKA, SchreibenAktion.LOESCHEN, KUNDE_4711);
+        new Schreibenloeschung(schreiben, host, richtlinie, dokumente, uhr).loesche(ERIKA, id);
     }
 
     @Test
