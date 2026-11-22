@@ -42,11 +42,12 @@ class HostSiehtNurDasSpiTest {
     void derBeispielHostImplementiertAlleDreiSchnittstellen() {
         var host = new BeispielHost();
         var kunde = new FachlicherBezug("Kunde", "4711");
+        var mahnung = new Standardschreibenkennung(UUID.randomUUID(), "Mahnung");
 
-        assertThat(host.datenkontext(new Datenanfrage("erika", kunde,
-                new Standardschreibenkennung(UUID.randomUUID(), "Mahnung"))).werte())
+        assertThat(host.datenkontext(new Datenanfrage("erika", kunde, mahnung)).werte())
                 .isEqualTo(Map.of("kunde", "4711"));
-        assertThat(host.istErlaubt(Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.ERZEUGEN, kunde))).isTrue();
+        assertThat(host.istErlaubt(Berechtigungsanfrage.zumErzeugen("erika", kunde, mahnung))).isTrue();
+        assertThat(host.istErlaubt(Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.ANSEHEN, kunde))).isTrue();
     }
 
     @Test

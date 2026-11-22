@@ -7,7 +7,9 @@ import dieterbaier.standardschreiben.spi.SchreibenAktion;
 import dieterbaier.standardschreiben.spi.VorlagenAktion;
 import dieterbaier.standardschreiben.spi.Berechtigungsanfrage;
 import dieterbaier.standardschreiben.spi.FachlicherBezug;
+import dieterbaier.standardschreiben.spi.Standardschreibenkennung;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -18,7 +20,7 @@ class RollenBerechtigungspruefungTest {
 
     private static final FachlicherBezug KUNDE = new FachlicherBezug("Kunde", "4711");
     private static final Berechtigungsanfrage ERZEUGEN =
-            Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.ERZEUGEN, KUNDE);
+            Berechtigungsanfrage.zumErzeugen("erika", KUNDE, new Standardschreibenkennung(UUID.randomUUID(), "Mahnung"));
 
     private final RollenBerechtigungspruefung pruefung = new RollenBerechtigungspruefung(
             new Berechtigungseigenschaften(Map.of(), Map.of()), new AuthenticationTrustResolverImpl());
@@ -42,6 +44,16 @@ class RollenBerechtigungspruefungTest {
         assertThat(pruefung.istErlaubt(Berechtigungsanfrage.zuVorlagen("erika", VorlagenAktion.VEROEFFENTLICHEN)))
                 .isTrue();
         assertThat(pruefung.istErlaubt(Berechtigungsanfrage.zuVorlagen("erika", VorlagenAktion.BEARBEITEN)))
+                .isFalse();
+    }
+
+    @Test
+    void eineAktionAnGespeichertenSchreibenHatIhreEigeneRolle() {
+        anmelden("erika", true, "ROLE_SSW_SCHREIBEN_HERUNTERLADEN");
+
+        assertThat(pruefung.istErlaubt(Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.HERUNTERLADEN, KUNDE)))
+                .isTrue();
+        assertThat(pruefung.istErlaubt(Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.ANSEHEN, KUNDE)))
                 .isFalse();
     }
 
@@ -74,7 +86,7 @@ class RollenBerechtigungspruefungTest {
     @Test
     void eineKonfigurierteRolleErsetztDenDefault() {
         var konfiguriert = new RollenBerechtigungspruefung(
-                new Berechtigungseigenschaften(Map.of(), Map.of(SchreibenAktion.ERZEUGEN, "ROLE_SACHBEARBEITUNG")),
+                new Berechtigungseigenschaften(Map.of(), Map.of(SchreibenRolle.ERZEUGEN, "ROLE_SACHBEARBEITUNG")),
                 new AuthenticationTrustResolverImpl());
         anmelden("erika", true, "ROLE_SSW_SCHREIBEN_ERZEUGEN");
 
@@ -87,7 +99,7 @@ class RollenBerechtigungspruefungTest {
 
     @Test
     void eineLeereRolleIstUnzulaessig() {
-        assertThatThrownBy(() -> new Berechtigungseigenschaften(Map.of(), Map.of(SchreibenAktion.LOESCHEN, " ")))
+        assertThatThrownBy(() -> new Berechtigungseigenschaften(Map.of(), Map.of(SchreibenRolle.LOESCHEN, " ")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("rollen.schreiben.LOESCHEN");
         assertThatThrownBy(() -> new Berechtigungseigenschaften(Map.of(VorlagenAktion.BEARBEITEN, ""), Map.of()))

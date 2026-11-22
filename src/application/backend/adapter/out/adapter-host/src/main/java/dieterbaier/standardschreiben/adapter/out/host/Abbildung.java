@@ -39,7 +39,6 @@ final class Abbildung {
 
     static dieterbaier.standardschreiben.spi.SchreibenAktion zumSpi(SchreibenAktion aktion) {
         return switch (aktion) {
-            case ERZEUGEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.ERZEUGEN;
             case ANSEHEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.ANSEHEN;
             case HERUNTERLADEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.HERUNTERLADEN;
             case LOESCHEN -> dieterbaier.standardschreiben.spi.SchreibenAktion.LOESCHEN;

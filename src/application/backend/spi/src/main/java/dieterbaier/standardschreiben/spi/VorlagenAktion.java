@@ -1,7 +1,7 @@
 package dieterbaier.standardschreiben.spi;
 
 /** Eine Handlung an Briefpapier und Standardschreiben. Sie hat keinen fachlichen Bezug. */
-public enum VorlagenAktion implements Aktion {
+public enum VorlagenAktion {
 
     /** Briefpapier und Standardschreiben anlegen, Entwürfe ändern und neue Entwürfe anlegen. */
     BEARBEITEN,

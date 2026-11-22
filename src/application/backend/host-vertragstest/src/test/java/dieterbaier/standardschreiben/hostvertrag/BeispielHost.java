@@ -25,8 +25,9 @@ final class BeispielHost implements PlatzhalterdatenAnbieter, Berechtigungspruef
     public boolean istErlaubt(Berechtigungsanfrage anfrage) {
         return switch (anfrage) {
             case Berechtigungsanfrage.ZuVorlagen vorlagen -> false;
-            case Berechtigungsanfrage.ZuSchreiben schreiben -> schreiben.benutzerkennung().equals("erika")
-                    && schreiben.bezug().typ().equals("Kunde");
+            case Berechtigungsanfrage.ZuSchreiben schreiben -> schreiben.benutzerkennung().equals("erika");
+            case Berechtigungsanfrage.ZumErzeugen erzeugen -> erzeugen.benutzerkennung().equals("erika")
+                    && erzeugen.standardschreiben().name().equals("Mahnung");
         };
     }
 

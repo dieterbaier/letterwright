@@ -2,12 +2,12 @@ package dieterbaier.standardschreiben.domaene.modell;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 
-/** Eine Handlung an den Schreiben zu einem {@link FachlicherBezug}. */
+/**
+ * Eine Handlung an den gespeicherten Schreiben zu einem {@link FachlicherBezug}. Das Erzeugen gehört nicht dazu, weil
+ * der Host dafür auch das Standardschreiben kennen muss (ADR-020).
+ */
 @ValueObject
-public enum SchreibenAktion implements Aktion {
-
-    /** Umfasst Vorschau und Speichern. */
-    ERZEUGEN,
+public enum SchreibenAktion {
 
     ANSEHEN,
 
