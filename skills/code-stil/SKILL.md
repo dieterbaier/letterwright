@@ -31,7 +31,7 @@ laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
 2. **Ein Flag oder ein optionales Feld ist ein fehlender Typ.** Hängt an einem
    `boolean` oder einem `@Nullable`-Feld, welche anderen Werte gültig sind, entwirf
    stattdessen einen Sealed Type mit einem Record je Fall. Vorbild:
-   `Berechtigungsanfrage` mit `ZuVorlagen` und `ZuSchreiben`.
+   `Berechtigungsanfrage` mit `ZuVorlagen`, `ZuSchreiben` und `ZumErzeugen`.
 3. **Kein `null` als Ergebnis.** Darf ein Ergebnis fehlen, gib ein `Optional`
    zurück. `Optional` ist kein Feld und kein Parameter.
 4. **Die Grenze bleibt geprüft.** Werte vom Host (SPI-Rückgaben) sind nicht
