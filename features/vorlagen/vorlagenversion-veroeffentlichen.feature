@@ -79,6 +79,18 @@ Funktionalität: Vorlagenversion veröffentlichen
     Dann ist der Stand veraltet
     Und der geänderte, ungeprüfte Entwurf bleibt ein Entwurf
 
+  Szenariogrundriss: Wird das Briefpapier während der Prüfung geändert, zählt der Prüfzeitpunkt
+    Angenommen ein anderer Vorlagenverwalter hat das Briefpapier <aenderung>, während die Mahnung geprüft wird
+    Wenn Vera die Mahnung veröffentlicht
+    Dann wurde das Probe-PDF mit Briefpapier Version 1 geprüft
+    Und Version 2 der Mahnung ist veröffentlicht
+    Und das Briefpapier ist <danach>
+
+    Beispiele:
+      | aenderung                | danach                       |
+      | durch Version 2 abgelöst | in Version 2 veröffentlicht  |
+      | zurückgezogen            | ohne veröffentlichte Version |
+
   Szenario: Eine veröffentlichte Version bleibt unverändert, eine Änderung beginnt einen neuen Entwurf
     Angenommen Vera hat die Mahnung veröffentlicht
     Wenn die veröffentlichte Version geändert werden soll

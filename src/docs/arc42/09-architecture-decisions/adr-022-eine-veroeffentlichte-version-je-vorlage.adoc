@@ -102,6 +102,18 @@ aus). Der ADR ist KI-gestützt formuliert und wartet auf das Review.
   Repository ersetzt eine Vorlage deshalb nur, wenn sie seit dem Laden unverändert
   ist; sonst wird nichts gespeichert, und der Benutzer lädt neu. So wird nie ein
   Inhalt veröffentlicht, der nicht geprüft wurde.
+* **Für das Gegenstück zählt der Prüfzeitpunkt.** Das bedingte Ersetzen sichert
+  nur die Vorlage, die veröffentlicht wird, nicht ihr Briefpapier. Wird das
+  Briefpapier während der Prüfung eines Standardschreibens abgelöst oder
+  zurückgezogen, wird das Standardschreiben trotzdem veröffentlicht. Das Ergebnis
+  gleicht der erlaubten Reihenfolge „erst das Standardschreiben veröffentlichen,
+  dann das Briefpapier ändern“:
+** Nach einer Ablösung entstehen neue Schreiben mit dem neuen Briefpapier, mit
+   dem das Standardschreiben nicht geprüft wurde. Das gilt für jede spätere
+   Ablösung ebenso (siehe Konsequenzen). Die Prüfung vor jedem Speichern fängt
+   ein nicht konformes PDF ab.
+** Nach einem Rückzug entsteht mit dem Standardschreiben keine Vorschau, bis ein
+   Briefpapier veröffentlicht ist.
 
 === Kontext
 
@@ -205,4 +217,9 @@ include::generated/adr-022-eine-veroeffentlichte-version-je-vorlage-traceability
 
 === Review Notes
 
-Noch kein Review.
+Im Review von PR #68 fragte der Owner, welcher Zeitpunkt für das veröffentlichte
+Briefpapier zählt, wenn es sich während der Prüfung eines Standardschreibens
+ändert. Am 2026-11-22 entschied er: der Prüfzeitpunkt. Der Port prüft das
+Briefpapier beim Ersetzen nicht mit; Entscheidung „Für das Gegenstück zählt der
+Prüfzeitpunkt“ und das Szenario dazu in
+`features/vorlagen/vorlagenversion-veroeffentlichen.feature`.

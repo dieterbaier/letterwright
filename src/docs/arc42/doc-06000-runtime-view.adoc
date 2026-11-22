@@ -253,7 +253,9 @@ die Prüfung nicht ausführen, wird ebenfalls nichts veröffentlicht. Ein
 Standardschreiben ohne veröffentlichtes Briefpapier wird nicht veröffentlicht.
 Die Persistenz ersetzt die Vorlage nur, wenn sie seit dem Laden unverändert ist;
 sonst meldet die Bibliothek „veraltet“, und kein ungeprüfter Inhalt wird
-veröffentlicht. Danach ist die neue Version die einzige veröffentlichte, die
+veröffentlicht. Das Briefpapier eines Standardschreibens sichert dieses Ersetzen
+nicht: Wird es während der Prüfung abgelöst oder zurückgezogen, zählt der
+Prüfzeitpunkt, als wäre das Briefpapier erst danach geändert worden. Danach ist die neue Version die einzige veröffentlichte, die
 bisherige ist abgelöst; gespeicherte Schreiben behalten ihre Versionen
 (xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022]).
 
