@@ -35,7 +35,7 @@ class SnapshotTest {
         assertThat(snapshot.bezug()).isEqualTo(KUNDE);
         assertThat(snapshot.briefpapier()).isEqualTo(BRIEFPAPIER_V1);
         assertThat(snapshot.standardschreiben()).isEqualTo(STANDARDSCHREIBEN_V3);
-        assertThat(snapshot.datenkontext()).isEqualTo(DATENKONTEXT);
+        assertThat(snapshot.zustand()).isEqualTo(new Snapshotzustand.Offen(DATENKONTEXT));
     }
 
     @Test
@@ -61,8 +61,30 @@ class SnapshotTest {
 
     @Test
     void erkenntEinenGeaendertenDatenkontext() {
-        assertThat(snapshot.hatUnveraendertenDatenkontext(Datenkontext.aus(Map.of("name", "Erika")))).isTrue();
-        assertThat(snapshot.hatUnveraendertenDatenkontext(Datenkontext.aus(Map.of("name", "Max")))).isFalse();
+        var offen = (Snapshotzustand.Offen) snapshot.zustand();
+
+        assertThat(offen.istUnveraendert(Datenkontext.aus(Map.of("name", "Erika")))).isTrue();
+        assertThat(offen.istUnveraendert(Datenkontext.aus(Map.of("name", "Max")))).isFalse();
+    }
+
+    @Test
+    void einVerbrauchterSnapshotHaeltKeinenDatenkontextMehr() {
+        Snapshot verbraucht = snapshot.verbraucht();
+
+        assertThat(verbraucht.zustand()).isEqualTo(new Snapshotzustand.Verbraucht());
+        assertThat(verbraucht).isEqualTo(snapshot);
+        assertThat(verbraucht.benutzer()).isEqualTo(SACHBEARBEITER);
+        assertThat(verbraucht.bezug()).isEqualTo(KUNDE);
+        assertThat(verbraucht.standardschreiben()).isEqualTo(STANDARDSCHREIBEN_V3);
+        assertThat(verbraucht.ablauf()).isEqualTo(snapshot.ablauf());
+    }
+
+    @Test
+    void einSnapshotWirdNurEinmalVerbraucht() {
+        Snapshot verbraucht = snapshot.verbraucht();
+
+        org.assertj.core.api.Assertions.assertThatIllegalStateException().isThrownBy(verbraucht::verbraucht)
+                .withMessageContaining("schon ein Schreiben");
     }
 
     @Test
@@ -84,7 +106,9 @@ class SnapshotTest {
         lehntAb(() -> Snapshot.anlegen(id, SACHBEARBEITER, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, DATENKONTEXT,
                 null), "Zeitpunkt der Anlage");
         lehntAb(() -> Snapshot.wiederherstellen(id, SACHBEARBEITER, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3,
-                DATENKONTEXT, null), "Ablaufzeitpunkt");
+                new Snapshotzustand.Offen(DATENKONTEXT), null), "Ablaufzeitpunkt");
+        lehntAb(() -> Snapshot.wiederherstellen(id, SACHBEARBEITER, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, null,
+                JETZT), "Zustand des Snapshots");
     }
 
     @Test
@@ -92,7 +116,7 @@ class SnapshotTest {
         Instant ablauf = JETZT.plusSeconds(5);
 
         Snapshot geladen = Snapshot.wiederherstellen(snapshot.id(), SACHBEARBEITER, KUNDE, BRIEFPAPIER_V1,
-                STANDARDSCHREIBEN_V3, DATENKONTEXT, ablauf);
+                STANDARDSCHREIBEN_V3, new Snapshotzustand.Verbraucht(), ablauf);
 
         assertThat(geladen.ablauf()).isEqualTo(ablauf);
         assertThat(geladen).as("gleich über die ID").isEqualTo(snapshot).hasSameHashCodeAs(snapshot);

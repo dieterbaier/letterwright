@@ -9,9 +9,11 @@ import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Briefpapier;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
@@ -44,7 +46,7 @@ class SchreibenSpeichernTest {
     private final Attrappen.Renderer renderer = new Attrappen.Renderer();
     private final Attrappen.Pruefer pruefer = new Attrappen.Pruefer();
     private final Attrappen.Dokumente dokumente = new Attrappen.Dokumente();
-    private final Attrappen.SchreibenAblage schreiben = new Attrappen.SchreibenAblage();
+    private final Attrappen.SchreibenAblage schreiben = new Attrappen.SchreibenAblage(snapshots);
     private final Attrappen.Uhr uhr = new Attrappen.Uhr(VORSCHAU);
     private final Vorschauerzeugung vorschau = new Vorschauerzeugung(vorlagen, host, host, renderer, snapshots, uhr);
     private final Schreibenspeicherung speicherung = new Schreibenspeicherung(snapshots, vorlagen, host, host, renderer,
@@ -71,6 +73,7 @@ class SchreibenSpeichernTest {
         Schreiben gespeichert = schreiben.gespeichert.get(vorschauVonErika);
         assertThat(ergebnis).isEqualTo(new Speicherergebnis.Gespeichert(gespeichert.id()));
         Snapshot snapshot = snapshots.lade(vorschauVonErika).orElseThrow();
+        assertThat(snapshot.zustand()).as("Datenkontext freigegeben").isEqualTo(new Snapshotzustand.Verbraucht());
         assertThat(gespeichert.briefpapier()).isEqualTo(snapshot.briefpapier());
         assertThat(gespeichert.standardschreiben()).isEqualTo(snapshot.standardschreiben());
         assertThat(gespeichert.bezug()).isEqualTo(KUNDE_4711);
@@ -147,6 +150,13 @@ class SchreibenSpeichernTest {
     }
 
     @Test
+    void auchNachDemSpeichernBleibtEinFremderSnapshotVerborgen() {
+        speicherung.speichere(ERIKA, vorschauVonErika);
+
+        assertThat(speicherung.speichere(MAX, vorschauVonErika)).isInstanceOf(Speicherergebnis.SnapshotUnbekannt.class);
+    }
+
+    @Test
     void einAbgelaufenerSnapshotWirdNichtGespeichert() {
         uhr.jetzt = VORSCHAU.plus(Duration.ofMinutes(30));
 
@@ -159,25 +169,46 @@ class SchreibenSpeichernTest {
     @Test
     void wiederholtesSpeichernDerselbenVorschauErgibtKeinZweitesSchreiben() {
         var erstes = (Speicherergebnis.Gespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
+        host.datenkontextAngefragt = 0;
 
         var erneut = speicherung.speichere(ERIKA, vorschauVonErika);
 
+        // Then: dasselbe Schreiben, ohne Datenkontext und ohne neues PDF
         assertThat(erneut).isEqualTo(new Speicherergebnis.BereitsGespeichert(erstes.schreiben()));
+        assertThat(host.datenkontextAngefragt).isZero();
         assertThat(renderer.pdfs).isEqualTo(1);
         assertThat(dokumente.abgelegt).hasSize(1);
     }
 
     @Test
+    void bleibtDerAusgangDesSpeichernsUngewissBleibtDasPdfErhalten() {
+        // Given: Die Persistenz speichert, aber die Bestätigung geht verloren
+        schreiben.danach = Optional.of(new IllegalStateException("Verbindung abgebrochen"));
+
+        // When: Erika speichert; das Speichern schlägt mit einem Fehler fehl
+        assertThatThrownBy(() -> speicherung.speichere(ERIKA, vorschauVonErika))
+                .hasMessageContaining("Verbindung abgebrochen");
+
+        // Then: Das PDF ist noch abgelegt; eine Wiederholung liefert das Schreiben mit genau diesem PDF
+        schreiben.danach = Optional.empty();
+        var erneut = (Speicherergebnis.BereitsGespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
+        Schreiben gespeichert = schreiben.gespeichert.get(vorschauVonErika);
+        assertThat(erneut.schreiben()).isEqualTo(gespeichert.id());
+        assertThat(dokumente.abgelegt).containsOnlyKeys(gespeichert.dokument());
+    }
+
+    @Test
     void gleichzeitigesSpeichernDerselbenVorschauErgibtEinSchreiben() {
-        Snapshot snapshot = snapshots.lade(vorschauVonErika).orElseThrow();
-        Schreiben derZweitenAnfrage = Schreiben.ausSnapshot(SchreibenId.neu(), snapshot,
-                new Dokumentverweis("ablage/zweite"), Pruefsumme.ueber(new byte[] {1}), uhr.jetzt);
-        schreiben.zuvor = Optional.of(derZweitenAnfrage);
+        // Given: Eine zweite Anfrage verbraucht den Snapshot, während diese ihr PDF erzeugt
+        SchreibenAusSnapshot derZweitenAnfrage = Schreiben.ausSnapshot(SchreibenId.neu(),
+                snapshots.lade(vorschauVonErika).orElseThrow(), new Dokumentverweis("ablage/zweite"),
+                Pruefsumme.ueber(new byte[] {1}), uhr.jetzt);
+        schreiben.zuvor = () -> schreiben.uebernimm(derZweitenAnfrage);
 
         var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
 
-        assertThat(ergebnis).isEqualTo(new Speicherergebnis.BereitsGespeichert(derZweitenAnfrage.id()));
-        assertThat(schreiben.gespeichert).containsOnly(Map.entry(vorschauVonErika, derZweitenAnfrage));
+        assertThat(ergebnis).isEqualTo(new Speicherergebnis.BereitsGespeichert(derZweitenAnfrage.schreiben().id()));
+        assertThat(schreiben.gespeichert).containsOnly(Map.entry(vorschauVonErika, derZweitenAnfrage.schreiben()));
         assertThat(dokumente.abgelegt).isEmpty();
     }
 
@@ -201,12 +232,11 @@ class SchreibenSpeichernTest {
     }
 
     @Test
-    void scheitertDasSpeichernWirdDasAbgelegtePdfEntfernt() {
-        schreiben.fehler = Optional.of(new IllegalStateException("Datenbank nicht erreichbar"));
+    void einVerbrauchterSnapshotOhneSchreibenIstEinDefekterBestand() {
+        snapshots.speichere(snapshots.lade(vorschauVonErika).orElseThrow().verbraucht());
 
         assertThatThrownBy(() -> speicherung.speichere(ERIKA, vorschauVonErika))
-                .hasMessageContaining("Datenbank nicht erreichbar");
-        nichtsGespeichertOderAbgelegt();
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("kein Schreiben");
     }
 
     @Test
@@ -225,8 +255,11 @@ class SchreibenSpeichernTest {
         return ((Vorschauergebnis.Erzeugt) vorschau.erzeuge(benutzer, KUNDE_4711, mahnung.id())).snapshot();
     }
 
+    /** Auch der Snapshot bleibt offen und behält seinen Datenkontext für einen weiteren Versuch. */
     private void nichtsGespeichertOderAbgelegt() {
         assertThat(schreiben.gespeichert).isEmpty();
         assertThat(dokumente.abgelegt).isEmpty();
+        assertThat(snapshots.lade(vorschauVonErika).orElseThrow().zustand())
+                .isInstanceOf(Snapshotzustand.Offen.class);
     }
 }

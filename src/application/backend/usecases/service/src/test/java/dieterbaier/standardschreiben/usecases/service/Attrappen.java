@@ -7,8 +7,10 @@ import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Briefpapier;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
@@ -20,6 +22,7 @@ import dieterbaier.standardschreiben.usecases.out.KonformitaetsPruefer;
 import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.usecases.out.SchreibenRepository;
 import dieterbaier.standardschreiben.usecases.out.Snapshotablage;
+import dieterbaier.standardschreiben.usecases.out.Speicherausgang;
 import dieterbaier.standardschreiben.usecases.out.VorlagenRepository;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -195,14 +198,20 @@ final class Attrappen {
     }
 
     /**
-     * Hält die Eindeutigkeit je Snapshot wie die Persistenz. {@link #zuvor} simuliert eine gleichzeitige Anfrage, die
-     * zwischen Suche und Speichern ein Schreiben zum selben Snapshot ablegt.
+     * Verhält sich wie die Persistenz: Schreiben speichern und Snapshot verbrauchen geschieht in einem Schritt und nur bei
+     * offenem Snapshot. {@link #zuvor} läuft vor diesem Schritt und simuliert eine gleichzeitige Anfrage;
+     * {@link #danach} wirft nach dem Speichern, als ginge die Bestätigung verloren.
      */
     static final class SchreibenAblage implements SchreibenRepository {
 
         final Map<SnapshotId, Schreiben> gespeichert = new HashMap<>();
-        Optional<Schreiben> zuvor = Optional.empty();
-        Optional<RuntimeException> fehler = Optional.empty();
+        private final Snapshots snapshots;
+        Runnable zuvor = () -> { };
+        Optional<RuntimeException> danach = Optional.empty();
+
+        SchreibenAblage(Snapshots snapshots) {
+            this.snapshots = snapshots;
+        }
 
         @Override
         public Optional<Schreiben> zuSnapshot(SnapshotId snapshot) {
@@ -210,12 +219,25 @@ final class Attrappen {
         }
 
         @Override
-        public Schreiben speichereEinmalig(Schreiben schreiben) {
-            fehler.ifPresent(f -> {
-                throw f;
+        public Speicherausgang speichere(SchreibenAusSnapshot neu) {
+            zuvor.run();
+            Speicherausgang ausgang = uebernimm(neu);
+            danach.ifPresent(fehler -> {
+                throw fehler;
             });
-            zuvor.ifPresent(gleichzeitig -> gespeichert.put(gleichzeitig.snapshot(), gleichzeitig));
-            return gespeichert.computeIfAbsent(schreiben.snapshot(), snapshot -> schreiben);
+            return ausgang;
+        }
+
+        /** Der atomare Schritt selbst, ohne die simulierten Störungen. */
+        Speicherausgang uebernimm(SchreibenAusSnapshot neu) {
+            SnapshotId id = neu.verbrauchterSnapshot().id();
+            Snapshot aktuell = snapshots.snapshots.get(id);
+            if (aktuell.zustand() instanceof Snapshotzustand.Verbraucht) {
+                return new Speicherausgang.SnapshotBereitsVerbraucht(gespeichert.get(id));
+            }
+            gespeichert.put(id, neu.schreiben());
+            snapshots.snapshots.put(id, neu.verbrauchterSnapshot());
+            return new Speicherausgang.Gespeichert();
         }
     }
 }
