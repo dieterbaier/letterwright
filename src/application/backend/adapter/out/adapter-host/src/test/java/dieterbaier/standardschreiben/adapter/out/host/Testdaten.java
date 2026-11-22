@@ -5,6 +5,7 @@ import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreibenzustand;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
@@ -26,7 +27,7 @@ final class Testdaten {
     static final Schreiben SCHREIBEN = Schreiben.wiederherstellen(SchreibenId.neu(), SnapshotId.neu(), KUNDE,
             new Versionsverweis(VorlagenId.neu(), Versionsnummer.ERSTE),
             new Versionsverweis(MAHNUNG.id(), Versionsnummer.ERSTE), new Dokumentverweis("ablage/1.pdf"),
-            Pruefsumme.ueber("pdf".getBytes(StandardCharsets.UTF_8)), ERSTELLT);
+            Pruefsumme.ueber("pdf".getBytes(StandardCharsets.UTF_8)), ERSTELLT, new Schreibenzustand.Sichtbar());
 
     /**
      * So sehen Benutzer, Bezug und Mahnung im SPI aus. Von Hand aufgebaut und nicht über {@link Abbildung}, damit ein

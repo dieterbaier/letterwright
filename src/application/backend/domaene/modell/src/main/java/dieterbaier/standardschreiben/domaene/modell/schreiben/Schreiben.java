@@ -16,6 +16,9 @@ import org.jmolecules.ddd.annotation.Identity;
  *
  * <p>Jedes Schreiben kennt den Snapshot, aus dem es entstand. Zu einem Snapshot gibt es höchstens ein Schreiben, damit
  * ein wiederholtes Speichern derselben Vorschau kein zweites erzeugt (ADR-021).
+ *
+ * <p>Ob ein Schreiben noch sichtbar ist, sagt sein {@link Schreibenzustand}. Ein logisch gelöschtes behandeln alle
+ * Anwendungsfälle wie ein nicht vorhandenes.
  */
 @AggregateRoot
 public final class Schreiben {
@@ -29,9 +32,11 @@ public final class Schreiben {
     private final Dokumentverweis dokument;
     private final Pruefsumme pdfPruefsumme;
     private final Instant erstellt;
+    private final Schreibenzustand zustand;
 
     private Schreiben(SchreibenId id, SnapshotId snapshot, FachlicherBezug bezug, Versionsverweis briefpapier,
-            Versionsverweis standardschreiben, Dokumentverweis dokument, Pruefsumme pdfPruefsumme, Instant erstellt) {
+            Versionsverweis standardschreiben, Dokumentverweis dokument, Pruefsumme pdfPruefsumme, Instant erstellt,
+            Schreibenzustand zustand) {
         this.id = Pruefe.pflicht(id, "Die ID des Schreibens");
         this.snapshot = Pruefe.pflicht(snapshot, "Der Snapshot des Schreibens");
         this.bezug = Pruefe.pflicht(bezug, "Der fachliche Bezug des Schreibens");
@@ -40,6 +45,7 @@ public final class Schreiben {
         this.dokument = Pruefe.pflicht(dokument, "Der Dokumentverweis des Schreibens");
         this.pdfPruefsumme = Pruefe.pflicht(pdfPruefsumme, "Die Prüfsumme des PDFs");
         this.erstellt = Pruefe.pflicht(erstellt, "Der Erstellungszeitpunkt des Schreibens");
+        this.zustand = Pruefe.pflicht(zustand, "Der Zustand des Schreibens");
     }
 
     /**
@@ -60,13 +66,33 @@ public final class Schreiben {
         }
         Snapshot verbraucht = snapshot.verbraucht();
         return new SchreibenAusSnapshot(new Schreiben(id, snapshot.id(), snapshot.bezug(), snapshot.briefpapier(),
-                snapshot.standardschreiben(), dokument, pdfPruefsumme, jetzt), verbraucht);
+                snapshot.standardschreiben(), dokument, pdfPruefsumme, jetzt, new Schreibenzustand.Sichtbar()),
+                verbraucht);
     }
 
     public static Schreiben wiederherstellen(SchreibenId id, SnapshotId snapshot, FachlicherBezug bezug,
             Versionsverweis briefpapier, Versionsverweis standardschreiben, Dokumentverweis dokument,
-            Pruefsumme pdfPruefsumme, Instant erstellt) {
-        return new Schreiben(id, snapshot, bezug, briefpapier, standardschreiben, dokument, pdfPruefsumme, erstellt);
+            Pruefsumme pdfPruefsumme, Instant erstellt, Schreibenzustand zustand) {
+        return new Schreiben(id, snapshot, bezug, briefpapier, standardschreiben, dokument, pdfPruefsumme, erstellt,
+                zustand);
+    }
+
+    /**
+     * Das Schreiben, wie es nach einer logischen Löschung ist: Das PDF bleibt, sichtbar ist es nicht mehr. Ob gelöscht
+     * werden darf und wie, entscheiden Berechtigung und Löschrichtlinie des Hosts, nicht das Schreiben.
+     *
+     * @throws IllegalStateException wenn das Schreiben schon logisch gelöscht ist
+     */
+    public Schreiben logischGeloescht(Instant jetzt) {
+        if (zustand instanceof Schreibenzustand.LogischGeloescht) {
+            throw new IllegalStateException("Schreiben " + id.wert() + " ist schon logisch gelöscht");
+        }
+        return new Schreiben(id, snapshot, bezug, briefpapier, standardschreiben, dokument, pdfPruefsumme, erstellt,
+                new Schreibenzustand.LogischGeloescht(Pruefe.pflicht(jetzt, "Der Zeitpunkt")));
+    }
+
+    public boolean istSichtbar() {
+        return zustand instanceof Schreibenzustand.Sichtbar;
     }
 
     public SchreibenId id() {
@@ -99,6 +125,10 @@ public final class Schreiben {
 
     public Instant erstellt() {
         return erstellt;
+    }
+
+    public Schreibenzustand zustand() {
+        return zustand;
     }
 
     /** Gleich sind zwei Instanzen mit derselben ID. */
