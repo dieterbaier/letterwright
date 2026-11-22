@@ -22,7 +22,7 @@ public sealed interface Speicherergebnis {
         }
     }
 
-    /** Den Snapshot gibt es nicht, oder er gehört einem anderen Benutzer. */
+    /** Den Snapshot gibt es nicht, er gehört einem anderen Benutzer, oder das Schreiben aus ihm ist gelöscht. */
     record SnapshotUnbekannt() implements Speicherergebnis {}
 
     /** Der Snapshot ist abgelaufen; eine neue Vorschau ist nötig. */
