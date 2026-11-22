@@ -8,6 +8,6 @@ package dieterbaier.standardschreiben.spi;
  */
 public interface PlatzhalterdatenAnbieter {
 
-    /** Die bereits formatierten Werte; nie {@code null}. Gibt es keine Werte, ein leerer Datenkontext. */
+    /** Die bereits formatierten Werte. Gibt es keine Werte, ein leerer Datenkontext. */
     Datenkontext datenkontext(Datenanfrage anfrage);
 }

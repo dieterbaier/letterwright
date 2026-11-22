@@ -69,12 +69,10 @@ public final class Briefpapier {
         return versionen.version(nummer);
     }
 
-    /** Der Entwurf, falls es einen gibt. Es gibt höchstens einen, und er ist die neueste Version. */
     public Optional<Vorlagenversion> entwurf() {
         return versionen.entwurf();
     }
 
-    /** Die veröffentlichte Version mit der höchsten Nummer, falls es eine gibt. */
     public Optional<Vorlagenversion> neuesteVeroeffentlichteVersion() {
         return versionen.neuesteVeroeffentlichte();
     }
@@ -94,7 +92,6 @@ public final class Briefpapier {
         return mit(versionen.neuerEntwurf(inhalt));
     }
 
-    /** Zieht eine veröffentlichte Version zurück. */
     public Briefpapier zurueckziehen(Versionsnummer nummer) {
         return mit(versionen.zurueckziehen(nummer));
     }

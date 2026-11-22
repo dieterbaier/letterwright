@@ -2,10 +2,10 @@ package dieterbaier.standardschreiben.hostvertrag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import dieterbaier.standardschreiben.spi.Aktion;
 import dieterbaier.standardschreiben.spi.Berechtigungsanfrage;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
 import dieterbaier.standardschreiben.spi.FachlicherBezug;
+import dieterbaier.standardschreiben.spi.SchreibenAktion;
 import dieterbaier.standardschreiben.spi.Standardschreibenkennung;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,8 +25,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Ein Host, der nur den Starter einbindet, kompiliert gegen das SPI und gegen nichts anderes aus der Bibliothek
- * (ADR-016). Der Test kompiliert Beispielquellen mit genau dem Klassenpfad, den Gradle diesem Modul gibt.
+ * Schützt den Kompilier-Klassenpfad eines Hosts (ADR-016). Ein Host, der nur den Starter einbindet, darf gegen das SPI
+ * kompilieren und gegen nichts anderes aus der Bibliothek. Sonst koppelt er sich unbemerkt an Domäne, Ports oder
+ * Adapter, und jedes Refactoring dort bricht ihn.
+ *
+ * <p>ArchUnit sieht das nicht: Es prüft die Abhängigkeiten im Code der Bibliothek, nicht, was Gradle einem Nutzer des
+ * Starters über {@code api} statt {@code implementation} mitgibt. Deshalb kompiliert der Test Beispielquellen mit genau
+ * dem Klassenpfad, den Gradle diesem Modul als Host gibt.
  */
 class HostSiehtNurDasSpiTest {
 
@@ -41,7 +46,7 @@ class HostSiehtNurDasSpiTest {
         assertThat(host.datenkontext(new Datenanfrage("erika", kunde,
                 new Standardschreibenkennung(UUID.randomUUID(), "Mahnung"))).werte())
                 .isEqualTo(Map.of("kunde", "4711"));
-        assertThat(host.istErlaubt(new Berechtigungsanfrage("erika", Aktion.SCHREIBEN_ERZEUGEN, kunde))).isTrue();
+        assertThat(host.istErlaubt(Berechtigungsanfrage.zuSchreiben("erika", SchreibenAktion.ERZEUGEN, kunde))).isTrue();
     }
 
     @Test

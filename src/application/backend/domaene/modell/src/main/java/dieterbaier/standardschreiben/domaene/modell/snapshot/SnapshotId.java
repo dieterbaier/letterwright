@@ -16,7 +16,6 @@ public record SnapshotId(UUID wert) {
         Pruefe.pflicht(wert, "Der Wert der SnapshotId");
     }
 
-    /** Vergibt eine neue, zufällige Identität. */
     public static SnapshotId neu() {
         return new SnapshotId(UUID.randomUUID());
     }

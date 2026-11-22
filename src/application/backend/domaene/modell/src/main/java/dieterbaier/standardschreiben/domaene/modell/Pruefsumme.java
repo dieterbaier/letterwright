@@ -20,7 +20,6 @@ public record Pruefsumme(String hex) {
         }
     }
 
-    /** Berechnet die Prüfsumme über die Bytes. */
     public static Pruefsumme ueber(byte[] inhalt) {
         MessageDigest sha256 = sha256();
         return new Pruefsumme(HexFormat.of().formatHex(sha256.digest(Pruefe.pflicht(inhalt, "Der Inhalt"))));
