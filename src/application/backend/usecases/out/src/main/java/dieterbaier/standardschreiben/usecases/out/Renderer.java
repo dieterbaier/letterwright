@@ -1,0 +1,11 @@
+package dieterbaier.standardschreiben.usecases.out;
+
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
+import dieterbaier.standardschreiben.domaene.modell.vorlage.Vorlagenversion;
+
+/** Führt Vorlagen und Datenkontext zusammen. Implementiert von {@code adapter-rendering} (ADR-004, ADR-005). */
+public interface Renderer {
+
+    /** Das HTML der Vorschau; paginiert wird im Browser (ADR-005). */
+    String zusammenfuehren(Vorlagenversion briefpapier, Vorlagenversion standardschreiben, Datenkontext datenkontext);
+}
