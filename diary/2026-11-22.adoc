@@ -78,6 +78,80 @@ Issues und Pull Requests.
 * #46: Ort und Form der Features noch nicht entschieden.
 * #55, #60 unverändert offen.
 
+== Zweite Sitzung: #53, #65, #54, #55
+
+Nach dem ersten Clock-out ging der Tag weiter. Die Session für PR #64 schloss der
+Owner, weil er den Eindruck hatte, sie komme ins Straucheln; die Arbeit lief in
+einer neuen Session weiter. Rekonstruiert aus `git log 51698a0..main`, den Pull
+Requests und Issues.
+
+=== Was geschah
+
+* **PR #64 gemergt** (#53, `292cd05` bis `6a97bf4`): Anwendungsfall „Schreiben
+  speichern“. ADR-021 „Höchstens ein Schreiben je Snapshot“ angenommen, die Regel
+  liegt als Zustandswechsel des Snapshots in der Domäne.
+* **Issue #65 vom Owner angelegt, PR #67 gemergt** (`b92c49b` bis `b5187e6`): Jede
+  Klasse mit eigenem Vertrag hat eine gleichnamige Testklasse. Sammeltests sind
+  aufgeteilt, die Tests von `adapter-host` bauen erwartete Werte unabhängig vom
+  Mapper. Die Konvention steht in Kapitel 4 und im Skill `code-stil`.
+* **PR #66 gemergt** (#54, `1f7e51f` bis `83c1efe`): Schreiben auflisten,
+  herunterladen und löschen; logisch gelöschte Schreiben als Zustand im Aggregat.
+  Zwei P2-Befunde im Review behoben: eine leere Seite hinter dem Ende ist gültig,
+  und eine gleichzeitige Speicheranfrage, deren Schreiben inzwischen gelöscht
+  ist, findet nichts (neuer Ausgang `SchreibenEntfernt`).
+* **PR #68 gemergt** (#55, `af47db7` bis `e552b62`): Vorlagenversion
+  veröffentlichen und zurückziehen. Neuer Zustand `ABGELOEST`, Beispieldaten an
+  der Vorlagenversion, Probe-PDF vor dem Veröffentlichen, bedingtes Ersetzen im
+  `VorlagenRepository`. ADR-022 angenommen.
+* **Issues:** #53, #54, #55 und #65 geschlossen; #55 von Hand, weil „Schließt #55“
+  beim Rebase-Merge nicht griff. Folgearbeiten kommentiert in #6 (Ausgang
+  `SchreibenEntfernt`, Beispieldaten, bedingtes Ersetzen), #7 (`erzeugeProbePdf`),
+  #8 und #9 (Pflege der Beispieldaten).
+
+=== Entscheidungen des Owners
+
+* Ein gelöschtes Schreiben: Eine Wiederholung des Speicherns bekommt „Snapshot
+  unbekannt“, auch im gleichzeitigen Pfad. Das PDF der unterlegenen Anfrage wird
+  entfernt.
+* Logisches Löschen ist ein Zustand im Aggregat `Schreiben`. Eine Übersicht ohne
+  Berechtigung ist „nicht erlaubt“. Der Download prüft die Prüfsumme; eine
+  Abweichung ist ein technischer Fehler.
+* Tests gehören zu ihrer Klasse; Anwendungsfalltests heißen nach der
+  Implementierungsklasse. Die Konvention darf allgemein gelten, wenn mit KI
+  implementiert wird.
+* Je Vorlage höchstens eine veröffentlichte Version; neue Schreiben entstehen mit
+  ihr, gespeicherte bleiben unverändert. Die bisherige wird *abgelöst*.
+* Beispieldaten pflegt der Vorlagenverwalter an der Vorlagenversion. Das
+  Probe-PDF entsteht mit dem veröffentlichten Gegenstück.
+* Für das Briefpapier zählt beim Veröffentlichen eines Standardschreibens der
+  Prüfzeitpunkt, nicht der Zeitpunkt des Speicherns.
+
+=== Gelernt
+
+* **Bedingtes Schreiben sichert nur das Aggregat, das geschrieben wird.** Beide
+  P2-Befunde des Nachmittags betrafen Vorbedingungen an einem anderen Objekt:
+  das gelöschte Schreiben hinter einem verbrauchten Snapshot und das Briefpapier
+  hinter einem Standardschreiben. Solche Lücken sieht kein Test gegen Attrappen,
+  solange niemand ein Szenario dafür schreibt.
+* **Ein Wettlauf ist harmlos, wenn sein Ergebnis einer erlaubten Reihenfolge
+  gleicht.** Das Argument trug die Entscheidung für den Prüfzeitpunkt und machte
+  eine zweite Vorbedingung im Port überflüssig.
+* **Invarianten müssen den Lauf der Zeit überstehen.** `Seite` lehnte eine leere
+  Seite hinter dem Ende ab; zwischen zwei Abrufen kann aber gelöscht werden.
+* **Eine Mutation muss unter `-Werror` kompilieren.** Konstante Bedingungen und
+  ungenutzte Variablen bricht der Compiler ab, bevor ein Test läuft. Taugliche
+  Mutationen ändern Laufzeitwerte.
+* **Erwartete Werte aus dem Produktionsmapper verbergen dessen Fehler.** Nach #65
+  erkennen die Adaptertests einen absichtlich eingebauten Abbildungsfehler.
+
+=== Offen
+
+* #60: ADR zur Ablage der Schreiben im DMS des Hosts.
+* #32: Spring-Boot-BOM schmal exportieren.
+* #6, #7, #10: Adapter und Verdrahtung, damit die Anwendungsfälle Ende-zu-Ende
+  laufen.
+* #46 und #9 unverändert offen.
+
 == Gelesen
 
 Was diese Sitzung tatsächlich abgerufen hat:
@@ -110,3 +184,28 @@ Fehlgeschlagen:
   Gegenprobe nicht wieder her; mit `command cp -f` wiederholt und geprüft.
 * Das Handoff `agent/diary-2026-11-21` im privaten Journal ist noch offen (siehe
   Clock-out).
+
+Zweite Sitzung, zusätzlich abgerufen:
+
+* Toolkit: Skills `implement-issue-workflow`, `clock-out`, `clock-in`
+  (Abschnitte Workflow, Gelesen, Bindung), `adr`; projektlokal
+  `skills/code-stil/SKILL.md`.
+* Doku: ADR-005, ADR-007, ADR-018, ADR-021, ADR-022 (selbst erstellt), Kapitel 4
+  (Code-Stil), 5 (Konformitätsprüfung), 6, Glossar.
+* GitHub: Issues #6, #7, #8, #9, #53, #54, #55, #65 und die Liste der offenen
+  Issues; PR #64, #66, #67, #68 mit Kommentaren, Inline-Kommentaren und Checks.
+* Code: `domaene-modell` (Vorlage, Schreiben, Seite, Datenkontext),
+  `usecases-in`, `usecases-out`, `usecases-service` mit Attrappen,
+  `adapter-host`, Feature-Dateien unter `features/schreiben/`.
+* Clock-out: `git status`, `gh pr list`, Branch-Sweep über alle Refs (`CLEAR`),
+  `git log 51698a0..main`, `progress/domaene-und-host.adoc`, dieser Eintrag.
+
+Fehlgeschlagen in der zweiten Sitzung:
+
+* Mehrere Mutationen kompilierten unter `-Werror` nicht; mit Laufzeitbedingungen
+  wiederholt.
+* `cp` (Alias `cp -i`) stellte eine Datei nicht wieder her; mit `/bin/cp -f`.
+* `./gradlew` aus einem Unterverzeichnis aufgerufen; im Wurzelverzeichnis
+  wiederholt.
+* `grep --include` scheiterte an der zsh-Globerweiterung; ohne die Option
+  wiederholt.
