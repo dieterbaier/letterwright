@@ -43,22 +43,24 @@ public final class Schreiben {
     }
 
     /**
-     * Erzeugt das Schreiben aus dem Snapshot, aus dem sein PDF gerendert wurde. Bezug und Vorlagenversionen kommen aus
-     * dem Snapshot, damit das Schreiben nicht von der Vorschau abweichen kann.
+     * Erzeugt das Schreiben aus dem Snapshot, aus dem sein PDF gerendert wurde, und verbraucht ihn. Bezug und
+     * Vorlagenversionen kommen aus dem Snapshot, damit das Schreiben nicht von der Vorschau abweichen kann. Aus einem
+     * verbrauchten Snapshot entsteht kein weiteres Schreiben (ADR-021).
      *
      * <p>{@code jetzt} ist zugleich Prüfzeitpunkt für den Ablauf und Erstellungszeitpunkt. Der Anwendungsfall übergibt
      * den Zeitpunkt seiner Uhr, damit beides übereinstimmt und Tests die Grenze ohne Warten prüfen können.
      *
-     * @throws IllegalStateException wenn der Snapshot zum Zeitpunkt {@code jetzt} abgelaufen ist
+     * @throws IllegalStateException wenn der Snapshot zum Zeitpunkt {@code jetzt} abgelaufen oder schon verbraucht ist
      */
-    public static Schreiben ausSnapshot(
+    public static SchreibenAusSnapshot ausSnapshot(
             SchreibenId id, Snapshot snapshot, Dokumentverweis dokument, Pruefsumme pdfPruefsumme, Instant jetzt) {
         Pruefe.pflicht(snapshot, "Der Snapshot");
         if (snapshot.istAbgelaufen(Pruefe.pflicht(jetzt, "Der Zeitpunkt"))) {
             throw new IllegalStateException("Snapshot " + snapshot.id().wert() + " ist abgelaufen");
         }
-        return new Schreiben(id, snapshot.id(), snapshot.bezug(), snapshot.briefpapier(), snapshot.standardschreiben(), dokument,
-                pdfPruefsumme, jetzt);
+        Snapshot verbraucht = snapshot.verbraucht();
+        return new SchreibenAusSnapshot(new Schreiben(id, snapshot.id(), snapshot.bezug(), snapshot.briefpapier(),
+                snapshot.standardschreiben(), dokument, pdfPruefsumme, jetzt), verbraucht);
     }
 
     public static Schreiben wiederherstellen(SchreibenId id, SnapshotId snapshot, FachlicherBezug bezug,

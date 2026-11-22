@@ -78,6 +78,13 @@ Funktionalität: Vorschau erzeugen
     Dann ist der bisherige Snapshot gelöscht
     Und der neue Snapshot läuft in 30 Minuten ab
 
+  Szenario: Eine aktualisierte Vorschau lässt einen verbrauchten Snapshot stehen
+    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
+    Und Erika hat aus ihrer bisherigen Vorschau schon ein Schreiben gespeichert
+    Wenn Erika diese Vorschau aktualisiert
+    Dann bleibt der bisherige, verbrauchte Snapshot bestehen
+    Und es gibt zusätzlich den neuen Snapshot
+
   Szenario: Ein fremder Snapshot verhält sich wie ein nicht vorhandener
     Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
     Und Max hat eine Vorschau der "Mahnung" zum Kunden 4711 erzeugt

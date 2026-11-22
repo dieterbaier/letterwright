@@ -14,8 +14,8 @@ public interface VorschauErzeugen {
     Vorschauergebnis erzeuge(BenutzerKennung benutzer, FachlicherBezug bezug, VorlagenId standardschreiben);
 
     /**
-     * Wie {@link #erzeuge}, ersetzt aber den Snapshot der bisherigen Vorschau. Gehört er einem anderen Benutzer oder gibt
-     * es ihn nicht, bleibt er unberührt, als wäre er nicht angegeben.
+     * Wie {@link #erzeuge}, ersetzt aber den Snapshot der bisherigen Vorschau. Gehört er einem anderen Benutzer, gibt
+     * es ihn nicht oder ist aus ihm schon ein Schreiben entstanden, bleibt er unberührt.
      */
     Vorschauergebnis aktualisiere(
             BenutzerKennung benutzer, FachlicherBezug bezug, VorlagenId standardschreiben, SnapshotId bisheriger);

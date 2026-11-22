@@ -7,6 +7,7 @@ import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshot;
 import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.Snapshotzustand;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Briefpapier;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
@@ -63,7 +64,7 @@ class VorschauErzeugenTest {
         assertThat(snapshot.bezug()).isEqualTo(KUNDE_4711);
         assertThat(snapshot.briefpapier()).isEqualTo(new Versionsverweis(briefpapier.id(), Versionsnummer.ERSTE));
         assertThat(snapshot.standardschreiben()).isEqualTo(new Versionsverweis(mahnung.id(), new Versionsnummer(2)));
-        assertThat(snapshot.datenkontext()).isEqualTo(host.datenkontext);
+        assertThat(snapshot.zustand()).isEqualTo(new Snapshotzustand.Offen(host.datenkontext));
         assertThat(erzeugt.ablauf()).isEqualTo(snapshot.ablauf()).isEqualTo(JETZT.plus(Duration.ofMinutes(30)));
         assertThat(host.erzeugenAngefragt).containsExactly(mahnung);
     }
@@ -183,6 +184,22 @@ class VorschauErzeugenTest {
         var fuerErika = (Vorschauergebnis.Erzeugt) ergebnis;
         assertThat(ablage.snapshots.get(fuerErika.snapshot()).benutzer()).isEqualTo(ERIKA);
         assertThat(ablage.snapshots.get(vonMax.snapshot())).isSameAs(snapshotVonMax);
+        assertThat(ablage.geloescht).isEmpty();
+    }
+
+    @Test
+    void eineAktualisierteVorschauLaesstEinenVerbrauchtenSnapshotStehen() {
+        // Given: Erika hat aus ihrer bisherigen Vorschau schon ein Schreiben gespeichert
+        host.erlaubt = true;
+        var bisherige = (Vorschauergebnis.Erzeugt) vorschau.erzeuge(ERIKA, KUNDE_4711, mahnung.id());
+        ablage.speichere(ablage.snapshots.get(bisherige.snapshot()).verbraucht());
+
+        // When: Erika aktualisiert diese Vorschau
+        var neue = (Vorschauergebnis.Erzeugt) vorschau.aktualisiere(ERIKA, KUNDE_4711, mahnung.id(),
+                bisherige.snapshot());
+
+        // Then: Der verbrauchte Snapshot bleibt, damit eine Wiederholung des Speicherns das Schreiben noch findet
+        assertThat(ablage.snapshots).containsOnlyKeys(bisherige.snapshot(), neue.snapshot());
         assertThat(ablage.geloescht).isEmpty();
     }
 
