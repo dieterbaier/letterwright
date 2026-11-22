@@ -1,0 +1,57 @@
+---
+name: code-stil
+description: "Write and review Java code in standardschreiben in the project's code style: validation only in the types, illegal states made unrepresentable with sealed types, no null outside what the type allows, static factory methods, and Javadoc only for the why or the SPI contract. Use when writing, changing or reviewing backend code, when tempted to add a parameter check, a boolean flag or a nullable field, or when writing Javadoc."
+---
+
+# Code-Stil
+
+Dieser Skill erweitert `skills/implement-issue-workflow/SKILL.md` aus dem Toolkit
+(`tools/architecture-knowledge-toolkit/`). Lies zuerst diesen, dann die Schritte
+hier.
+
+Die Regeln und ihre Begründung stehen in der Architekturdokumentation, nicht hier:
+
+- `src/docs/arc42/doc-04000-solution-strategy.adoc`, Abschnitt „Code-Stil“
+- ADR-018 (DDD-Rollen und Selbstvalidierung) und ADR-019 (Validierung in den
+  Typen und Null-Vertrag) unter `src/docs/arc42/09-architecture-decisions/`
+- Querschnittskonzept „Fachmodell“ in `src/docs/arc42/doc-08000-crosscutting-concepts.adoc`
+
+Was der Build durchsetzt, steht hier nicht: Modulgrenzen und Paketregeln
+(ArchUnit), den Null-Vertrag (NullAway), Abdeckung (JaCoCo) und den
+Kompilier-Klassenpfad des Hosts (`host-vertragstest`). Lass `./gradlew check`
+laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
+
+## Beim Schreiben
+
+1. **Eine Prüfung gehört in den Typ.** Willst du einen Parameter prüfen, frag, ob
+   du in einem Konstruktor oder einer Fabrikmethode bist. Nur dort steht `Pruefe`
+   (Domäne) oder `Pflicht` (SPI). In Anwendungsfällen, Ports, Adaptern und
+   Abfragemethoden prüfst du nicht.
+2. **Ein Flag oder ein optionales Feld ist ein fehlender Typ.** Hängt an einem
+   `boolean` oder einem `@Nullable`-Feld, welche anderen Werte gültig sind, entwirf
+   stattdessen einen Sealed Type mit einem Record je Fall. Vorbild:
+   `Berechtigungsanfrage` mit `ZuVorlagen` und `ZuSchreiben`.
+3. **Kein `null` als Ergebnis.** Darf ein Ergebnis fehlen, gib ein `Optional`
+   zurück. `Optional` ist kein Feld und kein Parameter.
+4. **Die Grenze bleibt geprüft.** Werte vom Host (SPI-Rückgaben) sind nicht
+   vertrauenswürdig. Prüfe sie in `adapter-host` und melde Verstöße als
+   `HostVertragVerletzt`.
+5. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `anlegen`,
+   `ausSnapshot`, `neu()`, `wiederherstellen`.
+6. **Namen aus dem Glossar** (`src/docs/arc42/doc-12000-glossary.adoc`). Ein neuer
+   Fachbegriff kommt zuerst ins Glossar.
+
+## Javadoc
+
+- **SPI (`spi`):** vollständig. Ein Host-Entwickler muss die Schnittstelle allein
+  aus der Javadoc richtig benutzen können. Paketweite Regeln wie den Null-Vertrag
+  einmal in `package-info.java`, nicht an jeder Methode.
+- **Sonst:** nur, wenn sie ein Warum oder eine Regel erklärt, die die Signatur
+  nicht ausdrücken kann. Wiederholt ein Kommentar den Methodennamen, lösch ihn.
+- Kein `@throws` für eine Prüfung, die ein Typ überflüssig machen könnte. Mach
+  zuerst den Typ (Punkt 2).
+
+## Beim Review
+
+Prüfe jede geänderte Datei gegen die Punkte oben. Melde einen Verstoß mit dem
+Verweis auf die Regel in der Lösungsstrategie oder dem ADR, nicht auf diesen Skill.

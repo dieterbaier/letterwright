@@ -130,11 +130,17 @@ thin routing wrappers instead of hand-writing them:
 - Toolkit-Pfade wie `skills/…`, `templates/…` oder
   `general-semantic-contracts.md` beziehen sich auf das
   Toolkit-Wurzelverzeichnis, hier `tools/architecture-knowledge-toolkit/`.
-  Ein projektlokales `skills/` gibt es derzeit nicht.
+  Ausnahme sind die projektlokalen Skills unter `skills/` im
+  Repository-Wurzelverzeichnis: derzeit nur `skills/code-stil/SKILL.md` für
+  den Code-Stil im Backend (Lösungsstrategie, ADR-018, ADR-019).
 - Claude Code findet die Toolkit-Skills über Symlinks unter `.claude/skills`.
   Sie werden mit
   `tools/architecture-knowledge-toolkit/adapters/shared/install-skills.sh install claude`
-  angelegt.
+  angelegt. Lokale Skills verlinkt das Skript nicht; dafür einmal
+  `ln -s ../../skills/code-stil .claude/skills/code-stil`.
+- Nach einer Änderung unter `skills/` die Adapter mit
+  `node scripts/build-agent-adapters.js` neu erzeugen;
+  `node scripts/check-agent-adapters.js` prüft, dass sie aktuell sind.
 - Sprache: Dokumentation, ADRs, Qualitätsszenarien, Risiken und die
   Ubiquitous Language sind **Deutsch**. Fachbegriffe stehen im Glossar
   (`src/docs/arc42/doc-12000-glossary.adoc`). Artefakt-IDs, Anker und
