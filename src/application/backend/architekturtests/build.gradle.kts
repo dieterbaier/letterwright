@@ -23,3 +23,24 @@ dependencies {
     // Nur für die Fixture-Klassen, die einen Regelverstoß nachstellen.
     testImplementation(libs.spring.context)
 }
+
+// Nachweis, dass das Null-Gate mit den Argumenten des Produktionscodes greift (ADR-019).
+val produktionsKompilierung = tasks.named<JavaCompile>("compileJava")
+val pruefeNullVertrag = tasks.register<PruefeNullVertrag>("pruefeNullVertrag") {
+    description = "Kompiliert Proben mit der Konfiguration des Produktionscodes und erwartet die Befunde von NullAway."
+    group = "verification"
+    proben = layout.projectDirectory.dir("src/nullprobe")
+    javac = produktionsKompilierung.flatMap { it.javaCompiler }.map { it.executablePath.asFile.absolutePath }
+    jvmArgumente = produktionsKompilierung.map { aufgabe ->
+        aufgabe.options.forkOptions.jvmArgs.orEmpty() +
+            aufgabe.options.forkOptions.jvmArgumentProviders.flatMap { it.asArguments() }
+    }
+    compilerArgumente = produktionsKompilierung.map { it.options.allCompilerArgs }
+    release = produktionsKompilierung.flatMap { it.options.release }
+    prozessorPfad.from(configurations.named("annotationProcessor"))
+    klassenPfad.from(configurations.named("compileClasspath"))
+}
+
+tasks.named("check") {
+    dependsOn(pruefeNullVertrag)
+}
