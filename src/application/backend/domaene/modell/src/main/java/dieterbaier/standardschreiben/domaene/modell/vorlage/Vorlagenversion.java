@@ -1,5 +1,6 @@
 package dieterbaier.standardschreiben.domaene.modell.vorlage;
 
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
@@ -13,6 +14,9 @@ import org.jmolecules.ddd.annotation.Identity;
  * sie dieselbe Version derselben Vorlage meinen, auch in verschiedenen Zuständen.
  *
  * <p>Der Inhalt darf leer sein, solange die Version ein Entwurf ist. Veröffentlichen verlangt Inhalt.
+ *
+ * <p>Die Beispieldaten füllen die Platzhalter im Probe-PDF, das vor dem Veröffentlichen geprüft wird. Sie gehören zur
+ * Version, damit nachvollziehbar bleibt, womit eine veröffentlichte Version geprüft wurde (ADR-022).
  */
 @Entity
 public final class Vorlagenversion {
@@ -21,32 +25,36 @@ public final class Vorlagenversion {
     private final Versionsnummer nummer;
     private final Vorlagenzustand zustand;
     private final String inhalt;
+    private final Datenkontext beispieldaten;
 
-    private Vorlagenversion(VorlagenId vorlage, Versionsnummer nummer, Vorlagenzustand zustand, String inhalt) {
+    private Vorlagenversion(VorlagenId vorlage, Versionsnummer nummer, Vorlagenzustand zustand, String inhalt,
+            Datenkontext beispieldaten) {
         this.vorlage = Pruefe.pflicht(vorlage, "Die Vorlage der Version");
         this.nummer = Pruefe.pflicht(nummer, "Die Versionsnummer");
         this.zustand = Pruefe.pflicht(zustand, "Der Zustand der Version");
         this.inhalt = Pruefe.pflicht(inhalt, "Der Inhalt der Version");
+        this.beispieldaten = Pruefe.pflicht(beispieldaten, "Die Beispieldaten der Version");
         if (zustand != Vorlagenzustand.ENTWURF) {
-            Pruefe.nichtBlank(inhalt, "Der Inhalt einer veröffentlichten oder zurückgezogenen Version");
+            Pruefe.nichtBlank(inhalt, "Der Inhalt einer freigegebenen Version");
         }
     }
 
-    public static Vorlagenversion wiederherstellen(
-            VorlagenId vorlage, Versionsnummer nummer, Vorlagenzustand zustand, String inhalt) {
-        return new Vorlagenversion(vorlage, nummer, zustand, inhalt);
+    public static Vorlagenversion wiederherstellen(VorlagenId vorlage, Versionsnummer nummer,
+            Vorlagenzustand zustand, String inhalt, Datenkontext beispieldaten) {
+        return new Vorlagenversion(vorlage, nummer, zustand, inhalt, beispieldaten);
     }
 
-    static Vorlagenversion entwurf(VorlagenId vorlage, Versionsnummer nummer, String inhalt) {
-        return new Vorlagenversion(vorlage, nummer, Vorlagenzustand.ENTWURF, inhalt);
+    static Vorlagenversion entwurf(VorlagenId vorlage, Versionsnummer nummer, String inhalt,
+            Datenkontext beispieldaten) {
+        return new Vorlagenversion(vorlage, nummer, Vorlagenzustand.ENTWURF, inhalt, beispieldaten);
     }
 
-    Vorlagenversion mitInhalt(String neuerInhalt) {
-        return new Vorlagenversion(vorlage, nummer, zustand, neuerInhalt);
+    Vorlagenversion mitInhalt(String neuerInhalt, Datenkontext neueBeispieldaten) {
+        return new Vorlagenversion(vorlage, nummer, zustand, neuerInhalt, neueBeispieldaten);
     }
 
     Vorlagenversion imZustand(Vorlagenzustand neuerZustand) {
-        return new Vorlagenversion(vorlage, nummer, neuerZustand, inhalt);
+        return new Vorlagenversion(vorlage, nummer, neuerZustand, inhalt, beispieldaten);
     }
 
     public VorlagenId vorlage() {
@@ -63,6 +71,15 @@ public final class Vorlagenversion {
 
     public String inhalt() {
         return inhalt;
+    }
+
+    public Datenkontext beispieldaten() {
+        return beispieldaten;
+    }
+
+    /** Ein Entwurf mit Inhalt, der nicht nur aus Leerraum besteht. */
+    public boolean istVeroeffentlichbar() {
+        return zustand == Vorlagenzustand.ENTWURF && !inhalt.isBlank();
     }
 
     /**

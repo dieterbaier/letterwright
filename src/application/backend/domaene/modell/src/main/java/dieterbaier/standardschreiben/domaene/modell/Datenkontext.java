@@ -54,6 +54,17 @@ public final class Datenkontext {
         return werte;
     }
 
+    /**
+     * Die Werte beider Datenkontexte; bei gleichem Schlüssel auf oberster Ebene gilt der Wert aus {@code vorrangig}.
+     * So entstehen die Daten für das Probe-PDF eines Standardschreibens aus den Beispieldaten seines Briefpapiers und
+     * seinen eigenen (ADR-022).
+     */
+    public Datenkontext ergaenztUm(Datenkontext vorrangig) {
+        Map<String, Object> zusammen = new TreeMap<>(werte);
+        zusammen.putAll(Pruefe.pflicht(vorrangig, "Der vorrangige Datenkontext").werte);
+        return new Datenkontext(Collections.unmodifiableMap(zusammen));
+    }
+
     /** SHA-256 über eine eindeutige, kanonische Kodierung der Werte. */
     public Pruefsumme pruefsumme() {
         return pruefsumme;

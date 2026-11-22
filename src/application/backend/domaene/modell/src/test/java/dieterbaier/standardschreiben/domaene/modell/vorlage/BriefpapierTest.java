@@ -4,8 +4,10 @@ import static dieterbaier.standardschreiben.domaene.modell.Pruefungen.lehntAb;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /** Die Regeln über alle Versionen einer Vorlage, geprüft am Briefpapier. Das Standardschreiben teilt sie. */
@@ -15,7 +17,8 @@ class BriefpapierTest {
     private final Briefpapier neu = Briefpapier.anlegenMitStandardtyp(id, "Geschäftsbrief", "<p>Hallo</p>");
 
     private static Vorlagenversion version(VorlagenId vorlage, int nummer, Vorlagenzustand zustand) {
-        return Vorlagenversion.wiederherstellen(vorlage, new Versionsnummer(nummer), zustand, "<p>" + nummer + "</p>");
+        return Vorlagenversion.wiederherstellen(vorlage, new Versionsnummer(nummer), zustand, "<p>" + nummer + "</p>",
+                Datenkontext.aus(Map.of()));
     }
 
     @Test
@@ -28,7 +31,9 @@ class BriefpapierTest {
             assertThat(version.verweis()).isEqualTo(new Versionsverweis(id, Versionsnummer.ERSTE));
         });
         assertThat(neu.entwurf()).isPresent();
-        assertThat(neu.neuesteVeroeffentlichteVersion()).isEmpty();
+        assertThat(neu.veroeffentlichteVersion()).isEmpty();
+        assertThat(neu.entwurf()).get().extracting(Vorlagenversion::beispieldaten)
+                .as("noch ohne Beispieldaten").isEqualTo(Datenkontext.aus(Map.of()));
     }
 
     @Test
@@ -38,6 +43,19 @@ class BriefpapierTest {
         assertThat(geaendert.entwurf()).get().extracting(Vorlagenversion::inhalt).isEqualTo("");
         assertThat(neu.entwurf()).get().extracting(Vorlagenversion::inhalt)
                 .as("die Ausgangsinstanz bleibt unverändert").isEqualTo("<p>Hallo</p>");
+    }
+
+    @Test
+    void derEntwurfTraegtSeineBeispieldatenUndEinNeuerEntwurfUebernimmtSie() {
+        Datenkontext beispieldaten = Datenkontext.aus(Map.of("empfaenger", "Erika Mustermann"));
+
+        Briefpapier mitDaten = neu.aendereEntwurf("<p>Hallo</p>", beispieldaten);
+        Briefpapier nurInhalt = mitDaten.aendereEntwurf("<p>Guten Tag</p>");
+        Briefpapier naechster = nurInhalt.veroeffentlicheEntwurf().neuerEntwurf("<p>neu</p>");
+
+        assertThat(nurInhalt.entwurf()).get().extracting(Vorlagenversion::beispieldaten).isEqualTo(beispieldaten);
+        assertThat(naechster.entwurf()).get().extracting(Vorlagenversion::beispieldaten).isEqualTo(beispieldaten);
+        lehntAb(() -> neu.aendereEntwurf("<p>Hallo</p>", null), "Beispieldaten der Version");
     }
 
     @Test
@@ -59,14 +77,35 @@ class BriefpapierTest {
     @Test
     void lebenszyklusEntwurfVeroeffentlichtZurueckgezogen() {
         Briefpapier veroeffentlicht = neu.veroeffentlicheEntwurf();
-        Briefpapier zurueckgezogen = veroeffentlicht.zurueckziehen(Versionsnummer.ERSTE);
+        Briefpapier zurueckgezogen = veroeffentlicht.zurueckziehen();
 
         assertThat(veroeffentlicht.entwurf()).isEmpty();
-        assertThat(veroeffentlicht.neuesteVeroeffentlichteVersion()).get()
+        assertThat(veroeffentlicht.veroeffentlichteVersion()).get()
                 .extracting(Vorlagenversion::nummer).isEqualTo(Versionsnummer.ERSTE);
         assertThat(zurueckgezogen.version(Versionsnummer.ERSTE)).get()
                 .extracting(Vorlagenversion::zustand).isEqualTo(Vorlagenzustand.ZURUECKGEZOGEN);
-        assertThat(zurueckgezogen.neuesteVeroeffentlichteVersion()).isEmpty();
+        assertThat(zurueckgezogen.veroeffentlichteVersion()).isEmpty();
+    }
+
+    @Test
+    void eineNeuVeroeffentlichteVersionLoestDieBisherigeAb() {
+        Briefpapier mitV2 = neu.veroeffentlicheEntwurf().neuerEntwurf("<p>2</p>").veroeffentlicheEntwurf();
+
+        assertThat(mitV2.versionen()).extracting(Vorlagenversion::zustand)
+                .containsExactly(Vorlagenzustand.ABGELOEST, Vorlagenzustand.VEROEFFENTLICHT);
+        assertThat(mitV2.veroeffentlichteVersion()).get()
+                .extracting(Vorlagenversion::nummer).isEqualTo(new Versionsnummer(2));
+        assertThat(mitV2.version(Versionsnummer.ERSTE)).get().extracting(Vorlagenversion::inhalt)
+                .as("die abgelöste Version bleibt unverändert").isEqualTo("<p>Hallo</p>");
+    }
+
+    @Test
+    void nachDemZurueckziehenLoestDieNaechsteVeroeffentlichungNichtsAb() {
+        Briefpapier mitV2 = neu.veroeffentlicheEntwurf().zurueckziehen().neuerEntwurf("<p>2</p>")
+                .veroeffentlicheEntwurf();
+
+        assertThat(mitV2.versionen()).extracting(Vorlagenversion::zustand)
+                .containsExactly(Vorlagenzustand.ZURUECKGEZOGEN, Vorlagenzustand.VEROEFFENTLICHT);
     }
 
     @Test
@@ -87,7 +126,7 @@ class BriefpapierTest {
         assertThat(mitV2.versionen()).extracting(Vorlagenversion::nummer)
                 .containsExactly(Versionsnummer.ERSTE, new Versionsnummer(2));
         assertThat(mitV2.entwurf()).get().extracting(Vorlagenversion::nummer).isEqualTo(new Versionsnummer(2));
-        assertThat(mitV2.neuesteVeroeffentlichteVersion()).get()
+        assertThat(mitV2.veroeffentlichteVersion()).get()
                 .extracting(Vorlagenversion::nummer).isEqualTo(Versionsnummer.ERSTE);
     }
 
@@ -100,20 +139,18 @@ class BriefpapierTest {
 
     @Test
     void neueNummernFolgenAufDieHoechsteAuchNachDemZurueckziehen() {
-        Briefpapier mitV2 = neu.veroeffentlicheEntwurf().zurueckziehen(Versionsnummer.ERSTE).neuerEntwurf("<p>2</p>");
+        Briefpapier mitV2 = neu.veroeffentlicheEntwurf().zurueckziehen().neuerEntwurf("<p>2</p>");
 
         assertThat(mitV2.entwurf()).get().extracting(Vorlagenversion::nummer).isEqualTo(new Versionsnummer(2));
     }
 
     @Test
-    void zurueckziehenGehtNurBeiVeroeffentlichtenVersionen() {
-        assertThatThrownBy(() -> neu.zurueckziehen(Versionsnummer.ERSTE))
+    void zurueckziehenBrauchtEineVeroeffentlichteVersion() {
+        assertThatThrownBy(neu::zurueckziehen)
                 .isInstanceOf(UnzulaessigerZustandswechsel.class)
-                .hasMessageContaining("ENTWURF");
-        Briefpapier zurueckgezogen = neu.veroeffentlicheEntwurf().zurueckziehen(Versionsnummer.ERSTE);
-        assertThatThrownBy(() -> zurueckgezogen.zurueckziehen(Versionsnummer.ERSTE))
-                .isInstanceOf(UnzulaessigerZustandswechsel.class);
-        lehntAb(() -> neu.zurueckziehen(new Versionsnummer(9)), "Version 9 gibt es nicht");
+                .hasMessageContaining("braucht eine veröffentlichte Version");
+        Briefpapier zurueckgezogen = neu.veroeffentlicheEntwurf().zurueckziehen();
+        assertThatThrownBy(zurueckgezogen::zurueckziehen).isInstanceOf(UnzulaessigerZustandswechsel.class);
     }
 
     @Test
@@ -140,11 +177,34 @@ class BriefpapierTest {
         lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ,
                 List.of(version(id, 2, Vorlagenzustand.ENTWURF))), "erwartet 1, gefunden 2");
         lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(
-                version(id, 1, Vorlagenzustand.VEROEFFENTLICHT), version(id, 1, Vorlagenzustand.VEROEFFENTLICHT))),
+                version(id, 1, Vorlagenzustand.ZURUECKGEZOGEN), version(id, 1, Vorlagenzustand.ZURUECKGEZOGEN))),
                 "erwartet 2, gefunden 1");
         lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(
                 version(id, 1, Vorlagenzustand.ENTWURF), version(id, 2, Vorlagenzustand.VEROEFFENTLICHT))),
                 "nicht die neueste");
+    }
+
+    @Test
+    void wiederherstellenLaesstHoechstensDieNeuesteFreigegebeneVeroeffentlicht() {
+        Briefpapiertyp typ = Briefpapiertyp.PRIVAT;
+
+        lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(
+                version(id, 1, Vorlagenzustand.VEROEFFENTLICHT), version(id, 2, Vorlagenzustand.VEROEFFENTLICHT))),
+                "Version 1 ist veröffentlicht");
+        lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(
+                version(id, 1, Vorlagenzustand.VEROEFFENTLICHT), version(id, 2, Vorlagenzustand.ZURUECKGEZOGEN))),
+                "höchstens eine veröffentlicht");
+        lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(version(id, 1, Vorlagenzustand.ABGELOEST))),
+                "keine neuere Version ist freigegeben");
+        lehntAb(() -> Briefpapier.wiederherstellen(id, "B", typ, List.of(
+                version(id, 1, Vorlagenzustand.ABGELOEST), version(id, 2, Vorlagenzustand.ENTWURF))),
+                "Version 1 ist abgelöst");
+
+        Briefpapier geladen = Briefpapier.wiederherstellen(id, "B", typ, List.of(
+                version(id, 1, Vorlagenzustand.ZURUECKGEZOGEN), version(id, 2, Vorlagenzustand.ABGELOEST),
+                version(id, 3, Vorlagenzustand.VEROEFFENTLICHT), version(id, 4, Vorlagenzustand.ENTWURF)));
+        assertThat(geladen.veroeffentlichteVersion()).get()
+                .extracting(Vorlagenversion::nummer).isEqualTo(new Versionsnummer(3));
     }
 
     @Test

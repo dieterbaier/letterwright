@@ -67,9 +67,9 @@ public final class Vorschauerzeugung implements VorschauErzeugen {
         if (!berechtigungen.darfErzeugen(benutzer, bezug, vorlage)) {
             return new Vorschauergebnis.NichtErlaubt();
         }
-        Optional<Vorlagenversion> inhalt = vorlage.neuesteVeroeffentlichteVersion();
+        Optional<Vorlagenversion> inhalt = vorlage.veroeffentlichteVersion();
         Optional<Vorlagenversion> briefpapier = vorlagen.briefpapier(vorlage.briefpapier())
-                .flatMap(gefunden -> gefunden.neuesteVeroeffentlichteVersion());
+                .flatMap(gefunden -> gefunden.veroeffentlichteVersion());
         if (inhalt.isEmpty() || briefpapier.isEmpty()) {
             return new Vorschauergebnis.KeineVeroeffentlichteVersion();
         }

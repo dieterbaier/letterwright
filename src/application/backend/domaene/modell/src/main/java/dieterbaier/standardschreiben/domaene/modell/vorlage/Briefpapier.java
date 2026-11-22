@@ -1,5 +1,6 @@
 package dieterbaier.standardschreiben.domaene.modell.vorlage;
 
+import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import java.util.List;
 import java.util.Optional;
@@ -73,27 +74,40 @@ public final class Briefpapier {
         return versionen.entwurf();
     }
 
-    public Optional<Vorlagenversion> neuesteVeroeffentlichteVersion() {
-        return versionen.neuesteVeroeffentlichte();
+    /** Die Version, mit der neue Schreiben entstehen; je Vorlage gibt es höchstens eine (ADR-022). */
+    public Optional<Vorlagenversion> veroeffentlichteVersion() {
+        return versionen.veroeffentlichte();
     }
 
-    /** Ersetzt den Inhalt des Entwurfs. Leer ist erlaubt, fehlend nicht. */
+    /** Ersetzt den Inhalt des Entwurfs und behält seine Beispieldaten. Leer ist erlaubt, fehlend nicht. */
     public Briefpapier aendereEntwurf(String inhalt) {
         return mit(versionen.aendereEntwurf(inhalt));
     }
 
-    /** Veröffentlicht den Entwurf. Er braucht Inhalt; danach ist er unveränderlich. */
+    /** Ersetzt Inhalt und Beispieldaten des Entwurfs. */
+    public Briefpapier aendereEntwurf(String inhalt, Datenkontext beispieldaten) {
+        return mit(versionen.aendereEntwurf(inhalt, beispieldaten));
+    }
+
+    /**
+     * Veröffentlicht den Entwurf. Er braucht Inhalt; danach ist er unveränderlich. Die bisher veröffentlichte Version ist
+     * danach abgelöst (ADR-022).
+     */
     public Briefpapier veroeffentlicheEntwurf() {
         return mit(versionen.veroeffentlicheEntwurf());
     }
 
-    /** Legt die nächste Version als Entwurf an. Geht nur, solange es keinen Entwurf gibt. */
+    /**
+     * Legt die nächste Version als Entwurf an und übernimmt die Beispieldaten der neuesten. Geht nur, solange es keinen
+     * Entwurf gibt.
+     */
     public Briefpapier neuerEntwurf(String inhalt) {
         return mit(versionen.neuerEntwurf(inhalt));
     }
 
-    public Briefpapier zurueckziehen(Versionsnummer nummer) {
-        return mit(versionen.zurueckziehen(nummer));
+    /** Nimmt die veröffentlichte Version ohne Nachfolger zurück; bis zur nächsten Veröffentlichung gibt es keine. */
+    public Briefpapier zurueckziehen() {
+        return mit(versionen.zurueckziehen());
     }
 
     private Briefpapier mit(Versionsfolge neueVersionen) {
