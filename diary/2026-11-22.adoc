@@ -209,3 +209,81 @@ Fehlgeschlagen in der zweiten Sitzung:
   wiederholt.
 * `grep --include` scheiterte an der zsh-Globerweiterung; ohne die Option
   wiederholt.
+
+== Dritte Sitzung: Fachlicher Bezug und Transaktionen des Hosts
+
+Eine Gesprächssitzung des Owners, mit einem Issue und PR #70 als Ergebnis.
+Rekonstruiert aus `git log e43565c..main`, PR #70 mit Review und Issue #69.
+
+=== Was geschah
+
+* **Fragen zum Modell geklärt:** Warum `Standardschreiben` den Bezugstyp als
+  `String` hält und nicht als `FachlicherBezug`, und wie die ID eines Bezugs
+  aussieht, wenn der Host mehrere Schlüssel braucht.
+* **Issue #69 angelegt:** Der Vertrag der ID von `FachlicherBezug` (undurchsichtig,
+  kanonisch, dauerhaft stabil, vom Browser kommend) soll ins Javadoc von SPI und
+  Domäne und ins Glossar.
+* **PR #70 gemergt** (`ec6f2b6`, `5655ba7`): Q-ARCH-004 hat die Folgefrage
+  „Speichern in einer Transaktion des Hosts“. Im Review präzisiert:
+  Java-API als primärer Weg, Rückruf vor dem gemeinsamen Commit,
+  Verantwortungsgrenze zwischen Bibliothek und Host, Impact auf ADR-006,
+  ADR-021, Bausteinsicht und QS-007. Ergebnis: konvergiert.
+
+=== Entscheidungen des Owners
+
+* Der Bezugstyp bleibt ein `String` ohne eigenes Value Object. Die Bibliothek
+  verantwortet ihn nur bis auf sein Vorhandensein; gibt es zu einem Typ keine
+  Vorlage, entsteht kein Schreiben, und das ist richtig.
+* Die ID eines fachlichen Bezugs bleibt ein undurchsichtiger `String`. Braucht der
+  Host mehrere Schlüssel, kodiert er sie selbst. Ein strukturierter Schlüssel im
+  SPI entsteht nicht.
+* Für das Speichern in einer Transaktion des Hosts bietet die Bibliothek beides
+  an: eine Java-API, die der Host aufruft, und einen optionalen synchronen
+  Rückruf (Tendenz in Q-ARCH-004, noch kein ADR).
+* Die Idempotenz der Host-Aktionen und etwaige Kompensation verantwortet der
+  Host; die Bibliothek verantwortet ihre Zusicherung aus ADR-021 und den Vertrag
+  des Rückrufs.
+
+=== Gelernt
+
+* **Typ und Instanz eines Bezugs sind zwei Ebenen.** Die Vorlage braucht nur den
+  Typ; die ID zählt erst beim Erzeugen und beim Wiederfinden der Schreiben.
+* **Eine ID, die verglichen und gespeichert wird, ist mehr als ein
+  Nachschlageschlüssel.** Übersicht, Löschen und Snapshot hängen an ihrer
+  Gleichheit, deshalb muss sie kanonisch und stabil sein.
+* **Dieselbe Datenquelle ist noch keine gemeinsame Transaktion.** Erst ein
+  gemeinsamer Transaktionsmanager macht Host, Bibliothek und Engine atomar.
+* **Idempotenz der Bibliothek macht den Anwendungsfall des Hosts nicht
+  idempotent.** Die Grenze muss im Vertrag stehen, sonst verlässt sich jede Seite
+  auf die andere.
+
+=== Offen
+
+* #69: Javadoc und Glossar zur ID von `FachlicherBezug`.
+* Q-ARCH-004: Vertrag für API und Rückruf, bevor ein ADR entsteht.
+* #60, #32, #6, #7, #10, #46 und #9 unverändert offen.
+
+=== Gelesen in der dritten Sitzung
+
+* Toolkit (Submodule `65d4412`): Skills `clock-out`, `clock-in` (Abschnitt
+  Bindung), Helfer `journal-config.sh`.
+* Doku: ADR-001, ADR-020, ADR-021 (Konsequenzen), `doc-005` (Q-ARCH-004), Glossar
+  (Bezugstyp, Fachlicher Bezug), `AGENTS.md`, `progress/domaene-und-host.adoc`,
+  dieser Eintrag.
+* GitHub: PR #70 mit Review, Inline-Kommentaren und Checks; Labels; Issue #69
+  (selbst angelegt).
+* Code: `Standardschreiben`, `FachlicherBezug` (Domäne und SPI), Signaturen in
+  `spi`, `usecases-in`, `usecases-out` und `usecases-service`,
+  `SchreibenSpeichern`.
+* Clock-out: `git status`, offene PRs über REST, `git ls-remote --heads`.
+
+Fehlgeschlagen in der dritten Sitzung:
+
+* WebFetch des Quelltexts lieferte nur eine Zusammenfassung; per Klon wiederholt.
+* `gh issue list` und `gh pr list` scheitern ohne GraphQL; über die REST-API
+  wiederholt.
+* `./build.sh validate` brach unter US-ASCII ab; mit `LC_ALL=C.UTF-8` wiederholt.
+* Das Löschen des Feature-Branchs über die API war nicht erlaubt; GitHub hatte
+  ihn beim Merge schon gelöscht.
+* Die Bindung an das private Journal ist in dieser Umgebung nicht hinterlegt
+  (`journal-config.sh get`, Exit 3); die Übergabe entfiel.
