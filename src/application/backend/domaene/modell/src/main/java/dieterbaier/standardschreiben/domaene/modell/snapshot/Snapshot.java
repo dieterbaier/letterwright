@@ -89,19 +89,19 @@ public final class Snapshot {
 
     /** Ab dem Ablaufzeitpunkt ist der Snapshot abgelaufen. */
     public boolean istAbgelaufen(Instant jetzt) {
-        return !Pruefe.pflicht(jetzt, "Der Zeitpunkt").isBefore(ablauf);
+        return !jetzt.isBefore(ablauf);
     }
 
     /** Verwendbar nur für denselben Benutzer und Bezug und nur vor dem Ablauf. */
     public boolean istVerwendbarFuer(BenutzerKennung anfragender, FachlicherBezug angefragterBezug, Instant jetzt) {
-        return benutzer.equals(Pruefe.pflicht(anfragender, "Der anfragende Benutzer"))
-                && bezug.equals(Pruefe.pflicht(angefragterBezug, "Der angefragte Bezug"))
+        return benutzer.equals(anfragender)
+                && bezug.equals(angefragterBezug)
                 && !istAbgelaufen(jetzt);
     }
 
     /** Ob der neu gelesene Datenkontext dieselbe Prüfsumme hat wie der des Snapshots. */
     public boolean hatUnveraendertenDatenkontext(Datenkontext neuGelesen) {
-        return datenkontext.pruefsumme().equals(Pruefe.pflicht(neuGelesen, "Der neu gelesene Datenkontext").pruefsumme());
+        return datenkontext.pruefsumme().equals(neuGelesen.pruefsumme());
     }
 
     /** Gleich sind zwei Instanzen mit derselben ID. */

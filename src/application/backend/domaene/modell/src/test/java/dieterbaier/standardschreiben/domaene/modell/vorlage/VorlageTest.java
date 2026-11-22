@@ -114,7 +114,6 @@ class VorlageTest {
         assertThatThrownBy(() -> zurueckgezogen.zurueckziehen(Versionsnummer.ERSTE))
                 .isInstanceOf(UnzulaessigerZustandswechsel.class);
         lehntAb(() -> neu.zurueckziehen(new Versionsnummer(9)), "Version 9 gibt es nicht");
-        lehntAb(() -> neu.zurueckziehen(null), "Versionsnummer");
     }
 
     @Test

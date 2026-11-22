@@ -88,14 +88,6 @@ class SnapshotTest {
     }
 
     @Test
-    void pflichtparameterDerAbfragen() {
-        lehntAb(() -> snapshot.istAbgelaufen(null), "Zeitpunkt");
-        lehntAb(() -> snapshot.istVerwendbarFuer(null, KUNDE, JETZT), "anfragende Benutzer");
-        lehntAb(() -> snapshot.istVerwendbarFuer(SACHBEARBEITER, null, JETZT), "angefragte Bezug");
-        lehntAb(() -> snapshot.hatUnveraendertenDatenkontext(null), "neu gelesene Datenkontext");
-    }
-
-    @Test
     void wiederherstellenBehaeltDenAblauf() {
         Instant ablauf = JETZT.plusSeconds(5);
 
