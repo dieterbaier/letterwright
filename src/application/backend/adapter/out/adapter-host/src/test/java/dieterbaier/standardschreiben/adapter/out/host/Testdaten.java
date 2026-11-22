@@ -10,6 +10,7 @@ import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsnummer;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Versionsverweis;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.VorlagenId;
+import dieterbaier.standardschreiben.domaene.modell.snapshot.SnapshotId;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
@@ -21,7 +22,7 @@ final class Testdaten {
     static final Instant ERSTELLT = Instant.parse("2026-11-21T10:00:00Z");
     static final Standardschreiben MAHNUNG =
             Standardschreiben.anlegen(VorlagenId.neu(), "Mahnung", VorlagenId.neu(), "Kunde", "Sehr geehrte {{name}}");
-    static final Schreiben SCHREIBEN = Schreiben.wiederherstellen(SchreibenId.neu(), KUNDE,
+    static final Schreiben SCHREIBEN = Schreiben.wiederherstellen(SchreibenId.neu(), SnapshotId.neu(), KUNDE,
             new Versionsverweis(VorlagenId.neu(), Versionsnummer.ERSTE),
             new Versionsverweis(MAHNUNG.id(), Versionsnummer.ERSTE), new Dokumentverweis("ablage/1.pdf"),
             Pruefsumme.ueber("pdf".getBytes(StandardCharsets.UTF_8)), ERSTELLT);

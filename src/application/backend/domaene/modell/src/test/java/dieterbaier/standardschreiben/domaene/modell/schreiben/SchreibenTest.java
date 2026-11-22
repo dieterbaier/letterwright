@@ -30,6 +30,7 @@ class SchreibenTest {
         Schreiben schreiben = Schreiben.ausSnapshot(id, snapshot, dokument, pdf, gespeichert);
 
         assertThat(schreiben.id()).isEqualTo(id);
+        assertThat(schreiben.snapshot()).isEqualTo(snapshot.id());
         assertThat(schreiben.bezug()).isEqualTo(KUNDE);
         assertThat(schreiben.briefpapier()).isEqualTo(BRIEFPAPIER_V1);
         assertThat(schreiben.standardschreiben()).isEqualTo(STANDARDSCHREIBEN_V3);
@@ -54,13 +55,15 @@ class SchreibenTest {
         lehntAb(() -> Schreiben.ausSnapshot(null, snapshot, dokument, pdf, JETZT), "ID des Schreibens");
         lehntAb(() -> Schreiben.ausSnapshot(id, snapshot, null, pdf, JETZT), "Dokumentverweis des Schreibens");
         lehntAb(() -> Schreiben.ausSnapshot(id, snapshot, dokument, null, JETZT), "Prüfsumme des PDFs");
-        lehntAb(() -> Schreiben.wiederherstellen(id, null, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, dokument, pdf,
+        lehntAb(() -> Schreiben.wiederherstellen(id, null, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, dokument,
+                pdf, JETZT), "Snapshot des Schreibens");
+        lehntAb(() -> Schreiben.wiederherstellen(id, snapshot.id(), null, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, dokument, pdf,
                 JETZT), "fachliche Bezug des Schreibens");
-        lehntAb(() -> Schreiben.wiederherstellen(id, KUNDE, null, STANDARDSCHREIBEN_V3, dokument, pdf, JETZT),
+        lehntAb(() -> Schreiben.wiederherstellen(id, snapshot.id(), KUNDE, null, STANDARDSCHREIBEN_V3, dokument, pdf, JETZT),
                 "Briefpapier-Version");
-        lehntAb(() -> Schreiben.wiederherstellen(id, KUNDE, BRIEFPAPIER_V1, null, dokument, pdf, JETZT),
+        lehntAb(() -> Schreiben.wiederherstellen(id, snapshot.id(), KUNDE, BRIEFPAPIER_V1, null, dokument, pdf, JETZT),
                 "Standardschreiben-Version");
-        lehntAb(() -> Schreiben.wiederherstellen(id, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, dokument, pdf,
+        lehntAb(() -> Schreiben.wiederherstellen(id, snapshot.id(), KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3, dokument, pdf,
                 null), "Erstellungszeitpunkt");
     }
 
@@ -68,7 +71,7 @@ class SchreibenTest {
     void gleichheitUeberDieIdentitaet() {
         SchreibenId id = SchreibenId.neu();
         Schreiben schreiben = Schreiben.ausSnapshot(id, snapshot, dokument, pdf, JETZT);
-        Schreiben geladen = Schreiben.wiederherstellen(id, KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3,
+        Schreiben geladen = Schreiben.wiederherstellen(id, snapshot.id(), KUNDE, BRIEFPAPIER_V1, STANDARDSCHREIBEN_V3,
                 new Dokumentverweis("ablage/2"), pdf, JETZT);
 
         assertThat(geladen).isEqualTo(schreiben).hasSameHashCodeAs(schreiben);
