@@ -518,8 +518,8 @@ Benachrichtigung nach dem Commit und keine eigene Wiederholung.
   Rückruf einen Outbox-Auftrag in dieselbe Transaktion und führt ihn danach
   wiederholbar selbst aus. Der Outbox-Auftrag entsteht so genau dann, wenn
   auch das Schreiben gespeichert ist.
-* Damit entfällt der Vorschlag unter „Benachrichtigung des Hosts“, dass die
-  Bibliothek die Benachrichtigung wiederholt. Ein Fehler im Rückruf verhindert
+* Folgt man der Empfehlung, entfällt der Vorschlag unter „Benachrichtigung
+  des Hosts“, dass die Bibliothek die Benachrichtigung wiederholt. Ein Fehler im Rückruf verhindert
   das Speichern, und der Benutzer speichert erneut.
 * Eine Wahl zwischen beiden Semantiken je Rückruf vergrößert den Vertrag und die
   Testmatrix, ohne etwas zu ermöglichen, was der Host mit der Outbox nicht
