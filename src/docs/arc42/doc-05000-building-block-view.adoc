@@ -20,7 +20,8 @@ metadata_version: '1.0'
 Die Bausteinsicht nennt je Baustein die Technologien und Bibliotheken, die er
 einsetzt. Viele Module sind noch Gerüste. _Kursiv_ steht deshalb eine
 Technologie, die durch einen ADR festgelegt, aber noch nicht im Build
-eingebunden ist. Was im Prototyp (`prototyp/`) erprobt ist, steht bei
+eingebunden ist. Ein Baustein mit dem Zusatz _(geplant)_ ist durch einen ADR
+festgelegt, aber noch nicht als Modul angelegt. Was im Prototyp (`prototyp/`) erprobt ist, steht bei
 xref:bausteine-ebene-2-adapter-rendering[adapter-rendering].
 
 == Ebene 1
@@ -37,6 +38,8 @@ System_Boundary(host, "Host-Anwendung") {
   }
   Container_Boundary(be, "Backend (Spring-Boot-Starter)") {
     Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
+    Component(aapi, "adapter-api (geplant)", "Java", "Bildet die Java-API auf die Anwendungsfälle ab")
+    Component(api, "api (geplant)", "Java, ohne Spring", "Java-API für den Host mit eigenen Datentypen")
     Component(uin, "usecases-in", "Java, ohne Spring", "Eingehende Ports: Anwendungsfälle")
     Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
     Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
@@ -48,7 +51,8 @@ System_Boundary(host, "Host-Anwendung") {
     Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
     Component(ahost, "adapter-host", "Java", "Bildet interne Ports auf das SPI ab")
   }
-  Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie")
+  Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie, optional Rückruf nach dem Speichern")
+  Component_Ext(hostuc, "Host-Anwendungsfälle", "Java", "Speichern in eigener Transaktion")
   ContainerDb_Ext(db, "Host-Datenbank", "SQL")
   ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType", "Lizenzierte Schriften der DOCX-Vorgabe")
 }
@@ -56,6 +60,9 @@ Rel(ui_vorschau, web, "REST/JSON, HTML")
 Rel(ui_uebersicht, web, "REST/JSON, PDF")
 Rel(ui_editor, web, "REST/JSON")
 Rel(web, uin, "ruft")
+Rel(hostuc, api, "ruft")
+Rel(aapi, api, "implementiert")
+Rel(aapi, uin, "ruft")
 Rel(app, uin, "implementiert")
 Rel(app, uout, "nutzt")
 Rel(app, dom, "nutzt")
@@ -64,7 +71,7 @@ Rel(dsvc, dom, "arbeitet auf")
 Rel(dom, val, "prüft mit")
 Rel(ren, uout, "implementiert Renderer, KonformitaetsPruefer")
 Rel(per, uout, "implementiert VorlagenRepository, Snapshotablage, SchreibenRepository, DokumentAblage")
-Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie")
+Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie, Rückruf")
 Rel(ahost, spiapi, "ruft, bildet ab")
 Rel(spi, spiapi, "implementiert")
 Rel(per, db, "JDBC")
@@ -91,13 +98,15 @@ Java 21 und JSpecify; das steht deshalb nicht in jeder Zeile.
 | domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | –
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | –
 | usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert | –
-| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; einziges Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]) | –
+| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; neben `api` das einzige Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommt die optionale Schnittstelle `NachDemSpeichern` hinzu: ein Rückruf vor dem gemeinsamen Commit, nur bei einer Neuanlage, mit dem Ergebnis `Rueckrufergebnis` | –
+| api _(geplant)_ | Java-API für den Host mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek: Schreiben in der Transaktion des Hosts speichern (Spring `REQUIRED`) und das Ergebnis als Rückgabewert erhalten (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
 | usecases-service | Implementierung der Anwendungsfälle | –
-| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung | _Spring MVC_
+| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung. Beim Speichern äußere Grenze der Transaktion; lehnt der Rückruf des Hosts ab, rollt er ausdrücklich zurück und meldet danach den Grund (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | _Spring MVC_
+| adapter-api _(geplant)_ | Eingehender Adapter: implementiert `api`, ruft die Anwendungsfälle und bildet zwischen API-Typen und Domänenmodell ab (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
 | adapter-rendering | Ausgehender Adapter: Zusammenführen, HTML-Bereinigung, Schriftauflösung, PDF-Erzeugung und Konformitätsprüfung; Whitebox in xref:bausteine-ebene-2-adapter-rendering[Ebene 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox und FontBox, veraPDF_, freie OFL-Ersatzschriften
 | adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006])
-| adapter-host | Ausgehender Adapter: implementiert die Ports `Platzhalterdatenquelle`, `Berechtigungen` und `Loeschregeln`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostVertragVerletzt` | –
-| spring-boot-starter | Autokonfiguration `StandardschreibenAutoKonfiguration`, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi`. Fehlt `PlatzhalterdatenAnbieter` oder `Loeschrichtlinie`, startet der Kontext nicht | Spring Boot Autoconfigure, _Spring Security_
+| adapter-host | Ausgehender Adapter: implementiert die Ports `Platzhalterdatenquelle`, `Berechtigungen` und `Loeschregeln`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostVertragVerletzt`. Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] ruft er auch den optionalen Rückruf `NachDemSpeichern` | –
+| spring-boot-starter | Autokonfiguration `StandardschreibenAutoKonfiguration`, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi`, mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] zusätzlich `api`. Fehlt `PlatzhalterdatenAnbieter` oder `Loeschrichtlinie`, startet der Kontext nicht | Spring Boot Autoconfigure, _Spring Security_
 | Frontend-Paket | Vorschau, Übersicht, Editor. Die Vorschau soll barrierefrei sein (xref:qs-003-barrierefreie-vorschau[QS-003]); der Nachweis ist in #3 noch offen (VoiceOver am Seitenwechsel, Reflow bei 200 %, NVDA). | React, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003])
 |===
 
