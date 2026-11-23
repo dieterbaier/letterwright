@@ -411,7 +411,8 @@ Noch offen, bevor die Regel als ADR festgehalten wird:
 * *Benachrichtigung des Hosts:* Was gilt, wenn die Benachrichtigung über
   Dateiname und technischen Schlüssel fehlschlägt? Vorschlag: Das Schreiben bleibt
   gespeichert, und die Benachrichtigung wird wiederholt. Alternativ läuft sie in
-  derselben Transaktion, und ein Fehler verhindert das Speichern.
+  derselben Transaktion, und ein Fehler verhindert das Speichern. Beides
+  zugleich geht nicht, siehe „Atomar oder entkoppelt“ unten.
 * *Speichern in einer Transaktion des Hosts:* Der Host muss das Speichern
   zusammen mit eigenen Datenbankaktionen atomar ausführen können, etwa mit dem
   Abschließen eines Human Task. Heute löst er das Speichern nur über die
@@ -475,6 +476,104 @@ Offen dazu:
 * *Fehler des Rückrufs:* Welche Fehler rollen die gemeinsame Transaktion zurück?
   Checked Exceptions und fachliche Fehler als Rückgabewert tun das nicht
   automatisch; der Vertrag muss es festlegen.
+* *Atomar oder entkoppelt* (Präzisierung, Vorschlag, nicht reviewt,
+  2026-11-23): Für die Benachrichtigung nach dem Speichern schließen sich zwei
+  Semantiken aus. Ein Rückruf kann nicht beides liefern.
++
+[horizontal]
+Atomar:: Der Rückruf läuft vor dem gemeinsamen Commit. Schlägt eine Aktion des
+  Hosts fehl, rollen Schreiben, Verbrauch des Snapshots und die Daten des Hosts
+  gemeinsam zurück. Ein Retry innerhalb der Transaktion gibt es nicht, denn nach
+  dem Fehler ist sie nur noch zum Zurückrollen markiert (Spring: rollback-only).
+  Die Wiederholung ist ein neuer Speicherversuch des Benutzers, solange der
+  Snapshot gültig ist.
+Entkoppelt:: Die Benachrichtigung läuft nach dem Commit (`AFTER_COMMIT` oder
+  Outbox). Das Schreiben bleibt gespeichert, auch wenn die Aktion des Hosts
+  fehlschlägt. Dann muss jemand die Benachrichtigung wiederholen, und der Host
+  muss sie idempotent verarbeiten. Das entspricht dem Vorschlag unter
+  „Benachrichtigung des Hosts“, ist aber nicht atomar.
++
+Für den Weg über die Java-API braucht es keinen Rückruf: Der Host ist schon in
+seinem eigenen Anwendungsfall, erhält das Ergebnis als Rückgabewert und macht in
+derselben Transaktion weiter. Ein Rückruf betrifft nur das Speichern über den
+Endpunkt der Bibliothek, bei dem kein Anwendungsfall des Hosts läuft.
++
+Die Tendenz vom 2026-11-22 verlangt Atomarität und widerspricht damit dem
+Vorschlag unter „Benachrichtigung des Hosts“. Zu entscheiden ist, was für das
+Speichern über die Oberfläche gilt: nur atomar, nur entkoppelt, oder beides mit
+einer Wahl des Hosts je Rückruf. Im entkoppelten Fall ist außerdem offen, wer
+wiederholt. Nach der Verantwortungsgrenze oben übernimmt die Bibliothek keine
+Workflow-Steuerung, eine Outbox wäre also Sache des Hosts.
++
+.Skizze 1: Java-API, der Host orchestriert (kein Rückruf)
+[plantuml,q-arch-004-java-api,svg]
+----
+@startuml
+participant "Host: Anwendungsfall" as Host
+participant "Java-API (Bibliothek)" as Api
+database "Datenbank\n(gemeinsame Transaktion)" as DB
+Host -> DB: Transaktion beginnen
+Host -> Api: Schreiben speichern (Snapshot-ID)
+Api -> DB: Schreiben anlegen, Snapshot verbrauchen
+Api --> Host: Ergebnis (Neuanlage oder BereitsGespeichert,\nDateiname, technischer Schlüssel)
+Host -> DB: eigene Fachdaten ändern, Task abschließen
+alt alles erfolgreich
+  Host -> DB: Commit
+else Fehler im Host
+  Host -> DB: Rollback (auch das Schreiben)
+end
+note over Host, Api: Das Ergebnis kommt als Rückgabewert.\nEin Rückruf ist nicht nötig.
+@enduml
+----
++
+.Skizze 2: Speichern über die Oberfläche, synchroner Rückruf vor dem Commit (atomar)
+[plantuml,q-arch-004-rueckruf-atomar,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Vorschau (React)" as UI
+participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
+participant "Host: Rückruf" as Host
+database "Datenbank\n(gemeinsame Transaktion)" as DB
+SB -> UI: Speichern
+UI -> Lib: POST /schreiben (Snapshot-ID)
+Lib -> DB: Transaktion beginnen
+Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
+Lib -> Host: Rückruf (Dateiname, technischer Schlüssel)
+Host -> DB: eigene Aktionen, z. B. Task abschließen
+alt Rückruf erfolgreich
+  Lib -> DB: Commit
+  Lib --> UI: gespeichert
+else Rückruf wirft einen Fehler
+  Lib -> DB: Rollback (Schreiben, Snapshot, Daten des Hosts)
+  Lib --> UI: Fehler
+  note over SB, UI: Kein Retry durch die Bibliothek.\nDer Benutzer speichert erneut,\nsolange der Snapshot gültig ist.
+end
+@enduml
+----
++
+.Skizze 3: Speichern über die Oberfläche, Benachrichtigung nach dem Commit (entkoppelt)
+[plantuml,q-arch-004-benachrichtigung-entkoppelt,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Vorschau (React)" as UI
+participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
+database "Datenbank" as DB
+participant "Host" as Host
+SB -> UI: Speichern
+UI -> Lib: POST /schreiben (Snapshot-ID)
+Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
+Lib -> DB: Commit
+Lib --> UI: gespeichert
+Lib -> Host: Benachrichtigung (Dateiname, technischer Schlüssel)
+alt Benachrichtigung erfolgreich
+  Host -> Host: eigene Aktionen, eigener Commit
+else Benachrichtigung schlägt fehl
+  note over Lib, Host: Das Schreiben bleibt gespeichert.\nDie Benachrichtigung wird wiederholt (wer? offen),\nder Host verarbeitet sie idempotent.
+end
+@enduml
+----
 * *Umfang der Atomarität:* Metadaten des Schreibens, Verbrauch des Snapshots und
   transaktionale Daten des Hosts committen oder rollen gemeinsam zurück. Eine
   externe Ablage (#60) nimmt daran nicht automatisch teil. Ein verwaistes
