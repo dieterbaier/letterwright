@@ -505,7 +505,7 @@ einer Wahl des Hosts je Rückruf. Im entkoppelten Fall ist außerdem offen, wer
 wiederholt. Nach der Verantwortungsgrenze oben übernimmt die Bibliothek keine
 Workflow-Steuerung, eine Outbox wäre also Sache des Hosts.
 +
-.Empfehlung (Vorschlag, 2026-11-23, noch nicht entschieden)
+.Empfehlung (Vorschlag, 2026-11-23, vom Owner am selben Tag angenommen)
 ====
 Die Bibliothek bietet nur den atomaren Rückruf an, keine eigene
 Benachrichtigung nach dem Commit und keine eigene Wiederholung.
@@ -525,6 +525,21 @@ Benachrichtigung nach dem Commit und keine eigene Wiederholung.
   Testmatrix, ohne etwas zu ermöglichen, was der Host mit der Outbox nicht
   schon selbst erreicht.
 ====
++
+Antwort (Owner, 2026-11-23): Der Empfehlung wird gefolgt. Der Vertrag steht als
+Entwurf in
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]:
++
+--
+* Beim Speichern über die Oberfläche gibt es nur den atomaren Rückruf. Damit
+  entfällt der Vorschlag unter „Benachrichtigung des Hosts“: Die Bibliothek
+  wiederholt nichts, ein Fehler im Rückruf verhindert das Speichern.
+* Der Rückruf läuft nur, wenn das Schreiben in dieser Transaktion entsteht. Bei
+  `BereitsGespeichert` läuft er nicht noch einmal.
+* Der Rückruf lehnt fachlich über ein Sealed-Ergebnis mit einem Grund für den
+  Benutzer ab. Eine Ablehnung rollt die gemeinsame Transaktion zurück, ebenso
+  jede Ausnahme.
+--
 +
 .Skizze 4: Empfehlung, atomarer Rückruf mit Outbox des Hosts
 [plantuml,q-arch-004-empfehlung-outbox,svg]
