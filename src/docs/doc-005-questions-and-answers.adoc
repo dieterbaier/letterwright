@@ -550,9 +550,9 @@ Benachrichtigung nach dem Commit und keine eigene Wiederholung.
   schon selbst erreicht.
 ====
 +
-Antwort (Owner, 2026-11-23): Der Empfehlung wird gefolgt. Der Vertrag steht als
-Entwurf in
-xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]:
+Antwort (Owner, 2026-11-23): Der Empfehlung wird gefolgt. Der Vertrag steht in
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], angenommen am
+2026-11-23:
 +
 --
 * Beim Speichern über die Oberfläche gibt es nur den atomaren Rückruf. Damit

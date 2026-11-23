@@ -2,10 +2,10 @@
 id: ADR-023-speichern-in-einer-transaktion-des-hosts
 type: ADR
 title: 'Speichern eines Schreibens in einer Transaktion des Hosts'
-status: proposed
+status: accepted
 owner: 'Architektur'
 created: '2026-11-23'
-reviewed: false
+reviewed: true
 summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die einer laufenden Transaktion beitritt (REQUIRED), oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Der Host verknüpft seine Daten über die ID des Schreibens; der Dateiname ist ausgeklammert. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
 derived_from:
 - type: question
@@ -25,24 +25,24 @@ tags:
 relations:
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'ADR-016 nimmt an, dass der Host keine eingehende Java-API braucht, und sieht für diesen Fall ein eigenes Modul mit eigenen Typen und eingehendem Adapter vor. Dieser ADR löst den Fall aus und ergänzt spi um einen optionalen Rückruf.'
-  reviewed: false
+  reviewed: true
 - type: refines
   target: ADR-021-hoechstens-ein-schreiben-je-snapshot
-  status: proposed
+  status: accepted
   rationale: 'ADR-021 regelt die Idempotenz des Speicherns. Dieser ADR legt fest, dass der Rückruf nur bei einer Neuanlage läuft und eine Wiederholung ihn nicht erneut auslöst, und erweitert den Fehlerpfad um den Rollback durch den Host.'
-  reviewed: false
+  reviewed: true
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
-  status: proposed
+  status: accepted
   rationale: 'Die Bibliothek tritt einer laufenden Transaktion des Hosts bei (REQUIRED) und eröffnet nur dann eine eigene, wenn keine läuft. Innerhalb einer laufenden Transaktion darf die Persistenz keine unabhängige Transaktion eröffnen.'
-  reviewed: false
+  reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Der Rückruf ist optional und zählt nicht zu den drei Schnittstellen, die der Host implementieren muss. Wer ihn nutzt, hat eine Schnittstelle mehr und muss den Transaktionskontext teilen.'
-  reviewed: false
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-023-speichern-in-einer-transaktion-des-hosts]]
@@ -50,20 +50,19 @@ metadata_version: '1.0'
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-23.
 
-Der ADR ist KI-gestützt formuliert. Die Richtung hat der Owner am 2026-11-23
-vorgegeben: nur atomarer Rückruf, Rückruf nur bei einer Neuanlage, fachliche
-Ablehnung als Sealed-Ergebnis. Im Review von PR #74 hat er am selben Tag die
-offenen Fragen zu Namen und `REQUIRED` entschieden und Präzisierungen verlangt;
-beides ist eingearbeitet. Den Dateinamen hat er danach aus diesem ADR
-herausgenommen und zurückgestellt. Angenommen ist der ADR erst nach dem
-erneuten Review.
+Der Owner hat am 2026-11-23 die Richtung vorgegeben: nur atomarer Rückruf,
+Rückruf nur bei einer Neuanlage, fachliche Ablehnung als Sealed-Ergebnis. Der ADR
+ist KI-gestützt formuliert. Im Review von PR #74 hat der Owner die offenen Fragen
+zu Namen und `REQUIRED` entschieden, Präzisierungen verlangt und den Dateinamen
+zurückgestellt. Danach hat er den ADR und seine vier Relationen am selben Tag
+angenommen.
 
 === Entscheidung
 
-Wir schlagen vor, dass der Host das Speichern eines Schreibens auf zwei Wegen
-mit eigenen Datenbankaktionen atomar verbinden kann. Beide nutzen denselben
+Der Host kann das Speichern eines Schreibens auf zwei Wegen mit eigenen
+Datenbankaktionen atomar verbinden. Beide nutzen denselben
 Anwendungsfall `SchreibenSpeichern`, dieselbe Berechtigungsprüfung
 (`ZumErzeugen`) und dieselbe Idempotenz nach
 xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
@@ -187,7 +186,7 @@ Für den Weg über die Java-API gibt es keine Alternative mit Rückruf: Der Host
 schon in seinem Anwendungsfall. Die Optionen betreffen das Speichern über die
 Oberfläche.
 
-==== Option 1: Nur atomarer Rückruf (vorgeschlagen)
+==== Option 1: Nur atomarer Rückruf (gewählt)
 
 Wie oben. Entkoppelte Wirkungen erreicht der Host mit einer Outbox im Rückruf.
 
@@ -306,9 +305,11 @@ include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-traceability
 === Review Notes
 
 * Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen, die
-  offenen Fragen des ersten Entwurfs im Review von PR #74. Zu prüfen sind die
-  präzisierte Transaktionsgrenze und die Präzisierung zu `BereitsGespeichert`.
-* Die vier Relationen hat der Owner im Review fachlich bestätigt; die
-  Begründung zu ADR-006 ist danach präzisiert.
-* ADR-016 bleibt unverändert, bis dieser ADR angenommen ist. Seine Annahme, dass
-  der Host keine Java-API braucht, gilt danach nicht mehr.
+  offenen Fragen des ersten Entwurfs im Review von PR #74. Seine Präzisierungen
+  zur Transaktionsgrenze, zu `BereitsGespeichert` und zur Begründung der
+  Relation zu ADR-006 sind eingearbeitet.
+* Danach hat der Owner den ADR und seine vier Relationen am 2026-11-23
+  angenommen.
+* ADR-016 und die Bausteinsicht beschreiben noch keine Java-API und keinen
+  Rückruf. Sie werden in einem eigenen Schritt angeglichen; die Annahme in
+  ADR-016, dass der Host keine Java-API braucht, gilt nicht mehr.
