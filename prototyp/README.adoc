@@ -40,7 +40,8 @@ Produktqualität.
 | `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
   Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
   den Tag-Baum mit Text. NVDA mit Acrobat Reader liest beide Referenz-PDFs ohne Befund
-  (Owner, 2026-11-23, siehe unten). axesCheck (axesPAC-Engine): PDF/UA und WCAG erfüllt.
+  (Owner, 2026-11-23, siehe unten). axesCheck (axesPAC-Engine): PDF/UA und WCAG erfüllt,
+  je eine Warnung ohne Details.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
@@ -372,8 +373,11 @@ unter Windows, an `geschaeftsbrief-einseitig.pdf` und `geschaeftsbrief-mehrseiti
 * Acrobat Reader erkennt die PDF/A-Konformitätsangabe und öffnet das Dokument im PDF/A-Modus.
 * NVDA liest den Alternativtext des Logos vor.
 * axesCheck von axes4 (Engine axesPAC, PDF/UA nach Matterhorn-Protokoll, WCAG Stufe A und AA)
-  meldet PDF/UA und WCAG als erfüllt (Owner, 2026-11-23):
-  https://check.axes4.com/en/result/01c57a1f-35ab-49f8-b016-539b0bf6766f[Prüfbericht].
+  meldet für beide PDFs PDF/UA und WCAG als erfüllt (Owner, 2026-11-23). Als Titel zeigt es
+  „(Bitte Betreff ergänzen)“, den Betreff des Musterbriefs. Es bleibt je eine Warnung, zu der
+  axesCheck keine Details anzeigt: bei PDF/UA unter „Logical Structure“ → „Structure Tree“,
+  bei WCAG unter „4 Robust“ → „4.1 Compatible“. Nicht weiter untersucht; die Desktop-Fassung
+  von PAC zeigt die Einzelprüfung.
 
 == Barrierefreiheit der Vorschau
 
