@@ -389,15 +389,29 @@ endgültigen Dateinamen und den technischen Schlüssel des Dokuments. So kann de
 Host eine Beziehung zwischen Fachdaten und Dokument herstellen. Dafür ist die
 Host-Anwendung verantwortlich.
 +
-Ergänzung (Owner, 2026-11-23, Review von PR #74): Gibt der Host keinen Namen
-vor, liefert die Bibliothek einen Default, als Vorschlag
-`<fachlicherBezug>.pdf`. Der Host kann ihn überschreiben, über die Java-API als
-optionalen Eingabewert, beim Speichern über die Oberfläche vor dem Speichern.
-Die Bibliothek vergibt den Namen auch bei gleichzeitigem Speichern
-kollisionsfrei, mit dem hochgezählten Index von oben. Ergebnis der Java-API und
-Rückruf melden den tatsächlich vergebenen Namen; eine Wiederholung liefert den
-vorhandenen. Der Vertrag steht in
-xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
+Zurückgestellt (Owner, 2026-11-23, nach dem Review von PR #74): Der Dateiname
+gehört nicht zum Vertrag für das Speichern in einer Transaktion des Hosts
+(xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]). Der Host
+verknüpft seine Daten über die ID des Schreibens. Für später festgehalten:
++
+--
+* *Zwei Namen trennen:* Der *Ablagename* ist der technische Schlüssel, unter dem
+  das PDF liegt. Der *Anzeigename* ist der Name, den der Benutzer beim Download
+  sieht. Nur der Ablagename muss eindeutig sein, und nur, wenn er in einem
+  gemeinsamen Namensraum liegt, etwa im DMS des Hosts (#60). Der Anzeigename ist
+  beim Download nur ein Vorschlag an den Browser.
+* *Varianten:*
+** Vorgabe des Hosts mit hochgezähltem Index bei einer Kollision (Antwort vom
+   2026-11-16 oben). Die Vergabe muss auch bei gleichzeitigem Speichern
+   kollisionsfrei sein, ohne innerhalb der Transaktion des Hosts eine
+   Constraint-Verletzung abzufangen. Die ID des Bezugs kann Zeichen enthalten,
+   die in Dateinamen nicht erlaubt sind (#69).
+** Ein generierter Name, etwa die ID des Schreibens als UUID: ohne Kollision
+   und ohne ungültige Zeichen, für Menschen aber nicht lesbar.
+** Ein Pattern je Vorlage, das Fachanwender mit der Vorlage pflegen, etwa
+   `+Mahnung-${bezug.id}-${datum}.pdf+`, mit der Platzhaltersprache
+   (xref:adr-008-platzhaltersprache[ADR-008]) und dem Datenkontext (Epic #9).
+--
 
 Noch offen, bevor die Regel als ADR festgehalten wird:
 
