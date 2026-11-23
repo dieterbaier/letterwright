@@ -36,12 +36,11 @@ Produktqualität.
 | ADR-003
 
 | PDF/A-2b und PDF/UA-1
-| erfüllt, Stichprobe teilweise
+| erfüllt, Stichprobe gemacht
 | `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
   Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
   den Tag-Baum mit Text. NVDA mit Acrobat Reader liest beide Referenz-PDFs ohne Befund
-  (Owner, 2026-11-23, siehe unten). Nicht geprüft: PAC (kein Zugang) und ob NVDA im PDF den
-  Alternativtext des Logos vorliest.
+  (Owner, 2026-11-23, siehe unten). axesCheck (axesPAC-Engine): PDF/UA und WCAG erfüllt.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
@@ -371,7 +370,10 @@ unter Windows, an `geschaeftsbrief-einseitig.pdf` und `geschaeftsbrief-mehrseiti
   es wählt damit nur die Stimme. Das PDF setzt `/Lang (de)` im Katalog und am
   `Document`-Element (`struktur`).
 * Acrobat Reader erkennt die PDF/A-Konformitätsangabe und öffnet das Dokument im PDF/A-Modus.
-* Ohne PDF Accessibility Checker (PAC); dafür stand kein Zugang zur Verfügung.
+* NVDA liest den Alternativtext des Logos vor.
+* axesCheck von axes4 (Engine axesPAC, PDF/UA nach Matterhorn-Protokoll, WCAG Stufe A und AA)
+  meldet PDF/UA und WCAG als erfüllt (Owner, 2026-11-23):
+  https://check.axes4.com/en/result/01c57a1f-35ab-49f8-b016-539b0bf6766f[Prüfbericht].
 
 == Barrierefreiheit der Vorschau
 
