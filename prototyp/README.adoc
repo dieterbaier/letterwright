@@ -36,16 +36,18 @@ Produktqualität.
 | ADR-003
 
 | PDF/A-2b und PDF/UA-1
-| erfüllt, Stichprobe offen
+| erfüllt, Stichprobe teilweise
 | `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
   Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
-  den Tag-Baum mit Text.
+  den Tag-Baum mit Text. NVDA mit Acrobat Reader liest beide Referenz-PDFs ohne Befund
+  (Owner, 2026-11-23, siehe unten); PAC, Alternativtexte sowie Ansage von Titel und Sprache
+  sind nicht geprüft.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
 | mit Grenze, vom Owner akzeptiert
 | openhtmltopdf gibt laufende Elemente immer als Artefakt aus. Ein PDFBox-Nachbearbeitungsschritt
-  taggt sie; VoiceOver liest sie (Owner). Der Schritt hängt an der Ausgabe von openhtmltopdf.
+  taggt sie; VoiceOver und NVDA lesen sie (Owner). Der Schritt hängt an der Ausgabe von openhtmltopdf.
   Nachweis bei jeder Erzeugung: Genau die Texte der Fußzeile aus dem HTML stehen in dieser
   Reihenfolge am Ende des Strukturbaums, sonst Abbruch; `gegenprobe` belegt, dass falsche
   Reihenfolge, Teil-Tagging und zusätzliche Blöcke abbrechen. Das widerspricht dem Antwortmaß
@@ -130,7 +132,8 @@ Nicht gelungen oder bewusst nicht gemacht:
   per Tastatur (Ausnahme für zweidimensionale Inhalte in WCAG 1.4.10).
 * Durchgehendes Vorlesen über Seitenwechsel mit VoiceOver. Nicht weiter untersucht.
 * Eine gleich breite freie Ersatzschrift für Arial Narrow. Es gibt keine.
-* NVDA-Prüfung. Kein Windows-Gerät; braucht eine Windows-Prüfumgebung.
+* NVDA-Prüfung der Vorschau. Kein Windows-Gerät; braucht eine Windows-Prüfumgebung. Das PDF
+  ist mit NVDA geprüft.
 * Die Messung der Bildschirmdarstellung der Vorschau gegen das PDF (QS-004).
 
 == Aufbau
@@ -355,6 +358,17 @@ Prototyps fällt auf:
   Update von openhtmltopdf mitgeprüft werden. Im Produkt läge er vor einer Signatur des PDFs.
 * Der Betreff ist eine Überschrift (`H1`), sieht aber aus wie in der Word-Vorgabe.
 * Die Anschrift (`<address>`) wird zu `Sect` mit `P`, nicht zu einem eigenen Tag.
+
+NVDA-Stichprobe (Owner, 2026-11-23) mit NVDA 2026.1.1 und Adobe Acrobat Reader 2026.001.21662
+unter Windows, an `geschaeftsbrief-einseitig.pdf` und `geschaeftsbrief-mehrseitig.pdf`:
+
+* „Alles lesen“ (NVDA+↓) liest den Brief sauber und verständlich auf Deutsch vor.
+* „Seite x von y“ wird nicht vorgelesen; es ist ein Artefakt. Beim Seitenwechsel sagt NVDA selbst
+  „Seite 2“ bzw. „Seite 3“ an.
+* Beim Blättern auf die dritte Seite sagt NVDA „3 Schrägstrich 3 c“ an. Vermutlich ist das die
+  Seitenanzeige des Readers; im Strukturbaum steht kein solcher Text, und beim durchgehenden
+  Lesen tritt es nicht auf.
+* Acrobat Reader erkennt die PDF/A-Konformitätsangabe und öffnet das Dokument im PDF/A-Modus.
 
 == Barrierefreiheit der Vorschau
 
