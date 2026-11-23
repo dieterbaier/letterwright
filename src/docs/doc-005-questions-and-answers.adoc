@@ -476,8 +476,9 @@ Offen dazu:
 * *Fehler des Rückrufs:* Welche Fehler rollen die gemeinsame Transaktion zurück?
   Checked Exceptions und fachliche Fehler als Rückgabewert tun das nicht
   automatisch; der Vertrag muss es festlegen.
-* *Atomar oder entkoppelt* (Präzisierung, vom Owner reviewt, 2026-11-23): Für die Benachrichtigung nach dem Speichern schließen sich zwei
-  Semantiken aus. Ein Rückruf kann nicht beides liefern.
+* *Atomar oder entkoppelt* (Präzisierung, vom Owner reviewt, 2026-11-23):
+  Für die Benachrichtigung nach dem Speichern schließen sich zwei Semantiken
+  aus. Ein Rückruf kann nicht beides liefern.
 +
 [horizontal]
 Atomar:: Der Rückruf läuft vor dem gemeinsamen Commit. Schlägt eine Aktion des
