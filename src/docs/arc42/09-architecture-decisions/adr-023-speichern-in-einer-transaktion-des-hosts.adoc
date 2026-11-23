@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-23'
 reviewed: false
-summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die einer laufenden Transaktion beitritt (REQUIRED), oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Den Dateinamen gibt der Host vor oder die Bibliothek bildet einen Default; sie vergibt ihn kollisionsfrei und meldet den tatsächlichen Namen zurück. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
+summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die einer laufenden Transaktion beitritt (REQUIRED), oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Der Host verknüpft seine Daten über die ID des Schreibens; der Dateiname ist ausgeklammert. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
 derived_from:
 - type: question
   description: 'Q-ARCH-004, Folgefrage „Speichern in einer Transaktion des Hosts“ mit Tendenz (2026-11-22), Verantwortungsgrenze (Review PR #70) und Empfehlung (PR #71)'
@@ -15,7 +15,7 @@ derived_from:
 - type: conversation
   description: 'Entscheidungen des Owners am 2026-11-23: nur atomarer Rückruf, Rückruf nur bei Neuanlage, fachliche Ablehnung als Sealed-Ergebnis, Vertrag als ADR-Entwurf'
 - type: external
-  description: 'Review des Owners zu PR #74 (2026-11-23): Namen, Dateinamenvertrag, REQUIRED, Präzisierungen zu BereitsGespeichert, Transaktionsgrenze und Ablehnung'
+  description: 'Review des Owners zu PR #74 (2026-11-23): Namen, REQUIRED, Dateiname zurückgestellt, Präzisierungen zu BereitsGespeichert, Transaktionsgrenze und Ablehnung'
   uri: https://github.com/dieterbaier/standardschreiben/pull/74
 tags:
 - decision
@@ -36,7 +36,7 @@ relations:
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
   status: proposed
-  rationale: 'Die Bibliothek tritt einer laufenden Transaktion des Hosts bei (REQUIRED) und eröffnet nur dann eine eigene, wenn keine läuft. Innerhalb einer laufenden Transaktion darf die Persistenz keine unabhängige Transaktion eröffnen. Außerdem muss sie Dateinamen auch bei parallelem Speichern kollisionsfrei vergeben.'
+  rationale: 'Die Bibliothek tritt einer laufenden Transaktion des Hosts bei (REQUIRED) und eröffnet nur dann eine eigene, wenn keine läuft. Innerhalb einer laufenden Transaktion darf die Persistenz keine unabhängige Transaktion eröffnen.'
   reviewed: false
 - type: affects
   target: QS-007-integration-in-host-anwendung
@@ -55,8 +55,9 @@ Vorgeschlagen (proposed).
 Der ADR ist KI-gestützt formuliert. Die Richtung hat der Owner am 2026-11-23
 vorgegeben: nur atomarer Rückruf, Rückruf nur bei einer Neuanlage, fachliche
 Ablehnung als Sealed-Ergebnis. Im Review von PR #74 hat er am selben Tag die
-offenen Fragen zu Namen, Dateiname und `REQUIRED` entschieden und Präzisierungen
-verlangt; beides ist eingearbeitet. Angenommen ist der ADR erst nach dem
+offenen Fragen zu Namen und `REQUIRED` entschieden und Präzisierungen verlangt;
+beides ist eingearbeitet. Den Dateinamen hat er danach aus diesem ADR
+herausgenommen und zurückgestellt. Angenommen ist der ADR erst nach dem
 erneuten Review.
 
 === Entscheidung
@@ -74,10 +75,10 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   Host sieht weder Domänenmodell noch interne Use-Case-Ports. Der Starter
   exportiert `api` neben `spi`.
 * Der Host ruft in seinem eigenen Anwendungsfall „Schreiben speichern“ mit
-  Benutzerkennung, Snapshot-ID und optional einem Dateinamen auf. Er erhält ein
+  Benutzerkennung und Snapshot-ID auf. Er erhält ein
   Sealed-Ergebnis mit denselben Fällen wie `Speicherergebnis`. Gespeichert und
-  bereits gespeichert tragen die Identifikatoren, die auch der Rückruf erhält,
-  darunter den tatsächlich vergebenen Dateinamen (siehe unten).
+  bereits gespeichert tragen die Identifikatoren, die auch der Rückruf erhält
+  (siehe unten).
 * *Transaktion (`REQUIRED`):* Die Bibliothek tritt einer laufenden Transaktion
   bei. Läuft keine, eröffnet sie eine eigene, und es gilt das Verhalten von
   heute. Innerhalb einer laufenden Transaktion eröffnet sie keine unabhängige
@@ -105,8 +106,8 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   sein, oder ein anderer Aufruf in derselben äußeren Transaktion hat es angelegt,
   bevor der Host committet.
 * *Daten:* Der Rückruf erhält stabile Identifikatoren: die ID des Schreibens
-  (technischer Schlüssel), den tatsächlich vergebenen Dateinamen, den fachlichen
-  Bezug, das Standardschreiben, die Benutzerkennung und den Zeitpunkt der
+  (technischer Schlüssel), über die der Host seine Daten mit dem Schreiben
+  verknüpft, den fachlichen Bezug, das Standardschreiben, die Benutzerkennung und den Zeitpunkt der
   Erstellung.
 * *Ergebnis:* Der Rückruf liefert ein `Rueckrufergebnis`, `Angenommen` oder
   `Abgelehnt` mit einem Grund für den Benutzer. Ein Rückgabewert löst in Spring
@@ -132,25 +133,10 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
 
 ==== Dateiname
 
-* *Default:* Gibt der Host keinen Namen vor, bildet die Bibliothek ihn aus dem
-  fachlichen Bezug, als Vorschlag `<fachlicherBezug>.pdf`.
-* *Vorgabe des Hosts:* Der Host kann den Default überschreiben. Über die Java-API
-  übergibt er den Namen als optionalen Eingabewert. Beim Speichern über REST gibt
-  er ihn vor dem Speichern vor; die Vorgabe wird an den Snapshot gebunden, damit
-  eine Wiederholung denselben Namen trägt. Der Rückruf kommt nach der Ablage und
-  kann den Namen nur noch melden, nicht mehr vorgeben.
-* *Kollisionsfrei:* Die Bibliothek löst Default und Vorgabe vor oder bei der
-  Ablage auf. Gibt es den Namen schon, hängt sie am Ende einen hochgezählten
-  Index an (Q-ARCH-004, Antwort des Owners vom 2026-11-16). Das gilt auch bei
-  gleichzeitigem Speichern. Die Persistenz sichert den Namen mit einer
-  Eindeutigkeitsregel ab. Ein Verfahren, das eine Verletzung dieser Regel
-  abfängt und mit dem nächsten Index wiederholt, genügt innerhalb der
-  Transaktion des Hosts nicht: Auf manchen Datenbanken lässt sie sich danach
-  nur noch zurückrollen. Wie die Vergabe das vermeidet, legt der
-  Persistenzentwurf (#6) fest.
-* *Rückmeldung:* Ergebnis der Java-API und Rückruf enthalten den tatsächlich
-  vergebenen Namen. `BereitsGespeichert` liefert den vorhandenen Namen, auch
-  wenn eine Wiederholung eine andere Vorgabe mitbringt.
+Der Dateiname gehört nicht zu diesem Vertrag und ist zurückgestellt
+(Q-ARCH-004, Frage „Dateiname“). Für die Verknüpfung mit den Daten des Hosts
+genügt die ID des Schreibens. Kommt ein Dateiname hinzu, ergänzt er Ergebnis und
+Rückruf, ohne die Zusicherungen dieses ADR zu ändern.
 
 ==== Verantwortungsgrenze
 
@@ -277,16 +263,12 @@ Wahl der Semantik.
 * Vorbereiten und Festschreiben trennen, damit Rendering und Prüfung vor einer
   kurzen Schreibtransaktion liegen (Q-ARCH-004). Das ist eine bewusste
   Umstrukturierung von `Schreibenspeicherung` und eine eigene Entscheidung.
-* Die Persistenz (#6) speichert den Dateinamen am Schreiben und vergibt ihn
-  kollisionsfrei; der Download liefert das PDF unter diesem Namen aus.
 * Integrationsnachweise im Host-Vertragstest:
 ** gemeinsamer Commit und später Rollback des Hosts,
 ** Speichern über die Java-API ohne äußere Transaktion,
 ** Ablehnung und Ausnahme im Rückruf; bei der Ablehnung prüft der Test die
    REST-Antwort mit dem Grund und den Zustand beider Seiten nach dem Rollback,
-** verlorene Antwort mit Retry,
-** Dateiname: Default, Überschreiben durch den Host, Kollision bei
-   gleichzeitigem Speichern und unveränderter Name beim Retry.
+** verlorene Antwort mit Retry.
 * ADR-016 und die Bausteinsicht beschreiben die Java-API und den Rückruf, sobald
   dieser ADR angenommen ist. Die Pflichten des Hosts gehören in die
   Integrationsdoku (#11).
@@ -316,21 +298,16 @@ include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-traceability
 
 === Open Questions
 
-* *Form des Defaults:* Wie wird aus Typ und ID des fachlichen Bezugs ein
-  gültiger Dateiname? Die ID kann Zeichen enthalten, die in Dateinamen nicht
-  erlaubt sind (#69: Der Host kodiert sie frei).
-
-Die drei offenen Fragen des ersten Entwurfs hat der Owner im Review von PR #74
-beantwortet: Modul `api`, Schnittstelle `spi.NachDemSpeichern` mit
-`Rueckrufergebnis` (`Angenommen`, `Abgelehnt`); der Dateiname wird in diesem
-ADR geregelt; die Java-API arbeitet mit `REQUIRED`.
+* Keine. Die drei offenen Fragen des ersten Entwurfs hat der Owner im Review
+  von PR #74 beantwortet: Modul `api`, Schnittstelle `spi.NachDemSpeichern` mit
+  `Rueckrufergebnis` (`Angenommen`, `Abgelehnt`); die Java-API arbeitet mit
+  `REQUIRED`; der Dateiname ist zurückgestellt und steht in Q-ARCH-004.
 
 === Review Notes
 
 * Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen, die
-  offenen Fragen des ersten Entwurfs im Review von PR #74. Zu prüfen sind der
-  ergänzte Dateinamenvertrag, die präzisierte Transaktionsgrenze und die offene
-  Frage zur Form des Defaults.
+  offenen Fragen des ersten Entwurfs im Review von PR #74. Zu prüfen sind die
+  präzisierte Transaktionsgrenze und die Präzisierung zu `BereitsGespeichert`.
 * Die vier Relationen hat der Owner im Review fachlich bestätigt; die
   Begründung zu ADR-006 ist danach präzisiert.
 * ADR-016 bleibt unverändert, bis dieser ADR angenommen ist. Seine Annahme, dass
