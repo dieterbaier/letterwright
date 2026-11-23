@@ -40,8 +40,8 @@ Produktqualität.
 | `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
   Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
   den Tag-Baum mit Text. NVDA mit Acrobat Reader liest beide Referenz-PDFs ohne Befund
-  (Owner, 2026-11-23, siehe unten); PAC, Alternativtexte sowie Ansage von Titel und Sprache
-  sind nicht geprüft.
+  (Owner, 2026-11-23, siehe unten). Nicht geprüft: PAC (kein Zugang) und ob NVDA im PDF den
+  Alternativtext des Logos vorliest.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
@@ -99,7 +99,8 @@ Produktqualität.
   mit Fußzeile am Ende, keine Fokusfalle, Aktualisieren mit `aria-live`. VoiceOver liest das
   Schreiben (Owner). Grenzen: VoiceOver bleibt am Ende der ersten Seite stehen und braucht
   einen neuen Einstieg in den Frame; bei 200 % Zoom scrollt die Seite waagerecht statt
-  umzubrechen (festes A4-Blatt). NVDA ist ungeprüft.
+  umzubrechen (festes A4-Blatt). NVDA liest das ganze Schreiben einschließlich der
+  Alternativtexte (Owner, 2026-11-23).
 | ADR-005, ADR-014
 
 | Schriften nur aus dem Ordner des Hosts
@@ -132,8 +133,6 @@ Nicht gelungen oder bewusst nicht gemacht:
   per Tastatur (Ausnahme für zweidimensionale Inhalte in WCAG 1.4.10).
 * Durchgehendes Vorlesen über Seitenwechsel mit VoiceOver. Nicht weiter untersucht.
 * Eine gleich breite freie Ersatzschrift für Arial Narrow. Es gibt keine.
-* NVDA-Prüfung der Vorschau. Kein Windows-Gerät; braucht eine Windows-Prüfumgebung. Das PDF
-  ist mit NVDA geprüft.
 * Die Messung der Bildschirmdarstellung der Vorschau gegen das PDF (QS-004).
 
 == Aufbau
@@ -368,7 +367,11 @@ unter Windows, an `geschaeftsbrief-einseitig.pdf` und `geschaeftsbrief-mehrseiti
 * Beim Blättern auf die dritte Seite sagt NVDA „3 Schrägstrich 3 c“ an. Vermutlich ist das die
   Seitenanzeige des Readers; im Strukturbaum steht kein solcher Text, und beim durchgehenden
   Lesen tritt es nicht auf.
+* NVDA sagt den Dokumenttitel an. Die Sprache sagt NVDA nicht an; das tut es auch sonst nicht,
+  es wählt damit nur die Stimme. Das PDF setzt `/Lang (de)` im Katalog und am
+  `Document`-Element (`struktur`).
 * Acrobat Reader erkennt die PDF/A-Konformitätsangabe und öffnet das Dokument im PDF/A-Modus.
+* Ohne PDF Accessibility Checker (PAC); dafür stand kein Zugang zur Verfügung.
 
 == Barrierefreiheit der Vorschau
 
@@ -410,7 +413,8 @@ waren oder der scrollbare Bereich fehlte. Eine Vermutung ist, dass VoiceOver den
 des Schreibens mit `role="main"` als Gruppe behandelt; die Fortsetzungen auf den Folgeseiten
 haben die Rolle nicht. Nicht weiter untersucht; es kann auch an der Bedienung liegen.
 
-*Ungeprüft:* NVDA (Windows). Dafür stand kein Gerät zur Verfügung.
+NVDA (Owner, 2026-11-23, NVDA 2026.1.1 unter Windows) liest die Vorschau vollständig vor,
+einschließlich der Alternativtexte.
 
 == HTML-Bereinigung
 
