@@ -388,6 +388,16 @@ endgültigen Schreibens informiert die Bibliothek die Host-Anwendung über den
 endgültigen Dateinamen und den technischen Schlüssel des Dokuments. So kann der
 Host eine Beziehung zwischen Fachdaten und Dokument herstellen. Dafür ist die
 Host-Anwendung verantwortlich.
++
+Ergänzung (Owner, 2026-11-23, Review von PR #74): Gibt der Host keinen Namen
+vor, liefert die Bibliothek einen Default, als Vorschlag
+`<fachlicherBezug>.pdf`. Der Host kann ihn überschreiben, über die Java-API als
+optionalen Eingabewert, beim Speichern über die Oberfläche vor dem Speichern.
+Die Bibliothek vergibt den Namen auch bei gleichzeitigem Speichern
+kollisionsfrei, mit dem hochgezählten Index von oben. Ergebnis der Java-API und
+Rückruf melden den tatsächlich vergebenen Namen; eine Wiederholung liefert den
+vorhandenen. Der Vertrag steht in
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
 
 Noch offen, bevor die Regel als ADR festgehalten wird:
 
