@@ -69,12 +69,19 @@ Datentypen (Option 3):
   bindet er als `implementation` ein. Ein Host, der den Starter einbindet, sieht
   beim Kompilieren von der Bibliothek nur `spi`; Ports, Anwendungsfälle,
   Domänenmodell, Domänenservices und Adapter bekommt er nur zur Laufzeit.
+  Nachtrag 2026-11-23: Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] exportiert der Starter
+  zusätzlich das Modul `api` der Java-API.
 * Die Default-Implementierung von `Berechtigungspruefung` auf Spring Security
   implementiert die SPI-Schnittstelle wie jede Host-Implementierung. Sie liegt im
   Starter und tritt zurück, sobald der Host eine eigene Bean bereitstellt.
 * Eine eingehende Java-API für den Host gibt es nicht. Der Host nutzt die
   Bibliothek über die React-Komponenten und die REST-Endpunkte von
   `adapter-web` und stellt ihr Daten über `spi` bereit.
+  Nachtrag 2026-11-23: überholt durch xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]. Für das Speichern in
+  seiner eigenen Transaktion bekommt der Host eine Java-API nach dem Muster
+  dieses ADR, ein eigenes Modul `api` mit eigenen Typen und einem eingehenden
+  Adapter. `spi` bekommt dazu die optionale Schnittstelle
+  `spi.NachDemSpeichern`.
 
 Der Schnitt:
 
@@ -244,10 +251,15 @@ include::generated/adr-016-schnittstelle-zur-host-anwendung-traceability.adoc[le
 
 * Der Host braucht keine eingehende Java-API. Er bedient die Bibliothek über die
   React-Komponenten und REST (Einschätzung des Owners am 2026-11-17).
+  Nachtrag 2026-11-23: Die Annahme gilt nicht mehr, siehe
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
 * Den fachlichen Schlüssel und den Dateinamen aus Q-ARCH-004 übergibt der Host
   über die Frontend-Komponenten und damit über REST, nicht über Java. Braucht er
   dafür doch einen Java-Aufruf, kommt eine eingehende API nach demselben Muster
   hinzu: ein eigenes Modul mit eigenen Typen und ein eingehender Adapter.
+  Nachtrag 2026-11-23: Den Dateinamen hat der Owner zurückgestellt
+  (Q-ARCH-004). Die Java-API kommt für das Speichern in einer Transaktion des
+  Hosts hinzu (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
 * Die Typen, die über die Schnittstelle fließen, sind wenige und flach
   (Bezug als Typ und ID, Datenkontext als Werte, Ja/Nein-Entscheidungen). Das
   Mapping bleibt dadurch klein.
@@ -266,5 +278,6 @@ include::generated/adr-016-schnittstelle-zur-host-anwendung-traceability.adoc[le
   Relationen zu ADR-002, ADR-015 und QS-007 ebenso.
 * Die Annahme, dass der Host keine eingehende Java-API braucht, bleibt eine
   Annahme. Zeigt Q-ARCH-004 das Gegenteil, kommt eine eingehende API nach dem
-  Muster dieses ADR hinzu.
+  Muster dieses ADR hinzu. Nachtrag 2026-11-23: eingetreten, siehe
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
 * ADR-015 bleibt unverändert; die Verfeinerung steht als Relation in diesem ADR.
