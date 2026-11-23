@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-23'
 reviewed: false
-summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die sich seiner Transaktion anschließt, oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
+summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die einer laufenden Transaktion beitritt (REQUIRED), oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Den Dateinamen gibt der Host vor oder die Bibliothek bildet einen Default; sie vergibt ihn kollisionsfrei und meldet den tatsächlichen Namen zurück. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
 derived_from:
 - type: question
   description: 'Q-ARCH-004, Folgefrage „Speichern in einer Transaktion des Hosts“ mit Tendenz (2026-11-22), Verantwortungsgrenze (Review PR #70) und Empfehlung (PR #71)'
@@ -14,6 +14,9 @@ derived_from:
   anchor: q-arch-004
 - type: conversation
   description: 'Entscheidungen des Owners am 2026-11-23: nur atomarer Rückruf, Rückruf nur bei Neuanlage, fachliche Ablehnung als Sealed-Ergebnis, Vertrag als ADR-Entwurf'
+- type: external
+  description: 'Review des Owners zu PR #74 (2026-11-23): Namen, Dateinamenvertrag, REQUIRED, Präzisierungen zu BereitsGespeichert, Transaktionsgrenze und Ablehnung'
+  uri: https://github.com/dieterbaier/standardschreiben/pull/74
 tags:
 - decision
 - schreiben
@@ -33,7 +36,7 @@ relations:
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
   status: proposed
-  rationale: 'Die Persistenz muss sich einer laufenden Transaktion des Hosts anschließen und darf keine eigene neue Transaktion öffnen.'
+  rationale: 'Die Bibliothek tritt einer laufenden Transaktion des Hosts bei (REQUIRED) und eröffnet nur dann eine eigene, wenn keine läuft. Innerhalb einer laufenden Transaktion darf die Persistenz keine unabhängige Transaktion eröffnen. Außerdem muss sie Dateinamen auch bei parallelem Speichern kollisionsfrei vergeben.'
   reviewed: false
 - type: affects
   target: QS-007-integration-in-host-anwendung
@@ -51,7 +54,10 @@ Vorgeschlagen (proposed).
 
 Der ADR ist KI-gestützt formuliert. Die Richtung hat der Owner am 2026-11-23
 vorgegeben: nur atomarer Rückruf, Rückruf nur bei einer Neuanlage, fachliche
-Ablehnung als Sealed-Ergebnis. Angenommen ist er erst nach dem Review.
+Ablehnung als Sealed-Ergebnis. Im Review von PR #74 hat er am selben Tag die
+offenen Fragen zu Namen, Dateiname und `REQUIRED` entschieden und Präzisierungen
+verlangt; beides ist eingearbeitet. Angenommen ist der ADR erst nach dem
+erneuten Review.
 
 === Entscheidung
 
@@ -63,42 +69,55 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
 
 ==== Java-API, der primäre Weg
 
-* Ein eigenes Modul mit eigenen Typen und einem eingehenden Adapter, nach dem
-  Muster aus xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Der Host
-  sieht weder Domänenmodell noch interne Use-Case-Ports. Der Starter exportiert
-  das Modul neben `spi`.
+* Ein eigenes Modul `api` mit eigenen Typen und einem eingehenden Adapter, nach
+  dem Muster aus xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Der
+  Host sieht weder Domänenmodell noch interne Use-Case-Ports. Der Starter
+  exportiert `api` neben `spi`.
 * Der Host ruft in seinem eigenen Anwendungsfall „Schreiben speichern“ mit
-  Benutzerkennung und Snapshot-ID auf und erhält ein Sealed-Ergebnis mit
-  denselben Fällen wie `Speicherergebnis`. Gespeichert und bereits gespeichert
-  tragen die Identifikatoren, die auch der Rückruf erhält (siehe unten).
-* Die Bibliothek schließt sich einer laufenden Transaktion an (Spring
-  `REQUIRED`), nie einer neuen (`REQUIRES_NEW`). Ohne laufende Transaktion
-  öffnet sie eine eigene, und es gilt das Verhalten von heute.
+  Benutzerkennung, Snapshot-ID und optional einem Dateinamen auf. Er erhält ein
+  Sealed-Ergebnis mit denselben Fällen wie `Speicherergebnis`. Gespeichert und
+  bereits gespeichert tragen die Identifikatoren, die auch der Rückruf erhält,
+  darunter den tatsächlich vergebenen Dateinamen (siehe unten).
+* *Transaktion (`REQUIRED`):* Die Bibliothek tritt einer laufenden Transaktion
+  bei. Läuft keine, eröffnet sie eine eigene, und es gilt das Verhalten von
+  heute. Innerhalb einer laufenden Transaktion eröffnet sie keine unabhängige
+  (kein `REQUIRES_NEW`). Atomar mit weiteren Aktionen des Hosts ist das
+  Speichern also nur, wenn der Host die gemeinsame Transaktion vor dem Aufruf
+  eröffnet.
 * Der Host wertet das Ergebnis aus, ändert eigene Daten und committet alles
   gemeinsam. Rollt er zurück, rollen auch Schreiben und Verbrauch des Snapshots
   zurück. Einen Rückruf gibt es auf diesem Weg nicht.
 
 ==== Speichern über die Oberfläche: optionaler synchroner Rückruf
 
-* `spi` bekommt eine optionale Schnittstelle für den Rückruf nach dem Speichern.
-  Stellt der Host keine Implementierung bereit, verhält sich die Bibliothek wie
-  heute.
+* `spi` bekommt die optionale Schnittstelle `spi.NachDemSpeichern`. Stellt der
+  Host keine Implementierung bereit, verhält sich die Bibliothek wie heute.
+* *Transaktionsgrenze:* Beim Speichern über REST ist der Endpunkt der Bibliothek
+  die äußere Grenze der Transaktion. Rückruf und Datenbankaktionen des Hosts
+  nehmen daran teil.
 * *Zeitpunkt:* Der Rückruf läuft in derselben Transaktion, nach den
   Datenbankänderungen der Bibliothek und vor dem Commit. Einen Listener nach dem
   Commit (`AFTER_COMMIT`) gibt es nicht.
-* *Nur bei einer Neuanlage:* Der Rückruf läuft nur, wenn das Schreiben in dieser
-  Transaktion entsteht. Bei `BereitsGespeichert` ist die Transaktion des ersten
-  Versuchs samt Rückruf schon committet; eine Wiederholung liefert das
-  vorhandene Schreiben ohne erneuten Rückruf.
+* *Nur bei einer Neuanlage:* Der Rückruf läuft nur, wenn der aktuelle Aufruf das
+  Schreiben anlegt. Liefert er `BereitsGespeichert`, legt er kein neues
+  Schreiben an und löst keinen Rückruf aus. Mehr sichert der Vertrag dabei nicht
+  zu: Das vorhandene Schreiben kann über die Java-API ohne Rückruf entstanden
+  sein, oder ein anderer Aufruf in derselben äußeren Transaktion hat es angelegt,
+  bevor der Host committet.
 * *Daten:* Der Rückruf erhält stabile Identifikatoren: die ID des Schreibens
-  (technischer Schlüssel), den fachlichen Bezug, das Standardschreiben, die
-  Benutzerkennung und den Zeitpunkt der Erstellung. Den endgültigen Dateinamen
-  erhält er, sobald die Bibliothek ihn bildet (Q-ARCH-004, Frage „Dateiname“).
-* *Ergebnis:* Der Rückruf liefert ein Sealed-Ergebnis, *angenommen* oder
-  *abgelehnt* mit einem Grund für den Benutzer. Eine Ablehnung rollt die
-  gemeinsame Transaktion zurück. Das Speichern meldet dann einen eigenen Fall
-  von `Speicherergebnis` mit dem Grund. Der Snapshot bleibt offen, solange er
-  nicht abläuft, und der Benutzer kann erneut speichern.
+  (technischer Schlüssel), den tatsächlich vergebenen Dateinamen, den fachlichen
+  Bezug, das Standardschreiben, die Benutzerkennung und den Zeitpunkt der
+  Erstellung.
+* *Ergebnis:* Der Rückruf liefert ein `Rueckrufergebnis`, `Angenommen` oder
+  `Abgelehnt` mit einem Grund für den Benutzer. Ein Rückgabewert löst in Spring
+  für sich allein keinen Rollback aus. Die Bibliothek rollt bei `Abgelehnt`
+  deshalb ausdrücklich an ihrer äußeren Grenze zurück und meldet erst danach
+  einen eigenen Fall von `Speicherergebnis` mit dem Grund. Innere, teilnehmende
+  Grenzen markieren die Transaktion dafür nicht als rollback-only und kehren
+  dann regulär zurück. Sonst verdrängt eine `UnexpectedRollbackException` das
+  fachliche Ergebnis, und der Grund kommt beim Benutzer nicht an. Der Snapshot
+  bleibt offen, solange er nicht abläuft, und der Benutzer kann erneut
+  speichern.
 * *Ausnahmen:* Jede Ausnahme des Rückrufs ist ein technischer Fehler und rollt
   die gemeinsame Transaktion ebenfalls zurück. Der Vertrag deklariert keine
   Checked Exceptions.
@@ -110,6 +129,28 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   Engine oder die Ablage im eigenen DMS, schreibt er im Rückruf einen
   Outbox-Auftrag in dieselbe Transaktion und führt ihn danach wiederholbar und
   idempotent selbst aus.
+
+==== Dateiname
+
+* *Default:* Gibt der Host keinen Namen vor, bildet die Bibliothek ihn aus dem
+  fachlichen Bezug, als Vorschlag `<fachlicherBezug>.pdf`.
+* *Vorgabe des Hosts:* Der Host kann den Default überschreiben. Über die Java-API
+  übergibt er den Namen als optionalen Eingabewert. Beim Speichern über REST gibt
+  er ihn vor dem Speichern vor; die Vorgabe wird an den Snapshot gebunden, damit
+  eine Wiederholung denselben Namen trägt. Der Rückruf kommt nach der Ablage und
+  kann den Namen nur noch melden, nicht mehr vorgeben.
+* *Kollisionsfrei:* Die Bibliothek löst Default und Vorgabe vor oder bei der
+  Ablage auf. Gibt es den Namen schon, hängt sie am Ende einen hochgezählten
+  Index an (Q-ARCH-004, Antwort des Owners vom 2026-11-16). Das gilt auch bei
+  gleichzeitigem Speichern. Die Persistenz sichert den Namen mit einer
+  Eindeutigkeitsregel ab. Ein Verfahren, das eine Verletzung dieser Regel
+  abfängt und mit dem nächsten Index wiederholt, genügt innerhalb der
+  Transaktion des Hosts nicht: Auf manchen Datenbanken lässt sie sich danach
+  nur noch zurückrollen. Wie die Vergabe das vermeidet, legt der
+  Persistenzentwurf (#6) fest.
+* *Rückmeldung:* Ergebnis der Java-API und Rückruf enthalten den tatsächlich
+  vergebenen Namen. `BereitsGespeichert` liefert den vorhandenen Namen, auch
+  wenn eine Wiederholung eine andere Vorgabe mitbringt.
 
 ==== Verantwortungsgrenze
 
@@ -236,9 +277,16 @@ Wahl der Semantik.
 * Vorbereiten und Festschreiben trennen, damit Rendering und Prüfung vor einer
   kurzen Schreibtransaktion liegen (Q-ARCH-004). Das ist eine bewusste
   Umstrukturierung von `Schreibenspeicherung` und eine eigene Entscheidung.
-* Integrationsnachweise im Host-Vertragstest: gemeinsamer Commit, später
-  Rollback des Hosts, Ablehnung und Ausnahme im Rückruf, verlorene Antwort mit
-  Retry.
+* Die Persistenz (#6) speichert den Dateinamen am Schreiben und vergibt ihn
+  kollisionsfrei; der Download liefert das PDF unter diesem Namen aus.
+* Integrationsnachweise im Host-Vertragstest:
+** gemeinsamer Commit und später Rollback des Hosts,
+** Speichern über die Java-API ohne äußere Transaktion,
+** Ablehnung und Ausnahme im Rückruf; bei der Ablehnung prüft der Test die
+   REST-Antwort mit dem Grund und den Zustand beider Seiten nach dem Rollback,
+** verlorene Antwort mit Retry,
+** Dateiname: Default, Überschreiben durch den Host, Kollision bei
+   gleichzeitigem Speichern und unveränderter Name beim Retry.
 * ADR-016 und die Bausteinsicht beschreiben die Java-API und den Rückruf, sobald
   dieser ADR angenommen ist. Die Pflichten des Hosts gehören in die
   Integrationsdoku (#11).
@@ -268,18 +316,22 @@ include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-traceability
 
 === Open Questions
 
-* *Name und Ort:* Wie heißen das API-Modul und die Schnittstelle des Rückrufs?
-  Vorschlag: Modul `api`, Schnittstelle `spi.NachDemSpeichern` mit dem Ergebnis
-  `Rueckrufergebnis` (`Angenommen`, `Abgelehnt`).
-* *Dateiname:* Erhält der Rückruf den endgültigen Dateinamen schon mit diesem
-  ADR, oder erst mit der Entscheidung zum Dateinamen aus Q-ARCH-004?
-* *Ohne laufende Transaktion:* Soll die Java-API ohne laufende Transaktion eine
-  eigene öffnen (`REQUIRED`) oder ablehnen (`MANDATORY`)? Der Entwurf nimmt
-  `REQUIRED`.
+* *Form des Defaults:* Wie wird aus Typ und ID des fachlichen Bezugs ein
+  gültiger Dateiname? Die ID kann Zeichen enthalten, die in Dateinamen nicht
+  erlaubt sind (#69: Der Host kodiert sie frei).
+
+Die drei offenen Fragen des ersten Entwurfs hat der Owner im Review von PR #74
+beantwortet: Modul `api`, Schnittstelle `spi.NachDemSpeichern` mit
+`Rueckrufergebnis` (`Angenommen`, `Abgelehnt`); der Dateiname wird in diesem
+ADR geregelt; die Java-API arbeitet mit `REQUIRED`.
 
 === Review Notes
 
-* Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen; zu
-  prüfen sind die Ausformulierung, die offenen Fragen und die vier Relationen.
+* Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen, die
+  offenen Fragen des ersten Entwurfs im Review von PR #74. Zu prüfen sind der
+  ergänzte Dateinamenvertrag, die präzisierte Transaktionsgrenze und die offene
+  Frage zur Form des Defaults.
+* Die vier Relationen hat der Owner im Review fachlich bestätigt; die
+  Begründung zu ADR-006 ist danach präzisiert.
 * ADR-016 bleibt unverändert, bis dieser ADR angenommen ist. Seine Annahme, dass
   der Host keine Java-API braucht, gilt danach nicht mehr.
