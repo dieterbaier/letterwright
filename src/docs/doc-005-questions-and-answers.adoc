@@ -476,8 +476,7 @@ Offen dazu:
 * *Fehler des Rückrufs:* Welche Fehler rollen die gemeinsame Transaktion zurück?
   Checked Exceptions und fachliche Fehler als Rückgabewert tun das nicht
   automatisch; der Vertrag muss es festlegen.
-* *Atomar oder entkoppelt* (Präzisierung, Vorschlag, nicht reviewt,
-  2026-11-23): Für die Benachrichtigung nach dem Speichern schließen sich zwei
+* *Atomar oder entkoppelt* (Präzisierung, vom Owner reviewt, 2026-11-23): Für die Benachrichtigung nach dem Speichern schließen sich zwei
   Semantiken aus. Ein Rückruf kann nicht beides liefern.
 +
 [horizontal]
@@ -504,6 +503,55 @@ Speichern über die Oberfläche gilt: nur atomar, nur entkoppelt, oder beides mi
 einer Wahl des Hosts je Rückruf. Im entkoppelten Fall ist außerdem offen, wer
 wiederholt. Nach der Verantwortungsgrenze oben übernimmt die Bibliothek keine
 Workflow-Steuerung, eine Outbox wäre also Sache des Hosts.
++
+.Empfehlung (Vorschlag, 2026-11-23, noch nicht entschieden)
+====
+Die Bibliothek bietet nur den atomaren Rückruf an, keine eigene
+Benachrichtigung nach dem Commit und keine eigene Wiederholung.
+
+* Das erfüllt die Tendenz vom 2026-11-22 und passt zur Verantwortungsgrenze:
+  Die Bibliothek sichert nur zu, dass der Rückruf vor dem gemeinsamen Commit
+  läuft und ein Fehler alles zurückrollt.
+* Braucht der Host eine entkoppelte Wirkung, etwa den Abschluss eines Tasks in
+  einer entfernten Engine oder die Ablage im eigenen DMS, schreibt er im
+  Rückruf einen Outbox-Auftrag in dieselbe Transaktion und führt ihn danach
+  wiederholbar selbst aus. Der Outbox-Auftrag entsteht so genau dann, wenn
+  auch das Schreiben gespeichert ist.
+* Damit entfällt der Vorschlag unter „Benachrichtigung des Hosts“, dass die
+  Bibliothek die Benachrichtigung wiederholt. Ein Fehler im Rückruf verhindert
+  das Speichern, und der Benutzer speichert erneut.
+* Eine Wahl zwischen beiden Semantiken je Rückruf vergrößert den Vertrag und die
+  Testmatrix, ohne etwas zu ermöglichen, was der Host mit der Outbox nicht
+  schon selbst erreicht.
+====
++
+.Skizze 4: Empfehlung, atomarer Rückruf mit Outbox des Hosts
+[plantuml,q-arch-004-empfehlung-outbox,svg]
+----
+@startuml
+actor Sachbearbeiter as SB
+participant "Vorschau (React)" as UI
+participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
+participant "Host: Rückruf" as Host
+database "Datenbank\n(gemeinsame Transaktion)" as DB
+participant "Host: Outbox-Verarbeitung" as Outbox
+participant "Entfernte Engine\noder DMS" as Ext
+SB -> UI: Speichern
+UI -> Lib: POST /schreiben (Snapshot-ID)
+Lib -> DB: Transaktion beginnen
+Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
+Lib -> Host: Rückruf (Dateiname, technischer Schlüssel)
+Host -> DB: eigene Daten ändern, Outbox-Auftrag anlegen
+Lib -> DB: Commit (Schreiben, Snapshot, Daten und Outbox-Auftrag des Hosts)
+Lib --> UI: gespeichert
+... nach dem Commit, in der Verantwortung des Hosts ...
+loop bis erfolgreich
+  Outbox -> DB: offenen Auftrag lesen
+  Outbox -> Ext: Task abschließen oder ablegen (idempotent)
+end
+Outbox -> DB: Auftrag als erledigt markieren
+@enduml
+----
 +
 .Skizze 1: Java-API, der Host orchestriert (kein Rückruf)
 [plantuml,q-arch-004-java-api,svg]
