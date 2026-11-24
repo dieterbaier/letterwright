@@ -106,6 +106,16 @@ class HexagonaleArchitekturTest {
     }
 
     @Test
+    void apiIstEigenstaendig() {
+        ArchitekturRegeln.apiIstEigenstaendig(BASIS).check(produktionsCode);
+    }
+
+    @Test
+    void nurAdapterApiUndStarterKennenDieApi() {
+        ArchitekturRegeln.nurAdapterApiUndStarterKennenDieApi(BASIS).check(produktionsCode);
+    }
+
+    @Test
     void adapterSindVoneinanderIsoliert() {
         ArchitekturRegeln.adapterSindVoneinanderIsoliert(BASIS).check(produktionsCode);
     }

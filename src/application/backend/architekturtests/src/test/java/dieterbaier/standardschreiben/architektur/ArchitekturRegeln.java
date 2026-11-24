@@ -241,6 +241,34 @@ final class ArchitekturRegeln {
                 .because("nur adapter-host bildet zwischen SPI und Domäne ab, nur der Starter verdrahtet (ADR-016)");
     }
 
+    /**
+     * Die Java-API ist reines Java und hängt an keinem anderen Paket der Bibliothek, auch nicht am SPI (ADR-023).
+     *
+     * <p>Verboten ist wie beim SPI jedes Paket unter dem Basispaket außerhalb von {@code api}, damit die Regel auch für
+     * ein später hinzukommendes Paket rot bleibt.
+     */
+    static ArchRule apiIstEigenstaendig(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + ".api..")
+                .should().dependOnClassesThat(
+                        resideInAPackage("org.springframework..")
+                                .or(resideInAPackage(basis + "..")
+                                        .and(resideOutsideOfPackage(basis + ".api.."))))
+                .because("die Java-API ist ein Vertrag mit dem Host und hat eigene Datentypen (ADR-016, ADR-023)");
+    }
+
+    /** Außer der API selbst benutzen nur adapter-api und der Starter die Java-API. */
+    static ArchRule nurAdapterApiUndStarterKennenDieApi(String basis) {
+        return noClasses()
+                .that().resideInAPackage(basis + "..")
+                .and().resideOutsideOfPackages(
+                        basis + ".api..",
+                        basis + ".adapter.in.api..",
+                        basis + ".starter..")
+                .should().dependOnClassesThat().resideInAPackage(basis + ".api..")
+                .because("nur adapter-api bildet zwischen API und Domäne ab, nur der Starter verdrahtet (ADR-023)");
+    }
+
     /** Kein Adapter benutzt einen anderen; jeder spricht die Anwendung nur über ihre Ports an. */
     static ArchRule adapterSindVoneinanderIsoliert(String basis) {
         return slices()
