@@ -94,6 +94,12 @@ Der Schnitt:
 | `spring-boot-starter` | `spring-boot-starter` | `spi` (`api`), alle übrigen Module (`implementation`)
 |===
 
+Nachtrag 2026-11-23: Die Tabelle zeigt den ursprünglichen Schnitt. Mit
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommen die
+geplanten Module `api` und `adapter-api` hinzu. `api` hängt wie `spi` an
+nichts. Der Starter exportiert dann `spi` und `api` per `api` und hält
+`adapter-api` wie alle übrigen Module per `implementation` intern.
+
 ArchUnit prüft zusätzlich, jede Regel mit Fixture:
 
 * `spi` hängt von keinem anderen Paket der Bibliothek ab.
