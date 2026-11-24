@@ -4,15 +4,16 @@ Wegwerf-Prototyp, der ADR-003 bis ADR-005, ADR-014 und ADR-017 an realen
 DOCX-Vorgaben belegt oder widerlegt (Epic #3).
 
 *Status:* aktiv seit 2026-11-19. Die Ergebnisse stehen in den ADRs und
-Qualitätsszenarien (PR #49, #58). ADR-004 und ADR-017 sind angenommen. Offen
-sind die Annahme von ADR-003, ADR-005 und ADR-014 durch den Owner sowie die
-manuellen Prüfungen, die nur der Owner machen kann.
+Qualitätsszenarien (PR #49, #58, #76). ADR-004 und ADR-017 sind angenommen. Die
+manuellen Prüfungen mit NVDA und axesCheck sind gemacht (PR #76). Offen sind die
+Einordnung von zwei axesCheck-Warnungen, die NVDA-Einzelkriterien der Vorschau und
+die Annahme von ADR-003, ADR-005 und ADR-014 durch den Owner.
 
 == The plan
 
-Erst die manuellen Prüfungen, weil die Annahme von ADR-005 (PDF/UA) und
-ADR-014 (Barrierefreiheit der Vorschau) davon abhängt. Chromium kommt nur
-wieder, wenn die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und
+Erst die offenen Teile der manuellen Prüfungen, weil die Annahme von ADR-005
+(PDF/UA) und ADR-014 (Barrierefreiheit der Vorschau) davon abhängt. Chromium kommt
+nur wieder, wenn die Einordnung der axesCheck-Warnungen ein Problem zeigt, das openhtmltopdf und
 PDFBox nicht zuverlässig lösen. Apache FOP mit XSLT ist der Ausweichweg, falls
 Kunden openhtmltopdf nicht akzeptieren (ADR-004, Owner 2026-11-21), aber kein
 geplanter Schritt.
@@ -26,10 +27,12 @@ geplanter Schritt.
 * [x] Ergebnisse in ADR-003, -004, -005, -014, -017 und QS-002, QS-004 eintragen; Q-PO-004 nachziehen (PR #49)
 * [x] QS-013 als Annahme festhalten, Originalschriften nur vom Host (Owner, Kommentar in #3 vom 2026-11-21; PR #58)
 * [x] QS-004 Sichtprobe Vorschau gegen PDF (Owner); ADR-004 angenommen (PR #58)
-* [ ] Manuelle PDF/UA-Stichprobe (Owner): #3, ADR-005
-* [ ] NVDA auf einem Windows-Rechner (Owner): #3, ADR-014
+* [x] Manuelle PDF/UA-Stichprobe mit NVDA und axesCheck an beiden Referenz-PDFs (Owner, PR #76): #3, ADR-005
+* [x] Erster NVDA-Durchgang der Vorschau mit Chrome am mehrseitigen Schreiben (Owner, PR #76): #3, ADR-014
+* [ ] Zwei axesCheck-Warnungen einordnen (PDF/UA „Structure Tree“, WCAG 4.1), z. B. mit PAC Desktop (Owner): #3, QS-002
+* [ ] NVDA-Kriterien der Vorschau einzeln prüfen: Reihenfolge, Seitenwechsel, keine Wiederholungen, Statusmeldungen; QS-003 nennt Firefox (Owner): #3, ADR-014
 * [ ] Annahme von ADR-003, ADR-005, ADR-014 durch den Owner
-* [ ] Nur wenn die PDF/UA-Stichprobe es verlangt: Option 2 (Chromium) prüfen: #3
+* [ ] Nur wenn die Einordnung der Warnungen es verlangt: Option 2 (Chromium) prüfen: #3
 
 ADR-014 bleibt `proposed`, bis der Prototyp die Prüfkriterien erfüllt
 (Owner, 2026-11-15).
@@ -46,7 +49,10 @@ kommt als automatischer Test in #7.
 
 * Ligatur „ﬁ“ im Text des PDFs mit PT Sans Narrow: Abhilfe fürs Produkt offen
   (ADR-017, Konsequenzen).
-* Die Ergebnisse von PDF/UA-Stichprobe und NVDA trägt der Owner in #3 ein.
+* Die Ansage „3 Schrägstrich 3 c“ auf Seite 3 des mehrseitigen PDFs ist ungeklärt
+  (Prototyp-README, NVDA-Stichprobe).
+* Die Abnahme von #3 bleibt offen, bis die Punkte oben erledigt sind (Owner,
+  2026-11-24).
 
 == Checks
 
@@ -60,6 +66,7 @@ npm run pruefen -- geschaeftsbrief-mehrseitig               # Sandbox, CSP, Druc
 ../gradlew vergleich --args="ausgabe/geschaeftsbrief-mehrseitig.pdf ausgabe/geschaeftsbrief-mehrseitig-vorschau.pdf"
 ../gradlew gegenprobe --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
 ../gradlew konformitaet --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"
+../gradlew struktur --args="ausgabe/geschaeftsbrief-mehrseitig.pdf"    # Titel, Sprache, Tag-Baum für die Stichprobe
 npm run barrierefreiheit -- geschaeftsbrief-mehrseitig
 ../gradlew run --args="boesartig" && npm run angriff -- boesartig
 ----

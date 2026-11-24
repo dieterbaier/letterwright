@@ -33,3 +33,73 @@ Rekonstruiert aus `git log 5a3c4d7..main`, PR #75 und den Issues #77 bis #79.
 * Gemeinsames Commit mit dem Host prüfbar erst mit #6, der Rollback am
   REST-Endpunkt mit #10.
 * PR #76 (`issue_3`) des Owners: keine Checks gemeldet, nicht Teil dieser Sitzung.
+
+== Parallele Sitzung: Prototyp (#3)
+
+Thema `prototyp`, begonnen am Nachmittag des 2026-11-23. Der Eintrag des
+2026-11-23 war schon geschrieben, deshalb steht sie hier. Rekonstruiert aus
+`git log 7522bbc..main`, den Pull Requests #76 und #80 und ihren Reviews.
+
+=== Was geschah
+
+* **Prototyp-PDFs beim Kunden:** `gradlew` ließ sich dort nicht ausführen,
+  Meldung „kein Zugriff“. Ursache nicht geklärt. Vermutlich blockiert das
+  Firmennetz die Downloads von Gradle-Distribution und Maven Central. Die PDFs sind
+  lokal erzeugt und per E-Mail übertragen.
+* **NVDA- und axesCheck-Stichprobe** (Owner, Windows, NVDA 2026.1.1, Acrobat
+  Reader 2026.001.21662, Chrome 157). PDF: beide Referenzschreiben ohne Befund,
+  axesCheck meldet PDF/UA und WCAG als erfüllt, mit je einer Warnung ohne Details.
+  Vorschau: NVDA liest das mehrseitige Schreiben vollständig mit Alternativtexten.
+* **PR #76 gemergt** (`4984e0b` bis `c0f0e30`, Rebase): Ergebnisse im
+  Prototyp-README. ADR-004, ADR-014 und die Bausteinsicht nennen NVDA nicht mehr als
+  ungeprüft. In QS-002 ist die Dokumentsprache aus dem manuellen Antwortmaß
+  gestrichen. Im Review präzisiert: Status „Stichprobe durchgeführt, Warnungen
+  offen“, Einzelkriterien der Vorschau als offen markiert, KI-Vermutungen als solche
+  gekennzeichnet. Rebase auf `main` mit einem Konflikt in der Bausteinsicht (ADR-023).
+* **PR #80 gemergt** (`2bedd48`): `AGENTS.md` legt Git-Worktrees unter
+  `../worktree/standardschreiben/<branch>` ab.
+
+=== Entscheidungen des Owners
+
+* Die Dokumentsprache wird in QS-002 nur automatisch geprüft (veraPDF), nicht mehr
+  manuell.
+* Der Link zum axesCheck-Bericht kommt nicht ins README.
+* Die Abnahme von #3 bleibt offen, bis die dokumentierten Prüfungen erledigt sind.
+* Worktrees liegen neben dem Projektordner, nicht im Scratchpad des Agenten.
+
+=== Gelernt
+
+* **Ein lokaler `pre-push`-Hook sperrt Pushes aus Pfaden unter `/private/`.** Ein
+  Worktree im temporären Verzeichnis des Agenten ließ sich deshalb auch vom Owner
+  nicht pushen. Daraus wurde die Regel in PR #80.
+* **Ein manuelles Kriterium muss scheitern können.** „Text in der gesetzten Sprache
+  vorgelesen“ unterscheidet bei einem deutschen Brief und einer deutschen Stimme
+  nichts.
+* **Ein Prüfwerkzeug mit „erfüllt“ und offenen Warnungen ist kein Nachweis für
+  „0 offene Befunde“.** Ergebnis des Werkzeugs und Prüfstatus gehören getrennt
+  notiert.
+* **Ergebnisseiten, die erst im Browser laden, kann der Agent nicht lesen.** Der
+  axesCheck-Bericht kam deshalb als Angabe des Owners in die Doku.
+
+=== Offen
+
+* Die zwei axesCheck-Warnungen einordnen. Davon hängt ab, ob Option 2 in ADR-004
+  wieder infrage kommt.
+* NVDA-Einzelkriterien der Vorschau, dazu Firefox nach QS-003.
+* Die Ansage „3 Schrägstrich 3 c“ auf Seite 3 ist ungeklärt.
+* Warum `gradlew` beim Kunden „kein Zugriff“ meldet, ist ungeklärt.
+
+=== Gelesen
+
+* Toolkit (Submodule): Skills `pr-review`, `post-merge-sync`, `clock-out`,
+  `clock-in` (Branch-Abgleich, Journal-Bindung, Vorlage `progress.adoc`); Helfer
+  `journal-config.sh`.
+* Doku und Code: `AGENTS.md`, `prototyp/README.adoc`, `prototyp/build.gradle.kts`,
+  Gradle-Wrapper und `settings.gradle.kts`, QS-002, QS-003, ADR-004, ADR-014,
+  Bausteinsicht, `progress/prototyp.adoc`, `diary/2026-11-23.adoc`,
+  `diary/2026-11-24.adoc`, `.git/hooks/pre-push`.
+* Prototyp-Läufe: `run`, `struktur` und `positionen` an beiden Referenzschreiben.
+* GitHub: Issue #3, Suche nach „NVDA“ in den Issues, PR #76 mit Reviews und
+  Inline-Kommentaren, PR #80, Checks beider PRs.
+* Nicht lesbar: Der axesCheck-Bericht unter check.axes4.com lieferte beim Abruf
+  keine Ergebnisdaten, weil die Seite sie erst im Browser lädt.
