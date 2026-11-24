@@ -305,7 +305,7 @@ die Vorschau zusätzlich unter der CSP. Umsetzung in #8 und #9.
 | Screenreader liest einmal, vollständig, in logischer Reihenfolge | mit Grenze | VoiceOver/Safari liest Briefkopf, Anschrift, Infoblock, Betreff, Brieftext, Fußzeile. Am Ende der ersten Seite ist ein neuer Einstieg in den Frame nötig. Die Randfelder sind mit `aria-hidden` verborgen, eine versteckte Kopie der Fußzeile steht am Ende.
 | Zoom 200 % und Reflow | mit Grenze | Die Seite ist ein festes A4-Blatt und scrollt waagerecht, auch per Tastatur (Ausnahme für zweidimensionale Inhalte in WCAG 1.4.10). Der Owner akzeptiert das.
 | Aktualisieren ohne Fokusverlust, `aria-live` | erfüllt |
-| NVDA und VoiceOver | teilweise | VoiceOver geprüft (Owner). NVDA ungeprüft, es fehlt eine Windows-Prüfumgebung.
+| NVDA und VoiceOver | teilweise | VoiceOver/Safari geprüft (Owner). NVDA 2026.1.1 mit Chrome 157 (Owner, 2026-11-23): liest das Schreiben vollständig einschließlich der Alternativtexte. Lesereihenfolge, Seitenwechsel und Wiederholungen sind mit NVDA nicht einzeln festgehalten; das geprüfte Referenzschreiben ist nicht vermerkt.
 | axe-core im iframe | erfüllt | 0 Verstöße der Stufen serious und critical; moderat bleibt „Inhalt außerhalb von Landmarks“.
 | Höhe, Schriften, Bilder, Paginierung unter Sandbox und CSP | erfüllt | Schriften im Prototyp als `data:`-URI, rund 5 MB je Dokument.
 | Kein Code aus Vorlage und Daten | erfüllt | 25 Angriffe, siehe oben.
@@ -350,7 +350,8 @@ include::generated/adr-014-isolation-der-vorschau-im-iframe-traceability.adoc[le
   Prototyp, siehe oben.
 * Allowlist für das Vorlagenmodell: beantwortet durch den Prototyp, siehe oben.
   Die beiden Referenzschreiben ergeben 0 Befunde.
-* Wie wird NVDA geprüft? Es fehlt eine Windows-Prüfumgebung.
+* Wie wird NVDA geprüft? Beantwortet: Der Owner prüft auf einem Windows-Rechner (erster
+  Durchgang 2026-11-23 mit Chrome). Offen sind die einzelnen Kriterien, siehe oben.
 
 === Review Notes
 
