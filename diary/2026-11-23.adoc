@@ -1,0 +1,99 @@
+= Projekttagebuch 2026-11-23
+
+Zehnter Arbeitstag, im Thema `domaene-und-host`. Erst der Vertrag der ID eines
+fachlichen Bezugs (#69), danach die Entscheidung zum Speichern in einer
+Transaktion des Hosts (ADR-023). Die Sitzung lief am Morgen des 2026-11-24 noch
+weiter; das steht im Eintrag dieses Tages. Rekonstruiert aus
+`git log 2f02b81..main`, den Pull Requests #71, #73, #74 und #75 sowie den
+Issues #69 und #72.
+
+== Was geschah
+
+* **Vor dieser Sitzung, in der Nacht:** PR #71 gemergt („Q-ARCH-004: Rückruf
+  atomar oder entkoppelt präzisieren“). Danach folgten direkt auf `main` die
+  Commits `8dd2c6f` bis `a884d11`: Empfehlung in Q-ARCH-004, alle Optionen offen
+  gehalten. Diese Sitzung hat sie nur gelesen.
+* **Issue #72 vom Owner angelegt:** Schreiben übergreifend auflisten, gefiltert
+  nach Bezugstypen.
+* **PR #73 gemergt** (#69, `49740cc`, `4e6a5f8`): Das Javadoc von
+  `spi.FachlicherBezug` nennt den Vertrag der ID: eindeutig je Bezugstyp,
+  kanonisch, dauerhaft stabil und ohne Schaden sichtbar. Mehrere Schlüssel kodiert
+  der Host kollisionsfrei. Das Javadoc in der Domäne sagt, warum ein
+  strukturierter Schlüssel fehlt. Das Glossar ist angepasst. Im Review ergänzt:
+  Die Eindeutigkeit gilt für Typ und ID zusammen, Typ und ID dürfen nicht nur aus
+  Leerraum bestehen. #69 von Hand geschlossen, weil „Schließt“ nicht griff.
+* **PR #74 gemergt** (`af48058` bis `5a3c4d7`): ADR-023 „Speichern eines Schreibens
+  in einer Transaktion des Hosts“, vom Owner angenommen. Q-ARCH-004 ist
+  beantwortet. Im Review präzisiert: `REQUIRED` mit seinen Grenzen, der
+  REST-Endpunkt als äußere Grenze der Transaktion mit ausdrücklichem Rollback,
+  `derived_from` als Typ `question`, Platzhaltersyntax nach ADR-008. Danach ist
+  der Dateiname aus dem ADR herausgenommen und zurückgestellt.
+* **PR #75 eröffnet:** ADR-016, Bausteinsicht und Glossar an ADR-023 angleichen,
+  gemergt am 2026-11-24.
+* **PR #76 vom Owner eröffnet** (Branch `issue_3`, NVDA- und axe-Stichprobe des
+  Prototyps), eine andere Sitzung. Hier nicht bearbeitet.
+
+== Entscheidungen des Owners
+
+* Für das Speichern über die Oberfläche gibt es nur einen atomaren Rückruf, keine
+  entkoppelte Benachrichtigung nach dem Commit. Wirkungen außerhalb seiner
+  Datenbank erreicht der Host über eine Outbox im Rückruf.
+* Der Rückruf läuft nur, wenn der aktuelle Aufruf das Schreiben anlegt.
+* Der Rückruf liefert ein Sealed-Ergebnis (`Angenommen`, `Abgelehnt` mit Grund)
+  und keine Ausnahme als fachliche Ablehnung.
+* Die Java-API ist der primäre Weg. Sie tritt einer laufenden Transaktion bei
+  (`REQUIRED`) und eröffnet nie eine unabhängige.
+* Der Dateiname ist zurückgestellt: Ablagename und Anzeigename werden getrennt.
+  Drei Varianten liegen in Q-ARCH-004: Eingabe des Hosts mit Kollisionsindex,
+  UUID oder ein Muster je Vorlage.
+
+== Gelernt
+
+* **Ein Rückgabewert rollt nichts zurück.** Lehnt der Rückruf ab, muss die äußere
+  Grenze ausdrücklich zurückrollen. Markieren innere Grenzen die Transaktion als
+  rollback-only, verdrängt eine `UnexpectedRollbackException` den Grund, und der
+  Benutzer erfährt nicht, warum.
+* **`REQUIRED` macht nur atomar, was der Host vorher eröffnet hat.** Ohne laufende
+  Transaktion committet die Bibliothek allein; das muss im Vertrag stehen und
+  nicht nur in der Annotation.
+* **Eindeutigkeit einer ID gilt immer relativ zu etwas.** „Eindeutig“ ohne den
+  Bezugstyp war eine stärkere Forderung, als die Bibliothek braucht.
+* **Eine zurückgestellte Frage braucht ihre Varianten im Text.** Sonst beginnt
+  die Diskussion beim nächsten Mal von vorn.
+
+== Offen
+
+* ADR-023 umsetzen: Java-API und Rückruf (am 2026-11-24 als #77 bis #79 angelegt).
+* Dateiname: zurückgestellt in Q-ARCH-004.
+* #60, #32, #6, #7, #10, #46, #9 und #72 unverändert offen.
+
+== Gelesen
+
+Was diese Sitzung tatsächlich abgerufen hat, am 2026-11-23 und 2026-11-24:
+
+* Toolkit (Submodule): Skills `clock-in`, `clock-out`, `implement-issue-workflow`,
+  `adr`, `commit-message`, `slice-issues`; Helfer `journal-config.sh`;
+  projektlokal `skills/code-stil/SKILL.md`.
+* Doku: ADR-006, ADR-008, ADR-016, ADR-021, ADR-022, ADR-023 (selbst erstellt),
+  `doc-005` (Q-ARCH-004), Bausteinsicht, Glossar, `AGENTS.md`,
+  `progress/domaene-und-host.adoc`, `diary/2026-11-22.adoc`.
+* GitHub: Issues #69, #77 (selbst angelegt), Liste der offenen Issues, Sub-Issues
+  von #5 und #77; PR #73, #74 und #75 mit Reviews, Inline-Kommentaren und Checks;
+  Liste der gemergten PRs; PR #76 (Kopf und Checks); Issue #72 (Kopf).
+* Code: `FachlicherBezug` in SPI und Domäne, `Pflicht`, `Pruefe`.
+* Clock-in und Clock-out: `git status`, `gh pr list`, Branch-Sweep über alle Refs,
+  `git log 2f02b81..main`.
+
+Fehlgeschlagen:
+
+* Der Branch-Sweep meldete unter zsh fälschlich BLOCKED (Wortaufteilung); mit
+  `bash` wiederholt.
+* `:domaene:modell:javadoc` gibt es nicht; das Projekt heißt `:domaene-modell`.
+* Das Review zu PR #73 habe ich zunächst nicht abgerufen und den PR als offen
+  gemeldet; erst auf Nachfrage des Owners eingearbeitet.
+* Ein PR-Kommentar enthielt ein nicht ersetztes `$(git rev-parse …)`; per PATCH
+  korrigiert.
+* `gh pr comment` und `gh issue comment` mit `--jq` und verworfener Fehlerausgabe
+  legten keinen Kommentar an; mit `--body-file -` wiederholt und gezählt.
+* Einen Commit-SHA (`5b0d3c8`) falsch gemeldet; richtig war `5311e4f` bzw. auf
+  `main` `6f98330`.

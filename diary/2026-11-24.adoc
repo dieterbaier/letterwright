@@ -1,0 +1,35 @@
+= Projekttagebuch 2026-11-24
+
+Fortsetzung der Sitzung vom 2026-11-23 (siehe dort, auch für „Gelesen“).
+Rekonstruiert aus `git log 5a3c4d7..main`, PR #75 und den Issues #77 bis #79.
+
+== Was geschah
+
+* **PR #75 gemergt** (`c65c076`, `c33a7cc`): ADR-016 bleibt angenommen und hat
+  datierte Nachträge mit Verweis auf ADR-023. Die Bausteinsicht führt `api` und
+  `adapter-api` als _(geplant)_, dazu den Rückruf und `adapter-web` als
+  Transaktionsgrenze. Der Glossareintrag „SPI“ nennt die Java-API. Im Review
+  ergänzt: ein Nachtrag zur Modultabelle in ADR-016 (Zielstand: `spi` und `api`
+  exportiert, `adapter-api` intern) und die Bedeutung von `REQUIRED` in der
+  Bausteinsicht.
+* **Issue #77 angelegt** (unter Epic #5) und auf Wunsch des Owners in zwei Stories
+  geteilt: #78 Java-API, #79 Rückruf `NachDemSpeichern`. Empfohlene
+  Reihenfolge: #78 zuerst, als Kommentar an #77.
+
+== Entscheidungen des Owners
+
+* Der eingehende Adapter heißt `adapter-api`.
+* Die Umsetzung von ADR-023 kommt in zwei Stories, nicht in einem Issue.
+
+== Gelernt
+
+* **Ein Nachtrag im Fließtext reicht nicht, wenn eine Tabelle das Gegenteil
+  zeigt.** Die Modultabelle in ADR-016 widersprach dem eigenen Nachtrag, bis sie
+  einen eigenen bekam.
+
+== Offen
+
+* #78, dann #79; #77 bleibt der Koordinationspunkt.
+* Gemeinsames Commit mit dem Host prüfbar erst mit #6, der Rollback am
+  REST-Endpunkt mit #10.
+* PR #76 (`issue_3`) des Owners: keine Checks gemeldet, nicht Teil dieser Sitzung.
