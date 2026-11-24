@@ -422,9 +422,9 @@ waren oder der scrollbare Bereich fehlte. Eine Vermutung ist, dass VoiceOver den
 des Schreibens mit `role="main"` als Gruppe behandelt; die Fortsetzungen auf den Folgeseiten
 haben die Rolle nicht. Nicht weiter untersucht; es kann auch an der Bedienung liegen.
 
-NVDA-Durchgang (Owner, 2026-11-23) mit NVDA 2026.1.1 und Chrome 157.0.8.103.39 unter Windows.
-ADR-014 erlaubt Firefox oder Chrome; QS-003 nennt NVDA mit Firefox, das ist nicht geprüft.
-Welches Referenzschreiben geprüft wurde, ist nicht festgehalten.
+NVDA-Durchgang (Owner, 2026-11-23) mit NVDA 2026.1.1 und Chrome 157.0.8.103.39 unter Windows
+am mehrseitigen Referenzschreiben. ADR-014 erlaubt Firefox oder Chrome; QS-003 nennt NVDA mit
+Firefox, das ist nicht geprüft.
 
 * Beobachtet: NVDA liest das Schreiben vollständig vor, einschließlich der Alternativtexte.
 * Nicht einzeln festgehalten und damit offen: Lesereihenfolge, durchgehendes Lesen über die
