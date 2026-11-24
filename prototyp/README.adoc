@@ -36,12 +36,13 @@ Produktqualität.
 | ADR-003
 
 | PDF/A-2b und PDF/UA-1
-| erfüllt, Stichprobe gemacht
+| erfüllt, Stichprobe durchgeführt, Warnungen offen
 | `konformitaet` (veraPDF) ohne Verstöße, auch mit Ersatzschriften und für das bösartige
   Testschreiben. Die manuelle Stichprobe aus QS-002 macht der Owner; `struktur` zeigt dafür
-  den Tag-Baum mit Text. NVDA mit Acrobat Reader liest beide Referenz-PDFs ohne Befund
-  (Owner, 2026-11-23, siehe unten). axesCheck (axesPAC-Engine): PDF/UA und WCAG erfüllt,
-  je eine Warnung ohne Details.
+  den Tag-Baum mit Text. Durchgeführt am 2026-11-23 an beiden Referenz-PDFs (Owner, siehe
+  unten): NVDA mit Acrobat Reader ohne Befund; axesCheck (axesPAC-Engine) meldet PDF/UA und
+  WCAG als erfüllt, mit je einer Warnung ohne Details. Ob die Warnungen QS-002 betreffen, ist
+  nicht geklärt; bis dahin ist das Antwortmaß „0 offene Befunde“ nicht nachgewiesen.
 | ADR-005
 
 | Fußzeile im PDF vorlesbar
@@ -99,8 +100,9 @@ Produktqualität.
   mit Fußzeile am Ende, keine Fokusfalle, Aktualisieren mit `aria-live`. VoiceOver liest das
   Schreiben (Owner). Grenzen: VoiceOver bleibt am Ende der ersten Seite stehen und braucht
   einen neuen Einstieg in den Frame; bei 200 % Zoom scrollt die Seite waagerecht statt
-  umzubrechen (festes A4-Blatt). NVDA liest das ganze Schreiben einschließlich der
-  Alternativtexte (Owner, 2026-11-23).
+  umzubrechen (festes A4-Blatt). NVDA mit Chrome liest das Schreiben vollständig einschließlich
+  der Alternativtexte (Owner, 2026-11-23); die übrigen Kriterien sind mit NVDA nicht einzeln
+  festgehalten (siehe unten).
 | ADR-005, ADR-014
 
 | Schriften nur aus dem Ordner des Hosts
@@ -364,20 +366,21 @@ unter Windows, an `geschaeftsbrief-einseitig.pdf` und `geschaeftsbrief-mehrseiti
 * „Alles lesen“ (NVDA+↓) liest den Brief sauber und verständlich auf Deutsch vor.
 * „Seite x von y“ wird nicht vorgelesen; es ist ein Artefakt. Beim Seitenwechsel sagt NVDA selbst
   „Seite 2“ bzw. „Seite 3“ an.
-* Beim Blättern auf die dritte Seite sagt NVDA „3 Schrägstrich 3 c“ an. Vermutlich ist das die
-  Seitenanzeige des Readers; im Strukturbaum steht kein solcher Text, und beim durchgehenden
-  Lesen tritt es nicht auf.
-* NVDA sagt den Dokumenttitel an. Die Sprache sagt NVDA nicht an; das tut es auch sonst nicht,
-  es wählt damit nur die Stimme. Das PDF setzt `/Lang (de)` im Katalog und am
-  `Document`-Element (`struktur`).
+* Ungeklärt: Auf der dritten Seite sagte NVDA „3 Schrägstrich 3 c“ an, beim durchgehenden Lesen
+  nicht. Auf Seite 2 kam keine entsprechende Ansage. Im Strukturbaum steht kein solcher Text.
+  _Vermutung:_ eine Ansage des Readers, etwa seiner Seitenanzeige; das „c“ erklärt sie nicht.
+* NVDA sagt den Dokumenttitel an, die Dokumentsprache nicht. Das PDF setzt `/Lang (de)` im
+  Katalog und am `Document`-Element (`struktur`). Ob NVDA die Stimme danach wählt, zeigt die
+  Stichprobe nicht: Die Stimme war ohnehin deutsch.
 * Acrobat Reader erkennt die PDF/A-Konformitätsangabe und öffnet das Dokument im PDF/A-Modus.
 * NVDA liest den Alternativtext des Logos vor.
 * axesCheck von axes4 (Engine axesPAC, PDF/UA nach Matterhorn-Protokoll, WCAG Stufe A und AA)
   meldet für beide PDFs PDF/UA und WCAG als erfüllt (Owner, 2026-11-23). Als Titel zeigt es
   „(Bitte Betreff ergänzen)“, den Betreff des Musterbriefs. Es bleibt je eine Warnung, zu der
   axesCheck keine Details anzeigt: bei PDF/UA unter „Logical Structure“ → „Structure Tree“,
-  bei WCAG unter „4 Robust“ → „4.1 Compatible“. Nicht weiter untersucht; die Desktop-Fassung
-  von PAC zeigt die Einzelprüfung.
+  bei WCAG unter „4 Robust“ → „4.1 Compatible“. *Offen:* Vor der Abnahme ist zu klären, was die
+  Warnungen bedeuten und ob sie QS-002 betreffen; die Desktop-Fassung von PAC zeigt die
+  Einzelprüfung.
 
 == Barrierefreiheit der Vorschau
 
@@ -419,8 +422,14 @@ waren oder der scrollbare Bereich fehlte. Eine Vermutung ist, dass VoiceOver den
 des Schreibens mit `role="main"` als Gruppe behandelt; die Fortsetzungen auf den Folgeseiten
 haben die Rolle nicht. Nicht weiter untersucht; es kann auch an der Bedienung liegen.
 
-NVDA (Owner, 2026-11-23, NVDA 2026.1.1 unter Windows) liest die Vorschau vollständig vor,
-einschließlich der Alternativtexte.
+NVDA-Durchgang (Owner, 2026-11-23) mit NVDA 2026.1.1 und Chrome 157.0.8.103.39 unter Windows.
+ADR-014 erlaubt Firefox oder Chrome; QS-003 nennt NVDA mit Firefox, das ist nicht geprüft.
+Welches Referenzschreiben geprüft wurde, ist nicht festgehalten.
+
+* Beobachtet: NVDA liest das Schreiben vollständig vor, einschließlich der Alternativtexte.
+* Nicht einzeln festgehalten und damit offen: Lesereihenfolge, durchgehendes Lesen über die
+  Seitenwechsel eines mehrseitigen Schreibens, keine wiederholten Kopf- und Fußzeilen oder
+  Seitenzahlen im Fließtext, Fokus und Ansage der Statusmeldungen.
 
 == HTML-Bereinigung
 

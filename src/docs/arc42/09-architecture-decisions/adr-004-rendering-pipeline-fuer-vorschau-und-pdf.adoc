@@ -72,8 +72,9 @@ metadata_version: '1.0'
 Angenommen (accepted) am 2026-11-21.
 
 Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn nach dem Prototyp (#3)
-geprüft und angenommen. Offen sind die PDF/UA-Stichprobe und der Test mit NVDA;
-beide macht der Owner (siehe Ergebnis des Prototyps).
+geprüft und angenommen. Die PDF/UA-Stichprobe und der Test mit NVDA sind am
+2026-11-23 durchgeführt (Owner); offen ist die Einordnung von zwei Warnungen aus
+axesCheck (siehe Ergebnis des Prototyps).
 
 === Entscheidung
 
@@ -210,8 +211,8 @@ Referenzschreiben geprüft. Stand der Abnahmekriterien:
 |===
 | Kriterium | Stand | Befund
 | PDF/A-2b (QS-001) | erfüllt | veraPDF ohne Verstöße, auch mit Ersatzschriften und für ein bösartiges Testschreiben.
-| PDF/UA-1 (QS-002) | teilweise | veraPDF ohne Verstöße. Die manuelle Stichprobe steht aus. Die inhaltliche Fußzeile wird erst durch einen Nachbearbeitungsschritt mit PDFBox lesbar (siehe unten).
-| Barrierefreie Vorschau (QS-003) | mit Grenzen | axe-core ohne Verstöße der Stufen serious und critical, keine Fokusfalle, Statusmeldungen über `aria-live`. VoiceOver liest das Schreiben vollständig, braucht am Ende der ersten Seite aber einen neuen Einstieg in den Frame. Bei 200 % Zoom scrollt die Vorschau statt umzubrechen. NVDA ist ungeprüft.
+| PDF/UA-1 (QS-002) | teilweise | veraPDF ohne Verstöße. Manuelle Stichprobe an beiden Referenz-PDFs (Owner, 2026-11-23): NVDA mit Acrobat Reader ohne Befund; axesCheck meldet PDF/UA und WCAG als erfüllt, mit je einer Warnung ohne Details (Strukturbaum, WCAG 4.1), die noch nicht eingeordnet ist. Die inhaltliche Fußzeile wird erst durch einen Nachbearbeitungsschritt mit PDFBox lesbar (siehe unten).
+| Barrierefreie Vorschau (QS-003) | mit Grenzen | axe-core ohne Verstöße der Stufen serious und critical, keine Fokusfalle, Statusmeldungen über `aria-live`. VoiceOver liest das Schreiben vollständig, braucht am Ende der ersten Seite aber einen neuen Einstieg in den Frame. Bei 200 % Zoom scrollt die Vorschau statt umzubrechen. NVDA mit Chrome liest das Schreiben vollständig einschließlich der Alternativtexte; Reihenfolge und Wiederholungen sind mit NVDA nicht einzeln festgehalten.
 | Wiedergabetreue (QS-004) | erfüllt, Messung folgt | Das Chrome-Druck-PDF der Vorschau weicht höchstens 0,3 mm vom PDF ab, bei gleicher Seitenzahl und gleicher erster und letzter Zeile je Seite. In der Sichtprobe des Owners am Bildschirm (100 %, nebeneinander) ist kein Unterschied zu erkennen. Die genaue Messung der Bildschirmdarstellung wird ein automatischer Test in #7.
 | Stiltreue (QS-013) | angenommen | Das PDF weicht höchstens 0,1 mm vom Word-PDF ab. Eine Abnahme durch die zentrale Abteilung ist nicht möglich; das Projekt nimmt an, dass die Stiltreue passt (Owner, 2026-11-21).
 |===
@@ -253,8 +254,9 @@ openhtmltopdf (Annahme unten, R-003) hat der Prototyp nicht geprüft.
 *Annahme* (Owner, 2026-11-21): Option 1 ist angenommen. QS-013 gilt als Annahme,
 die der erste echte Kundeneinsatz bestätigen muss; der ist erst mit einem
 produktionsreifen Stand möglich. Die Wiedergabetreue am Bildschirm ist per
-Sichtprobe bestätigt und wird in #7 automatisch gemessen. Offen und beim Owner
-sind die PDF/UA-Stichprobe und der Test mit NVDA; die Anleitung steht in #3. Zeigt
+Sichtprobe bestätigt und wird in #7 automatisch gemessen. Die PDF/UA-Stichprobe
+und der Test mit NVDA sind durchgeführt (Owner, 2026-11-23); offen und beim Owner
+ist die Einordnung der zwei Warnungen aus axesCheck. Zeigt
 die Stichprobe ein Problem, das sich mit openhtmltopdf und PDFBox nicht zuverlässig
 lösen lässt, kommt Option 2 wieder infrage.
 
