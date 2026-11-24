@@ -62,6 +62,13 @@ Funktionalität: Schreiben über die Java-API speichern
     Dann erhält der Host den Fehler
     Und die Transaktion des Hosts kann nur noch zurückgerollt werden
 
+  Szenario: Eine ungültige Benutzerkennung rollt die Transaktion des Hosts zurück
+    Angenommen der Host hat eine Transaktion eröffnet
+    Wenn der Host die Vorschau mit einer leeren Benutzerkennung über die API speichert
+    Dann erhält der Host einen Fehler des Aufrufers
+    Und der Anwendungsfall wurde nicht aufgerufen
+    Und die Transaktion des Hosts kann nur noch zurückgerollt werden
+
   Szenario: Rollt der Host zurück, rollt das Speichern mit zurück
     Angenommen der Host hat eine Transaktion eröffnet
     Wenn der Host die Vorschau für Erika über die API speichert

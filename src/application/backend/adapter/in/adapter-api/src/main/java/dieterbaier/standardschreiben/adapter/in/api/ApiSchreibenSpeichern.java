@@ -15,6 +15,8 @@ import org.springframework.transaction.support.TransactionTemplate;
  * <p>Die Transaktion steuert der Adapter selbst mit {@code REQUIRED}, statt über {@code @Transactional}: Dann hängt die
  * Grenze nicht davon ab, dass der Aufruf durch einen Proxy läuft, und sie lässt sich ohne Spring-Kontext prüfen. Ein
  * Ergebnis kehrt regulär zurück und markiert die Transaktion deshalb nie zum Zurückrollen; nur eine Ausnahme tut das.
+ * Auch die Eingaben werden erst innerhalb der Grenze zu Domänentypen: Eine ungültige Eingabe markiert die Transaktion
+ * des Hosts wie jede andere Ausnahme, damit ein Host, der sie fängt, nicht halb committen kann.
  */
 public final class ApiSchreibenSpeichern implements SchreibenSpeichern {
 
@@ -30,8 +32,9 @@ public final class ApiSchreibenSpeichern implements SchreibenSpeichern {
 
     @Override
     public Speicherergebnis speichere(String benutzerkennung, UUID snapshot) {
-        BenutzerKennung benutzer = new BenutzerKennung(benutzerkennung);
-        SnapshotId id = new SnapshotId(snapshot);
-        return transaktion.execute(status -> Abbildung.zurApi(anwendungsfall.speichere(benutzer, id), benutzer));
+        return transaktion.execute(status -> {
+            BenutzerKennung benutzer = new BenutzerKennung(benutzerkennung);
+            return Abbildung.zurApi(anwendungsfall.speichere(benutzer, new SnapshotId(snapshot)), benutzer);
+        });
     }
 }
