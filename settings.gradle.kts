@@ -24,6 +24,7 @@ val backendModule = mapOf(
     "spi" to "spi",
     "api" to "api",
     "adapter-web" to "adapter/in/adapter-web",
+    "adapter-api" to "adapter/in/adapter-api",
     "adapter-rendering" to "adapter/out/adapter-rendering",
     "adapter-persistenz-jdbc" to "adapter/out/adapter-persistenz-jdbc",
     "adapter-host" to "adapter/out/adapter-host",
