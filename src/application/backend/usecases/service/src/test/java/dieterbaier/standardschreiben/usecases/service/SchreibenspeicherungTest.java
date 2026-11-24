@@ -75,7 +75,7 @@ class SchreibenspeicherungTest {
         var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
 
         Schreiben gespeichert = schreiben.gespeichert.get(vorschauVonErika);
-        assertThat(ergebnis).isEqualTo(new Speicherergebnis.Gespeichert(gespeichert.id()));
+        assertThat(ergebnis).isEqualTo(new Speicherergebnis.Gespeichert(gespeichert));
         Snapshot snapshot = snapshots.lade(vorschauVonErika).orElseThrow();
         assertThat(snapshot.zustand()).as("Datenkontext freigegeben").isEqualTo(new Snapshotzustand.Verbraucht());
         assertThat(gespeichert.briefpapier()).isEqualTo(snapshot.briefpapier());
@@ -197,7 +197,7 @@ class SchreibenspeicherungTest {
         schreiben.danach = Optional.empty();
         var erneut = (Speicherergebnis.BereitsGespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
         Schreiben gespeichert = schreiben.gespeichert.get(vorschauVonErika);
-        assertThat(erneut.schreiben()).isEqualTo(gespeichert.id());
+        assertThat(erneut.schreiben()).isEqualTo(gespeichert);
         assertThat(dokumente.abgelegt).containsOnlyKeys(gespeichert.dokument());
     }
 
@@ -240,7 +240,7 @@ class SchreibenspeicherungTest {
 
         var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
 
-        assertThat(ergebnis).isEqualTo(new Speicherergebnis.BereitsGespeichert(derZweitenAnfrage.schreiben().id()));
+        assertThat(ergebnis).isEqualTo(new Speicherergebnis.BereitsGespeichert(derZweitenAnfrage.schreiben()));
         assertThat(schreiben.gespeichert).containsOnly(Map.entry(vorschauVonErika, derZweitenAnfrage.schreiben()));
         assertThat(dokumente.abgelegt).isEmpty();
     }
@@ -268,7 +268,7 @@ class SchreibenspeicherungTest {
     @ValueSource(strings = {"hart", "logisch"})
     void istDasSchreibenGeloeschtFindetEineWiederholungDesSpeichernsNichtsMehr(String art) {
         var gespeichert = (Speicherergebnis.Gespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
-        loesche(gespeichert.schreiben(), art);
+        loesche(gespeichert.schreiben().id(), art);
 
         var erneut = speicherung.speichere(ERIKA, vorschauVonErika);
 
