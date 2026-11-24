@@ -168,12 +168,24 @@ class ApiSchreibenSpeichernTest {
     }
 
     @Test
-    void eineUngueltigeBenutzerkennungIstEinFehlerDesAufrufers() {
-        assertThatThrownBy(() -> api.speichere(" ", vorschauVonErika))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Benutzerkennung");
+    void eineUngueltigeBenutzerkennungRolltDieTransaktionDesHostsZurueck() {
+        List<RuntimeException> fehlerBeimHost = new ArrayList<>();
+
+        // Der Host fängt den Fehler und versucht trotzdem zu committen.
+        assertThatThrownBy(() -> host.executeWithoutResult(status -> {
+            try {
+                api.speichere(" ", vorschauVonErika);
+            } catch (IllegalArgumentException fehler) {
+                fehlerBeimHost.add(fehler);
+            }
+        })).isInstanceOf(UnexpectedRollbackException.class);
+
+        assertThat(fehlerBeimHost).singleElement().extracting(Throwable::getMessage).asString()
+                .contains("Benutzerkennung");
         assertThat(anwendungsfall.aufrufe).isEmpty();
-        assertThat(transaktionen.eroeffnet).isZero();
+        assertThat(transaktionen.nurNochRollback).isTrue();
+        assertThat(transaktionen.committet).isZero();
+        assertThat(transaktionen.zurueckgerollt).isEqualTo(1);
     }
 
     private static dieterbaier.standardschreiben.usecases.in.Speicherergebnis ablehnungDesAnwendungsfalls(

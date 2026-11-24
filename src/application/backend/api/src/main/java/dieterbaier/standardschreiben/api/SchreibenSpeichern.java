@@ -18,8 +18,9 @@ import java.util.UUID;
  * dann ohne Schreiben zurück.
  *
  * <p>Eine fachliche Ablehnung ist ein Fall von {@link Speicherergebnis} und markiert die Transaktion nicht zum
- * Zurückrollen. Eine Ausnahme ist ein technischer Fehler; in einer laufenden Transaktion markiert sie diese zum
- * Zurückrollen.
+ * Zurückrollen. Jede Ausnahme aus diesem Aufruf markiert eine laufende Transaktion dagegen zum Zurückrollen, auch wenn
+ * der Host sie fängt: ein technischer Fehler ebenso wie eine {@link IllegalArgumentException} für eine ungültige
+ * Eingabe, also einen Fehler des Aufrufers.
  */
 public interface SchreibenSpeichern {
 
