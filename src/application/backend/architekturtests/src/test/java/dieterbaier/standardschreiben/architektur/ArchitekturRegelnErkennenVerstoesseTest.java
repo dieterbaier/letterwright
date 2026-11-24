@@ -6,11 +6,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
+import dieterbaier.standardschreiben.archfixture.adapter.in.api.ApiAdapter;
 import dieterbaier.standardschreiben.archfixture.adapter.in.web.WebAdapter;
 import dieterbaier.standardschreiben.archfixture.adapter.out.host.HostAdapter;
 import dieterbaier.standardschreiben.archfixture.adapter.out.rendering.RenderingAdapter;
+import dieterbaier.standardschreiben.archfixture.api.ApiDatensatz;
+import dieterbaier.standardschreiben.archfixture.api.ApiSchnittstelle;
 import dieterbaier.standardschreiben.archfixture.spi.HostDatensatz;
 import dieterbaier.standardschreiben.archfixture.spi.HostSchnittstelle;
+import dieterbaier.standardschreiben.archfixture.usecases.in.EingehenderPort;
 import dieterbaier.standardschreiben.archfixture.usecases.out.AusgehenderPort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -200,6 +204,44 @@ class ArchitekturRegelnErkennenVerstoesseTest {
                 .importClasses(HostAdapter.class, HostSchnittstelle.class, AusgehenderPort.class);
 
         assertThatCode(() -> ArchitekturRegeln.nurAdapterHostUndStarterKennenDasSpi(FIXTURE).check(erlaubt))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void apiMitDomaenenabhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.apiIstEigenstaendig(FIXTURE), "ApiMitDomaene");
+    }
+
+    @Test
+    void apiMitSpiAbhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.apiIstEigenstaendig(FIXTURE), "ApiMitSpi");
+    }
+
+    @Test
+    void apiMitSpringAbhaengigkeitVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.apiIstEigenstaendig(FIXTURE), "ApiMitSpring");
+    }
+
+    @Test
+    void apiDarfSichSelbstBenutzen() {
+        JavaClasses erlaubt = new ClassFileImporter()
+                .importClasses(ApiSchnittstelle.class, ApiDatensatz.class);
+
+        assertThatCode(() -> ArchitekturRegeln.apiIstEigenstaendig(FIXTURE).check(erlaubt))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void andererAdapterMitApiVerletztDieRegel() {
+        erkenntVerstoss(ArchitekturRegeln.nurAdapterApiUndStarterKennenDieApi(FIXTURE), "RenderingAdapterMitApi");
+    }
+
+    @Test
+    void adapterApiDarfDieApiBenutzen() {
+        JavaClasses erlaubt = new ClassFileImporter()
+                .importClasses(ApiAdapter.class, ApiSchnittstelle.class, ApiDatensatz.class, EingehenderPort.class);
+
+        assertThatCode(() -> ArchitekturRegeln.nurAdapterApiUndStarterKennenDieApi(FIXTURE).check(erlaubt))
                 .doesNotThrowAnyException();
     }
 }

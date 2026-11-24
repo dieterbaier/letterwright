@@ -12,10 +12,12 @@ dependencies {
     testImplementation(project(":usecases-out"))
     testImplementation(project(":usecases-service"))
     testImplementation(project(":spi"))
+    testImplementation(project(":api"))
     testImplementation(project(":adapter-host"))
     testImplementation(project(":adapter-persistenz-jdbc"))
     testImplementation(project(":adapter-rendering"))
     testImplementation(project(":adapter-web"))
+    testImplementation(project(":adapter-api"))
     testImplementation(project(":spring-boot-starter"))
     testImplementation(libs.archunit.junit5)
     // Für die Fixtures, die die DDD-Annotationen verwenden (ADR-018).
