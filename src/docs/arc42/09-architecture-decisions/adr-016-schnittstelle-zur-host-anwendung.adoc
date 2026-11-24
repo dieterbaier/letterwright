@@ -100,11 +100,23 @@ geplanten Module `api` und `adapter-api` hinzu. `api` hängt wie `spi` an
 nichts. Der Starter exportiert dann `spi` und `api` per `api` und hält
 `adapter-api` wie alle übrigen Module per `implementation` intern.
 
+Nachtrag 2026-11-24: Beide Module sind mit #78 angelegt und nicht mehr geplant.
+Der Starter exportiert `spi` und `api` per `api`, `adapter-api` bindet er per
+`implementation` ein. `adapter-api` hängt an `api`, `usecases-in` und Spring
+Transaction (`implementation`).
+
 ArchUnit prüft zusätzlich, jede Regel mit Fixture:
 
 * `spi` hängt von keinem anderen Paket der Bibliothek ab.
 * Domäne, Ports und Anwendungsfälle kennen `spi` nicht.
 * Nur `adapter-host` und der Starter benutzen `spi`.
+
+Nachtrag 2026-11-24: Für die Java-API aus
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] gelten die
+entsprechenden Regeln, ebenfalls mit Fixture: `api` hängt von keinem anderen
+Paket der Bibliothek ab, auch nicht von `spi`, und nur `adapter-api` und der
+Starter benutzen `api`. `host-vertragstest` prüft, dass ein Host beim
+Kompilieren `spi` und `api` sieht und sonst nichts.
 
 === Kontext
 
@@ -213,6 +225,11 @@ in allen dreien dieselben drei Schnittstellen.
   Repository auf, kompiliert sein Code nicht.
 * Die öffentliche API ist an einem Modul ablesbar. Was nicht in `spi` liegt,
   gehört nicht zum Vertrag mit dem Host.
+* Nachtrag 2026-11-24: Seit
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] und #78 sieht
+  der Host beim Kompilieren `spi` und `api`. Beide hängen an keinem anderen
+  Modul der Bibliothek; was in keinem der beiden liegt, gehört nicht zum Vertrag
+  mit dem Host. Die zwei Punkte oben gelten entsprechend.
 * Der Kern kennt keine Host-Typen. Das Mapping liegt an einer Stelle, in einem
   Adapter, der wie jeder andere austauschbar und testbar ist.
 

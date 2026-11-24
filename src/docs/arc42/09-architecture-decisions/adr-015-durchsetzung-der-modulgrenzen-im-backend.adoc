@@ -113,7 +113,8 @@ Geprüfte Belege im Repository:
   `usecases-service` exportiert `usecases-in` per `api` und
   nutzt `usecases-out` und `domaene-service` per `implementation`;
   `spring-boot-starter` exportiert nur `spi` per `api` und bindet Ports, Service
-  und Adapter als `implementation` ein. `domaene-service` sieht er beim
+  und Adapter als `implementation` ein (Nachtrag 2026-11-24: seit #78 auch
+  `api`; `adapter-api` hängt an `api` und `usecases-in`). `domaene-service` sieht er beim
   Kompilieren nicht, er bringt es nur transitiv zur Laufzeit mit.
 * `src/application/backend/architekturtests/`: die ArchUnit-Regeln, jede mit
   einer Fixture, die einen Verstoß nachstellt.
@@ -139,6 +140,9 @@ gewöhnlichen Anwendung:
   und die Adapter. Zur Laufzeit bindet der Host über den Starter ohnehin alles
   ein. Bei der ersten Entscheidung waren das die Ports und die Domäne; seit
   xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] ist es nur `spi`.
+  Nachtrag 2026-11-24: seit
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] (#78) `spi`
+  und `api`.
 * **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
   können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
   vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
@@ -365,7 +369,9 @@ Was das bedeutet und was nicht:
 * Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
   nicht erst angeboten.
 * Ein Host sieht beim Kompilieren nur `spi`, auch wenn er den Starter einbindet
-  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Domänenmodell,
+  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]; Nachtrag 2026-11-24:
+  seit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] `spi` und
+  `api`). Domänenmodell,
   Ports, Anwendungsfälle, Service und Adapter bringt der Starter nur zur
   Laufzeit mit.
 * Für die Regeln, die beide abdecken, prüfen ArchUnit und Modulgrenzen auf zwei
