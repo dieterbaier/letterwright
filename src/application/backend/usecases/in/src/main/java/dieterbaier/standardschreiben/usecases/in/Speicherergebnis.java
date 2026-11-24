@@ -1,13 +1,16 @@
 package dieterbaier.standardschreiben.usecases.in;
 
-import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.validierung.Pruefe;
 import java.util.List;
 
-/** Was beim Speichern eines Schreibens herauskommt. Nur die ersten beiden Fälle haben ein Schreiben. */
+/**
+ * Was beim Speichern eines Schreibens herauskommt. Nur die ersten beiden Fälle haben ein Schreiben. Sie tragen das ganze
+ * Schreiben, weil die Java-API dem Host seine Identifikatoren zurückgibt (ADR-023).
+ */
 public sealed interface Speicherergebnis {
 
-    record Gespeichert(SchreibenId schreiben) implements Speicherergebnis {
+    record Gespeichert(Schreiben schreiben) implements Speicherergebnis {
 
         public Gespeichert {
             Pruefe.pflicht(schreiben, "Das gespeicherte Schreiben");
@@ -15,7 +18,7 @@ public sealed interface Speicherergebnis {
     }
 
     /** Zum Snapshot gab es schon ein Schreiben, etwa nach einem Doppelklick oder einem Retry. Es entstand kein neues. */
-    record BereitsGespeichert(SchreibenId schreiben) implements Speicherergebnis {
+    record BereitsGespeichert(Schreiben schreiben) implements Speicherergebnis {
 
         public BereitsGespeichert {
             Pruefe.pflicht(schreiben, "Das bereits gespeicherte Schreiben");

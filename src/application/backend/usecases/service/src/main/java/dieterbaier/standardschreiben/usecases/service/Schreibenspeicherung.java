@@ -80,7 +80,7 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
             // Ist das Schreiben inzwischen gelöscht, gibt es für den Benutzer nichts mehr zu finden.
             case Snapshotzustand.Verbraucht verbraucht -> schreiben.zuSnapshot(id)
                     .filter(Schreiben::istSichtbar)
-                    .<Speicherergebnis>map(vorhandenes -> new Speicherergebnis.BereitsGespeichert(vorhandenes.id()))
+                    .<Speicherergebnis>map(vorhandenes -> new Speicherergebnis.BereitsGespeichert(vorhandenes))
                     .orElseGet(Speicherergebnis.SnapshotUnbekannt::new);
             case Snapshotzustand.Offen offen -> speichere(benutzer, snapshot, offen, vorlage, jetzt);
         };
@@ -105,7 +105,7 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
                 Schreiben.ausSnapshot(SchreibenId.neu(), snapshot, dokument, Pruefsumme.ueber(pdf), jetzt);
         // Wirft speichere, ist der Ausgang ungewiss; das PDF bleibt, weil ein Schreiben darauf verweisen kann.
         return switch (schreiben.speichere(neu)) {
-            case Speicherausgang.Gespeichert gespeichert -> new Speicherergebnis.Gespeichert(neu.schreiben().id());
+            case Speicherausgang.Gespeichert gespeichert -> new Speicherergebnis.Gespeichert(neu.schreiben());
             case Speicherausgang.SnapshotNichtMehrVorhanden entfernt -> {
                 // Eine neue Vorschau hat den Snapshot inzwischen ersetzt; gespeichert wurde sicher nichts.
                 dokumente.entferne(dokument);
@@ -115,7 +115,7 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
                 // Eine gleichzeitige Anfrage war schneller; ihr PDF gilt, auf dieses verweist sicher nichts.
                 dokumente.entferne(dokument);
                 yield bereits.vorhandenes().istSichtbar()
-                        ? new Speicherergebnis.BereitsGespeichert(bereits.vorhandenes().id())
+                        ? new Speicherergebnis.BereitsGespeichert(bereits.vorhandenes())
                         : new Speicherergebnis.SnapshotUnbekannt();
             }
             case Speicherausgang.SchreibenEntfernt entfernt -> {
