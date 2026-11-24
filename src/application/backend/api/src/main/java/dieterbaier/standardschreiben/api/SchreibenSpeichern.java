@@ -5,7 +5,11 @@ import java.util.UUID;
 /**
  * Anwendungsfall „Schreiben speichern“ für den Code des Hosts (ADR-023). Der Host ruft ihn in seinem eigenen
  * Anwendungsfall auf, wertet das Ergebnis aus und committet seine eigenen Datenbankänderungen gemeinsam mit dem
- * Schreiben. Die Implementierung stellt der Starter bereit.
+ * Schreiben.
+ *
+ * <p><b>Lieferstand:</b> Der Starter exportiert diese Schnittstelle, stellt aber noch keine Implementierung als Bean
+ * bereit. Die kommt mit der Verdrahtung der Anwendungsfälle im Starter (Issue #10). Bis dahin kann ein Host gegen die
+ * Schnittstelle kompilieren, sie aber nicht injizieren.
  *
  * <p>Es gelten dieselben Regeln wie beim Speichern über die Oberfläche: dieselbe Berechtigungsprüfung, dasselbe PDF aus
  * dem Snapshot der Vorschau, gespeichert nur, wenn es konform ist, und höchstens ein Schreiben je Snapshot (ADR-021).
