@@ -22,6 +22,7 @@ val backendModule = mapOf(
     "usecases-out" to "usecases/out",
     "usecases-service" to "usecases/service",
     "spi" to "spi",
+    "api" to "api",
     "adapter-web" to "adapter/in/adapter-web",
     "adapter-rendering" to "adapter/out/adapter-rendering",
     "adapter-persistenz-jdbc" to "adapter/out/adapter-persistenz-jdbc",
