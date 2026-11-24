@@ -168,6 +168,13 @@ thin routing wrappers instead of hand-writing them:
   Pull Request zu einem anderen Thema und wartet auf dessen Review. Der Clock-out
   integriert `session-diary` per Fast-Forward in `main` und lässt den Branch für
   die nächste Sitzung stehen.
+- Git-Worktrees liegen neben dem Projektordner unter
+  `../worktree/standardschreiben/<branch>`, nie in einem temporären Verzeichnis
+  oder Scratchpad des Agenten. Anlegen aus dem Projektordner mit
+  `git worktree add ../worktree/standardschreiben/<branch> <branch>`, nach dem
+  Merge mit `git worktree remove` entfernen. Grund: Ein lokaler `pre-push`-Hook
+  sperrt Pushes aus Pfaden unter `/private/`, wo unter macOS die temporären
+  Verzeichnisse liegen. Ein Worktree dort lässt sich auch vom Owner nicht pushen.
 
 ## PR-Historie und Archiv
 
