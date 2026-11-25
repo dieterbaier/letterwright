@@ -4,7 +4,8 @@ package dieterbaier.standardschreiben.spi;
  * Optionaler Rückruf, wenn ein Benutzer über die Oberfläche der Bibliothek ein Schreiben speichert (ADR-023). Der Host
  * ändert darin eigene Daten im selben Commit wie das Schreiben, oder er lehnt das Speichern mit einem Grund ab. Der Host
  * implementiert diese Schnittstelle als Bean, wenn er sie braucht; ohne Bean verhält sich die Bibliothek wie ohne
- * Rückruf.
+ * Rückruf. Es gibt höchstens einen Rückruf. Stellt der Host mehrere Beans bereit, wählt Spring wie üblich: Die Bean
+ * mit {@code @Primary} wird gerufen, die anderen nicht; ohne {@code @Primary} startet die Anwendung nicht.
  *
  * <p><b>Wann:</b> Die Bibliothek ruft {@link #angelegt} in derselben Transaktion wie das Speichern auf, nach ihren
  * eigenen Datenbankänderungen und vor dem Commit. Einen Aufruf nach dem Commit gibt es nicht. Die Datenbankaktionen des
