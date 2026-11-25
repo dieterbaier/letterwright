@@ -11,6 +11,7 @@ import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
 import dieterbaier.standardschreiben.spi.Loeschanfrage;
 import dieterbaier.standardschreiben.validierung.Validierungsfehler;
@@ -54,6 +55,14 @@ class AbbildungTest {
 
         assertThat(imSpi.getClass().getSimpleName()).isEqualTo(entscheidung.getClass().getSimpleName());
         assertThat(Abbildung.zurDomaene(imSpi)).isEqualTo(entscheidung);
+    }
+
+    @Test
+    void jedesRueckrufergebnisDesHostsGehtAufDasGleichnamige() {
+        assertThat(Abbildung.zurDomaene(dieterbaier.standardschreiben.spi.Rueckrufergebnis.angenommen()))
+                .isEqualTo(Rueckrufergebnis.angenommen());
+        assertThat(Abbildung.zurDomaene(dieterbaier.standardschreiben.spi.Rueckrufergebnis.abgelehnt("Erledigt")))
+                .isEqualTo(Rueckrufergebnis.abgelehnt("Erledigt"));
     }
 
     @Test

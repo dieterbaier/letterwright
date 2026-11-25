@@ -6,11 +6,14 @@ import dieterbaier.standardschreiben.domaene.modell.FachlicherBezug;
 import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.vorlage.Standardschreiben;
 import dieterbaier.standardschreiben.spi.Datenanfrage;
+import dieterbaier.standardschreiben.spi.GespeichertesSchreiben;
 import dieterbaier.standardschreiben.spi.Loeschanfrage;
 import dieterbaier.standardschreiben.spi.Standardschreibenkennung;
+import dieterbaier.standardschreiben.spi.Standardschreibenversion;
 import dieterbaier.standardschreiben.validierung.Validierungsfehler;
 
 /**
@@ -87,6 +90,26 @@ final class Abbildung {
 
     static Datenanfrage datenanfrage(BenutzerKennung benutzer, FachlicherBezug bezug, Standardschreiben vorlage) {
         return new Datenanfrage(benutzer.wert(), zumSpi(bezug), kennung(vorlage));
+    }
+
+    static Rueckrufergebnis zurDomaene(dieterbaier.standardschreiben.spi.Rueckrufergebnis ergebnis) {
+        return switch (ergebnis) {
+            case dieterbaier.standardschreiben.spi.Rueckrufergebnis.Angenommen angenommen ->
+                    Rueckrufergebnis.angenommen();
+            case dieterbaier.standardschreiben.spi.Rueckrufergebnis.Abgelehnt abgelehnt ->
+                    Rueckrufergebnis.abgelehnt(abgelehnt.grund());
+        };
+    }
+
+    /**
+     * Das Schreiben selbst führt keine Benutzerkennung. Der Rückruf läuft nur bei einer Neuanlage, und angelegt wird nur
+     * aus einem eigenen Snapshot des Benutzers; der aufrufende Benutzer hat das Schreiben also erzeugt.
+     */
+    static GespeichertesSchreiben gespeichertesSchreiben(BenutzerKennung benutzer, Schreiben schreiben) {
+        return new GespeichertesSchreiben(schreiben.id().wert(), zumSpi(schreiben.bezug()),
+                new Standardschreibenversion(schreiben.standardschreiben().vorlage().wert(),
+                        schreiben.standardschreiben().nummer().wert()),
+                benutzer.wert(), schreiben.erstellt());
     }
 
     static Loeschanfrage loeschanfrage(BenutzerKennung benutzer, Schreiben schreiben) {
