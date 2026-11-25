@@ -32,10 +32,12 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /** Zugleich Brücke zum Szenario „Ohne Rückruf des Hosts nimmt die Bibliothek jedes neue Schreiben an“ in rueckruf-nach-dem-speichern.feature. */
 class StandardschreibenAutoKonfigurationTest {
@@ -118,6 +120,39 @@ class StandardschreibenAutoKonfigurationTest {
                 laufend.getBean(Speicherrueckruf.class).angelegt(ERIKA, SCHREIBEN))
                 .isEqualTo(dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis.abgelehnt(
                         "Aufgabe ist erledigt")));
+    }
+
+    @Test
+    void beiMehrerenRueckrufenWirdDerPrimaereGefragt() {
+        kontext.withUserConfiguration(PflichtSpi.class, AblehnenderRueckruf.class, PrimaererRueckruf.class)
+                .run(laufend -> assertThat(laufend.getBean(Speicherrueckruf.class).angelegt(ERIKA, SCHREIBEN))
+                        .isEqualTo(dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis.angenommen()));
+    }
+
+    @Test
+    void mehrereRueckrufeOhnePrimaerenLassenDenKontextNichtStarten() {
+        kontext.withUserConfiguration(PflichtSpi.class, AblehnenderRueckruf.class, WeitererRueckruf.class)
+                .run(laufend -> assertThat(laufend).hasFailed()
+                        .getFailure().hasRootCauseInstanceOf(NoUniqueBeanDefinitionException.class));
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class PrimaererRueckruf {
+
+        @Bean
+        @Primary
+        NachDemSpeichern primaererRueckruf() {
+            return schreiben -> Rueckrufergebnis.angenommen();
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class WeitererRueckruf {
+
+        @Bean
+        NachDemSpeichern weitererRueckruf() {
+            return schreiben -> Rueckrufergebnis.angenommen();
+        }
     }
 
     @Configuration(proxyBeanMethods = false)
