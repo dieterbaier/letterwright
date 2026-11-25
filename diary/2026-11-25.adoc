@@ -1,0 +1,76 @@
+= Projekttagebuch 2026-11-25
+
+Thema `domaene-und-host`. Rekonstruiert aus `git log 9b89b5f..6761170`, den Pull
+Requests #81 und #82 mit ihren Reviews und Kommentaren sowie den Issues #10 und
+#79.
+
+== Was geschah
+
+* **PR #81 gemergt** (`a374142` bis `9b89b5f`, Rebase): Java-API nach ADR-023 mit
+  den Modulen `api` und `adapter-api`. Vorher Convergence Check auf dem Stand des
+  PR: konvergiert. #78 bleibt offen, bis #10 die Bean im Starter liefert.
+* **#79 umgesetzt, PR #82 gemergt** (`f29ce93` bis `6761170`, Rebase): optionaler
+  Rückruf `spi.NachDemSpeichern` mit `Rueckrufergebnis`, ausgehender Port
+  `Speicherrueckruf`, neuer Fall `Speicherergebnis.VomHostAbgelehnt`,
+  `HostSpeicherrueckruf` in `adapter-host`, Bean im Starter, Gherkin-Datei
+  `features/schreiben/rueckruf-nach-dem-speichern.feature`, Host-Vertragstest,
+  Glossar und Bausteinsicht.
+* **Zwei Review-Runden auf PR #82.** Erste Runde, vier Befunde: Das Kriterium zum
+  offenen Snapshot war mit `Closes #79` nicht erfüllbar, das Szenario ohne Rückruf
+  versprach mehr als sein Test, die Regel bei mehreren Rückruf-Beans war falsch
+  beschrieben, und #10 fehlte ein Kriterium für Commit und Rollback mit Host-Daten
+  über REST. Zweite Runde: Die Regel nannte nur `@Primary`. Convergence Check auf
+  `b58582a`: konvergiert.
+* **#10 ergänzt** um drei Akzeptanzkriterien: „Rückruf bei Ablehnung“, „Rückruf
+  mit Persistenz“ (braucht #6) und „Java-API ohne Rückruf“, dazu eine Zeile im
+  Umfang.
+* **#79 präzisiert:** Das Kriterium bei `Abgelehnt` verlangt den Fall von
+  `Speicherergebnis` mit Grund; dass der Snapshot offen bleibt, weist #10 nach.
+
+== Entscheidungen des Owners
+
+* Die Folgekriterien aus #79 stehen als Akzeptanzkriterien in #10.
+* #79 wird auf das Ergebnis des Anwendungsfalls begrenzt und schließt mit PR #82.
+* Bei mehreren Beans `NachDemSpeichern` gilt die Auswahl von Spring nach den
+  üblichen Regeln; bleibt sie mehrdeutig, startet die Anwendung nicht. Vom Agenten
+  vorgeschlagen, im Convergence Check bestätigt.
+
+== Gelernt
+
+* **Ein Szenario verspricht nur, was sein Brückentest prüft.** „Wird gespeichert
+  wie bisher“ hing an einem Test, der nur die Verdrahtung prüft. Was erst eine
+  spätere Schicht nachweisen kann, gehört mit Verweis in deren Issue.
+* **Ein Akzeptanzkriterium kann an der falschen Schicht hängen.** „Der Snapshot
+  bleibt offen“ leistet der Rollback an der äußeren Grenze, nicht der
+  Anwendungsfall. Das fiel erst beim Umsetzen auf.
+* **Eine Regel über Spring beschreibt man allgemein.** `getIfAvailable()` wählt
+  nicht nur über `@Primary`; ein Vertrag, der eine Regel nachbaut, ist schnell zu
+  eng.
+* **Bei einer Störung der GraphQL-Schnittstelle von GitHub hilft die REST-API.**
+  `gh issue edit` scheiterte, `gh api -X PATCH` ging.
+
+== Offen
+
+* #10: Bean der Java-API, Rollback bei Ablehnung, gemeinsamer Commit mit
+  Host-Daten (mit #6). Danach #78 und #77 schließen.
+* Zwei neue Tests prüfen die Bean-Auswahl über `@Primary` und den mehrdeutigen
+  Fall, nicht andere Auswahlregeln wie `@Priority`.
+* Ein PDF ohne Schreiben nach einer Ablehnung räumen #60 und #6 auf.
+
+== Gelesen
+
+Der Anfang der Sitzung ist aus einer Zusammenfassung des Gesprächs rekonstruiert;
+hier steht nur, was dort oder danach nachweislich abgerufen wurde.
+
+* Toolkit-Skills: `clock-in`, `convergence-check`, `post-merge-sync`,
+  `implement-issue-workflow`, `code-stil`, `commit-message`, `clock-out`.
+* Projekt: `AGENTS.md`, `progress/domaene-und-host.adoc`, `diary/2026-11-24.adoc`,
+  `spi/package-info.java`, `NachDemSpeichern.java`,
+  `StandardschreibenAutoKonfiguration.java` und ihr Test, die Feature-Datei des
+  Rückrufs.
+* GitHub: Issues #10 und #79 (Text), #77, #78 und #79 (Status), PR #81, PR #82 mit
+  Reviews, Inline-Kommentar und Kommentaren, Checks von PR #82.
+* Repository: Branch-Abgleich (`SWEEP: CLEAR`), `git log 9b89b5f..6761170`.
+* Nicht lesbar: Zweimal scheiterte `gh issue edit` an einem GraphQL-Fehler von
+  GitHub; Kommentare über die Weboberfläche waren laut Owner zeitweise nicht
+  möglich.

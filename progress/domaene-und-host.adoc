@@ -6,8 +6,10 @@ dass ein Host die Bibliothek nur über das SPI einbindet (Epic #5).
 *Status:* aktiv seit 2026-11-21. Alle Anwendungsfälle des Epics sind gemergt:
 Vorschau (#52), Speichern (#53), Auflisten, Herunterladen und Löschen (#54),
 Vorlagenversion veröffentlichen und zurückziehen (#55). Das Speichern in einer
-Transaktion des Hosts ist entschieden (ADR-023) und als #78 und #79 unter #77
-geschnitten. Offen sind außerdem der ADR zur Ablage im DMS des Hosts (#60) und
+Transaktion des Hosts ist entschieden (ADR-023) und unter #77 umgesetzt, soweit
+es ohne Persistenz und REST geht: die Java-API (PR #81, #78) und der Rückruf
+`NachDemSpeichern` (PR #82, #79). #78 bleibt offen, bis #10 die Bean für die
+Java-API liefert. Offen sind außerdem der ADR zur Ablage im DMS des Hosts (#60) und
 der schmale BOM-Export (#32).
 
 == The plan
@@ -32,8 +34,8 @@ Hosts: erst die Entscheidung (ADR-023), dann die Umsetzung, zuerst die Java-API
 * [x] Anwendungsfälle Vorlagenversion veröffentlichen und zurückziehen (PR #68, ADR-022): #55
 * [x] Vertrag der ID von `FachlicherBezug` in Javadoc und Glossar (PR #73): #69
 * [x] Speichern in einer Transaktion des Hosts (PR #74, ADR-023): Q-ARCH-004
-* [ ] Java-API nach ADR-023 (ADR-016 und Bausteinsicht angeglichen in PR #75): #78 (unter #77)
-* [ ] Rückruf `NachDemSpeichern` nach ADR-023: #79 (unter #77)
+* [ ] Java-API nach ADR-023: Module `api` und `adapter-api` gemergt (PR #81); #78 bleibt offen, bis #10 die Bean liefert (unter #77)
+* [x] Rückruf `NachDemSpeichern` nach ADR-023 (PR #82): #79 (unter #77)
 * [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60
 * [ ] Spring-Boot-BOM schmal exportieren: #32
 
@@ -51,10 +53,14 @@ Ausgängen von `Speicherausgang` (ADR-021), Filtern vor dem Paginieren (QS-009),
 Beispieldaten je Vorlagenversion und bedingtes Ersetzen von Vorlagen (ADR-022).
 #7: `erzeugeProbePdf` mit eingebautem Beispielinhalt.
 
-ADR-023 legt `api` und `adapter-api` fest; die Bausteinsicht und ADR-016 führen
-sie als _(geplant)_, bis #78 sie anlegt. Gemeinsames Commit und Rollback mit dem
-Host lassen sich erst mit #6 prüfen, der ausdrückliche Rollback am REST-Endpunkt
-kommt mit #10.
+Nach ADR-023 gibt es die Java-API `api.SchreibenSpeichern` (Modul `api`,
+umgesetzt in `adapter-api`) und den optionalen Rückruf `spi.NachDemSpeichern`, den
+der Anwendungsfall nur bei einer Neuanlage ruft. Der Starter verdrahtet den
+Rückruf, aber noch keine Bean für die Java-API. Was die äußeren Grenzen leisten
+müssen, steht als Akzeptanzkriterien in #10: Bean der Java-API mit eigener
+Instanz des Anwendungsfalls ohne Rückruf, Rollback bei Ablehnung mit Grund und
+wieder offenem Snapshot, gemeinsamer Commit und Rollback mit Host-Daten (braucht
+#6).
 
 Fachliche Ablehnungen sind Fälle von Sealed-Ergebnistypen; technische Fehler
 bleiben Ausnahmen. Die Testkonvention steht in Kapitel 4 und im Skill
