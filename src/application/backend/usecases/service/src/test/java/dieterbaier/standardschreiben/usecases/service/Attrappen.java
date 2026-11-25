@@ -9,6 +9,7 @@ import dieterbaier.standardschreiben.domaene.modell.Seitenanfrage;
 import dieterbaier.standardschreiben.domaene.modell.VorlagenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
@@ -29,6 +30,7 @@ import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.usecases.out.SchreibenRepository;
 import dieterbaier.standardschreiben.usecases.out.Snapshotablage;
 import dieterbaier.standardschreiben.usecases.out.Speicherausgang;
+import dieterbaier.standardschreiben.usecases.out.Speicherrueckruf;
 import dieterbaier.standardschreiben.usecases.out.VorlagenRepository;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -260,6 +262,21 @@ final class Attrappen {
             throw new UnsupportedOperationException();
         }
     }
+
+    /** Hält jeden Rückruf fest; ohne Vorgabe nimmt der Host jedes Schreiben an. */
+    static final class Rueckruf implements Speicherrueckruf {
+
+        final List<Rueckrufaufruf> aufrufe = new ArrayList<>();
+        Function<Schreiben, Rueckrufergebnis> ergebnis = schreiben -> Rueckrufergebnis.angenommen();
+
+        @Override
+        public Rueckrufergebnis angelegt(BenutzerKennung benutzer, Schreiben schreiben) {
+            aufrufe.add(new Rueckrufaufruf(benutzer, schreiben));
+            return ergebnis.apply(schreiben);
+        }
+    }
+
+    record Rueckrufaufruf(BenutzerKennung benutzer, Schreiben schreiben) {}
 
     /** Ein konfigurierbares Ergebnis; ohne Vorgabe ist jedes PDF konform. */
     static final class Pruefer implements KonformitaetsPruefer {

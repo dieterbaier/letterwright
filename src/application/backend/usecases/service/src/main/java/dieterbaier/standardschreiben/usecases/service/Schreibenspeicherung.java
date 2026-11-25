@@ -3,6 +3,7 @@ package dieterbaier.standardschreiben.usecases.service;
 import dieterbaier.standardschreiben.domaene.modell.BenutzerKennung;
 import dieterbaier.standardschreiben.domaene.modell.Datenkontext;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
@@ -23,6 +24,7 @@ import dieterbaier.standardschreiben.usecases.out.Platzhalterdatenquelle;
 import dieterbaier.standardschreiben.usecases.out.Renderer;
 import dieterbaier.standardschreiben.usecases.out.SchreibenRepository;
 import dieterbaier.standardschreiben.usecases.out.Speicherausgang;
+import dieterbaier.standardschreiben.usecases.out.Speicherrueckruf;
 import dieterbaier.standardschreiben.usecases.out.Snapshotablage;
 import dieterbaier.standardschreiben.usecases.out.VorlagenRepository;
 import java.time.Clock;
@@ -33,6 +35,9 @@ import java.util.Optional;
  * Prüft Snapshot und Berechtigung, bevor es den Zustand des Snapshots auswertet: Ein Unberechtigter erfährt so nicht,
  * ob schon gespeichert wurde. Aus einem offenen Snapshot liest es den Datenkontext erneut, erzeugt das PDF und speichert
  * nur ein konformes (fail-closed). Ein PDF entfernt es nur, wenn sicher ist, dass kein Schreiben darauf verweist.
+ *
+ * <p>Ein neu angelegtes Schreiben meldet es vor dem Commit dem {@link Speicherrueckruf} des Hosts (ADR-023). Welcher
+ * Rückruf gilt, entscheidet die Verdrahtung: Über die Java-API gibt es keinen.
  */
 public final class Schreibenspeicherung implements SchreibenSpeichern {
 
@@ -44,11 +49,12 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
     private final KonformitaetsPruefer pruefer;
     private final DokumentAblage dokumente;
     private final SchreibenRepository schreiben;
+    private final Speicherrueckruf rueckruf;
     private final Clock uhr;
 
     public Schreibenspeicherung(Snapshotablage snapshots, VorlagenRepository vorlagen, Berechtigungen berechtigungen,
             Platzhalterdatenquelle daten, Renderer renderer, KonformitaetsPruefer pruefer, DokumentAblage dokumente,
-            SchreibenRepository schreiben, Clock uhr) {
+            SchreibenRepository schreiben, Speicherrueckruf rueckruf, Clock uhr) {
         this.snapshots = snapshots;
         this.vorlagen = vorlagen;
         this.berechtigungen = berechtigungen;
@@ -57,6 +63,7 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
         this.pruefer = pruefer;
         this.dokumente = dokumente;
         this.schreiben = schreiben;
+        this.rueckruf = rueckruf;
         this.uhr = uhr;
     }
 
@@ -95,17 +102,17 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
                 .nummer()).orElseThrow(() -> fehlt(snapshot.standardschreiben())), offen.datenkontext());
         return switch (pruefer.pruefe(pdf)) {
             case Konformitaet.NichtKonform nichtKonform -> new Speicherergebnis.NichtKonform(nichtKonform.befunde());
-            case Konformitaet.Konform konform -> speichere(snapshot, pdf, jetzt);
+            case Konformitaet.Konform konform -> speichere(benutzer, snapshot, pdf, jetzt);
         };
     }
 
-    private Speicherergebnis speichere(Snapshot snapshot, byte[] pdf, Instant jetzt) {
+    private Speicherergebnis speichere(BenutzerKennung benutzer, Snapshot snapshot, byte[] pdf, Instant jetzt) {
         Dokumentverweis dokument = dokumente.lege(pdf);
         SchreibenAusSnapshot neu =
                 Schreiben.ausSnapshot(SchreibenId.neu(), snapshot, dokument, Pruefsumme.ueber(pdf), jetzt);
         // Wirft speichere, ist der Ausgang ungewiss; das PDF bleibt, weil ein Schreiben darauf verweisen kann.
         return switch (schreiben.speichere(neu)) {
-            case Speicherausgang.Gespeichert gespeichert -> new Speicherergebnis.Gespeichert(neu.schreiben());
+            case Speicherausgang.Gespeichert gespeichert -> nachDemAnlegen(benutzer, neu.schreiben());
             case Speicherausgang.SnapshotNichtMehrVorhanden entfernt -> {
                 // Eine neue Vorschau hat den Snapshot inzwischen ersetzt; gespeichert wurde sicher nichts.
                 dokumente.entferne(dokument);
@@ -123,6 +130,17 @@ public final class Schreibenspeicherung implements SchreibenSpeichern {
                 dokumente.entferne(dokument);
                 yield new Speicherergebnis.SnapshotUnbekannt();
             }
+        };
+    }
+
+    /**
+     * Nur hier entsteht ein neues Schreiben, deshalb läuft der Rückruf nur hier. Lehnt der Host ab, bleibt das PDF
+     * liegen: Das Schreiben ist schon geschrieben, und ob der Rollback es zurücknimmt, entscheidet die äußere Grenze.
+     */
+    private Speicherergebnis nachDemAnlegen(BenutzerKennung benutzer, Schreiben neues) {
+        return switch (rueckruf.angelegt(benutzer, neues)) {
+            case Rueckrufergebnis.Angenommen angenommen -> new Speicherergebnis.Gespeichert(neues);
+            case Rueckrufergebnis.Abgelehnt abgelehnt -> new Speicherergebnis.VomHostAbgelehnt(abgelehnt.grund());
         };
     }
 

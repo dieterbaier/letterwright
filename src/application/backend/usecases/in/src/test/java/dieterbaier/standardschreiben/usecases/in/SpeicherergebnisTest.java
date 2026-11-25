@@ -31,9 +31,10 @@ class SpeicherergebnisTest {
         assertThat(Stream.of(new Speicherergebnis.Gespeichert(schreiben),
                 new Speicherergebnis.BereitsGespeichert(schreiben), new Speicherergebnis.SnapshotUnbekannt(),
                 new Speicherergebnis.SnapshotAbgelaufen(), new Speicherergebnis.NichtErlaubt(),
-                new Speicherergebnis.DatenkontextGeaendert(), new Speicherergebnis.NichtKonform(List.of("Befund")))
+                new Speicherergebnis.DatenkontextGeaendert(), new Speicherergebnis.NichtKonform(List.of("Befund")),
+                new Speicherergebnis.VomHostAbgelehnt("Aufgabe ist bereits erledigt"))
                 .map(SpeicherergebnisTest::status))
-                .containsExactly(201, 200, 404, 410, 403, 409, 422);
+                .containsExactly(201, 200, 404, 410, 403, 409, 422, 400);
     }
 
     private static int status(Speicherergebnis ergebnis) {
@@ -45,6 +46,7 @@ class SpeicherergebnisTest {
             case Speicherergebnis.NichtErlaubt nichtErlaubt -> 403;
             case Speicherergebnis.DatenkontextGeaendert geaendert -> 409;
             case Speicherergebnis.NichtKonform nichtKonform -> 422;
+            case Speicherergebnis.VomHostAbgelehnt abgelehnt -> 400;
         };
     }
 
@@ -56,5 +58,8 @@ class SpeicherergebnisTest {
         assertThatThrownBy(() -> new Speicherergebnis.Gespeichert(null)).hasMessageContaining("gespeicherte");
         assertThatThrownBy(() -> new Speicherergebnis.BereitsGespeichert(null)).hasMessageContaining("bereits");
         assertThatThrownBy(() -> new Speicherergebnis.NichtKonform(null)).hasMessageContaining("Befunde");
+        assertThat(new Speicherergebnis.VomHostAbgelehnt("Aufgabe ist bereits erledigt").grund())
+                .isEqualTo("Aufgabe ist bereits erledigt");
+        assertThatThrownBy(() -> new Speicherergebnis.VomHostAbgelehnt(" ")).hasMessageContaining("Grund");
     }
 }

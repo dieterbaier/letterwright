@@ -188,6 +188,18 @@ class ApiSchreibenSpeichernTest {
         assertThat(transaktionen.zurueckgerollt).isEqualTo(1);
     }
 
+    /** Kein Szenario: Die Java-API ist ohne Rückruf verdrahtet (ADR-023). Kommt die Ablehnung doch, rollt sie zurück. */
+    @Test
+    void eineAblehnungDurchDenRueckrufIstEinFehlerDerVerdrahtung() {
+        anwendungsfall.ergebnis = () -> new dieterbaier.standardschreiben.usecases.in.Speicherergebnis
+                .VomHostAbgelehnt("Die Aufgabe ist bereits erledigt");
+
+        assertThatThrownBy(() -> host.executeWithoutResult(status -> api.speichere("erika", vorschauVonErika)))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("keinen Rückruf");
+        assertThat(transaktionen.committet).isZero();
+        assertThat(transaktionen.zurueckgerollt).isEqualTo(1);
+    }
+
     private static dieterbaier.standardschreiben.usecases.in.Speicherergebnis ablehnungDesAnwendungsfalls(
             String ablehnung) {
         return switch (ablehnung) {

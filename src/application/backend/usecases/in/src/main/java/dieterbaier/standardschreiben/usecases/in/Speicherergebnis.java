@@ -37,6 +37,18 @@ public sealed interface Speicherergebnis {
     /** Der Host liefert inzwischen andere Daten als in der Vorschau; eine neue Vorschau ist nötig. */
     record DatenkontextGeaendert() implements Speicherergebnis {}
 
+    /**
+     * Der Rückruf des Hosts hat das neue Schreiben abgelehnt (ADR-023). Die Bibliothek hat ihre Änderungen schon
+     * geschrieben; erst der Rollback an der äußeren Transaktionsgrenze nimmt sie zurück, der Snapshot ist dann wieder
+     * offen. Diese Grenze meldet den Grund erst nach dem Rollback.
+     */
+    record VomHostAbgelehnt(String grund) implements Speicherergebnis {
+
+        public VomHostAbgelehnt {
+            Pruefe.nichtBlank(grund, "Der Grund der Ablehnung");
+        }
+    }
+
     /** Das erzeugte PDF ist nicht konform; gespeichert wurde nichts. */
     record NichtKonform(List<String> befunde) implements Speicherergebnis {
 
