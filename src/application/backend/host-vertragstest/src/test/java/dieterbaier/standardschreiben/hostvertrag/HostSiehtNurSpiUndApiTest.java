@@ -55,6 +55,21 @@ class HostSiehtNurSpiUndApiTest {
     }
 
     @Test
+    void derBeispielHostImplementiertDenRueckruf() {
+        var host = new BeispielHost();
+        var mahnung = new dieterbaier.standardschreiben.spi.Standardschreibenversion(UUID.randomUUID(), 1);
+        var erstellt = Instant.parse("2026-11-25T10:00:00Z");
+
+        assertThat(host.angelegt(new dieterbaier.standardschreiben.spi.GespeichertesSchreiben(UUID.randomUUID(),
+                new dieterbaier.standardschreiben.spi.FachlicherBezug("Kunde", "4711"), mahnung, "erika", erstellt)))
+                .isEqualTo(dieterbaier.standardschreiben.spi.Rueckrufergebnis.abgelehnt(
+                        "Die Aufgabe zum Kunden 4711 ist bereits erledigt"));
+        assertThat(host.angelegt(new dieterbaier.standardschreiben.spi.GespeichertesSchreiben(UUID.randomUUID(),
+                new dieterbaier.standardschreiben.spi.FachlicherBezug("Kunde", "4712"), mahnung, "erika", erstellt)))
+                .isEqualTo(dieterbaier.standardschreiben.spi.Rueckrufergebnis.angenommen());
+    }
+
+    @Test
     void derBeispielAnwendungsfallSpeichertUeberDieApi() {
         var snapshot = UUID.randomUUID();
         var schreiben = new GespeichertesSchreiben(UUID.randomUUID(), new FachlicherBezug("Kunde", "4711"),
