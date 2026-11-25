@@ -3,6 +3,9 @@
 # je Szenario, benannt nach dem Szenariotitel. Die ersten vier Szenarien prüft
 # SchreibenspeicherungTest im Modul usecases-service gegen Attrappen der Ports,
 # das letzte StandardschreibenAutoKonfigurationTest im Modul spring-boot-starter.
+# Es prüft nur die Verdrahtung ohne Rückruf des Hosts; dass ein angenommenes
+# Schreiben gespeichert ist, zeigt das erste Szenario. Durchgängig über die
+# Oberfläche speichert erst der REST-Endpunkt in #10.
 # Dass der Snapshot nach einer Ablehnung offen bleibt, leistet der Rollback an der
 # äußeren Grenze; das prüft der REST-Endpunkt in #10.
 Funktionalität: Rückruf nach dem Speichern
@@ -40,7 +43,7 @@ Funktionalität: Rückruf nach dem Speichern
     Dann schlägt das Speichern mit diesem Fehler fehl
     Und die Bibliothek hat den Rückruf nicht wiederholt
 
-  Szenario: Ohne Rückruf des Hosts wird gespeichert wie bisher
+  Szenario: Ohne Rückruf des Hosts nimmt die Bibliothek jedes neue Schreiben an
     Angenommen die Host-Anwendung stellt keinen Rückruf bereit
-    Wenn Erika die Vorschau speichert
-    Dann wird das Schreiben ohne Rückruf angenommen
+    Wenn die Bibliothek nach dem Anlegen eines Schreibens den Rückruf befragt
+    Dann ist das neue Schreiben angenommen

@@ -37,7 +37,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Zugleich Brücke zum Szenario „Ohne Rückruf des Hosts wird gespeichert wie bisher“ in rueckruf-nach-dem-speichern.feature. */
+/** Zugleich Brücke zum Szenario „Ohne Rückruf des Hosts nimmt die Bibliothek jedes neue Schreiben an“ in rueckruf-nach-dem-speichern.feature. */
 class StandardschreibenAutoKonfigurationTest {
 
     private static final dieterbaier.standardschreiben.spi.FachlicherBezug KUNDE =
@@ -106,7 +106,7 @@ class StandardschreibenAutoKonfigurationTest {
     }
 
     @Test
-    void ohneRueckrufDesHostsWirdGespeichertWieBisher() {
+    void ohneRueckrufDesHostsNimmtDieBibliothekJedesNeueSchreibenAn() {
         kontext.withUserConfiguration(PflichtSpi.class).run(laufend -> assertThat(
                 laufend.getBean(Speicherrueckruf.class).angelegt(ERIKA, SCHREIBEN))
                 .isEqualTo(dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis.angenommen()));
