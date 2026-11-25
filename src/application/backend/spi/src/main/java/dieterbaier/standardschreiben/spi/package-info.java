@@ -4,7 +4,8 @@
  *
  * <p>Der Host implementiert drei Schnittstellen: {@link dieterbaier.standardschreiben.spi.PlatzhalterdatenAnbieter},
  * {@link dieterbaier.standardschreiben.spi.Berechtigungspruefung} (optional, der Starter bringt eine Default-Implementierung
- * mit) und {@link dieterbaier.standardschreiben.spi.Loeschrichtlinie}.
+ * mit) und {@link dieterbaier.standardschreiben.spi.Loeschrichtlinie}. Optional kommt der Rückruf
+ * {@link dieterbaier.standardschreiben.spi.NachDemSpeichern} hinzu (ADR-023); er zählt nicht zu diesen drei.
  *
  * <p>Für alle Typen dieses Pakets gilt:
  * <ul>
