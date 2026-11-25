@@ -63,7 +63,8 @@ public class StandardschreibenAutoKonfiguration {
     @Bean
     Speicherrueckruf speicherrueckruf(ObjectProvider<NachDemSpeichern> rueckruf) {
         // Bei mehreren Beans gilt die Auswahl von Spring, wie im Vertrag von NachDemSpeichern beschrieben:
-        // getIfAvailable nimmt die mit @Primary und lässt den Kontext ohne sie nicht starten.
+        // getIfAvailable wählt nach den üblichen Regeln von Spring (etwa @Primary) und lässt den Kontext nicht
+        // starten, wenn die Auswahl mehrdeutig bleibt.
         return Optional.ofNullable(rueckruf.getIfAvailable()).map(HostSpeicherrueckruf::zu)
                 .orElseGet(HostSpeicherrueckruf::ohne);
     }
