@@ -10,6 +10,7 @@ import dieterbaier.standardschreiben.domaene.modell.Pruefsumme;
 import dieterbaier.standardschreiben.domaene.modell.SchreibenAktion;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Dokumentverweis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Loeschentscheidung;
+import dieterbaier.standardschreiben.domaene.modell.schreiben.Rueckrufergebnis;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.Schreiben;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenAusSnapshot;
 import dieterbaier.standardschreiben.domaene.modell.schreiben.SchreibenId;
@@ -33,7 +34,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Brücke zu {@code features/schreiben/schreiben-speichern.feature}: ein Test je Szenario, benannt nach dem
+ * Brücke zu {@code features/schreiben/schreiben-speichern.feature} und den ersten vier Szenarien von
+ * {@code features/schreiben/rueckruf-nach-dem-speichern.feature}: ein Test je Szenario, benannt nach dem
  * Szenariotitel. Die Vorschau entsteht mit dem echten Anwendungsfall, damit Snapshot und Speichern zusammenpassen; die
  * ausgehenden Ports sind {@link Attrappen}.
  */
@@ -51,10 +53,11 @@ class SchreibenspeicherungTest {
     private final Attrappen.Pruefer pruefer = new Attrappen.Pruefer();
     private final Attrappen.Dokumente dokumente = new Attrappen.Dokumente();
     private final Attrappen.SchreibenAblage schreiben = new Attrappen.SchreibenAblage(snapshots);
+    private final Attrappen.Rueckruf rueckruf = new Attrappen.Rueckruf();
     private final Attrappen.Uhr uhr = new Attrappen.Uhr(VORSCHAU);
     private final Vorschauerzeugung vorschau = new Vorschauerzeugung(vorlagen, host, host, renderer, snapshots, uhr);
     private final Schreibenspeicherung speicherung = new Schreibenspeicherung(snapshots, vorlagen, host, host, renderer,
-            pruefer, dokumente, schreiben, uhr);
+            pruefer, dokumente, schreiben, rueckruf, uhr);
 
     private final Briefpapier briefpapier = vorlagen.ablegen(
             Briefpapier.anlegenMitStandardtyp(VorlagenId.neu(), "Standard", "<header/>").veroeffentlicheEntwurf());
@@ -296,6 +299,58 @@ class SchreibenspeicherungTest {
         assertThat(schreiben.gespeichert.values()).noneMatch(Schreiben::istSichtbar);
         assertThat(dokumente.abgelegt.keySet()).as("nur noch das PDF eines logisch gelöschten Schreibens")
                 .isSubsetOf(derZweitenAnfrage.schreiben().dokument());
+    }
+
+    // Rückruf nach dem Speichern (rueckruf-nach-dem-speichern.feature)
+
+    @Test
+    void legtDasSpeichernEinSchreibenAnErhaeltDerHostEinenRueckruf() {
+        var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        Schreiben gespeichert = schreiben.gespeichert.get(vorschauVonErika);
+        assertThat(ergebnis).isEqualTo(new Speicherergebnis.Gespeichert(gespeichert));
+        assertThat(rueckruf.aufrufe).containsExactly(new Attrappen.Rueckrufaufruf(ERIKA, gespeichert));
+    }
+
+    @Test
+    void eineWiederholungLoestKeinenWeiterenRueckrufAus() {
+        var erstes = (Speicherergebnis.Gespeichert) speicherung.speichere(ERIKA, vorschauVonErika);
+
+        var erneut = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        assertThat(erneut).isEqualTo(new Speicherergebnis.BereitsGespeichert(erstes.schreiben()));
+        assertThat(rueckruf.aufrufe).hasSize(1);
+    }
+
+    @Test
+    void derHostLehntDasNeueSchreibenMitEinemGrundAb() {
+        rueckruf.ergebnis = neues -> Rueckrufergebnis.abgelehnt("Die Aufgabe ist bereits erledigt");
+
+        var ergebnis = speicherung.speichere(ERIKA, vorschauVonErika);
+
+        assertThat(ergebnis).isEqualTo(new Speicherergebnis.VomHostAbgelehnt("Die Aufgabe ist bereits erledigt"));
+        assertThat(rueckruf.aufrufe).hasSize(1);
+    }
+
+    @Test
+    void einFehlerImRueckrufIstEinTechnischerFehler() {
+        rueckruf.ergebnis = neues -> {
+            throw new IllegalStateException("Aufgabenverwaltung nicht erreichbar");
+        };
+
+        assertThatThrownBy(() -> speicherung.speichere(ERIKA, vorschauVonErika))
+                .isInstanceOf(IllegalStateException.class).hasMessage("Aufgabenverwaltung nicht erreichbar");
+        assertThat(rueckruf.aufrufe).as("nicht wiederholt").hasSize(1);
+    }
+
+    @Test
+    void wirdNichtsAngelegtGibtEsKeinenRueckruf() {
+        pruefer.ergebnis = pdf -> Konformitaet.nichtKonform(List.of("PDF/UA-1: Bild ohne Alternativtext"));
+        speicherung.speichere(ERIKA, vorschauVonErika);
+        host.erlaubt = false;
+        speicherung.speichere(ERIKA, vorschauVonErika);
+
+        assertThat(rueckruf.aufrufe).isEmpty();
     }
 
     private void loesche(SchreibenId id, String art) {

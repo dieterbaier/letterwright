@@ -37,6 +37,11 @@ final class Abbildung {
                     new Speicherergebnis.DatenkontextGeaendert();
             case dieterbaier.standardschreiben.usecases.in.Speicherergebnis.NichtKonform nichtKonform ->
                     new Speicherergebnis.NichtKonform(nichtKonform.befunde());
+            // Der Anwendungsfall hinter der Java-API ist ohne Rückruf verdrahtet (ADR-023). Kommt der Fall trotzdem,
+            // ist die Verdrahtung falsch; die Ausnahme rollt die Transaktion des Hosts zurück.
+            case dieterbaier.standardschreiben.usecases.in.Speicherergebnis.VomHostAbgelehnt abgelehnt ->
+                    throw new IllegalStateException("Über die Java-API gibt es keinen Rückruf, der Host hat aber"
+                            + " abgelehnt: " + abgelehnt.grund());
         };
     }
 

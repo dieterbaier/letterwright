@@ -16,7 +16,8 @@ class PortsTest {
 
     private static final String MODELL = "dieterbaier.standardschreiben.domaene.modell";
 
-    static final List<Class<?>> PORTS = List.of(Platzhalterdatenquelle.class, Berechtigungen.class, Loeschregeln.class);
+    static final List<Class<?>> PORTS = List.of(Platzhalterdatenquelle.class, Berechtigungen.class, Loeschregeln.class,
+            Speicherrueckruf.class);
 
     @ParameterizedTest
     @FieldSource("PORTS")
