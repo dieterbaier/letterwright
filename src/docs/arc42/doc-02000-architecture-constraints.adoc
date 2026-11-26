@@ -31,5 +31,5 @@ metadata_version: '1.0'
 | RB-09 | Keine Mandantenfähigkeit | Owner
 | RB-10 | Lösch- und Aufbewahrungsregeln bestimmt die Host-Anwendung | Owner
 | RB-11 | Entwicklung KI-gestützt mit dem architecture-knowledge-toolkit | Issue #1
-| RB-12 | Dokumentation und Ubiquitous Language auf Deutsch. Zur Änderung für Code, Features, README und Integrationsdoku vorgeschlagen: xref:adr-024-sprache-der-ubiquitous-language-im-code[ADR-024] | Owner
+| RB-12 | Entfallen. War: Dokumentation und Ubiquitous Language auf Deutsch. Ersetzt durch xref:adr-024-sprache-der-ubiquitous-language-im-code[ADR-024]: Code und Dokumentation englisch, Fachglossar zweisprachig | Owner
 |===

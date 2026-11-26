@@ -141,10 +141,14 @@ thin routing wrappers instead of hand-writing them:
 - Nach einer Änderung unter `skills/` die Adapter mit
   `node scripts/build-agent-adapters.js` neu erzeugen;
   `node scripts/check-agent-adapters.js` prüft, dass sie aktuell sind.
-- Sprache: Dokumentation, ADRs, Qualitätsszenarien, Risiken und die
-  Ubiquitous Language sind **Deutsch**. Fachbegriffe stehen im Glossar
-  (`src/docs/arc42/doc-12000-glossary.adoc`). Artefakt-IDs, Anker und
-  Dateinamen folgen dem Toolkit-Schema (ASCII, Kleinbuchstaben, ohne Umlaute).
+- Sprache nach ADR-024: Code, Gherkin-Features, README, Integrationsdoku,
+  Architekturdoku und ADRs sind **Englisch**. Das Fachglossar
+  (`src/docs/arc42/doc-12000-glossary.adoc`) ist zweisprachig und nennt zu jedem
+  deutschen Fachbegriff verbindlich den englischen Begriff im Code. Übergang: Bis
+  der Doku-PR mit der Übersetzung gemergt ist, entsteht Architekturdoku weiter auf
+  Deutsch; bis zur Migration des Codes tragen neue Bezeichner noch die bisherigen
+  deutschen Namen. Artefakt-IDs, Anker und Dateinamen bleiben stabil und folgen
+  dem Toolkit-Schema (ASCII, Kleinbuchstaben, ohne Umlaute).
 - Architekturdokumentation einschließlich ADRs kommt als Pull Request auf
   einem Feature-Branch. Epics und Stories werden als GitHub-Issues mit
   Sub-Issues geführt.
