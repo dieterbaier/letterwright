@@ -18,6 +18,8 @@ derived_from:
 - type: conversation
   description: 'Entscheidung des Owners am 2026-11-26 nach Prüfung: Der Name ist letterwright'
 - type: conversation
+  description: 'Review des Owners am 2026-11-26: LetterSaveCallback statt AfterSave, weil AfterSave den Zeitpunkt offenlässt; die Javadoc nennt ihn ausdrücklich'
+- type: conversation
   description: 'Annahme durch den Owner am 2026-11-26 mit Option 4 statt der vorgeschlagenen Option 2: Auch Architekturdoku und ADRs englisch, Fachglossar zweisprachig, weil Mitentwickler die Architekturdoku verstehen müssen; Übersetzung durch die KI in einem eigenen Doku-PR, den der Owner gesondert prüft'
 tags:
 - decision
@@ -95,7 +97,8 @@ Code und Dokumentation des Projekts sind englisch. Die deutsche Fachsprache blei
 
 ==== Kernbegriffe
 
-`LetterTemplate` und `BusinessReference` hat der Owner am 2026-11-26 festgelegt,
+`LetterTemplate`, `BusinessReference` und `LetterSaveCallback` hat der Owner am
+2026-11-26 festgelegt,
 die übrigen Übersetzungen gelten mit der Annahme dieses ADR. Die Migration
 übernimmt sie ins Glossar; danach führt nur noch das Glossar sie.
 
@@ -115,7 +118,7 @@ die übrigen Übersetzungen gelten mit der Annahme dieses ADR. Die Migration
 | Berechtigungsprüfung | `AuthorizationCheck` |
 | Löschrichtlinie | `DeletionPolicy` |
 | Löschentscheidung | `DeletionDecision` |
-| Rückruf nach dem Speichern | `AfterSave` | Heute `NachDemSpeichern`.
+| Rückruf nach dem Speichern | `LetterSaveCallback` | Heute `NachDemSpeichern`. Festgelegt vom Owner statt `AfterSave`, das offenlässt, ob der Rückruf vor oder nach dem Commit läuft. Weil auch `LetterSaveCallback` den Zeitpunkt nicht nennt, sagt die Javadoc ausdrücklich: synchron in derselben Transaktion, vor dem Commit, Rollback bei Ablehnung (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
 | Rückrufergebnis | `CallbackResult` |
 | Vorschau | `Preview` |
 | Snapshot | `Snapshot` | Unverändert.
@@ -327,5 +330,7 @@ include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.
 * Der Owner hat den ADR und seine drei Relationen am 2026-11-26 angenommen, mit
   Option 4 statt der vorgeschlagenen Option 2. Kriterium, Matrix und Konsequenzen
   sind daran angepasst.
-* Die Tabelle der Kernbegriffe gilt; die Migration übernimmt sie ins Glossar.
+* Im Review hat der Owner `AfterSave` durch `LetterSaveCallback` ersetzt, mit
+  ausdrücklicher Javadoc zum Zeitpunkt. Die Tabelle der Kernbegriffe gilt damit;
+  die Migration übernimmt sie ins Glossar.
 * RB-12 ist gestrichen, `AGENTS.md` ist angepasst.
