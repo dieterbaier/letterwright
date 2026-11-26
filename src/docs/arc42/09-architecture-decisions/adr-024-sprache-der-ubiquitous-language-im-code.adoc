@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-26'
 reviewed: false
-summary: 'Vorschlag: Bezeichner im Code, Gherkin-Features, README und Integrationsdoku sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und das Glossar nennt verbindlich den englischen Begriff im Code. Die Architekturdokumentation und die ADRs bleiben deutsch. Projekt, Paket und Artefakte bekommen einen englischen Namen. Die Umstellung geschieht in einem Zug vor dem ersten Release und vor dem Rest von #10. RB-12 gilt dann nur noch für die Architekturdokumentation.'
+summary: 'Vorschlag: Bezeichner im Code, Gherkin-Features, README und Integrationsdoku sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und das Glossar nennt verbindlich den englischen Begriff im Code. Die Architekturdokumentation und die ADRs bleiben deutsch. Projekt, Paket und Artefakte heißen letterwright. Die Umstellung geschieht in einem Zug vor dem ersten Release und vor dem Rest von #10. RB-12 gilt dann nur noch für die Architekturdokumentation.'
 derived_from:
 - type: external
   description: 'Issue #1, Frage 2 „Sprache der Dokumentation, der ADRs und des Codes“: damals entschieden „Doku, ADRs und Ubiquitous Language auf Deutsch“ (RB-12)'
@@ -15,6 +15,8 @@ derived_from:
   description: 'Überlegung des Owners am 2026-11-26: Seit SPI und Java-API öffentlich sind, passt deutsche Ubiquitous Language im Code womöglich nicht zu einem Open-Source-Werkzeug; Vorschlag, die damalige Option „Code englisch, Glossar DE↔EN“ als ADR-Entwurf zu prüfen'
 - type: conversation
   description: 'Antworten des Owners am 2026-11-26 auf die Open Questions des ersten Entwurfs: Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als Basissprache; LetterTemplate und BusinessReference; Paket und Artefakt umbenennen; Migration vor dem Rest von #10'
+- type: conversation
+  description: 'Entscheidung des Owners am 2026-11-26 nach Prüfung: Der Name ist letterwright'
 tags:
 - decision
 - sprache
@@ -70,7 +72,7 @@ Ubiquitous Language über das Glossar zweisprachig zu führen (Option 2).
 * *Deutsch bleibt die Architekturdokumentation:* arc42-Kapitel, ADRs,
   Qualitätsszenarien, Risiken und Glossar bleiben deutsch. Texte der Oberfläche sind
   keine Bezeichner und nicht Gegenstand dieses ADR.
-* *Projekt, Paket und Artefakte bekommen einen englischen Namen* (siehe unten).
+* *Projekt, Paket und Artefakte heißen `letterwright`* (siehe unten).
 * *Ein Zug, vor dem ersten Release:* Die Umstellung ist eine eigene Migration in
   einem Issue. Sie läuft vor dem Rest von #10, bevor weitere öffentliche Typen
   hinzukommen. Solange es kein Release gibt, bricht sie keinen Host.
@@ -112,13 +114,13 @@ verbindlich. Danach führt sie das Glossar.
 ==== Name von Projekt, Paket und Artefakten
 
 Der Name `standardschreiben` ist an den deutschen Fachbegriff gebunden und folgt
-nicht mehr der Sprache des Codes. Wir schlagen *Letterwright* vor:
+nicht mehr der Sprache des Codes. Der neue Name ist *Letterwright*:
 
 * Gebildet wie _playwright_ oder _shipwright_: jemand, der Briefe fertigt. Die
   Bibliothek fertigt aus Briefpapier, Standardschreiben und Daten des Hosts ein
   Schreiben.
 * Am 2026-11-26 gab es weder ein npm-Paket noch ein GitHub-Repository dieses
-  Namens. Maven Central und Marken sind vor der Umbenennung zu prüfen.
+  Namens. Der Owner hat den Namen am selben Tag geprüft und festgelegt.
 * Daraus folgen die Gruppe `io.github.dieterbaier.letterwright`, das Paket
   `dieterbaier.letterwright`, das Gradle-Projekt `letterwright` und das npm-Paket
   `@dieterbaier/letterwright`.
@@ -126,8 +128,7 @@ nicht mehr der Sprache des Codes. Wir schlagen *Letterwright* vor:
 Betrachtete Alternativen: `letterkit` (ein Baukasten aus Starter und Komponenten;
 ein gleichnamiges GitHub-Repository existiert), `letterforge` (mehrere
 gleichnamige Projekte) und ein beschreibender Name wie `letter-templates` (eindeutig,
-aber kaum als Eigenname tauglich). Der Owner bestätigt den Namen mit der Annahme
-dieses ADR oder ersetzt ihn im Review.
+aber kaum als Eigenname tauglich).
 
 === Kontext
 
@@ -289,7 +290,7 @@ include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.
 
 === Open Questions
 
-* Bestätigt der Owner den Namen _Letterwright_, oder gilt eine der Alternativen?
+* Keine. Den Namen `letterwright` hat der Owner am 2026-11-26 festgelegt.
 
 Die fünf Fragen des ersten Entwurfs hat der Owner am 2026-11-26 beantwortet:
 Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als
@@ -298,8 +299,8 @@ umbenannt; Migration vor dem Rest von #10.
 
 === Review Notes
 
-* Die Antworten des Owners vom 2026-11-26 sind eingearbeitet. Offen ist nur der
-  Name. Mit der Annahme wird die Tabelle der Kernbegriffe verbindlich und wandert
+* Die Antworten des Owners vom 2026-11-26 sind eingearbeitet, ebenso der Name
+  `letterwright`. Mit der Annahme wird die Tabelle der Kernbegriffe verbindlich und wandert
   ins Glossar.
 * Der Owner bestätigt die drei Relationen. RB-12 ist kein Artefakt mit ID und
   erscheint deshalb nur im Text.
