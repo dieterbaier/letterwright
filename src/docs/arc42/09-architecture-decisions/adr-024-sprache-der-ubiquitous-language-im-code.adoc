@@ -1,12 +1,12 @@
 ---
 id: ADR-024-sprache-der-ubiquitous-language-im-code
 type: ADR
-title: 'Sprache der Ubiquitous Language im Code'
-status: proposed
+title: 'Sprache von Code, Ubiquitous Language und Dokumentation'
+status: accepted
 owner: 'Architektur'
 created: '2026-11-26'
-reviewed: false
-summary: 'Vorschlag: Bezeichner im Code, Gherkin-Features, README und Integrationsdoku sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und das Glossar nennt verbindlich den englischen Begriff im Code. Die Architekturdokumentation und die ADRs bleiben deutsch. Projekt, Paket und Artefakte heißen letterwright. Die Umstellung geschieht in einem Zug vor dem ersten Release und vor dem Rest von #10. RB-12 gilt dann nur noch für die Architekturdokumentation.'
+reviewed: true
+summary: 'Code, Gherkin-Features, README, Integrationsdoku und Architekturdokumentation einschließlich ADRs sind englisch. Das Glossar ist zweisprachig: Es nennt zu jedem Fachbegriff den deutschen Begriff der Fachsprache und verbindlich den englischen Begriff im Code. Projekt, Paket und Artefakte heißen letterwright. Der Code wird in einem Zug vor dem ersten Release und vor dem Rest von #10 umgestellt; die Architekturdokumentation übersetzt ein eigener Doku-PR. RB-12 entfällt zugunsten dieses ADR.'
 derived_from:
 - type: external
   description: 'Issue #1, Frage 2 „Sprache der Dokumentation, der ADRs und des Codes“: damals entschieden „Doku, ADRs und Ubiquitous Language auf Deutsch“ (RB-12)'
@@ -17,6 +17,8 @@ derived_from:
   description: 'Antworten des Owners am 2026-11-26 auf die Open Questions des ersten Entwurfs: Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als Basissprache; LetterTemplate und BusinessReference; Paket und Artefakt umbenennen; Migration vor dem Rest von #10'
 - type: conversation
   description: 'Entscheidung des Owners am 2026-11-26 nach Prüfung: Der Name ist letterwright'
+- type: conversation
+  description: 'Annahme durch den Owner am 2026-11-26 mit Option 4 statt der vorgeschlagenen Option 2: Auch Architekturdoku und ADRs englisch, Fachglossar zweisprachig, weil Mitentwickler die Architekturdoku verstehen müssen; Übersetzung durch die KI in einem eigenen Doku-PR, den der Owner gesondert prüft'
 tags:
 - decision
 - sprache
@@ -25,66 +27,77 @@ tags:
 relations:
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
-  status: proposed
+  status: accepted
   rationale: 'ADR-018 setzt voraus, dass die Namen im Code die Begriffe des Glossars sind. Dieser ADR hält daran fest, legt aber fest, dass der Begriff im Code der englische Eintrag des Glossars ist.'
-  reviewed: false
+  reviewed: true
 - type: affects
   target: ADR-016-schnittstelle-zur-host-anwendung
-  status: proposed
+  status: accepted
   rationale: 'Die Typen von spi und api, die ADR-016 und ADR-023 festlegen, sind der Vertrag mit dem Host. Ihre Namen ändern sich mit diesem ADR; der Schnitt bleibt gleich.'
-  reviewed: false
+  reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
-  status: proposed
-  rationale: 'Ein Entwicklerteam ohne Deutschkenntnisse kann SPI und Java-API mit englischen Namen und englischer Javadoc lesen. Das senkt den Integrationsaufwand für alle, die nicht Deutsch sprechen.'
-  reviewed: false
+  status: accepted
+  rationale: 'Ein Entwicklerteam ohne Deutschkenntnisse kann SPI, Java-API, Javadoc, Integrationsdoku und Architekturdoku lesen. Das senkt den Integrationsaufwand für alle, die nicht Deutsch sprechen.'
+  reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-024-sprache-der-ubiquitous-language-im-code]]
-== ADR-024: Sprache der Ubiquitous Language im Code
+== ADR-024: Sprache von Code, Ubiquitous Language und Dokumentation
 
 === Status
 
-Vorgeschlagen (proposed).
+Angenommen (accepted) am 2026-11-26.
 
-Der ADR ist KI-gestützt formuliert. Er gilt erst als Architektur, wenn der Owner
-ihn angenommen hat. Die offenen Fragen unten muss der Owner vor der Annahme
-beantworten.
+Der ADR ist KI-gestützt formuliert. Vorgeschlagen war Option 2: Code englisch,
+Architekturdoku deutsch. Der Owner hat den ADR am 2026-11-26 angenommen, aber mit
+Option 4: Auch Architekturdoku und ADRs sind englisch, das Fachglossar ist
+zweisprachig. Sein Grund: Wer mitentwickeln will, muss die Architekturdoku
+verstehen. Eine deutsche Doku schließt alle aus, die kein Deutsch sprechen;
+Englisch ist in der IT üblich und akzeptiert. Zuvor hatte er die fünf offenen
+Fragen des ersten Entwurfs beantwortet und den Namen `letterwright` festgelegt.
 
 === Entscheidung
 
-Wir schlagen vor, die Bezeichner im Code auf Englisch umzustellen und die
-Ubiquitous Language über das Glossar zweisprachig zu führen (Option 2).
+Code und Dokumentation des Projekts sind englisch. Die deutsche Fachsprache bleibt
+über ein zweisprachiges Glossar erhalten (Option 4).
 
 * *Englisch im Code:* Typen, Methoden, Felder, Pakete, Module und Javadoc sind
   englisch, ebenso die Typen und Komponenten des Frontends. Für Umlaute gibt es
   dann keine Umschreibung mehr wie `Rueckrufergebnis` oder `Loeschanfrage`.
-* *Das Glossar bleibt die Quelle der Ubiquitous Language:* Es definiert die Begriffe
-  weiter auf Deutsch. Die Spalte „Im Code“ nennt verbindlich den englischen
-  Bezeichner. Für jeden Fachbegriff gibt es genau einen englischen Begriff. Ein
-  Synonym im Code ist ein Fehler, wie heute auch.
 * *Gherkin-Features englisch:* Die Features sind ausführbare Spezifikation des
   Codes und nutzen dieselben Begriffe wie er. `# language: de` entfällt.
+* *Architekturdokumentation englisch:* arc42-Kapitel, ADRs, Qualitätsszenarien,
+  Risiken, Fragen und Antworten sowie Vision und Roadmap sind englisch.
+  Artefakt-IDs, Anker und Dateinamen bleiben stabil, auch wenn sie deutsche Wörter
+  enthalten.
 * *README und Integrationsdoku englisch:* Sie richten sich an Host-Entwickler
   (#11). Das README sagt deutlich, dass die Basissprache der Fachdomäne Deutsch
-  ist, dass das Glossar die Begriffe deutsch definiert und dass die englischen
+  ist, dass das Glossar die deutschen Begriffe nennt und dass die englischen
   Begriffe Übersetzungen sind, die teils holpern.
-* *Deutsch bleibt die Architekturdokumentation:* arc42-Kapitel, ADRs,
-  Qualitätsszenarien, Risiken und Glossar bleiben deutsch. Texte der Oberfläche sind
-  keine Bezeichner und nicht Gegenstand dieses ADR.
+* *Zweisprachiges Fachglossar:* Das Glossar nennt zu jedem Fachbegriff den
+  deutschen Begriff der Fachsprache und verbindlich den englischen Begriff im Code.
+  Für jeden Fachbegriff gibt es genau einen englischen Begriff. Ein Synonym im Code
+  ist ein Fehler, wie heute auch. Die Definitionen sind englisch wie die übrige
+  Doku.
+* *Texte der Oberfläche* sind keine Bezeichner und nicht Gegenstand dieses ADR.
 * *Projekt, Paket und Artefakte heißen `letterwright`* (siehe unten).
-* *Ein Zug, vor dem ersten Release:* Die Umstellung ist eine eigene Migration in
-  einem Issue. Sie läuft vor dem Rest von #10, bevor weitere öffentliche Typen
-  hinzukommen. Solange es kein Release gibt, bricht sie keinen Host.
-* *Was RB-12 dann regelt:* Die Randbedingung gilt nur noch für die
-  Architekturdokumentation. Für Code, Features, README und Integrationsdoku gilt
-  dieser ADR.
+* *Zwei Schritte:*
+** Der Code wird in einem Zug in einem eigenen Issue umgestellt, vor dem Rest von
+   #10 und bevor weitere öffentliche Typen hinzukommen. Solange es kein Release
+   gibt, bricht das keinen Host. Diese Migration passt die Bezeichner in der noch
+   deutschen Doku an.
+** Die Architekturdokumentation übersetzt die KI in einem eigenen Doku-PR. Der
+   Owner prüft die Übersetzung gesondert. Bis dieser PR gemergt ist, entsteht neue
+   Architekturdoku weiter auf Deutsch, damit die Doku nicht halb übersetzt ist.
+* *RB-12 entfällt:* Die Randbedingung „Dokumentation und Ubiquitous Language auf
+  Deutsch“ gilt nicht mehr. An ihre Stelle tritt dieser ADR.
 
-==== Vorschlag für die Kernbegriffe
+==== Kernbegriffe
 
-`LetterTemplate` und `BusinessReference` hat der Owner am 2026-11-26 festgelegt.
-Die übrigen Übersetzungen sind ein Vorschlag und werden mit der Annahme dieses ADR
-verbindlich. Danach führt sie das Glossar.
+`LetterTemplate` und `BusinessReference` hat der Owner am 2026-11-26 festgelegt,
+die übrigen Übersetzungen gelten mit der Annahme dieses ADR. Die Migration
+übernimmt sie ins Glossar; danach führt nur noch das Glossar sie.
 
 [cols="2,2,3", options="header"]
 |===
@@ -172,6 +185,8 @@ voran „Standardschreiben“.
   Spring-API, keine Umschreibung von Umlauten.
 * **Eine Sprache im Modell:** Ein Fachbegriff hat im Code genau einen Namen. An der
   Grenze zum Host wird nicht übersetzt.
+* **Zugänglichkeit der Architekturdoku:** Mitentwickler ohne Deutschkenntnisse
+  verstehen Entscheidungen, Qualitätsziele und Bausteine.
 * **Aufwand der Umstellung:** Code, Tests, Features, Doku und Glossar.
 
 === Betrachtete Optionen
@@ -182,7 +197,7 @@ Code, Glossar und Dokumentation bleiben deutsch. Es gibt keinen Aufwand und kein
 Übersetzung. Der öffentliche Vertrag bleibt für alle schwer lesbar, die kein Deutsch
 sprechen.
 
-==== Option 2: Code englisch, Glossar DE↔EN, Architekturdoku deutsch (vorgeschlagen)
+==== Option 2: Code englisch, Glossar DE↔EN, Architekturdoku deutsch
 
 Wie oben beschrieben. Code und Features stehen in einer Sprache, README und
 Integrationsdoku sprechen Host-Entwickler auf Englisch an, und das Glossar ist die
@@ -196,11 +211,12 @@ Der Host sieht englische Namen, der Kern bleibt deutsch. Der Adapter an der Gren
 widerspricht der Ubiquitous Language mehr als jede einheitliche Lösung, und für
 Beitragende ändert sich nichts.
 
-==== Option 4: Alles englisch, auch die Dokumentation
+==== Option 4: Alles englisch, Fachglossar zweisprachig (gewählt)
 
-Wie Option 2, dazu Architekturdokumentation, ADRs und Glossar auf Englisch. Das wäre am
-zugänglichsten, entfernt die Doku aber von den Fachanwendern und verlangt die
-Übersetzung aller 23 ADRs und der arc42-Kapitel.
+Wie Option 2, dazu Architekturdokumentation und ADRs auf Englisch. Das Glossar
+nennt deutsche und englische Begriffe. Das ist am zugänglichsten, entfernt die Doku
+aber von deutschsprachigen Fachanwendern und verlangt die Übersetzung aller ADRs
+und arc42-Kapitel.
 
 === Pugh-Matrix
 
@@ -215,8 +231,9 @@ Unterstützung. Die Matrix ist ungewichtet.
 | Nähe zur Fachsprache | +1 | 0 | 0 | -1
 | Eine Sprache im Code | -1 | +1 | -1 | +1
 | Eine Sprache im Modell | +1 | +1 | -1 | +1
+| Zugänglichkeit der Architekturdoku | -1 | -1 | -1 | +1
 | Aufwand der Umstellung | +1 | -1 | 0 | -1
-s| Summe s| +1 s| +2 s| -1 s| +1
+s| Summe s| 0 s| +1 s| -2 s| +2
 |===
 
 Option 2 bekommt bei der Nähe zur Fachsprache `0`, weil Glossar,
@@ -225,25 +242,33 @@ Zugänglichkeit `+1`, weil Hosts nur den Vertrag sehen. Für Beitragende bliebe 
 Kern trotzdem deutsch. Beim Aufwand bekommt Option 3 `0`, weil zwar nur der
 Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
 
+Der erste Entwurf kannte das Kriterium „Zugänglichkeit der Architekturdoku“ nicht
+und schlug deshalb Option 2 vor. Der Owner hat es bei der Annahme eingebracht.
+Option 4 bleibt bei der Nähe zur Fachsprache bei `-1`: Das zweisprachige Glossar
+mildert den Abstand, die Doku liest ein Fachanwender trotzdem nicht in seiner
+Sprache.
+
 === Konsequenzen
 
 ==== Positiv
 
-* SPI, Java-API und Javadoc sind ohne Deutschkenntnisse lesbar. Das hilft bei der
-  Integration (QS-007) und bei Beiträgen.
+* SPI, Java-API, Javadoc und Architekturdoku sind ohne Deutschkenntnisse lesbar.
+  Das hilft bei der Integration (QS-007) und bei Beiträgen.
 * Im Code steht eine Sprache, ohne Umschreibung von Umlauten.
 * Geschieht die Umstellung vor dem ersten Release, bricht sie keinen Host.
 
 ==== Negativ
 
 * Einmaliger Aufwand: Typen, Pakete, Module, Tests, Gherkin-Steps, Frontend,
-  Glossar, Bausteinsicht und alle ADRs, die Bezeichner im Code nennen. Die ADR-Texte
-  selbst bleiben deutsch, ihre Code-Beispiele ändern sich.
+  Glossar, Bausteinsicht und alle ADRs, die Bezeichner im Code nennen.
+* Die Übersetzung der gesamten Architekturdoku kostet einen eigenen PR und eine
+  eigene Prüfung durch den Owner. Bis dahin ist die Doku deutsch und der Code
+  englisch.
 * Bis zur Migration laufen Issues mit deutschen Namen weiter, oder sie warten.
   Beides kostet.
 * Fachbegriffe und Bezeichner unterscheiden sich. Wer zwischen Gespräch und Code
   wechselt, braucht das Glossar. Das gilt auch für die Features: Ein Fachanwender
-  liest sie nicht mehr in seiner Sprache.
+  liest sie nicht mehr in seiner Sprache, ebenso wenig die Architekturdoku.
 * Der Name des Projekts ändert sich. Links, Pages-URL und Verweise in Issues
   zeigen auf den alten Namen, bis das Repository umbenannt ist.
 * Eine schlechte Übersetzung eines Kernbegriffs prägt den Code dauerhaft. Sie ist
@@ -251,14 +276,15 @@ Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
 
 ==== Neutral oder Folgearbeiten
 
-* Ein Issue für die Migration, vor dem Rest von #10, mit Reihenfolge: Glossar mit
-  englischen Begriffen, Kern, SPI/API, Adapter, Starter, Frontend, Features,
-  Gruppe, Paket und Artefakte, README und Integrationsdoku.
+* Ein Issue für die Migration des Codes, vor dem Rest von #10, mit Reihenfolge:
+  Glossar mit englischen Begriffen, Kern, SPI/API, Adapter, Starter, Frontend,
+  Features, Gruppe, Paket und Artefakte, README und Integrationsdoku.
+* Ein Issue für die Übersetzung der Architekturdoku in einem eigenen Doku-PR,
+  gesondert vom Owner geprüft.
 * Das Glossar bekommt eine Spalte für den englischen Begriff oder führt ihn in der
   Spalte „Im Code“. Das entscheidet die Migration.
-* RB-12 nach der Annahme anpassen: „Architekturdokumentation auf Deutsch;
-  Bezeichner im Code, Features, README und Integrationsdoku englisch nach
-  ADR-024“. Bis dahin verweist RB-12 auf diesen ADR.
+* RB-12 ist mit der Annahme dieses ADR gestrichen. `AGENTS.md` beschreibt die
+  Sprachregel nach diesem ADR.
 * Das GitHub-Repository umbenennen. GitHub leitet alte URLs weiter; die
   Pages-URL und der lokale Ordner ändern sich. Das entscheidet der Owner mit der
   Migration.
@@ -290,19 +316,16 @@ include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.
 
 === Open Questions
 
-* Keine. Den Namen `letterwright` hat der Owner am 2026-11-26 festgelegt.
-
-Die fünf Fragen des ersten Entwurfs hat der Owner am 2026-11-26 beantwortet:
-Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als
-Basissprache; `LetterTemplate` und `BusinessReference`; Paket und Artefakt werden
-umbenannt; Migration vor dem Rest von #10.
+* Keine. Den Namen `letterwright` hat der Owner am 2026-11-26 festgelegt, die
+  fünf Fragen des ersten Entwurfs hat er am selben Tag beantwortet: Gherkin
+  englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als
+  Basissprache; `LetterTemplate` und `BusinessReference`; Paket und Artefakt werden
+  umbenannt; Migration vor dem Rest von #10.
 
 === Review Notes
 
-* Die Antworten des Owners vom 2026-11-26 sind eingearbeitet, ebenso der Name
-  `letterwright`. Mit der Annahme wird die Tabelle der Kernbegriffe verbindlich und wandert
-  ins Glossar.
-* Der Owner bestätigt die drei Relationen. RB-12 ist kein Artefakt mit ID und
-  erscheint deshalb nur im Text.
-* Mit der Annahme dieses ADR wird das Issue zur Migration angelegt, und RB-12 wird
-  angepasst. Den Verweis von RB-12 auf diesen ADR gibt es schon.
+* Der Owner hat den ADR und seine drei Relationen am 2026-11-26 angenommen, mit
+  Option 4 statt der vorgeschlagenen Option 2. Kriterium, Matrix und Konsequenzen
+  sind daran angepasst.
+* Die Tabelle der Kernbegriffe gilt; die Migration übernimmt sie ins Glossar.
+* RB-12 ist gestrichen, `AGENTS.md` ist angepasst.
