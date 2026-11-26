@@ -276,10 +276,10 @@ Sprache.
 
 ==== Neutral oder Folgearbeiten
 
-* Ein Issue für die Migration des Codes, vor dem Rest von #10, mit Reihenfolge:
+* #84: Migration des Codes, vor dem Rest von #10, mit Reihenfolge:
   Glossar mit englischen Begriffen, Kern, SPI/API, Adapter, Starter, Frontend,
   Features, Gruppe, Paket und Artefakte, README und Integrationsdoku.
-* Ein Issue für die Übersetzung der Architekturdoku in einem eigenen Doku-PR,
+* #85: Übersetzung der Architekturdoku in einem eigenen Doku-PR,
   gesondert vom Owner geprüft.
 * Das Glossar bekommt eine Spalte für den englischen Begriff oder führt ihn in der
   Spalte „Im Code“. Das entscheidet die Migration.
