@@ -6,13 +6,15 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-26'
 reviewed: false
-summary: 'Vorschlag: Bezeichner im Code, also Typen, Methoden, Pakete und Module, sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und eine neue Spalte nennt verbindlich den englischen Begriff im Code. Dokumentation und ADRs bleiben deutsch. Die Umstellung geschieht in einem Zug vor dem ersten Release. RB-12 gilt dann nur noch für die Dokumentation.'
+summary: 'Vorschlag: Bezeichner im Code, Gherkin-Features, README und Integrationsdoku sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und das Glossar nennt verbindlich den englischen Begriff im Code. Die Architekturdokumentation und die ADRs bleiben deutsch. Projekt, Paket und Artefakte bekommen einen englischen Namen. Die Umstellung geschieht in einem Zug vor dem ersten Release und vor dem Rest von #10. RB-12 gilt dann nur noch für die Architekturdokumentation.'
 derived_from:
 - type: external
   description: 'Issue #1, Frage 2 „Sprache der Dokumentation, der ADRs und des Codes“: damals entschieden „Doku, ADRs und Ubiquitous Language auf Deutsch“ (RB-12)'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 - type: conversation
   description: 'Überlegung des Owners am 2026-11-26: Seit SPI und Java-API öffentlich sind, passt deutsche Ubiquitous Language im Code womöglich nicht zu einem Open-Source-Werkzeug; Vorschlag, die damalige Option „Code englisch, Glossar DE↔EN“ als ADR-Entwurf zu prüfen'
+- type: conversation
+  description: 'Antworten des Owners am 2026-11-26 auf die Open Questions des ersten Entwurfs: Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als Basissprache; LetterTemplate und BusinessReference; Paket und Artefakt umbenennen; Migration vor dem Rest von #10'
 tags:
 - decision
 - sprache
@@ -59,30 +61,38 @@ Ubiquitous Language über das Glossar zweisprachig zu führen (Option 2).
   weiter auf Deutsch. Die Spalte „Im Code“ nennt verbindlich den englischen
   Bezeichner. Für jeden Fachbegriff gibt es genau einen englischen Begriff. Ein
   Synonym im Code ist ein Fehler, wie heute auch.
-* *Deutsch bleibt, was Menschen lesen, die die Fachsprache sprechen:*
-  Dokumentation, ADRs, Qualitätsszenarien und Risiken bleiben deutsch (RB-12 für
-  die Dokumentation). Texte der Oberfläche sind keine Bezeichner und nicht
-  Gegenstand dieses ADR.
+* *Gherkin-Features englisch:* Die Features sind ausführbare Spezifikation des
+  Codes und nutzen dieselben Begriffe wie er. `# language: de` entfällt.
+* *README und Integrationsdoku englisch:* Sie richten sich an Host-Entwickler
+  (#11). Das README sagt deutlich, dass die Basissprache der Fachdomäne Deutsch
+  ist, dass das Glossar die Begriffe deutsch definiert und dass die englischen
+  Begriffe Übersetzungen sind, die teils holpern.
+* *Deutsch bleibt die Architekturdokumentation:* arc42-Kapitel, ADRs,
+  Qualitätsszenarien, Risiken und Glossar bleiben deutsch. Texte der Oberfläche sind
+  keine Bezeichner und nicht Gegenstand dieses ADR.
+* *Projekt, Paket und Artefakte bekommen einen englischen Namen* (siehe unten).
 * *Ein Zug, vor dem ersten Release:* Die Umstellung ist eine eigene Migration in
-  einem Issue. Sie läuft, bevor weitere öffentliche Typen hinzukommen, also vor der
-  weiteren Arbeit an #10. Solange es kein Release gibt, bricht sie keinen Host.
-* *Was RB-12 dann regelt:* Die Randbedingung gilt nur noch für die Dokumentation.
-  Für die Sprache im Code gilt dieser ADR.
+  einem Issue. Sie läuft vor dem Rest von #10, bevor weitere öffentliche Typen
+  hinzukommen. Solange es kein Release gibt, bricht sie keinen Host.
+* *Was RB-12 dann regelt:* Die Randbedingung gilt nur noch für die
+  Architekturdokumentation. Für Code, Features, README und Integrationsdoku gilt
+  dieser ADR.
 
 ==== Vorschlag für die Kernbegriffe
 
-Die Übersetzungen sind ein Vorschlag und im Review zu bestätigen. Sie legen auch
-fest, wie Pakete und der Name des Artefakts heißen (siehe Open Questions).
+`LetterTemplate` und `BusinessReference` hat der Owner am 2026-11-26 festgelegt.
+Die übrigen Übersetzungen sind ein Vorschlag und werden mit der Annahme dieses ADR
+verbindlich. Danach führt sie das Glossar.
 
 [cols="2,2,3", options="header"]
 |===
 | Begriff im Glossar | Vorschlag im Code | Anmerkung
 | Briefpapier | `Letterhead` | Üblicher englischer Begriff für das Seitenlayout eines Briefs.
-| Standardschreiben | `LetterTemplate` | Alternativen: `StandardLetter`, `FormLetter`. „Template“ ist eindeutig, kollidiert aber mit dem Oberbegriff „Vorlage“.
-| Vorlage (Briefpapier oder Standardschreiben) | `Template` | Folgt aus der Wahl für Standardschreiben.
+| Standardschreiben | `LetterTemplate` | Festgelegt vom Owner.
+| Vorlage (Briefpapier oder Standardschreiben) | `Template` | Oberbegriff; `LetterTemplate` ist eine Art davon.
 | Vorlagenversion | `TemplateVersion` |
 | Schreiben | `Letter` | Anwendungsfälle etwa `SaveLetter`, `ListLetters`, `DownloadLetter`, `DeleteLetter`.
-| Fachlicher Bezug | `BusinessReference` | Alternative: `Subject`. Prägt viele Signaturen im SPI.
+| Fachlicher Bezug | `BusinessReference` | Festgelegt vom Owner.
 | Bezugstyp | `ReferenceType` |
 | Datenkontext | `DataContext` |
 | Platzhalter | `Placeholder` |
@@ -98,6 +108,26 @@ fest, wie Pakete und der Name des Artefakts heißen (siehe Open Questions).
 | Benutzerkennung | `UserId` |
 | Dokumentverweis | `DocumentReference` |
 |===
+
+==== Name von Projekt, Paket und Artefakten
+
+Der Name `standardschreiben` ist an den deutschen Fachbegriff gebunden und folgt
+nicht mehr der Sprache des Codes. Wir schlagen *Letterwright* vor:
+
+* Gebildet wie _playwright_ oder _shipwright_: jemand, der Briefe fertigt. Die
+  Bibliothek fertigt aus Briefpapier, Standardschreiben und Daten des Hosts ein
+  Schreiben.
+* Am 2026-11-26 gab es weder ein npm-Paket noch ein GitHub-Repository dieses
+  Namens. Maven Central und Marken sind vor der Umbenennung zu prüfen.
+* Daraus folgen die Gruppe `io.github.dieterbaier.letterwright`, das Paket
+  `dieterbaier.letterwright`, das Gradle-Projekt `letterwright` und das npm-Paket
+  `@dieterbaier/letterwright`.
+
+Betrachtete Alternativen: `letterkit` (ein Baukasten aus Starter und Komponenten;
+ein gleichnamiges GitHub-Repository existiert), `letterforge` (mehrere
+gleichnamige Projekte) und ein beschreibender Name wie `letter-templates` (eindeutig,
+aber kaum als Eigenname tauglich). Der Owner bestätigt den Namen mit der Annahme
+dieses ADR oder ersetzt ihn im Review.
 
 === Kontext
 
@@ -151,9 +181,10 @@ Code, Glossar und Dokumentation bleiben deutsch. Es gibt keinen Aufwand und kein
 Übersetzung. Der öffentliche Vertrag bleibt für alle schwer lesbar, die kein Deutsch
 sprechen.
 
-==== Option 2: Code englisch, Glossar DE↔EN, Doku deutsch (vorgeschlagen)
+==== Option 2: Code englisch, Glossar DE↔EN, Architekturdoku deutsch (vorgeschlagen)
 
-Wie oben beschrieben. Im Code steht genau eine Sprache, und das Glossar ist die
+Wie oben beschrieben. Code und Features stehen in einer Sprache, README und
+Integrationsdoku sprechen Host-Entwickler auf Englisch an, und das Glossar ist die
 verbindliche Brücke zur deutschen Fachsprache. Die Umstellung kostet einmal Arbeit.
 Wer mit Fachanwendern spricht, muss die Zuordnung im Glossar kennen.
 
@@ -166,7 +197,7 @@ Beitragende ändert sich nichts.
 
 ==== Option 4: Alles englisch, auch die Dokumentation
 
-Wie Option 2, dazu Dokumentation, ADRs und Glossar auf Englisch. Das wäre am
+Wie Option 2, dazu Architekturdokumentation, ADRs und Glossar auf Englisch. Das wäre am
 zugänglichsten, entfernt die Doku aber von den Fachanwendern und verlangt die
 Übersetzung aller 23 ADRs und der arc42-Kapitel.
 
@@ -187,8 +218,8 @@ Unterstützung. Die Matrix ist ungewichtet.
 s| Summe s| +1 s| +2 s| -1 s| +1
 |===
 
-Option 2 bekommt bei der Nähe zur Fachsprache `0`, weil Glossar, Doku und
-Gespräch deutsch bleiben, der Code aber nicht. Option 3 bekommt bei der
+Option 2 bekommt bei der Nähe zur Fachsprache `0`, weil Glossar,
+Architekturdoku und Gespräch deutsch bleiben, Code und Features aber nicht. Option 3 bekommt bei der
 Zugänglichkeit `+1`, weil Hosts nur den Vertrag sehen. Für Beitragende bliebe der
 Kern trotzdem deutsch. Beim Aufwand bekommt Option 3 `0`, weil zwar nur der
 Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
@@ -210,18 +241,26 @@ Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
 * Bis zur Migration laufen Issues mit deutschen Namen weiter, oder sie warten.
   Beides kostet.
 * Fachbegriffe und Bezeichner unterscheiden sich. Wer zwischen Gespräch und Code
-  wechselt, braucht das Glossar.
+  wechselt, braucht das Glossar. Das gilt auch für die Features: Ein Fachanwender
+  liest sie nicht mehr in seiner Sprache.
+* Der Name des Projekts ändert sich. Links, Pages-URL und Verweise in Issues
+  zeigen auf den alten Namen, bis das Repository umbenannt ist.
 * Eine schlechte Übersetzung eines Kernbegriffs prägt den Code dauerhaft. Sie ist
   später so teuer zu ändern wie jetzt die Umstellung.
 
 ==== Neutral oder Folgearbeiten
 
-* Ein Issue für die Migration, mit Reihenfolge: Glossar mit EN-Spalte, Kern,
-  SPI/API, Adapter, Starter, Frontend, Features, Doku.
+* Ein Issue für die Migration, vor dem Rest von #10, mit Reihenfolge: Glossar mit
+  englischen Begriffen, Kern, SPI/API, Adapter, Starter, Frontend, Features,
+  Gruppe, Paket und Artefakte, README und Integrationsdoku.
 * Das Glossar bekommt eine Spalte für den englischen Begriff oder führt ihn in der
   Spalte „Im Code“. Das entscheidet die Migration.
-* RB-12 in den Randbedingungen anpassen: „Dokumentation auf Deutsch; Bezeichner im
-  Code englisch nach ADR-024“.
+* RB-12 nach der Annahme anpassen: „Architekturdokumentation auf Deutsch;
+  Bezeichner im Code, Features, README und Integrationsdoku englisch nach
+  ADR-024“. Bis dahin verweist RB-12 auf diesen ADR.
+* Das GitHub-Repository umbenennen. GitHub leitet alte URLs weiter; die
+  Pages-URL und der lokale Ordner ändern sich. Das entscheidet der Owner mit der
+  Migration.
 * ADR-018 und die Lösungsstrategie (Code-Stil) verweisen auf diesen ADR.
 * Die Commit-Messages sind schon englisch. Für sie ändert sich nichts.
 
@@ -250,25 +289,19 @@ include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.
 
 === Open Questions
 
-* *Gherkin-Features:* Englisch wie der Code? Oder bleiben sie deutsch
-  (`# language: de`), als Spezifikation in der Sprache der Fachanwender? Dann
-  übersetzen die Step-Definitionen über das Glossar.
-* *Dokumentation:* Bleibt sie vollständig deutsch? Oder werden README und
-  Integrationsdoku (#11) zusätzlich oder ausschließlich englisch, weil sie sich an
-  Host-Entwickler richten?
-* *Kernbegriffe:* Welche Übersetzung gilt für „Standardschreiben“ (`LetterTemplate`,
-  `StandardLetter`, `FormLetter`) und für „Fachlicher Bezug“ (`BusinessReference`,
-  `Subject`)?
-* *Name von Projekt, Paket und Artefakt:* Bleibt `standardschreiben` als
-  Eigenname im Paket `dieterbaier.standardschreiben` und im Artefakt, oder folgt er
-  der Übersetzung?
-* *Zeitpunkt:* Migration vor dem Rest von #10 (Vorschlag) oder danach?
+* Bestätigt der Owner den Namen _Letterwright_, oder gilt eine der Alternativen?
+
+Die fünf Fragen des ersten Entwurfs hat der Owner am 2026-11-26 beantwortet:
+Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als
+Basissprache; `LetterTemplate` und `BusinessReference`; Paket und Artefakt werden
+umbenannt; Migration vor dem Rest von #10.
 
 === Review Notes
 
-* Der Owner beantwortet die Open Questions, vor allem die Übersetzung der
-  Kernbegriffe. Danach wird die Tabelle oben verbindlich und wandert ins Glossar.
+* Die Antworten des Owners vom 2026-11-26 sind eingearbeitet. Offen ist nur der
+  Name. Mit der Annahme wird die Tabelle der Kernbegriffe verbindlich und wandert
+  ins Glossar.
 * Der Owner bestätigt die drei Relationen. RB-12 ist kein Artefakt mit ID und
   erscheint deshalb nur im Text.
 * Mit der Annahme dieses ADR wird das Issue zur Migration angelegt, und RB-12 wird
-  angepasst.
+  angepasst. Den Verweis von RB-12 auf diesen ADR gibt es schon.
