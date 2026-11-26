@@ -1,0 +1,274 @@
+---
+id: ADR-024-sprache-der-ubiquitous-language-im-code
+type: ADR
+title: 'Sprache der Ubiquitous Language im Code'
+status: proposed
+owner: 'Architektur'
+created: '2026-11-26'
+reviewed: false
+summary: 'Vorschlag: Bezeichner im Code, also Typen, Methoden, Pakete und Module, sind englisch. Die Ubiquitous Language bleibt im Glossar deutsch geführt, und eine neue Spalte nennt verbindlich den englischen Begriff im Code. Dokumentation und ADRs bleiben deutsch. Die Umstellung geschieht in einem Zug vor dem ersten Release. RB-12 gilt dann nur noch für die Dokumentation.'
+derived_from:
+- type: external
+  description: 'Issue #1, Frage 2 „Sprache der Dokumentation, der ADRs und des Codes“: damals entschieden „Doku, ADRs und Ubiquitous Language auf Deutsch“ (RB-12)'
+  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+- type: conversation
+  description: 'Überlegung des Owners am 2026-11-26: Seit SPI und Java-API öffentlich sind, passt deutsche Ubiquitous Language im Code womöglich nicht zu einem Open-Source-Werkzeug; Vorschlag, die damalige Option „Code englisch, Glossar DE↔EN“ als ADR-Entwurf zu prüfen'
+tags:
+- decision
+- sprache
+- ubiquitous-language
+- integration
+relations:
+- type: refines
+  target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
+  status: proposed
+  rationale: 'ADR-018 setzt voraus, dass die Namen im Code die Begriffe des Glossars sind. Dieser ADR hält daran fest, legt aber fest, dass der Begriff im Code der englische Eintrag des Glossars ist.'
+  reviewed: false
+- type: affects
+  target: ADR-016-schnittstelle-zur-host-anwendung
+  status: proposed
+  rationale: 'Die Typen von spi und api, die ADR-016 und ADR-023 festlegen, sind der Vertrag mit dem Host. Ihre Namen ändern sich mit diesem ADR; der Schnitt bleibt gleich.'
+  reviewed: false
+- type: affects
+  target: QS-007-integration-in-host-anwendung
+  status: proposed
+  rationale: 'Ein Entwicklerteam ohne Deutschkenntnisse kann SPI und Java-API mit englischen Namen und englischer Javadoc lesen. Das senkt den Integrationsaufwand für alle, die nicht Deutsch sprechen.'
+  reviewed: false
+metadata_version: '1.0'
+---
+[[adr-024-sprache-der-ubiquitous-language-im-code]]
+== ADR-024: Sprache der Ubiquitous Language im Code
+
+=== Status
+
+Vorgeschlagen (proposed).
+
+Der ADR ist KI-gestützt formuliert. Er gilt erst als Architektur, wenn der Owner
+ihn angenommen hat. Die offenen Fragen unten muss der Owner vor der Annahme
+beantworten.
+
+=== Entscheidung
+
+Wir schlagen vor, die Bezeichner im Code auf Englisch umzustellen und die
+Ubiquitous Language über das Glossar zweisprachig zu führen (Option 2).
+
+* *Englisch im Code:* Typen, Methoden, Felder, Pakete, Module und Javadoc sind
+  englisch, ebenso die Typen und Komponenten des Frontends. Für Umlaute gibt es
+  dann keine Umschreibung mehr wie `Rueckrufergebnis` oder `Loeschanfrage`.
+* *Das Glossar bleibt die Quelle der Ubiquitous Language:* Es definiert die Begriffe
+  weiter auf Deutsch. Die Spalte „Im Code“ nennt verbindlich den englischen
+  Bezeichner. Für jeden Fachbegriff gibt es genau einen englischen Begriff. Ein
+  Synonym im Code ist ein Fehler, wie heute auch.
+* *Deutsch bleibt, was Menschen lesen, die die Fachsprache sprechen:*
+  Dokumentation, ADRs, Qualitätsszenarien und Risiken bleiben deutsch (RB-12 für
+  die Dokumentation). Texte der Oberfläche sind keine Bezeichner und nicht
+  Gegenstand dieses ADR.
+* *Ein Zug, vor dem ersten Release:* Die Umstellung ist eine eigene Migration in
+  einem Issue. Sie läuft, bevor weitere öffentliche Typen hinzukommen, also vor der
+  weiteren Arbeit an #10. Solange es kein Release gibt, bricht sie keinen Host.
+* *Was RB-12 dann regelt:* Die Randbedingung gilt nur noch für die Dokumentation.
+  Für die Sprache im Code gilt dieser ADR.
+
+==== Vorschlag für die Kernbegriffe
+
+Die Übersetzungen sind ein Vorschlag und im Review zu bestätigen. Sie legen auch
+fest, wie Pakete und der Name des Artefakts heißen (siehe Open Questions).
+
+[cols="2,2,3", options="header"]
+|===
+| Begriff im Glossar | Vorschlag im Code | Anmerkung
+| Briefpapier | `Letterhead` | Üblicher englischer Begriff für das Seitenlayout eines Briefs.
+| Standardschreiben | `LetterTemplate` | Alternativen: `StandardLetter`, `FormLetter`. „Template“ ist eindeutig, kollidiert aber mit dem Oberbegriff „Vorlage“.
+| Vorlage (Briefpapier oder Standardschreiben) | `Template` | Folgt aus der Wahl für Standardschreiben.
+| Vorlagenversion | `TemplateVersion` |
+| Schreiben | `Letter` | Anwendungsfälle etwa `SaveLetter`, `ListLetters`, `DownloadLetter`, `DeleteLetter`.
+| Fachlicher Bezug | `BusinessReference` | Alternative: `Subject`. Prägt viele Signaturen im SPI.
+| Bezugstyp | `ReferenceType` |
+| Datenkontext | `DataContext` |
+| Platzhalter | `Placeholder` |
+| Platzhalterdaten-Anbieter | `PlaceholderDataProvider` | So schon in Issue #1 vorgeschlagen.
+| Berechtigungsprüfung | `AuthorizationCheck` |
+| Löschrichtlinie | `DeletionPolicy` |
+| Löschentscheidung | `DeletionDecision` |
+| Rückruf nach dem Speichern | `AfterSave` | Heute `NachDemSpeichern`.
+| Rückrufergebnis | `CallbackResult` |
+| Vorschau | `Preview` |
+| Snapshot | `Snapshot` | Unverändert.
+| Prüfsumme | `Checksum` |
+| Benutzerkennung | `UserId` |
+| Dokumentverweis | `DocumentReference` |
+|===
+
+=== Kontext
+
+Issue #1 hat in Frage 2 zwei Optionen genannt: Code und Ubiquitous Language im Code
+englisch mit einem Glossar DE↔EN oder alles deutsch. Der Owner hat sich damals für
+Deutsch entschieden. Daraus wurde RB-12, auf dem ADR-018 („Die Namen im Code sind
+die Begriffe des Glossars“) und die Lösungsstrategie (Code-Stil) aufbauen.
+
+Seitdem hat sich die Lage geändert:
+
+* *Der Vertrag mit dem Host ist öffentlich.* Die Module `spi` (ADR-016) und `api`
+  (ADR-023) sind die einzigen Teile der Bibliothek, gegen die der Host kompiliert.
+  Ihre Namen und ihre Javadoc liest jedes Entwicklerteam, das die Bibliothek
+  einbindet. Heute heißen sie zum Beispiel `PlatzhalterdatenAnbieter`,
+  `NachDemSpeichern`, `Rueckrufergebnis` und `Loeschentscheidung`.
+* *Die Bibliothek ist Open Source (MIT, RB-07).* Wer beitragen will, liest den
+  Kern. Deutsche Namen neben englischer Java- und Spring-API und Umschreibungen
+  wie `ue` erschweren das auch für Deutschsprachige.
+* *Es gibt noch kein Release.* Eine Umbenennung kostet heute Arbeit, nach dem
+  ersten Release bricht sie die API des Hosts. Jedes weitere Issue mit öffentlichen
+  Typen macht sie teurer.
+
+Der Bestand bei Erstellung dieses Entwurfs, auf `main` bei `5f3ae6b`: etwa 250
+Java-Dateien in 16 Gradle-Modulen mit teils deutschen Modulnamen (`domaene-*`,
+`adapter-persistenz-jdbc`, `architekturtests`, `host-vertragstest`), das Paket
+`dieterbaier.standardschreiben`, zehn Gherkin-Dateien mit `# language: de` und das
+npm-Paket `komponenten`. Das Datenbankschema mit Liquibase (#6) gibt es noch nicht.
+Die Zahlen liefert zum Beispiel `find src/application -name '*.java' | wc -l`.
+
+Die Fachsprache selbst ist deutsch und an deutsche Normen gebunden (DIN 5008,
+Form A und B). Für manche Begriffe gibt es kein eindeutiges englisches Wort, allen
+voran „Standardschreiben“.
+
+=== Entscheidungstreiber
+
+* **Zugänglichkeit des Vertrags:** Host-Entwickler und Beitragende ohne
+  Deutschkenntnisse verstehen SPI, Java-API und Kern.
+* **Nähe zur Fachsprache:** Das Gespräch mit Fachanwendern und die Gherkin-Szenarien
+  nutzen ihre Begriffe ohne Übersetzung.
+* **Eine Sprache im Code:** keine Mischung mit der englischen Java- und
+  Spring-API, keine Umschreibung von Umlauten.
+* **Eine Sprache im Modell:** Ein Fachbegriff hat im Code genau einen Namen. An der
+  Grenze zum Host wird nicht übersetzt.
+* **Aufwand der Umstellung:** Code, Tests, Features, Doku und Glossar.
+
+=== Betrachtete Optionen
+
+==== Option 1: Alles bleibt deutsch (Status quo, RB-12)
+
+Code, Glossar und Dokumentation bleiben deutsch. Es gibt keinen Aufwand und keine
+Übersetzung. Der öffentliche Vertrag bleibt für alle schwer lesbar, die kein Deutsch
+sprechen.
+
+==== Option 2: Code englisch, Glossar DE↔EN, Doku deutsch (vorgeschlagen)
+
+Wie oben beschrieben. Im Code steht genau eine Sprache, und das Glossar ist die
+verbindliche Brücke zur deutschen Fachsprache. Die Umstellung kostet einmal Arbeit.
+Wer mit Fachanwendern spricht, muss die Zuordnung im Glossar kennen.
+
+==== Option 3: Nur SPI und Java-API englisch, innen deutsch
+
+Der Host sieht englische Namen, der Kern bleibt deutsch. Der Adapter an der Grenze
+übersetzt zwischen beiden Sprachen. Jeder Begriff hat dann zwei Namen im Code. Das
+widerspricht der Ubiquitous Language mehr als jede einheitliche Lösung, und für
+Beitragende ändert sich nichts.
+
+==== Option 4: Alles englisch, auch die Dokumentation
+
+Wie Option 2, dazu Dokumentation, ADRs und Glossar auf Englisch. Das wäre am
+zugänglichsten, entfernt die Doku aber von den Fachanwendern und verlangt die
+Übersetzung aller 23 ADRs und der arc42-Kapitel.
+
+=== Pugh-Matrix
+
+`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
+Unterstützung. Die Matrix ist ungewichtet.
+
+[.pugh-matrix]
+[cols="2,1,1,1,1", options="header"]
+|===
+| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
+| Zugänglichkeit des Vertrags | -1 | +1 | +1 | +1
+| Nähe zur Fachsprache | +1 | 0 | 0 | -1
+| Eine Sprache im Code | -1 | +1 | -1 | +1
+| Eine Sprache im Modell | +1 | +1 | -1 | +1
+| Aufwand der Umstellung | +1 | -1 | 0 | -1
+s| Summe s| +1 s| +2 s| -1 s| +1
+|===
+
+Option 2 bekommt bei der Nähe zur Fachsprache `0`, weil Glossar, Doku und
+Gespräch deutsch bleiben, der Code aber nicht. Option 3 bekommt bei der
+Zugänglichkeit `+1`, weil Hosts nur den Vertrag sehen. Für Beitragende bliebe der
+Kern trotzdem deutsch. Beim Aufwand bekommt Option 3 `0`, weil zwar nur der
+Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
+
+=== Konsequenzen
+
+==== Positiv
+
+* SPI, Java-API und Javadoc sind ohne Deutschkenntnisse lesbar. Das hilft bei der
+  Integration (QS-007) und bei Beiträgen.
+* Im Code steht eine Sprache, ohne Umschreibung von Umlauten.
+* Geschieht die Umstellung vor dem ersten Release, bricht sie keinen Host.
+
+==== Negativ
+
+* Einmaliger Aufwand: Typen, Pakete, Module, Tests, Gherkin-Steps, Frontend,
+  Glossar, Bausteinsicht und alle ADRs, die Bezeichner im Code nennen. Die ADR-Texte
+  selbst bleiben deutsch, ihre Code-Beispiele ändern sich.
+* Bis zur Migration laufen Issues mit deutschen Namen weiter, oder sie warten.
+  Beides kostet.
+* Fachbegriffe und Bezeichner unterscheiden sich. Wer zwischen Gespräch und Code
+  wechselt, braucht das Glossar.
+* Eine schlechte Übersetzung eines Kernbegriffs prägt den Code dauerhaft. Sie ist
+  später so teuer zu ändern wie jetzt die Umstellung.
+
+==== Neutral oder Folgearbeiten
+
+* Ein Issue für die Migration, mit Reihenfolge: Glossar mit EN-Spalte, Kern,
+  SPI/API, Adapter, Starter, Frontend, Features, Doku.
+* Das Glossar bekommt eine Spalte für den englischen Begriff oder führt ihn in der
+  Spalte „Im Code“. Das entscheidet die Migration.
+* RB-12 in den Randbedingungen anpassen: „Dokumentation auf Deutsch; Bezeichner im
+  Code englisch nach ADR-024“.
+* ADR-018 und die Lösungsstrategie (Code-Stil) verweisen auf diesen ADR.
+* Die Commit-Messages sind schon englisch. Für sie ändert sich nichts.
+
+=== Impact
+
+include::generated/adr-024-sprache-der-ubiquitous-language-im-code-impact.adoc[leveloffset=+2]
+
+=== Traceability
+
+include::generated/adr-024-sprache-der-ubiquitous-language-im-code-attributes.adoc[]
+
+ifdef::derived_from_description[]
+==== Abgeleitet aus
+{derived_from_description}
+endif::[]
+
+// Generated traceability fragment. Relations are maintained only in YAML front matter.
+include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.adoc[leveloffset=+2]
+
+=== Annahmen
+
+* Bis zur Migration gibt es kein Release, und kein Host außerhalb des Projekts
+  kompiliert gegen `spi` oder `api`.
+* Die Zielgruppe der Bibliothek ist nicht auf deutschsprachige Entwicklerteams
+  beschränkt, auch wenn die Fachdomäne deutsch ist.
+
+=== Open Questions
+
+* *Gherkin-Features:* Englisch wie der Code? Oder bleiben sie deutsch
+  (`# language: de`), als Spezifikation in der Sprache der Fachanwender? Dann
+  übersetzen die Step-Definitionen über das Glossar.
+* *Dokumentation:* Bleibt sie vollständig deutsch? Oder werden README und
+  Integrationsdoku (#11) zusätzlich oder ausschließlich englisch, weil sie sich an
+  Host-Entwickler richten?
+* *Kernbegriffe:* Welche Übersetzung gilt für „Standardschreiben“ (`LetterTemplate`,
+  `StandardLetter`, `FormLetter`) und für „Fachlicher Bezug“ (`BusinessReference`,
+  `Subject`)?
+* *Name von Projekt, Paket und Artefakt:* Bleibt `standardschreiben` als
+  Eigenname im Paket `dieterbaier.standardschreiben` und im Artefakt, oder folgt er
+  der Übersetzung?
+* *Zeitpunkt:* Migration vor dem Rest von #10 (Vorschlag) oder danach?
+
+=== Review Notes
+
+* Der Owner beantwortet die Open Questions, vor allem die Übersetzung der
+  Kernbegriffe. Danach wird die Tabelle oben verbindlich und wandert ins Glossar.
+* Der Owner bestätigt die drei Relationen. RB-12 ist kein Artefakt mit ID und
+  erscheint deshalb nur im Text.
+* Mit der Annahme dieses ADR wird das Issue zur Migration angelegt, und RB-12 wird
+  angepasst.
