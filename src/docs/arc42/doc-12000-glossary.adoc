@@ -65,3 +65,21 @@ appear only in code.
 | PDF/A | PDF/A | ISO standard for PDFs suitable for long-term archiving; here part 2, level b. |
 | PDF/UA | PDF/UA | ISO standard for accessible PDFs; here PDF/UA-1. |
 |===
+
+[[document-terms]]
+== Document Terms
+
+Four general terms describe how letterwright produces a document. They place
+the terms of the table above in the host's view and do not replace them.
+
+[cols="2,5,3", options="header"]
+|===
+| Term | Meaning | In letterwright
+| document type | The business kind of document, for example order confirmation. It belongs to the host and is named in the host's language. | No term of its own; the host maps it to a document template
+| document template | Template for the content of a document with placeholders; it references a layout template. | letter template, `LetterTemplate`
+| layout template | Template for the page layout of a document. | letterhead, `Letterhead`
+| generated document | Document produced from a document template, its layout template and the business data. | letter, `Letter`
+|===
+
+The host selects the document template and supplies it directly to
+letterwright (xref:host-document-selection[system context]).

@@ -57,3 +57,13 @@ catalog controls all other versions; they are not an architecture decision.
 System boundary: the library delivers everything inside *letterwright*.
 Domain data, identities, database and operations belong to the host. The
 xref:building-block-view[building block view] shows the same boundary.
+
+[[host-document-selection]]
+=== Selecting the Document Template
+
+The host application owns the business document type (for example, order
+confirmation). It selects the document template and supplies it directly to
+letterwright. The document template references a layout template.
+Letterwright combines both with the supplied business data to produce the
+generated document. The xref:document-terms[glossary] maps these terms to
+`LetterTemplate`, `Letterhead` and `Letter`.
