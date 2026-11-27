@@ -18,8 +18,9 @@ domain term next to the binding English term in the code. Some of the English
 terms are translations that do not fit perfectly; *letter template* for
 *Standardschreiben* is the most obvious one.
 
-The architecture documentation is still German until its translation (#85) is
-done.
+The architecture documentation was written in German and translated to English
+with #85. Artifact IDs, anchors and file names kept their German-derived names
+so that links stay stable, for example `adr-021-hoechstens-ein-schreiben-je-snapshot`.
 
 ## Status
 
