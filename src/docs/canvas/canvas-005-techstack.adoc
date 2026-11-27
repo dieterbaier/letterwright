@@ -2,10 +2,10 @@
 = Techstack Canvas
 :id: CANVAS-005-techstack
 
-Entwurf, KI-gestützt erstellt, nicht reviewed.
+Draft, created with AI assistance, not reviewed.
 
-* *Backend*: Java 25 (Ziel 21), Spring Boot 4.x, Spring JDBC, Liquibase, FreeMarker, openhtmltopdf, veraPDF.
+* *Backend*: Java 25 (target 21), Spring Boot 4.x, Spring JDBC, Liquibase, FreeMarker, openhtmltopdf, veraPDF.
 * *Frontend*: React, TypeScript, Vite, UnoCSS, Paged.js, ProseMirror/TipTap.
 * *Test*: JUnit 5, Mockito, ArchUnit, Testcontainers, JaCoCo, Vitest, React Testing Library, axe-core, Playwright.
-* *Build und CI*: Gradle (Kotlin DSL), npm-Workspaces, GitHub Actions, GitHub Packages.
-* *Doku*: AsciiDoc, PlantUML, architecture-knowledge-toolkit.
+* *Build and CI*: Gradle (Kotlin DSL), npm workspaces, GitHub Actions, GitHub Packages.
+* *Documentation*: AsciiDoc, PlantUML, architecture-knowledge-toolkit.

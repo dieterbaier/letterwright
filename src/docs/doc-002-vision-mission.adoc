@@ -1,15 +1,14 @@
 [[vision-mission]]
-= Vision und Mission
+= Vision and Mission
 :id: DOC-002-vision-mission
 
 == Vision
 
-Jede Anwendung kann normgerechte, barrierefreie und archivierbare Schreiben
-erzeugen, deren Gestaltung Fachanwender selbst bestimmen.
+Every application can create standard-conformant, accessible and archivable
+letters whose design business users decide themselves.
 
 == Mission
 
-Standardschreiben liefert eine einbettbare Bibliothek, die Briefpapier und
-Standardschreiben als pflegbare Vorlagen verwaltet, mit Domänendaten des Hosts
-befüllt, eine barrierefreie Vorschau zeigt und unveränderliche PDF/A-Dokumente
-speichert.
+letterwright provides an embeddable library. It manages letterheads and
+letter templates as maintainable templates, fills them with the host's domain
+data, shows an accessible preview and saves immutable PDF/A documents.

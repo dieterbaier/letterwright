@@ -2,11 +2,11 @@
 = Business Model Canvas
 :id: CANVAS-001-business-model
 
-Entwurf, KI-gestützt erstellt, nicht reviewed.
+Draft, created with AI assistance, not reviewed.
 
-* *Kundensegmente*: Teams, die Spring-Boot-/React-Fachanwendungen bauen und Schreiben erzeugen müssen.
-* *Nutzenversprechen*: Normgerechte, barrierefreie, archivierbare Schreiben ohne Eigenentwicklung.
-* *Kanäle*: GitHub, GitHub Packages.
-* *Schlüsselaktivitäten*: Bibliothek, Editor, Rendering, Doku.
-* *Kostenstruktur*: Entwicklungszeit; keine Lizenzkosten (nur Open Source).
-* *Einnahmen*: keine; Open Source (MIT).
+* *Customer segments*: teams that build Spring Boot/React business applications and need to create letters.
+* *Value proposition*: standard-conformant, accessible, archivable letters without in-house development.
+* *Channels*: GitHub, GitHub Packages.
+* *Key activities*: library, editor, rendering, documentation.
+* *Cost structure*: development time; no license costs (open source only).
+* *Revenue*: none; open source (MIT).
