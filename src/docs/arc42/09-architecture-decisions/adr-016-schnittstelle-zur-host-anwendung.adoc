@@ -1,258 +1,257 @@
 ---
 id: ADR-016-schnittstelle-zur-host-anwendung
 type: ADR
-title: 'Schnitt und Datentypen der Schnittstelle zur Host-Anwendung'
+title: 'Cut and data types of the interface to the host application'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-17'
 reviewed: true
-summary: 'Die Host-Anwendung kompiliert nur gegen ein eigenes Modul spi mit eigenen Datentypen; ein ausgehender Adapter adapter-host bildet zwischen SPI-Typen und Domänenmodell ab, und der Starter exportiert nur spi.'
+summary: 'The host application compiles only against a separate module spi with its own data types; an outbound adapter adapter-host maps between SPI types and the domain model, and the starter exports only spi.'
 derived_from:
 - type: conversation
-  description: 'Vorschlag des Owners am 2026-11-17 vor Beginn von Issue #19: eigenes SPI-Modul, abgeschirmt von den Use-Case-Schnittstellen, ohne Abhängigkeit zum Domänenmodell, mit eigenen Datentypen und Mapping'
+  description: 'Proposal of the owner on 2026-11-17 before the start of issue #19: separate SPI module, shielded from the use case interfaces, without a dependency on the domain model, with its own data types and mapping'
 - type: external
-  description: 'Issue #27: Eigenes SPI-Modul mit eigenen Datentypen für die Host-Anwendung'
+  description: 'Issue #27: Separate SPI module with its own data types for the host application'
   uri: https://github.com/dieterbaier/standardschreiben/issues/27
 tags:
 - decision
-- architektur
+- architecture
 - hexagonal
 - integration
 relations:
 - type: refines
   target: ADR-002-hexagonale-architektur-und-ports
   status: accepted
-  rationale: 'ADR-002 legt fest, welche Ports der Host implementiert; dieser ADR legt fest, in welchem Modul sie liegen und mit welchen Datentypen sie arbeiten.'
+  rationale: 'ADR-002 defines which ports the host implements; this ADR defines in which module they lie and with which data types they work.'
   reviewed: true
 - type: refines
   target: ADR-015-durchsetzung-der-modulgrenzen-im-backend
   status: accepted
-  rationale: 'ADR-015 begründet die Modulgrenzen und nennt als Treiber eine schmale Host-Abhängigkeit aus Ports und Domänenmodell; dieser ADR verengt sie auf das Modul spi.'
+  rationale: 'ADR-015 justifies the module boundaries and names as a driver a narrow host dependency consisting of ports and domain model; this ADR narrows it to the module spi.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Der Host implementiert dieselben drei Schnittstellen wie bisher, kompiliert aber nur gegen spi; Änderungen am Domänenmodell brechen seine Implementierungen nicht.'
+  rationale: 'The host implements the same three interfaces as before, but compiles only against spi; changes to the domain model do not break its implementations.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-016-schnittstelle-zur-host-anwendung]]
-== ADR-016: Schnitt und Datentypen der Schnittstelle zur Host-Anwendung
+== ADR-016: Cut and data types of the interface to the host application
 
 === Status
 
-Angenommen (accepted) am 2026-11-17.
+Accepted on 2026-11-17.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #28
-geprüft und angenommen.
+This ADR was created with AI assistance. The owner reviewed and accepted it in
+the review of PR #28.
 
-=== Entscheidung
+=== Decision
 
-Die Schnittstelle zur Host-Anwendung ist ein eigenes Modul `spi` mit eigenen
-Datentypen (Option 3):
+The interface to the host application is a separate module `spi` with its own
+data types (option 3):
 
-* **`spi`** (Verzeichnis `src/application/backend/spi`) enthält die Schnittstellen,
-  die der Host implementiert: `PlaceholderDataProvider`, `AuthorizationCheck`
-  und `DeletionPolicy` (ADR-002). Dazu kommen eigene Datentypen für alles, was
-  über diese Schnittstellen fließt, etwa den fachlichen Bezug, den Datenkontext
-  und die Anfrage an die Berechtigungsprüfung. Das Modul ist reines Java ohne
-  Spring und hängt an keinem anderen Modul der Bibliothek.
-* **`usecases-out`** enthält nur noch interne Ports: Repositories,
-  `DocumentStore`, `Renderer`, `ConformanceChecker` und die Ports, über die
-  der Kern Platzhalterdaten, Berechtigung und Löschrichtlinie in Domänenbegriffen
-  anfragt. Kein Host implementiert `usecases-out`.
-* **`adapter-host`** (Verzeichnis `adapter/out/adapter-host`) ist ein ausgehender
-  Adapter. Er implementiert diese internen Ports, ruft die SPI-Implementierungen
-  des Hosts auf und bildet zwischen SPI-Typen und Domänenmodell ab. Neben dem
-  Starter ist er das einzige Modul, das `spi` kennt.
-* **`spring-boot-starter`** exportiert nur `spi` per `api`. Alle anderen Module
-  bindet er als `implementation` ein. Ein Host, der den Starter einbindet, sieht
-  beim Kompilieren von der Bibliothek nur `spi`; Ports, Anwendungsfälle,
-  Domänenmodell, Domänenservices und Adapter bekommt er nur zur Laufzeit.
-  Nachtrag 2026-11-23: Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] exportiert der Starter
-  zusätzlich das Modul `api` der Java-API.
-* Die Default-Implementierung von `AuthorizationCheck` auf Spring Security
-  implementiert die SPI-Schnittstelle wie jede Host-Implementierung. Sie liegt im
-  Starter und tritt zurück, sobald der Host eine eigene Bean bereitstellt.
-* Eine eingehende Java-API für den Host gibt es nicht. Der Host nutzt die
-  Bibliothek über die React-Komponenten und die REST-Endpunkte von
-  `adapter-web` und stellt ihr Daten über `spi` bereit.
-  Nachtrag 2026-11-23: überholt durch xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]. Für das Speichern in
-  seiner eigenen Transaktion bekommt der Host eine Java-API nach dem Muster
-  dieses ADR, ein eigenes Modul `api` mit eigenen Typen und einem eingehenden
-  Adapter. `spi` bekommt dazu die optionale Schnittstelle
+* **`spi`** (directory `src/application/backend/spi`) contains the interfaces
+  that the host implements: `PlaceholderDataProvider`, `AuthorizationCheck`
+  and `DeletionPolicy` (ADR-002). In addition there are separate data types for
+  everything that flows through these interfaces, for example the business
+  reference, the data context and the request to the authorization check. The
+  module is plain Java without Spring and depends on no other module of the
+  library.
+* **`usecases-out`** now contains only internal ports: repositories,
+  `DocumentStore`, `Renderer`, `ConformanceChecker` and the ports through which
+  the core requests placeholder data, permission and deletion policy in domain
+  terms. No host implements `usecases-out`.
+* **`adapter-host`** (directory `adapter/out/adapter-host`) is an outbound
+  adapter. It implements these internal ports, calls the host's SPI
+  implementations and maps between SPI types and the domain model. Apart from
+  the starter it is the only module that knows `spi`.
+* **`spring-boot-starter`** exports only `spi` via `api`. It includes all other
+  modules as `implementation`. A host that includes the starter sees only `spi`
+  of the library at compile time; it gets ports, use cases, domain model,
+  domain services and adapters only at runtime.
+  Addendum 2026-11-23: With xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] the starter
+  additionally exports the module `api` of the Java API.
+* The default implementation of `AuthorizationCheck` on Spring Security
+  implements the SPI interface like any host implementation. It lies in the
+  starter and steps back as soon as the host provides its own bean.
+* There is no inbound Java API for the host. The host uses the library through
+  the React components and the REST endpoints of `adapter-web` and provides
+  data to it through `spi`.
+  Addendum 2026-11-23: superseded by xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]. For saving in
+  its own transaction the host gets a Java API following the pattern of
+  this ADR: a separate module `api` with its own types and an inbound
+  adapter. For this, `spi` gets the optional interface
   `spi.LetterSaveCallback`.
 
-Der Schnitt:
+The cut:
 
 [cols="1,2,2", options="header"]
 |===
-| Modul | Verzeichnis | Hängt an
-| `spi` | `spi` | nichts
+| Module | Directory | Depends on
+| `spi` | `spi` | nothing
 | `usecases-out` | `usecases/out` | `domain-model` (`api`)
-| `adapter-host` | `adapter/out/adapter-host` | `usecases-out` und `spi` (`implementation`)
-| `spring-boot-starter` | `spring-boot-starter` | `spi` (`api`), alle übrigen Module (`implementation`)
+| `adapter-host` | `adapter/out/adapter-host` | `usecases-out` and `spi` (`implementation`)
+| `spring-boot-starter` | `spring-boot-starter` | `spi` (`api`), all other modules (`implementation`)
 |===
 
-Nachtrag 2026-11-23: Die Tabelle zeigt den ursprünglichen Schnitt. Mit
-xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommen die
-geplanten Module `api` und `adapter-api` hinzu. `api` hängt wie `spi` an
-nichts. Der Starter exportiert dann `spi` und `api` per `api` und hält
-`adapter-api` wie alle übrigen Module per `implementation` intern.
+Addendum 2026-11-23: The table shows the original cut. With
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] the planned
+modules `api` and `adapter-api` are added. Like `spi`, `api` depends on
+nothing. The starter then exports `spi` and `api` via `api` and keeps
+`adapter-api`, like all other modules, internal via `implementation`.
 
-Nachtrag 2026-11-24: Beide Module sind mit #78 angelegt und nicht mehr geplant.
-Der Starter exportiert `spi` und `api` per `api`, `adapter-api` bindet er per
-`implementation` ein. `adapter-api` hängt an `api`, `usecases-in` und Spring
-Transaction (`implementation`).
+Addendum 2026-11-24: Both modules were created with #78 and are no longer
+planned. The starter exports `spi` and `api` via `api`; it includes
+`adapter-api` via `implementation`. `adapter-api` depends on `api`,
+`usecases-in` and Spring Transaction (`implementation`).
 
-ArchUnit prüft zusätzlich, jede Regel mit Fixture:
+ArchUnit checks in addition, each rule with a fixture:
 
-* `spi` hängt von keinem anderen Paket der Bibliothek ab.
-* Domäne, Ports und Anwendungsfälle kennen `spi` nicht.
-* Nur `adapter-host` und der Starter benutzen `spi`.
+* `spi` depends on no other package of the library.
+* Domain, ports and use cases do not know `spi`.
+* Only `adapter-host` and the starter use `spi`.
 
-Nachtrag 2026-11-24: Für die Java-API aus
-xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] gelten die
-entsprechenden Regeln, ebenfalls mit Fixture: `api` hängt von keinem anderen
-Paket der Bibliothek ab, auch nicht von `spi`, und nur `adapter-api` und der
-Starter benutzen `api`. `host-contract-test` prüft, dass ein Host beim
-Kompilieren `spi` und `api` sieht und sonst nichts.
+Addendum 2026-11-24: For the Java API from
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] the
+corresponding rules apply, also with a fixture: `api` depends on no other
+package of the library, not even on `spi`, and only `adapter-api` and the
+starter use `api`. `host-contract-test` checks that a host sees `spi` and `api`
+at compile time and nothing else.
 
-=== Kontext
+=== Context
 
-ADR-002 nennt `usecases-out` das SPI. Darin liegen heute zwei Arten von Ports
-nebeneinander: die drei Ports, die der Host implementiert, und die Ports, die
-die ausgehenden Adapter der Bibliothek implementieren. `usecases-out`
-exportiert das Domänenmodell per `api`
-(`src/application/backend/usecases/out/build.gradle.kts`). Ein Host, der einen
-Port implementiert, arbeitet deshalb mit den Typen des Domänenmodells und sieht
-zugleich alle internen Ports.
+ADR-002 calls `usecases-out` the SPI. Today it holds two kinds of ports side by
+side: the three ports that the host implements, and the ports that the
+library's outbound adapters implement. `usecases-out` exports the domain model
+via `api` (`src/application/backend/usecases/out/build.gradle.kts`). A host
+that implements a port therefore works with the types of the domain model and
+at the same time sees all internal ports.
 
-Der Starter exportiert `usecases-in` und `usecases-out` per `api`
-(`src/application/backend/spring-boot-starter/build.gradle.kts`). Ein Host, der
-den Starter einbindet, sieht beim Kompilieren also alle Anwendungsfälle, alle
-Ports und das Domänenmodell. Die schmale Host-Abhängigkeit aus
-xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015] gilt nur für ein
-Host-Modul, das direkt an `usecases-out` hängt, und auch dort mit dem
-Domänenmodell.
+The starter exports `usecases-in` and `usecases-out` via `api`
+(`src/application/backend/spring-boot-starter/build.gradle.kts`). A host that
+includes the starter thus sees all use cases, all ports and the domain model at
+compile time. The narrow host dependency from
+xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015] applies only to
+a host module that depends directly on `usecases-out`, and even there it
+includes the domain model.
 
-Damit ist das Domänenmodell Teil der öffentlichen API. Jede Umbenennung oder
-Umstrukturierung im Modell bricht Host-Implementierungen, und das Modell lässt
-sich nicht mehr frei weiterentwickeln. ADR-002 nennt die SPIs bereits öffentliche
-API, die Versionierung braucht.
+This makes the domain model part of the public API. Every renaming or
+restructuring in the model breaks host implementations, and the model can no
+longer evolve freely. ADR-002 already calls the SPIs public API that needs
+versioning.
 
-Der Owner hat am 2026-11-17 ein eigenes SPI-Modul vorgeschlagen, abgeschirmt von
-den Use-Case-Schnittstellen, ohne Abhängigkeit zum Domänenmodell, mit eigenen
-Datentypen und einem Mapping vom und zum Domänenmodell. Eine eingehende
-Java-API braucht der Host nach seiner Einschätzung nicht.
+On 2026-11-17 the owner proposed a separate SPI module, shielded from the use
+case interfaces, without a dependency on the domain model, with its own data
+types and a mapping from and to the domain model. In his assessment the host
+does not need an inbound Java API.
 
-Noch gibt es keinen Fachcode in den Ports (Epic #5 steht aus). Der Schnitt lässt
-sich deshalb jetzt ohne Umbau bestehender Implementierungen ändern.
+There is no domain code in the ports yet (epic #5 is pending). The cut can
+therefore be changed now without reworking existing implementations.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* **Stabile Host-API:** Änderungen am Domänenmodell brechen keine
-  Host-Implementierung.
-* **Schmale Abhängigkeit des Hosts:** Der Host sieht beim Kompilieren nur das,
-  was er implementieren oder übergeben muss.
-* **Interne Ports frei änderbar:** Ports, die nur Adapter der Bibliothek
-  implementieren, sind kein Vertrag mit dem Host.
-* **Geringer Aufwand:** Wenige Module, wenig doppelte Typen und Mapping-Code.
-* **Integrationsaufwand des Hosts:** Die Zahl der zu implementierenden
-  Schnittstellen und der Konfiguration bleibt bei QS-007.
+* **Stable host API:** Changes to the domain model break no host
+  implementation.
+* **Narrow dependency of the host:** At compile time the host sees only what
+  it must implement or pass.
+* **Internal ports freely changeable:** Ports that only adapters of the library
+  implement are not a contract with the host.
+* **Low effort:** Few modules, few duplicated types and little mapping code.
+* **Integration effort of the host:** The number of interfaces to implement and
+  the configuration stay within QS-007.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Host-Ports bleiben in `usecases-out`
+==== Option 1: Host ports stay in `usecases-out`
 
-Der heutige Schnitt. Kein zusätzliches Modul, kein Mapping. Der Host arbeitet
-mit dem Domänenmodell und sieht alle internen Ports. Über den Starter sieht er
-zusätzlich alle Anwendungsfälle. Jede Änderung an Modell oder internen Ports ist
-für den Host potenziell inkompatibel.
+The current cut. No additional module, no mapping. The host works with the
+domain model and sees all internal ports. Via the starter it additionally sees
+all use cases. Every change to the model or the internal ports is potentially
+incompatible for the host.
 
-==== Option 2: Eigenes Modul `spi` mit den Typen des Domänenmodells
+==== Option 2: Separate module `spi` with the types of the domain model
 
-Die drei Host-Ports ziehen in ein eigenes Modul, das per `api` am
-Domänenmodell hängt. Der Kern ruft sie direkt auf, ein Mapping entfällt. Die
-internen Ports und die Anwendungsfälle sind für den Host unsichtbar, das
-Domänenmodell bleibt aber Teil der öffentlichen API. Der Kern hängt zudem an
-einem Modul, dessen Änderungen der Host mittragen muss.
+The three host ports move into a separate module that depends on the domain
+model via `api`. The core calls them directly; no mapping is needed. The
+internal ports and the use cases are invisible to the host, but the domain
+model remains part of the public API. In addition, the core depends on a
+module whose changes the host must go along with.
 
-==== Option 3: Eigenes Modul `spi` mit eigenen Datentypen (gewählt)
+==== Option 3: Separate module `spi` with its own data types (chosen)
 
-Wie Option 2, aber `spi` hängt an nichts. Die Datentypen der Schnittstelle sind
-eigene, unveränderliche Typen (Records). Ein ausgehender Adapter `adapter-host`
-bildet ab, so wie jeder andere ausgehende Adapter zwischen seiner Technik und
-den Ports übersetzt. Der Kern kennt `spi` nicht.
+Like option 2, but `spi` depends on nothing. The data types of the interface
+are separate, immutable types (records). An outbound adapter `adapter-host`
+maps, just as every other outbound adapter translates between its technology
+and the ports. The core does not know `spi`.
 
-Kosten: ein Modul mehr für `spi` und eines für `adapter-host`, doppelte Typen
-für die Daten, die über die Schnittstelle fließen, und Mapping-Code mit Tests.
-Hombergs nennt genau diese Kosten: Je feiner der Schnitt, desto mehr Mapping
-zwischen den Modulen (siehe xref:adr-015-literatur[Literatur in ADR-015]).
+Costs: one more module for `spi` and one for `adapter-host`, duplicated types
+for the data that flows through the interface, and mapping code with tests.
+Hombergs names exactly these costs: the finer the cut, the more mapping
+between the modules (see xref:adr-015-literatur[literature in ADR-015]).
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
-Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral, `-1` weaker support and `?` a rating
+that needs human review or a prototype. If a column contains a `?`, its sum is
+also `?`. The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Stabile Host-API | -1 | -1 | +1
-| Schmale Abhängigkeit des Hosts | -1 | 0 | +1
-| Interne Ports frei änderbar | -1 | +1 | +1
-| Geringer Aufwand | +1 | 0 | -1
-| Integrationsaufwand des Hosts | 0 | 0 | 0
-s| Summe s| -2 s| 0 s| +2
+| Criterion | Option 1 | Option 2 | Option 3
+| Stable host API | -1 | -1 | +1
+| Narrow dependency of the host | -1 | 0 | +1
+| Internal ports freely changeable | -1 | +1 | +1
+| Low effort | +1 | 0 | -1
+| Integration effort of the host | 0 | 0 | 0
+s| Sum s| -2 s| 0 s| +2
 |===
 
-Option 2 bekommt bei der schmalen Abhängigkeit `0`, weil der Host zwar die Ports
-und Anwendungsfälle nicht mehr sieht, das Domänenmodell aber weiterhin. Beim
-Integrationsaufwand unterscheiden sich die Optionen nicht: Der Host implementiert
-in allen dreien dieselben drei Schnittstellen.
+Option 2 gets `0` for the narrow dependency, because the host no longer sees
+the ports and use cases, but still sees the domain model. The options do not
+differ in integration effort: in all three the host implements the same three
+interfaces.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Das Domänenmodell ist keine öffentliche API mehr und kann sich ändern, ohne
-  Host-Implementierungen zu brechen.
-* Ein Host sieht beim Kompilieren von der Bibliothek nur `spi`, auch wenn er den
-  Starter einbindet. Ruft er versehentlich einen Anwendungsfall oder ein
-  Repository auf, kompiliert sein Code nicht.
-* Die öffentliche API ist an einem Modul ablesbar. Was nicht in `spi` liegt,
-  gehört nicht zum Vertrag mit dem Host.
-* Nachtrag 2026-11-24: Seit
-  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] und #78 sieht
-  der Host beim Kompilieren `spi` und `api`. Beide hängen an keinem anderen
-  Modul der Bibliothek; was in keinem der beiden liegt, gehört nicht zum Vertrag
-  mit dem Host. Die zwei Punkte oben gelten entsprechend.
-* Der Kern kennt keine Host-Typen. Das Mapping liegt an einer Stelle, in einem
-  Adapter, der wie jeder andere austauschbar und testbar ist.
+* The domain model is no longer public API and can change without breaking
+  host implementations.
+* At compile time a host sees only `spi` of the library, even if it includes
+  the starter. If it calls a use case or a repository by mistake, its code does
+  not compile.
+* The public API can be read off one module. What is not in `spi` is not
+  part of the contract with the host.
+* Addendum 2026-11-24: Since
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] and #78 the
+  host sees `spi` and `api` at compile time. Neither depends on any other
+  module of the library; what is in neither of them is not part of the contract
+  with the host. The two points above apply accordingly.
+* The core knows no host types. The mapping lies in one place, in an adapter
+  that, like any other, is replaceable and testable.
 
-==== Negativ
+==== Negative
 
-* Doppelte Typen und Mapping-Code zwischen `spi` und Domänenmodell, mit eigenen
-  Tests. Jedes neue Datum, das der Host liefert, ändert beide Seiten und das
-  Mapping.
-* Zwei Module mehr im Build.
-* Fehler im Mapping fallen nicht beim Kompilieren auf, sondern erst in den
-  Tests von `adapter-host`.
+* Duplicated types and mapping code between `spi` and the domain model, with
+  their own tests. Every new piece of data that the host delivers changes both
+  sides and the mapping.
+* Two more modules in the build.
+* Errors in the mapping do not show up at compile time, but only in the
+  tests of `adapter-host`.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Issue #27 hat den Schnitt umgesetzt, vor #19. Die Regel zur Isolation der
-  Adapter aus #19 deckt `adapter-host` ab.
-* ADR-002 und ADR-009 beschreiben, wo die Host-Ports liegen. Beide sind mit
-  PR #28 angeglichen und angenommen, die Bausteinsicht ebenfalls angeglichen.
-* Die Aussagen von ADR-015 zur schmalen Host-Abhängigkeit („Ports und transitiv das
-  Domänenmodell“) verfeinert dieser ADR. Mit #19 sind die Verweise in ADR-015
-  auf `spi` als Host-Abhängigkeit umgestellt.
-* Die Beispielanwendung (Epic #11) belegt den Vertrag mit einer Implementierung
-  gegen `spi`.
+* Issue #27 implemented the cut, before #19. The rule on the isolation of the
+  adapters from #19 covers `adapter-host`.
+* ADR-002 and ADR-009 describe where the host ports lie. Both were aligned and
+  accepted with PR #28; the building block view was aligned as well.
+* This ADR refines the statements of ADR-015 on the narrow host dependency
+  (“ports and, transitively, the domain model”). With #19 the references in
+  ADR-015 have been switched to `spi` as the host dependency.
+* The example application (epic #11) demonstrates the contract with an
+  implementation against `spi`.
 
 === Impact
 
@@ -263,44 +262,45 @@ include::generated/adr-016-schnittstelle-zur-host-anwendung-impact.adoc[leveloff
 include::generated/adr-016-schnittstelle-zur-host-anwendung-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-016-schnittstelle-zur-host-anwendung-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Der Host braucht keine eingehende Java-API. Er bedient die Bibliothek über die
-  React-Komponenten und REST (Einschätzung des Owners am 2026-11-17).
-  Nachtrag 2026-11-23: Die Annahme gilt nicht mehr, siehe
+* The host does not need an inbound Java API. It operates the library through
+  the React components and REST (assessment of the owner on 2026-11-17).
+  Addendum 2026-11-23: The assumption no longer holds, see
   xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
-* Den fachlichen Schlüssel und den Dateinamen aus Q-ARCH-004 übergibt der Host
-  über die Frontend-Komponenten und damit über REST, nicht über Java. Braucht er
-  dafür doch einen Java-Aufruf, kommt eine eingehende API nach demselben Muster
-  hinzu: ein eigenes Modul mit eigenen Typen und ein eingehender Adapter.
-  Nachtrag 2026-11-23: Den Dateinamen hat der Owner zurückgestellt
-  (Q-ARCH-004). Die Java-API kommt für das Speichern in einer Transaktion des
-  Hosts hinzu (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
-* Die Typen, die über die Schnittstelle fließen, sind wenige und flach
-  (Bezug als Typ und ID, Datenkontext als Werte, Ja/Nein-Entscheidungen). Das
-  Mapping bleibt dadurch klein.
+* The host passes the domain key and the file name from Q-ARCH-004 through
+  the frontend components and thus through REST, not through Java. If it does
+  need a Java call for this after all, an inbound API following the same
+  pattern is added: a separate module with its own types and an inbound adapter.
+  Addendum 2026-11-23: The owner has deferred the file name
+  (Q-ARCH-004). The Java API is added for saving in a transaction of the
+  host (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
+* The types that flow through the interface are few and flat
+  (reference as type and ID, data context as values, yes/no decisions). This
+  keeps the mapping small.
 
 === Open Questions
 
-* Keine. Beide Fragen hat der Owner im Review von PR #28 beantwortet:
-** *Versionierung von `spi`:* Wir starten mit einer Version für das gesamte
-   Paket. Eine getrennte Versionierung von `spi` ist vorerst nicht nötig.
-** *Ort der Default-`AuthorizationCheck`:* Vorerst reicht der Starter, ein
-   eigenes Modul ist nicht nötig.
+* None. The owner answered both questions in the review of PR #28:
+** *Versioning of `spi`:* We start with one version for the whole
+   package. Separate versioning of `spi` is not needed for now.
+** *Location of the default `AuthorizationCheck`:* The starter is enough for
+   now; a separate module is not needed.
 
 === Review Notes
 
-* Der Owner hat den ADR im Review von PR #28 am 2026-11-17 angenommen, die drei
-  Relationen zu ADR-002, ADR-015 und QS-007 ebenso.
-* Die Annahme, dass der Host keine eingehende Java-API braucht, bleibt eine
-  Annahme. Zeigt Q-ARCH-004 das Gegenteil, kommt eine eingehende API nach dem
-  Muster dieses ADR hinzu. Nachtrag 2026-11-23: eingetreten, siehe
+* The owner accepted the ADR in the review of PR #28 on 2026-11-17, and the
+  three relations to ADR-002, ADR-015 and QS-007 as well.
+* The assumption that the host does not need an inbound Java API remains an
+  assumption. If Q-ARCH-004 shows the opposite, an inbound API following the
+  pattern of this ADR is added. Addendum 2026-11-23: this has happened, see
   xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023].
-* ADR-015 bleibt unverändert; die Verfeinerung steht als Relation in diesem ADR.
+* ADR-015 remains unchanged; the refinement is recorded as a relation in this
+  ADR.

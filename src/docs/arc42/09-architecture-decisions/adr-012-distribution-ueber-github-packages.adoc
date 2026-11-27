@@ -1,15 +1,15 @@
 ---
 id: ADR-012-distribution-ueber-github-packages
 type: ADR
-title: 'Distribution über GitHub Packages'
+title: 'Distribution through GitHub Packages'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Maven-Artefakte und das npm-Paket werden über GitHub Packages veröffentlicht; ein späterer Wechsel zu Maven Central und npmjs bleibt möglich.'
+summary: 'Maven artifacts and the npm package are published through GitHub Packages; a later switch to Maven Central and npmjs remains possible.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
@@ -19,90 +19,90 @@ relations:
 - type: depends_on
   target: ADR-001-einbettbare-bibliothek
   status: proposed
-  rationale: 'Eine Bibliothek muss als Artefakt verteilt werden.'
+  rationale: 'A library must be distributed as an artifact.'
   reviewed: false
 - type: introduces_risk
   target: R-008-zugangshuerde-bei-github-packages
   status: proposed
-  rationale: 'GitHub Packages verlangt auch für öffentliche Pakete ein Token.'
+  rationale: 'GitHub Packages requires a token even for public packages.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-012-distribution-ueber-github-packages]]
-== ADR-012: Distribution über GitHub Packages
+== ADR-012: Distribution through GitHub Packages
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor, Releases über **GitHub Packages** zu veröffentlichen (Maven-Registry
-und npm-Registry), ausgelöst durch Git-Tags in GitHub Actions. Lizenz bleibt **MIT**.
+We propose to publish releases through **GitHub Packages** (Maven registry
+and npm registry), triggered by Git tags in GitHub Actions. The license stays **MIT**.
 
-Antwort auf die Frage des Owners: Die Wahl ist **nicht kriegsentscheidend**. Sie
-betrifft weder Architektur noch Code, nur Build-Konfiguration und die Dokumentation
-für Konsumenten, und kann jederzeit geändert werden.
+Answer to the owner's question: the choice is **not make-or-break**. It
+affects neither architecture nor code, only the build configuration and the documentation
+for consumers, and can be changed at any time.
 
-=== Kontext
+=== Context
 
-Der Owner wünscht GitHub Packages, kann Vor- und Nachteile aber nicht einschätzen.
+The owner wants GitHub Packages, but cannot judge the advantages and disadvantages.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Geringer Einrichtungsaufwand.
-* Einfacher Zugang für Konsumenten.
-* Später änderbar.
+* Low setup effort.
+* Easy access for consumers.
+* Changeable later.
 
-=== Betrachtete Optionen
+=== Considered Options
 
 ==== Option 1: GitHub Packages
 
-Vorteile: integriert in das Repository und GitHub Actions, keine zusätzliche Registrierung.
-Nachteil: Konsumenten brauchen auch für öffentliche Pakete ein GitHub-Token mit
-`read:packages` in ihrer Maven- bzw. npm-Konfiguration.
+Advantages: integrated into the repository and GitHub Actions, no additional registration.
+Disadvantage: consumers need a GitHub token with `read:packages` in their Maven or
+npm configuration, even for public packages.
 
-==== Option 2: Maven Central und npmjs.org
+==== Option 2: Maven Central and npmjs.org
 
-Vorteile: ohne Token nutzbar, Standard für Open Source. Nachteile: Namespace-
-Verifizierung, Signierung (GPG) und Registrierung erforderlich, mehr Einrichtungsaufwand.
+Advantages: usable without a token, the standard for open source. Disadvantages: namespace
+verification, signing (GPG) and registration required, more setup effort.
 
-==== Option 3: Kein Publishing, Einbindung als Git-Submodule oder Quellcode
+==== Option 3: No publishing, inclusion as a Git submodule or source code
 
-Kein Registry-Aufwand. Für Konsumenten unüblich und schwer versionierbar.
+No registry effort. Unusual for consumers and hard to version.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Geringer Einrichtungsaufwand | +1 | -1 | +1
-| Einfacher Zugang für Konsumenten | -1 | +1 | -1
-| Später änderbar | +1 | +1 | 0
-s| Summe s| +1 s| +1 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Low setup effort | +1 | -1 | +1
+| Easy access for consumers | -1 | +1 | -1
+| Changeable later | +1 | +1 | 0
+s| Sum s| +1 s| +1 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Release-Pipeline mit wenig Aufwand aufsetzbar.
+* A release pipeline can be set up with little effort.
 
-==== Negativ
+==== Negative
 
-* Konsumenten müssen ein Token konfigurieren (R-008).
+* Consumers have to configure a token (R-008).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Bei externer Nutzung Maven Central und npmjs.org erneut bewerten.
+* With external use, assess Maven Central and npmjs.org again.
 
 === Impact
 
@@ -113,21 +113,21 @@ include::generated/adr-012-distribution-ueber-github-packages-impact.adoc[levelo
 include::generated/adr-012-distribution-ueber-github-packages-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-012-distribution-ueber-github-packages-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Die ersten Konsumenten haben ohnehin GitHub-Zugang.
+* The first consumers have GitHub access anyway.
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Niedrige Dringlichkeit; kann mit dem ersten Release-Epic akzeptiert werden.
+Low urgency; can be accepted with the first release epic.

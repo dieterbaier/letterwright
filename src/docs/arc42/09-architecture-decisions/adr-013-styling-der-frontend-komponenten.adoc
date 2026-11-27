@@ -1,15 +1,15 @@
 ---
 id: ADR-013-styling-der-frontend-komponenten
 type: ADR
-title: 'Styling der Frontend-Komponenten: eigene Styles, vom Host überschreibbar'
+title: 'Styling of the frontend components: own styles, overridable by the host'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-15'
 reviewed: false
-summary: 'Die React-Komponenten bringen eigene Standard-Styles in einer CSS-Ebene mit, beziehen Farben, Schriften und Abstände aus CSS Custom Properties und lassen sich vom Host ohne !important überschreiben; das Schreiben in der Vorschau bleibt davon ausgenommen.'
+summary: 'The React components bring their own default styles in a CSS layer, take colours, fonts and spacing from CSS custom properties and can be overridden by the host without !important; the letter in the preview is excluded from this.'
 derived_from:
 - type: external
-  description: 'Q-ARCH-003 in doc-005, Antworten des Owners in PR #16 (2026-11-15)'
+  description: 'Q-ARCH-003 in doc-005, the owner''s answers in PR #16 (2026-11-15)'
   uri: https://github.com/dieterbaier/standardschreiben/pull/16
 tags:
 - decision
@@ -19,128 +19,128 @@ relations:
 - type: depends_on
   target: ADR-001-einbettbare-bibliothek
   status: proposed
-  rationale: 'Das Styling ist Teil des Integrationsvertrags des eingebetteten npm-Pakets.'
+  rationale: 'The styling is part of the integration contract of the embedded npm package.'
   reviewed: false
 - type: addresses
   target: QS-003-barrierefreie-vorschau
   status: proposed
-  rationale: 'Die Standard-Styles der Bibliothek erfüllen die Barrierefreiheit auch ohne Anpassung durch den Host.'
+  rationale: 'The default styles of the library meet accessibility even without customization by the host.'
   reviewed: false
 - type: relates_to
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: proposed
-  rationale: 'Das Schreiben in der Vorschau ist vom Host-Styling ausgenommen, damit es der DOCX-Vorgabe folgt.'
+  rationale: 'The letter in the preview is excluded from host styling so that it follows the DOCX specification.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-013-styling-der-frontend-komponenten]]
-== ADR-013: Styling der Frontend-Komponenten: eigene Styles, vom Host überschreibbar
+== ADR-013: Styling of the frontend components: own styles, overridable by the host
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor:
+We propose:
 
-* Die React-Komponenten bringen **eigene Standard-Styles** mit, erzeugt mit
-  UnoCSS. Die Klassen tragen ein **eigenes Präfix**, und es gibt **kein globales
-  Reset**. Das CSS des Pakets verändert nichts außerhalb seiner Komponenten.
-* Die Styles liegen in einer **eigenen CSS-Ebene** (`@layer`). Styles des Hosts,
-  die außerhalb dieser Ebene stehen, haben dadurch Vorrang. Der Host kann
-  überschreiben, ohne `!important` zu verwenden.
-* Öffentlicher Vertrag seit dem Frontend-Gerüst (#13): das Klassenpräfix `lw-`,
-  passend zum Tabellenpräfix `lw_`
-  (xref:adr-006-datenbankagnostische-persistenz[ADR-006]), und die
-  CSS-Ebene `letterwright`. Eine Änderung daran bricht Hosts, die Klassen
-  oder die Ebene in ihrem CSS ansprechen.
-* Farben, Schriften und Abstände kommen aus **CSS Custom Properties** mit eigenem
-  Präfix. Der Host setzt sie, sonst gelten Standardwerte. Das gilt für die
-  Admin-Oberfläche und für die Bedienelemente der Anzeigekomponente, etwa den
-  Hinweis und die Schaltfläche „Aktualisieren“.
-* Das **Schreiben in der Vorschau** ist ausgenommen. Es folgt nur der zentralen
-  DOCX-Vorgabe (QS-013) und ist von Host-Styles und Tokens isoliert, in einem
+* The React components bring **their own default styles**, generated with
+  UnoCSS. The classes carry **their own prefix**, and there is **no global
+  reset**. The package's CSS changes nothing outside its components.
+* The styles sit in **their own CSS layer** (`@layer`). Host styles
+  outside this layer therefore take precedence. The host can
+  override without using `!important`.
+* Public contract since the frontend scaffold (#13): the class prefix `lw-`,
+  matching the table prefix `lw_`
+  (xref:adr-006-datenbankagnostische-persistenz[ADR-006]), and the
+  CSS layer `letterwright`. Changing them breaks hosts that address the classes
+  or the layer in their CSS.
+* Colours, fonts and spacing come from **CSS custom properties** with their own
+  prefix. The host sets them; otherwise default values apply. This applies to the
+  admin UI and to the controls of the display component, such as the
+  notice and the button “Aktualisieren”.
+* The **letter in the preview** is excluded. It follows only the central
+  DOCX specification (QS-013) and is isolated from host styles and tokens, in an
   `iframe` (xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]).
-* **Render-Props** für einzelne Bausteine, etwa Schaltfläche oder Eingabefeld,
-  sind eine spätere Erweiterung. Sie kommen erst, wenn ein Host eigene
-  Komponenten einsetzen will.
+* **Render props** for single building blocks, such as a button or an input field,
+  are a later extension. They come only when a host wants to use its own
+  components.
 
-=== Kontext
+=== Context
 
-Die Komponenten laufen eingebettet in Host-Anwendungen
-(xref:adr-001-einbettbare-bibliothek[ADR-001]) und sollen sich deren Aussehen
-anpassen. Die bisher bekannte primäre Host-Anwendung ist eine React-Anwendung mit
-UnoCSS. Der Owner wünscht eigene Styles, die der Host überschreiben kann, und hält
-CSS Custom Properties für die Admin-Oberfläche und die Anzeigekomponente für
-geeignet (Q-ARCH-003, 2026-11-15).
+The components run embedded in host applications
+(xref:adr-001-einbettbare-bibliothek[ADR-001]) and are to adapt to their
+look. The primary host application known so far is a React application with
+UnoCSS. The owner wants own styles that the host can override, and considers
+CSS custom properties suitable for the admin UI and the display component
+(Q-ARCH-003, 2026-11-15).
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Die Komponenten sind ohne Aufwand beim Host sofort nutzbar und barrierefrei.
-* Der Host kann das Aussehen an sein Designsystem anpassen.
-* Das Paket hängt von keiner fremden Komponentenbibliothek ab.
-* Das CSS des Pakets verändert die Host-Anwendung nicht.
+* The components can be used at once without effort for the host, and they are accessible.
+* The host can adapt the look to its design system.
+* The package depends on no third-party component library.
+* The package's CSS does not change the host application.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Eigene Styles in einer CSS-Ebene mit Design-Tokens
+==== Option 1: Own styles in a CSS layer with design tokens
 
-Die Bibliothek stylt selbst, liest Tokens aus CSS Custom Properties und gibt den
-Styles des Hosts über `@layer` Vorrang. Render-Props können später ergänzt werden.
+The library styles itself, reads tokens from CSS custom properties and gives the
+host's styles precedence via `@layer`. Render props can be added later.
 
-==== Option 2: Ungestylte Komponenten (headless)
+==== Option 2: Unstyled components (headless)
 
-Die Bibliothek liefert nur Verhalten und Barrierefreiheit, der Host stylt alles
-selbst. Ohne Aufwand beim Host sehen die Komponenten unfertig aus.
+The library provides only behaviour and accessibility; the host styles everything
+itself. Without effort by the host, the components look unfinished.
 
-==== Option 3: Komponentenbibliothek des Hosts als Peer-Abhängigkeit
+==== Option 3: The host's component library as a peer dependency
 
-Die Bibliothek verwendet die UI-Komponenten einer bestimmten
-Komponentenbibliothek. Das passt genau zu Hosts mit dieser Bibliothek und bindet
-das Paket an deren Versionen.
+The library uses the UI components of a specific
+component library. This fits hosts with this library exactly and binds
+the package to its versions.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Ohne Host-Aufwand nutzbar | +1 | -1 | 0
-| Anpassbar an den Host | +1 | +1 | +1
-| Keine fremde Komponentenbibliothek | +1 | +1 | -1
-| Barrierefreiheit in eigener Hand | +1 | 0 | 0
-s| Summe s| +4 s| +1 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Usable without host effort | +1 | -1 | 0
+| Adaptable to the host | +1 | +1 | +1
+| No third-party component library | +1 | +1 | -1
+| Accessibility in our own hands | +1 | 0 | 0
+s| Sum s| +4 s| +1 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Die Komponenten funktionieren sofort und lassen sich schrittweise anpassen.
-* Die primäre Host-Anwendung kann mit ihrem eigenen UnoCSS überschreiben.
+* The components work at once and can be adapted step by step.
+* The primary host application can override with its own UnoCSS.
 
-==== Negativ
+==== Negative
 
-* Die Namen der Custom Properties und das Klassenpräfix gehören zum öffentlichen
-  Vertrag des Pakets und müssen stabil bleiben.
-* Überschreibt ein Host Farben, kann er Kontraste verschlechtern. Die
-  Barrierefreiheit der Standarddarstellung sichert nur die Bibliothek.
+* The names of the custom properties and the class prefix belong to the public
+  contract of the package and must stay stable.
+* If a host overrides colours, it can make contrasts worse. The library
+  ensures accessibility only for the default appearance.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Das Frontend-Gerüst (#13) richtet UnoCSS mit Präfix, ohne Reset und mit
-  `@layer` ein.
-* Die Custom Properties werden mit der ersten Komponente der Bedienoberfläche
-  festgelegt und dokumentiert.
-* Die Isolation der Vorschau regelt
+* The frontend scaffold (#13) sets up UnoCSS with a prefix, without a reset and with
+  `@layer`.
+* The custom properties are defined and documented with the first component of
+  the user interface.
+* The isolation of the preview is covered by
   xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014].
 
 === Impact
@@ -152,28 +152,28 @@ include::generated/adr-013-styling-der-frontend-komponenten-impact.adoc[leveloff
 include::generated/adr-013-styling-der-frontend-komponenten-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-013-styling-der-frontend-komponenten-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Die Hosts unterstützen CSS Cascade Layers, was alle aktuellen Browser tun.
+* The hosts support CSS cascade layers, which all current browsers do.
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Der Owner hat die Richtung am 2026-11-15 bestätigt: eigene Styles, vom Host
-überschreibbar, CSS Custom Properties, Render-Props als spätere Erweiterung.
+The owner confirmed the direction on 2026-11-15: own styles, overridable by the
+host, CSS custom properties, render props as a later extension.
 
-Im Review von PR #20 (2026-11-16) hat der Owner das Klassenpräfix `ssw-` und den
-Paketnamen `@dieterbaier/standardschreiben` übernommen. Mit der Umbenennung nach
-xref:adr-024-sprache-der-ubiquitous-language-im-code[ADR-024] heißen sie `lw-`,
-`@dieterbaier/letterwright` und die CSS-Ebene `letterwright` (#84); vor dem ersten
-Release bricht das keinen Host.
+In the review of PR #20 (2026-11-16), the owner adopted the class prefix `ssw-` and the
+package name `@dieterbaier/standardschreiben`. With the rename according to
+xref:adr-024-sprache-der-ubiquitous-language-im-code[ADR-024], they are called `lw-`,
+`@dieterbaier/letterwright` and the CSS layer `letterwright` (#84); before the first
+release, this breaks no host.

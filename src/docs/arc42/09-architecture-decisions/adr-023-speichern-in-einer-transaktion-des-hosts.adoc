@@ -1,276 +1,269 @@
 ---
 id: ADR-023-speichern-in-einer-transaktion-des-hosts
 type: ADR
-title: 'Speichern eines Schreibens in einer Transaktion des Hosts'
+title: 'Saving a letter in a transaction of the host'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-23'
 reviewed: true
-summary: 'Der Host speichert ein Schreiben atomar mit eigenen Datenbankaktionen: über eine eingehende Java-API, die einer laufenden Transaktion beitritt (REQUIRED), oder beim Speichern über die Oberfläche über einen optionalen synchronen Rückruf vor dem gemeinsamen Commit. Der Rückruf läuft nur bei einer Neuanlage und lehnt fachlich über ein Sealed-Ergebnis ab. Der Host verknüpft seine Daten über die ID des Schreibens; der Dateiname ist ausgeklammert. Eine Benachrichtigung nach dem Commit und eine Wiederholung durch die Bibliothek gibt es nicht.'
+summary: 'The host saves a letter atomically with its own database actions: through an inbound Java API that joins a running transaction (REQUIRED), or, when saving through the user interface, through an optional synchronous callback before the joint commit. The callback runs only on a new creation and rejects for business reasons through a sealed result. The host links its data through the ID of the letter; the file name is left out. There is no notification after the commit and no repeat by the library.'
 derived_from:
 - type: question
-  description: 'Q-ARCH-004, Folgefrage „Speichern in einer Transaktion des Hosts“ mit Tendenz (2026-11-22), Verantwortungsgrenze (Review PR #70) und Empfehlung (PR #71)'
+  description: 'Q-ARCH-004, follow-up question “Saving in a transaction of the host” with tendency (2026-11-22), responsibility boundary (review PR #70) and recommendation (PR #71)'
   path: src/docs/doc-005-questions-and-answers.adoc
   anchor: q-arch-004
 - type: conversation
-  description: 'Entscheidungen des Owners am 2026-11-23: nur atomarer Rückruf, Rückruf nur bei Neuanlage, fachliche Ablehnung als Sealed-Ergebnis, Vertrag als ADR-Entwurf'
+  description: 'Decisions of the owner on 2026-11-23: atomic callback only, callback only on a new creation, business rejection as a sealed result, contract as an ADR draft'
 - type: external
-  description: 'Review des Owners zu PR #74 (2026-11-23): Namen, REQUIRED, Dateiname zurückgestellt, Präzisierungen zu BereitsGespeichert, Transaktionsgrenze und Ablehnung'
+  description: 'Review of the owner on PR #74 (2026-11-23): names, REQUIRED, file name deferred, clarifications on AlreadySaved, transaction boundary and rejection'
   uri: https://github.com/dieterbaier/standardschreiben/pull/74
 tags:
 - decision
-- schreiben
+- letters
 - integration
-- transaktion
+- transaction
 relations:
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
   status: accepted
-  rationale: 'ADR-016 nimmt an, dass der Host keine eingehende Java-API braucht, und sieht für diesen Fall ein eigenes Modul mit eigenen Typen und eingehendem Adapter vor. Dieser ADR löst den Fall aus und ergänzt spi um einen optionalen Rückruf.'
+  rationale: 'ADR-016 assumes that the host does not need an inbound Java API, and for that case provides a separate module with its own types and an inbound adapter. This ADR triggers that case and adds an optional callback to spi.'
   reviewed: true
 - type: refines
   target: ADR-021-hoechstens-ein-schreiben-je-snapshot
   status: accepted
-  rationale: 'ADR-021 regelt die Idempotenz des Speicherns. Dieser ADR legt fest, dass der Rückruf nur bei einer Neuanlage läuft und eine Wiederholung ihn nicht erneut auslöst, und erweitert den Fehlerpfad um den Rollback durch den Host.'
+  rationale: 'ADR-021 governs the idempotency of saving. This ADR specifies that the callback runs only on a new creation and that a repeat does not trigger it again, and extends the error path by the rollback through the host.'
   reviewed: true
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
   status: accepted
-  rationale: 'Die Bibliothek tritt einer laufenden Transaktion des Hosts bei (REQUIRED) und eröffnet nur dann eine eigene, wenn keine läuft. Innerhalb einer laufenden Transaktion darf die Persistenz keine unabhängige Transaktion eröffnen.'
+  rationale: 'The library joins a running transaction of the host (REQUIRED) and opens its own only if none is running. Within a running transaction, the persistence must not open an independent transaction.'
   reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Der Rückruf ist optional und zählt nicht zu den drei Schnittstellen, die der Host implementieren muss. Wer ihn nutzt, hat eine Schnittstelle mehr und muss den Transaktionskontext teilen.'
+  rationale: 'The callback is optional and does not count among the three interfaces the host must implement. Whoever uses it has one interface more and must share the transaction context.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-023-speichern-in-einer-transaktion-des-hosts]]
-== ADR-023: Speichern eines Schreibens in einer Transaktion des Hosts
+== ADR-023: Saving a letter in a transaction of the host
 
 === Status
 
-Angenommen (accepted) am 2026-11-23.
+Accepted on 2026-11-23.
 
-Der Owner hat am 2026-11-23 die Richtung vorgegeben: nur atomarer Rückruf,
-Rückruf nur bei einer Neuanlage, fachliche Ablehnung als Sealed-Ergebnis. Der ADR
-ist KI-gestützt formuliert. Im Review von PR #74 hat der Owner die offenen Fragen
-zu Namen und `REQUIRED` entschieden, Präzisierungen verlangt und den Dateinamen
-zurückgestellt. Danach hat er den ADR und seine vier Relationen am selben Tag
-angenommen.
+The owner set the direction on 2026-11-23: atomic callback only, callback only
+on a new creation, business rejection as a sealed result. The ADR was drafted
+with AI support. In the review of PR #74, the owner decided the open questions
+on names and `REQUIRED`, asked for clarifications and deferred the file name.
+After that, he accepted the ADR and its four relations on the same day.
 
-=== Entscheidung
+=== Decision
 
-Der Host kann das Speichern eines Schreibens auf zwei Wegen mit eigenen
-Datenbankaktionen atomar verbinden. Beide nutzen denselben
-Anwendungsfall `SaveLetter`, dieselbe Berechtigungsprüfung
-(`ForCreation`) und dieselbe Idempotenz nach
+The host can combine saving a letter atomically with its own database actions
+in two ways. Both use the same use case `SaveLetter`, the same authorization
+check (`ForCreation`) and the same idempotency according to
 xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
 
-==== Java-API, der primäre Weg
+==== Java API, the primary way
 
-* Ein eigenes Modul `api` mit eigenen Typen und einem eingehenden Adapter, nach
-  dem Muster aus xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Der
-  Host sieht weder Domänenmodell noch interne Use-Case-Ports. Der Starter
-  exportiert `api` neben `spi`.
-* Der Host ruft in seinem eigenen Anwendungsfall „Schreiben speichern“ mit
-  Benutzerkennung und Snapshot-ID auf. Er erhält ein
-  Sealed-Ergebnis mit denselben Fällen wie `SaveResult`. Gespeichert und
-  bereits gespeichert tragen die Identifikatoren, die auch der Rückruf erhält
-  (siehe unten).
-* *Transaktion (`REQUIRED`):* Die Bibliothek tritt einer laufenden Transaktion
-  bei. Läuft keine, eröffnet sie eine eigene, und es gilt das Verhalten von
-  heute. Innerhalb einer laufenden Transaktion eröffnet sie keine unabhängige
-  (kein `REQUIRES_NEW`). Atomar mit weiteren Aktionen des Hosts ist das
-  Speichern also nur, wenn der Host die gemeinsame Transaktion vor dem Aufruf
-  eröffnet.
-* Der Host wertet das Ergebnis aus, ändert eigene Daten und committet alles
-  gemeinsam. Rollt er zurück, rollen auch Schreiben und Verbrauch des Snapshots
-  zurück. Einen Rückruf gibt es auf diesem Weg nicht.
+* A separate module `api` with its own types and an inbound adapter, following
+  the pattern from xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. The
+  host sees neither the domain model nor internal use case ports. The starter
+  exports `api` next to `spi`.
+* The host calls it in its own use case “save letter” with the user ID and
+  the snapshot ID. It receives a sealed result with the same cases as
+  `SaveResult`. Saved and already saved carry the identifiers that the callback
+  also receives (see below).
+* *Transaction (`REQUIRED`):* The library joins a running transaction. If none
+  is running, it opens its own, and today's behaviour applies. Within a running
+  transaction, it does not open an independent one (no `REQUIRES_NEW`). Saving
+  is therefore atomic with further actions of the host only if the host opens
+  the joint transaction before the call.
+* The host evaluates the result, changes its own data and commits everything
+  together. If it rolls back, the letter and the consumption of the snapshot
+  roll back too. There is no callback on this way.
 
-==== Speichern über die Oberfläche: optionaler synchroner Rückruf
+==== Saving through the user interface: optional synchronous callback
 
-* `spi` bekommt die optionale Schnittstelle `spi.LetterSaveCallback`. Stellt der
-  Host keine Implementierung bereit, verhält sich die Bibliothek wie heute.
-* *Transaktionsgrenze:* Beim Speichern über REST ist der Endpunkt der Bibliothek
-  die äußere Grenze der Transaktion. Rückruf und Datenbankaktionen des Hosts
-  nehmen daran teil.
-* *Zeitpunkt:* Der Rückruf läuft in derselben Transaktion, nach den
-  Datenbankänderungen der Bibliothek und vor dem Commit. Einen Listener nach dem
-  Commit (`AFTER_COMMIT`) gibt es nicht.
-* *Nur bei einer Neuanlage:* Der Rückruf läuft nur, wenn der aktuelle Aufruf das
-  Schreiben anlegt. Liefert er `AlreadySaved`, legt er kein neues
-  Schreiben an und löst keinen Rückruf aus. Mehr sichert der Vertrag dabei nicht
-  zu: Das vorhandene Schreiben kann über die Java-API ohne Rückruf entstanden
-  sein, oder ein anderer Aufruf in derselben äußeren Transaktion hat es angelegt,
-  bevor der Host committet.
-* *Daten:* Der Rückruf erhält stabile Identifikatoren: die ID des Schreibens
-  (technischer Schlüssel), über die der Host seine Daten mit dem Schreiben
-  verknüpft, den fachlichen Bezug, das Standardschreiben, die Benutzerkennung und den Zeitpunkt der
-  Erstellung.
-* *Ergebnis:* Der Rückruf liefert ein `CallbackResult`, `Accepted` oder
-  `Rejected` mit einem Grund für den Benutzer. Ein Rückgabewert löst in Spring
-  für sich allein keinen Rollback aus. Die Bibliothek rollt bei `Rejected`
-  deshalb ausdrücklich an ihrer äußeren Grenze zurück und meldet erst danach
-  einen eigenen Fall von `SaveResult` mit dem Grund. Innere, teilnehmende
-  Grenzen markieren die Transaktion dafür nicht als rollback-only und kehren
-  dann regulär zurück. Sonst verdrängt eine `UnexpectedRollbackException` das
-  fachliche Ergebnis, und der Grund kommt beim Benutzer nicht an. Der Snapshot
-  bleibt offen, solange er nicht abläuft, und der Benutzer kann erneut
-  speichern.
-* *Ausnahmen:* Jede Ausnahme des Rückrufs ist ein technischer Fehler und rollt
-  die gemeinsame Transaktion ebenfalls zurück. Der Vertrag deklariert keine
-  Checked Exceptions.
-* *Keine Wiederholung durch die Bibliothek:* Nach einem Fehler ist die
-  Transaktion nur noch zum Zurückrollen markiert. Die Wiederholung ist ein neuer
-  Speicherversuch des Benutzers.
-* *Entkoppelte Wirkungen sind Sache des Hosts:* Braucht der Host eine Wirkung
-  außerhalb seiner Datenbank, etwa den Abschluss eines Tasks in einer entfernten
-  Engine oder die Ablage im eigenen DMS, schreibt er im Rückruf einen
-  Outbox-Auftrag in dieselbe Transaktion und führt ihn danach wiederholbar und
-  idempotent selbst aus.
+* `spi` gets the optional interface `spi.LetterSaveCallback`. If the host does
+  not provide an implementation, the library behaves as it does today.
+* *Transaction boundary:* When saving through REST, the endpoint of the library
+  is the outer boundary of the transaction. The callback and the database
+  actions of the host take part in it.
+* *Timing:* The callback runs in the same transaction, after the database
+  changes of the library and before the commit. There is no listener after the
+  commit (`AFTER_COMMIT`).
+* *Only on a new creation:* The callback runs only if the current call creates
+  the letter. If it returns `AlreadySaved`, it creates no new letter and
+  triggers no callback. The contract guarantees nothing more in this case: the
+  existing letter may have been created through the Java API without a
+  callback, or another call in the same outer transaction created it before the
+  host commits.
+* *Data:* The callback receives stable identifiers: the ID of the letter
+  (technical key), through which the host links its data with the letter, the
+  business reference, the letter template, the user ID and the time of
+  creation.
+* *Result:* The callback returns a `CallbackResult`, `Accepted` or `Rejected`
+  with a reason for the user. In Spring, a return value alone does not trigger
+  a rollback. On `Rejected`, the library therefore explicitly rolls back at its
+  outer boundary and only after that reports a separate case of `SaveResult`
+  with the reason. Inner, participating boundaries do not mark the transaction
+  as rollback-only for this and then return normally. Otherwise an
+  `UnexpectedRollbackException` displaces the business result, and the reason
+  does not reach the user. The snapshot stays open as long as it does not
+  expire, and the user can save again.
+* *Exceptions:* Every exception of the callback is a technical error and also
+  rolls back the joint transaction. The contract declares no checked
+  exceptions.
+* *No repeat by the library:* After an error, the transaction is only marked
+  for rollback. The repeat is a new save attempt of the user.
+* *Decoupled effects are the host's business:* If the host needs an effect
+  outside its database, for example completing a task in a remote engine or
+  filing in its own DMS, it writes an outbox job into the same transaction in
+  the callback and then executes it itself, repeatably and idempotently.
 
-==== Dateiname
+==== File name
 
-Der Dateiname gehört nicht zu diesem Vertrag und ist zurückgestellt
-(Q-ARCH-004, Frage „Dateiname“). Für die Verknüpfung mit den Daten des Hosts
-genügt die ID des Schreibens. Kommt ein Dateiname hinzu, ergänzt er Ergebnis und
-Rückruf, ohne die Zusicherungen dieses ADR zu ändern.
+The file name is not part of this contract and is deferred (Q-ARCH-004,
+question “file name”). For linking with the host's data, the ID of the letter
+is enough. If a file name is added, it extends the result and the callback
+without changing the guarantees of this ADR.
 
-==== Verantwortungsgrenze
+==== Responsibility boundary
 
-Wie in Q-ARCH-004 festgehalten: Die Bibliothek verantwortet ihre Idempotenz nach
-ADR-021 und die Zusicherungen oben. Der Host verantwortet die Idempotenz seiner
-eigenen Aktionen, das Zusammenspiel seiner Orchestrierung mit dem Rückruf sowie
-Wiederholung, Recovery und Kompensation externer Seiteneffekte. Eine idempotente
-Speicherung durch die Bibliothek macht den Anwendungsfall des Hosts nicht
+As recorded in Q-ARCH-004: the library is responsible for its idempotency
+according to ADR-021 and for the guarantees above. The host is responsible for
+the idempotency of its own actions, for the interplay of its orchestration with
+the callback, and for repeat, recovery and compensation of external side
+effects. Idempotent saving by the library does not make the host's use case
 idempotent.
 
-=== Kontext
+=== Context
 
-Der Host muss das Speichern eines Schreibens zusammen mit eigenen
-Datenbankaktionen atomar ausführen können, etwa mit dem Abschließen eines Human
-Task (Q-ARCH-004). Heute löst er das Speichern nur über die React-Komponenten und
-REST aus; ADR-016 nimmt an, dass er keine Java-API braucht.
+The host must be able to save a letter atomically together with its own
+database actions, for example together with completing a human task
+(Q-ARCH-004). Today it triggers saving only through the React components and
+REST; ADR-016 assumes that it does not need a Java API.
 
-Zwei Integrationsbedürfnisse stehen nebeneinander. Ein Host, der selbst
-orchestriert, will das Speichern in seinem Anwendungsfall aufrufen und das
-Ergebnis als Rückgabewert auswerten. Ein Host, dessen Benutzer über die
-Oberfläche der Bibliothek speichert, hat in diesem Moment keinen eigenen
-Anwendungsfall und braucht einen Rückruf.
+Two integration needs exist side by side. A host that orchestrates itself wants
+to call saving in its use case and evaluate the result as a return value. A
+host whose user saves through the user interface of the library has no use
+case of its own at that moment and needs a callback.
 
-Für die Benachrichtigung nach dem Speichern schließen sich zwei Semantiken aus.
-Atomar läuft sie vor dem gemeinsamen Commit, und ein Fehler rollt alles zurück.
-Entkoppelt läuft sie nach dem Commit, das Schreiben bleibt gespeichert, und
-jemand muss wiederholen. Ein Rückruf kann nicht beides liefern.
+For the notification after saving, two semantics exclude each other. Atomic,
+it runs before the joint commit, and an error rolls back everything.
+Decoupled, it runs after the commit, the letter stays saved, and someone has to
+repeat. A callback cannot deliver both.
 
-Das Speichern rendert heute das PDF, prüft es und legt es in der Dokumentablage
-ab, bevor es Schreiben und verbrauchten Snapshot in einem Schritt speichert
-(`SaveLetterService`, ADR-021). Die Dokumentablage nimmt an der Transaktion
-nicht teil.
+Today, saving renders the PDF, checks it and stores it in the document store
+before it stores the letter and the consumed snapshot in one step
+(`SaveLetterService`, ADR-021). The document store does not take part in the
+transaction.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* **Atomarität:** Schreiben, Verbrauch des Snapshots und Daten des Hosts
-  committen oder rollen gemeinsam zurück.
-* **Kleiner Vertrag:** wenige Zusicherungen, wenige Fälle im Test, keine
-  Workflow-Steuerung in der Bibliothek.
-* **Robustheit bei Fehlern des Hosts:** Ein Fehler des Hosts lässt keinen
-  widersprüchlichen Zustand zurück, den die Bibliothek reparieren müsste.
-* **Integrationsaufwand des Hosts (QS-007):** keine neue verpflichtende
-  Schnittstelle, wenig Konfiguration.
+* **Atomicity:** The letter, the consumption of the snapshot and the data of
+  the host commit or roll back together.
+* **Small contract:** few guarantees, few cases in the test, no workflow
+  control in the library.
+* **Robustness against errors of the host:** An error of the host leaves no
+  contradictory state behind that the library would have to repair.
+* **Integration effort of the host (QS-007):** no new mandatory interface,
+  little configuration.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-Für den Weg über die Java-API gibt es keine Alternative mit Rückruf: Der Host ist
-schon in seinem Anwendungsfall. Die Optionen betreffen das Speichern über die
-Oberfläche.
+For the way through the Java API there is no alternative with a callback: the
+host is already in its use case. The options concern saving through the user
+interface.
 
-==== Option 1: Nur atomarer Rückruf (gewählt)
+==== Option 1: Atomic callback only (chosen)
 
-Wie oben. Entkoppelte Wirkungen erreicht der Host mit einer Outbox im Rückruf.
+As above. The host achieves decoupled effects with an outbox in the callback.
 
-==== Option 2: Nur entkoppelte Benachrichtigung
+==== Option 2: Decoupled notification only
 
-Die Bibliothek benachrichtigt den Host nach dem Commit (`AFTER_COMMIT` oder eigene
-Outbox). Das Schreiben bleibt gespeichert, auch wenn die Aktion des Hosts
-scheitert. Die Bibliothek oder der Host muss die Benachrichtigung wiederholen,
-und der Host muss sie idempotent verarbeiten. Die Tendenz des Owners vom
-2026-11-22 (Atomarität) erfüllt das nicht.
+The library notifies the host after the commit (`AFTER_COMMIT` or its own
+outbox). The letter stays saved even if the host's action fails. The library or
+the host must repeat the notification, and the host must process it
+idempotently. This does not meet the owner's tendency of 2026-11-22
+(atomicity).
 
-==== Option 3: Beides, der Host wählt je Rückruf
+==== Option 3: Both, the host chooses per callback
 
-Der Host wählt atomar oder entkoppelt. Der Vertrag enthält beide Semantiken, und
-jede Kombination mit Java-API, Wiederholung und Ablehnung muss getestet werden.
-Was der Host damit zusätzlich erreicht, erreicht er auch mit Option 1 und einer
-eigenen Outbox.
+The host chooses atomic or decoupled. The contract contains both semantics,
+and every combination with the Java API, repeat and rejection must be tested.
+What the host additionally achieves with this, it also achieves with option 1
+and its own outbox.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support. The
+matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Atomarität | +1 | -1 | +1
-| Kleiner Vertrag | +1 | 0 | -1
-| Robustheit bei Fehlern des Hosts | +1 | -1 | 0
-| Integrationsaufwand des Hosts | 0 | 0 | -1
-s| Summe s| +3 s| -2 s| -1
+| Criterion | Option 1 | Option 2 | Option 3
+| Atomicity | +1 | -1 | +1
+| Small contract | +1 | 0 | -1
+| Robustness against errors of the host | +1 | -1 | 0
+| Integration effort of the host | 0 | 0 | -1
+s| Total s| +3 s| -2 s| -1
 |===
 
-Option 2 bekommt bei der Robustheit `-1`, weil ein gespeichertes Schreiben ohne
-die zugehörige Aktion des Hosts zurückbleibt, bis jemand wiederholt. Option 3
-bekommt dort `0`, weil der Host im entkoppelten Modus dasselbe Problem hat. Beim
-Integrationsaufwand bleibt Option 1 neutral: Der Rückruf ist optional, wer ihn
-nutzt, implementiert eine Schnittstelle mehr. Option 3 verlangt zusätzlich die
-Wahl der Semantik.
+Option 2 gets `-1` for robustness, because a saved letter remains without the
+corresponding action of the host until someone repeats. Option 3 gets `0`
+there, because the host has the same problem in decoupled mode. For the
+integration effort, option 1 stays neutral: the callback is optional; whoever
+uses it implements one interface more. Option 3 additionally requires choosing
+the semantics.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Ein Host verbindet das Speichern mit eigenen Aktionen atomar, ob er selbst
-  orchestriert oder seine Benutzer über die Oberfläche speichern.
-* Die Bibliothek bleibt ohne Workflow-, Wiederholungs- und
-  Kompensationssteuerung. Eine Process Engine bleibt Sache des Hosts.
-* Eine fachliche Ablehnung des Hosts erreicht den Benutzer mit Grund, statt als
-  allgemeiner Fehler.
+* A host combines saving with its own actions atomically, whether it
+  orchestrates itself or its users save through the user interface.
+* The library stays free of workflow, repeat and compensation control. A
+  process engine remains the host's business.
+* A business rejection by the host reaches the user with a reason, instead of
+  as a generic error.
 
-==== Negativ
+==== Negative
 
-* Ein Modul mehr für die Java-API, mit eigenen Typen und Mapping, wie in ADR-016
-  beschrieben.
-* Der Fehlerpfad aus ADR-021 wird breiter. Rollt der Host zurück, liegt das PDF
-  schon in der Dokumentablage, und kein Schreiben verweist darauf. Das gilt auch,
-  wenn die Java-API erfolgreich zurückkehrt und der Host erst danach zurückrollt;
-  davon erfährt die Bibliothek nichts.
-* Rendering und Konformitätsprüfung laufen heute beim Speichern und verlängern
-  so die Transaktion des Hosts.
-* Teilt der Host seine Transaktion nicht richtig mit der Bibliothek, etwa mit
-  einer eingebetteten Engine ohne passend integrierten Transaktionsmanager, ist
-  die Atomarität nicht gegeben, ohne dass ein Fehler auffällt.
+* One more module for the Java API, with its own types and mapping, as
+  described in ADR-016.
+* The error path from ADR-021 becomes wider. If the host rolls back, the PDF is
+  already in the document store, and no letter refers to it. This also applies
+  if the Java API returns successfully and the host only rolls back afterwards;
+  the library learns nothing about that.
+* Rendering and conformance check run on saving today and thus lengthen the
+  host's transaction.
+* If the host does not share its transaction correctly with the library, for
+  example with an embedded engine without a properly integrated transaction
+  manager, atomicity is not given, without an error becoming visible.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* `SaveResult` bekommt einen Fall für die Ablehnung durch den Host, mit
-  Gherkin-Szenario und Test.
-* Bereinigung verwaister PDFs: gehört zum Ablagevertrag (#60) und zur Persistenz
-  (#6).
-* Vorbereiten und Festschreiben trennen, damit Rendering und Prüfung vor einer
-  kurzen Schreibtransaktion liegen (Q-ARCH-004). Das ist eine bewusste
-  Umstrukturierung von `SaveLetterService` und eine eigene Entscheidung.
-* Integrationsnachweise im Host-Vertragstest:
-** gemeinsamer Commit und später Rollback des Hosts,
-** Speichern über die Java-API ohne äußere Transaktion,
-** Ablehnung und Ausnahme im Rückruf; bei der Ablehnung prüft der Test die
-   REST-Antwort mit dem Grund und den Zustand beider Seiten nach dem Rollback,
-** verlorene Antwort mit Retry.
-* ADR-016 und die Bausteinsicht beschreiben die Java-API und den Rückruf, sobald
-  dieser ADR angenommen ist. Die Pflichten des Hosts gehören in die
-  Integrationsdoku (#11).
+* `SaveResult` gets a case for the rejection by the host, with a Gherkin
+  scenario and a test.
+* Cleanup of orphaned PDFs: belongs to the document store contract (#60) and
+  to the persistence (#6).
+* Separate preparing and committing, so that rendering and checking happen
+  before a short write transaction (Q-ARCH-004). This is a deliberate
+  restructuring of `SaveLetterService` and a decision of its own.
+* Integration evidence in the host contract test:
+** joint commit and later rollback by the host,
+** saving through the Java API without an outer transaction,
+** rejection and exception in the callback; for the rejection, the test checks
+   the REST response with the reason and the state of both sides after the
+   rollback,
+** lost response with retry.
+* ADR-016 and the building block view describe the Java API and the callback
+  once this ADR is accepted. The host's obligations belong in the integration
+  documentation (#11).
 
 === Impact
 
@@ -281,35 +274,34 @@ include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-impact.adoc[
 include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Host und Bibliothek teilen eine physische Transaktion über denselben
-  Transaktionsmanager. Eine gemeinsame Datenquelle allein genügt nicht.
-* Die Bibliothek bleibt für Hosts ohne Process Engine und ohne Rückruf
-  unverändert verwendbar.
+* The host and the library share one physical transaction through the same
+  transaction manager. A shared data source alone is not enough.
+* The library remains usable unchanged for hosts without a process engine and
+  without a callback.
 
 === Open Questions
 
-* Keine. Die drei offenen Fragen des ersten Entwurfs hat der Owner im Review
-  von PR #74 beantwortet: Modul `api`, Schnittstelle `spi.LetterSaveCallback` mit
-  `CallbackResult` (`Accepted`, `Rejected`); die Java-API arbeitet mit
-  `REQUIRED`; der Dateiname ist zurückgestellt und steht in Q-ARCH-004.
+* None. The owner answered the three open questions of the first draft in the
+  review of PR #74: module `api`, interface `spi.LetterSaveCallback` with
+  `CallbackResult` (`Accepted`, `Rejected`); the Java API works with
+  `REQUIRED`; the file name is deferred and is recorded in Q-ARCH-004.
 
 === Review Notes
 
-* Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen, die
-  offenen Fragen des ersten Entwurfs im Review von PR #74. Seine Präzisierungen
-  zur Transaktionsgrenze, zu `AlreadySaved` und zur Begründung der
-  Relation zu ADR-006 sind eingearbeitet.
-* Danach hat der Owner den ADR und seine vier Relationen am 2026-11-23
-  angenommen.
-* ADR-016 und die Bausteinsicht beschreiben noch keine Java-API und keinen
-  Rückruf. Sie werden in einem eigenen Schritt angeglichen; die Annahme in
-  ADR-016, dass der Host keine Java-API braucht, gilt nicht mehr.
+* The owner made the three fundamental decisions on 2026-11-23, and answered
+  the open questions of the first draft in the review of PR #74. His
+  clarifications on the transaction boundary, on `AlreadySaved` and on the
+  rationale of the relation to ADR-006 are incorporated.
+* After that, the owner accepted the ADR and its four relations on 2026-11-23.
+* ADR-016 and the building block view do not yet describe a Java API or a
+  callback. They will be aligned in a separate step; the assumption in ADR-016
+  that the host does not need a Java API no longer holds.

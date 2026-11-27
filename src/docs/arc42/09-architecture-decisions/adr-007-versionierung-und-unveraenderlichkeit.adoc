@@ -1,140 +1,140 @@
 ---
 id: ADR-007-versionierung-und-unveraenderlichkeit
 type: ADR
-title: 'Versionierte Vorlagen und unveränderliche Schreiben'
+title: 'Versioned templates and immutable letters'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Vorlagen sind versioniert; ein gespeichertes Schreiben verweist auf die verwendeten Vorlagenversionen und speichert das PDF mit Prüfsumme unverändert; Speichern verwendet den Datenstand der Vorschau und lehnt ab, wenn sich die Daten seither geändert haben; Snapshots laufen nach 30 Minuten ab und werden dann gelöscht.'
+summary: 'Templates are versioned; a stored letter refers to the template versions used and stores the PDF unchanged with a checksum; saving uses the data state of the preview and rejects if the data has changed since then; snapshots expire after 30 minutes and are then deleted.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
-- versionierung
-- nachvollziehbarkeit
+- versioning
+- traceability
 relations:
 - type: addresses
   target: QS-008-unveraenderliche-schreiben
   status: proposed
-  rationale: 'Gespeicherte PDFs werden nie neu erzeugt.'
+  rationale: 'Stored PDFs are never generated again.'
   reviewed: false
 - type: addresses
   target: QS-004-wiedergabetreue-vorschau-und-pdf
   status: proposed
-  rationale: 'Speichern rendert mit demselben Datenstand wie die Vorschau.'
+  rationale: 'Saving renders with the same data state as the preview.'
   reviewed: false
 - type: depends_on
   target: ADR-006-datenbankagnostische-persistenz
   status: proposed
-  rationale: 'Versionen und Dokumente werden über die Persistenz-Adapter abgelegt.'
+  rationale: 'Versions and documents are stored through the persistence adapters.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-007-versionierung-und-unveraenderlichkeit]]
-== ADR-007: Versionierte Vorlagen und unveränderliche Schreiben
+== ADR-007: Versioned templates and immutable letters
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor:
+We propose:
 
-* Briefpapier und Standardschreiben haben **Versionen** mit Zustand *Entwurf*,
-  *veröffentlicht* oder *zurückgezogen*. Veröffentlichte Versionen sind unveränderlich;
-  Änderungen erzeugen eine neue Version. Je Vorlage ist höchstens eine Version
-  veröffentlicht, die bisherige ist danach *abgelöst*; Nachtrag vom 2026-11-22,
-  siehe xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
-* Ein **gespeichertes Schreiben** speichert das erzeugte PDF, eine SHA-256-Prüfsumme
-  und die IDs der verwendeten Vorlagenversionen. Es wird **nie neu gerendert**.
-* Die **Vorschau** erzeugt einen kurzlebigen **Datenstand (Snapshot)**. Speichern
-  rendert das PDF aus genau diesem Snapshot, damit das Gespeicherte der Vorschau
-  entspricht, auch wenn sich Domänendaten zwischenzeitlich geändert haben.
-* Der Snapshot ist an den **Benutzer**, den **fachlichen Bezug** und **beide
-  Vorlagenversionen** (Briefpapier und Standardschreiben) gebunden. Beim Speichern
-  wird die Erzeugungsberechtigung erneut über den Host geprüft. Eine korrigierte
-  Vorlage erfordert eine neue Vorschau.
-* Der Snapshot speichert einen **Hash (SHA-256) des formatierten
-  Datenkontexts**. Beim Speichern liest die Bibliothek den Datenkontext zusammen
-  mit der Berechtigungsprüfung neu und vergleicht den Hash. Weicht er ab, wird
-  **nicht gespeichert**. Die Oberfläche meldet die Datenänderung und verlangt
-  „Aktualisieren“. Gerendert wird immer aus dem Snapshot.
-* Ein Snapshot **läuft nach 30 Minuten ab**. Ein abgelaufener Snapshot wird
-  gelöscht. Eine Bereinigung läuft dazu in kurzem Abstand (zum Beispiel jede
-  Minute). Bis dahin wird er wie ein nicht vorhandener behandelt. „Aktualisieren“
-  oder ein Neuladen erzeugt eine neue Vorschau mit neuem Snapshot. Der ersetzte
-  Snapshot wird im selben Schritt gelöscht.
-* Das Löschen eines Schreibens entscheidet die `DeletionPolicy` des Hosts (ADR-002).
+* Letterheads and letter templates have **versions** with the state *draft*,
+  *published* or *withdrawn*. Published versions are immutable;
+  changes create a new version. At most one version per template is
+  published; the previous one is then *superseded*; addendum of 2026-11-22,
+  see xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
+* A **stored letter** stores the generated PDF, a SHA-256 checksum
+  and the IDs of the template versions used. It is **never rendered again**.
+* The **preview** creates a short-lived **data state (snapshot)**. Saving
+  renders the PDF from exactly this snapshot, so that what is stored matches the
+  preview, even if domain data has changed in the meantime.
+* The snapshot is bound to the **user**, the **business reference** and **both
+  template versions** (letterhead and letter template). On saving, the
+  permission to create is checked again through the host. A corrected
+  template requires a new preview.
+* The snapshot stores a **hash (SHA-256) of the formatted
+  data context**. On saving, the library reads the data context again together
+  with the authorization check and compares the hash. If it differs, the letter
+  is **not saved**. The UI reports the data change and asks for
+  “Aktualisieren”. Rendering always uses the snapshot.
+* A snapshot **expires after 30 minutes**. An expired snapshot is
+  deleted. A cleanup runs for this at a short interval (for example every
+  minute). Until then it is treated like one that does not exist. “Aktualisieren”
+  or a reload creates a new preview with a new snapshot. The replaced
+  snapshot is deleted in the same step.
+* Whether a letter is deleted is decided by the host's `DeletionPolicy` (ADR-002).
 
-=== Kontext
+=== Context
 
-Der Owner hat bestätigt: Vorlagen werden versioniert, das gespeicherte PDF bleibt
-unverändert. Lösch- und Aufbewahrungsregeln entscheidet die Host-Anwendung.
+The owner has confirmed: templates are versioned, the stored PDF stays
+unchanged. The host application decides the rules for deletion and retention.
 
-Zu Snapshot und Datenänderungen hat der Owner am 2026-11-15 bestätigt
-(Q-PO-011): Das gespeicherte Schreiben entspricht genau der Vorschau. Geänderte
-Daten werden erkannt und erzwingen ein Aktualisieren. Die Ablaufzeit beträgt
-30 Minuten. Abgelaufene und ersetzte Snapshots werden sofort gelöscht.
+On the snapshot and data changes, the owner confirmed on 2026-11-15
+(Q-PO-011): the stored letter matches the preview exactly. Changed
+data is detected and forces a refresh. The expiry time is
+30 minutes. Expired and replaced snapshots are deleted immediately.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Nachvollziehbarkeit: Was der Benutzer gesehen hat, wird gespeichert.
-* Unveränderlichkeit gespeicherter Schreiben.
-* Einfaches Modell für Fachanwender (Entwurf, veröffentlicht).
+* Traceability: what the user has seen is stored.
+* Immutability of stored letters.
+* A simple model for business users (draft, published).
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Versionierte Vorlagen, PDF unverändert, Speichern aus Vorschau-Snapshot
+==== Option 1: Versioned templates, PDF unchanged, saving from the preview snapshot
 
-Gespeichertes entspricht exakt der Vorschau. Snapshot muss kurzzeitig gehalten werden.
+What is stored matches the preview exactly. The snapshot must be kept for a short time.
 
-==== Option 2: Versionierte Vorlagen, Speichern liest Daten neu
+==== Option 2: Versioned templates, saving reads the data again
 
-Kein Snapshot nötig. Gespeichertes kann von der Vorschau abweichen.
+No snapshot needed. What is stored can differ from the preview.
 
-==== Option 3: Keine Versionierung, PDF unverändert
+==== Option 3: No versioning, PDF unchanged
 
-Einfach, aber nicht nachvollziehbar, mit welcher Vorlage ein Schreiben entstand;
-laufende Bearbeitung beeinflusst Vorschauen anderer Benutzer.
+Simple, but it cannot be traced which template a letter was created with;
+ongoing editing affects other users' previews.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Gespeichertes entspricht Vorschau | +1 | -1 | -1
-| Nachvollziehbarkeit | +1 | +1 | -1
-| Einfachheit | 0 | +1 | +1
-s| Summe s| +2 s| +1 s| -1
+| Criterion | Option 1 | Option 2 | Option 3
+| What is stored matches the preview | +1 | -1 | -1
+| Traceability | +1 | +1 | -1
+| Simplicity | 0 | +1 | +1
+s| Sum s| +2 s| +1 s| -1
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Gespeicherte Schreiben sind revisionssicher nachvollziehbar.
+* Stored letters are traceable in an audit-proof way.
 
-==== Negativ
+==== Negative
 
-* Snapshot-Verwaltung (Ablaufzeit, Speicherort, Bereinigung) ist zusätzlicher Aufwand.
-* Beim Speichern ist ein zusätzlicher Aufruf beim Host nötig, um den Datenkontext neu zu lesen.
-* Ändern sich Daten häufig, muss der Benutzer öfter aktualisieren.
+* Managing snapshots (expiry time, storage location, cleanup) is additional effort.
+* Saving needs an additional call to the host to read the data context again.
+* If data changes often, the user has to refresh more often.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Laufzeitsicht um den Fehlerfall „Daten geändert“ ergänzen (erledigt).
+* Add the error case “data changed” to the runtime view (done).
 
 === Impact
 
@@ -145,23 +145,23 @@ include::generated/adr-007-versionierung-und-unveraenderlichkeit-impact.adoc[lev
 include::generated/adr-007-versionierung-und-unveraenderlichkeit-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-007-versionierung-und-unveraenderlichkeit-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Ein Snapshot darf personenbezogene Daten kurzzeitig serverseitig halten.
+* A snapshot may hold personal data on the server for a short time.
 
 === Open Questions
 
-* Darf der Benutzer in der Vorschau Inhalte vor dem Speichern noch manuell ändern? (Q-PO-006)
+* May the user still change content manually in the preview before saving? (Q-PO-006)
 
 === Review Notes
 
-Kernaussagen hat der Owner bestätigt. Snapshot-Treue, Hash-Vergleich, Ablaufzeit
-von 30 Minuten und sofortiges Löschen hat der Owner am 2026-11-15 bestätigt
-(Q-PO-011).
+The owner has confirmed the core statements. The owner confirmed snapshot
+fidelity, the hash comparison, the expiry time of 30 minutes and immediate
+deletion on 2026-11-15 (Q-PO-011).

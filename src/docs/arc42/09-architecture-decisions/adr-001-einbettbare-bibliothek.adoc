@@ -1,118 +1,122 @@
 ---
 id: ADR-001-einbettbare-bibliothek
 type: ADR
-title: 'Standardschreiben als einbettbare Bibliothek'
+title: 'letterwright as an embeddable library'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Standardschreiben wird als Spring-Boot-Starter plus npm-Paket mit React-Komponenten ausgeliefert, nicht als eigener Service.'
+summary: 'letterwright is shipped as a Spring Boot starter plus an npm package with React components, not as a service of its own.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
 - integration
-- produktform
+- product-form
 relations:
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: proposed
-  rationale: 'Eine Bibliothek integriert sich ohne zusätzlichen Betrieb in bestehende Host-Anwendungen.'
+  rationale: 'A library integrates into existing host applications without additional operations.'
   reviewed: false
 - type: introduces_risk
   target: R-007-bindung-an-spring-boot-hauptversion
   status: proposed
-  rationale: 'Ein Starter ist an die Spring-Boot-Hauptversion der Host-Anwendung gebunden.'
+  rationale: 'A starter is bound to the Spring Boot major version of the host application.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-001-einbettbare-bibliothek]]
-== ADR-001: Standardschreiben als einbettbare Bibliothek
+== ADR-001: letterwright as an embeddable library
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor, Standardschreiben als **einbettbare Bibliothek** auszuliefern:
+We propose to ship letterwright as an **embeddable library**:
 
-* Backend: ein **Spring-Boot-Starter** samt Modulen, der in der Host-Anwendung läuft,
-  deren Datenbank, Transaktionen und Spring Security nutzt und REST-Endpunkte unter
-  einem konfigurierbaren Pfad bereitstellt.
-* Frontend: ein **npm-Paket mit React-Komponenten**, das die Host-Anwendung in ihre
-  Oberfläche einbettet und das gegen diese REST-Endpunkte arbeitet.
+* Backend: a **Spring Boot starter** with its modules. It runs in the host
+  application, uses the host's database, transactions and Spring Security, and
+  provides REST endpoints under a configurable path.
+* Frontend: an **npm package with React components**. The host application
+  embeds them in its user interface, and they work against these REST
+  endpoints.
 
-=== Kontext
+=== Context
 
-Issue #1 verlangt ein Paket, das in bestehende Anwendungen integriert wird. Die
-Domänendaten stammen aus einem Spring-Boot-Backend, das die Schreiben auch
-persistiert. Der Owner hat Variante (a), die Bibliothek, bestätigt. Es gibt keine
-Mandantenfähigkeit und kein Mengengerüst.
+Issue #1 asks for a package that is integrated into existing applications. The
+domain data comes from a Spring Boot backend, which also persists the letters.
+The owner confirmed variant (a), the library. There is no multi-tenancy and no
+volume estimate.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Einfache Integration in bestehende Spring-Boot-/React-Anwendungen.
-* Kein zusätzlicher Betrieb (Deployment, Monitoring, Netzwerk).
-* Domänendaten und Security bleiben in der Host-Anwendung.
+* Simple integration into existing Spring Boot/React applications.
+* No additional operations (deployment, monitoring, network).
+* Domain data and security stay in the host application.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Bibliothek (Spring-Boot-Starter und npm-Paket)
+==== Option 1: Library (Spring Boot starter and npm package)
 
-Läuft im Prozess der Host-Anwendung. Datenzugriff über In-Process-Ports, Security
-über die Spring Security des Hosts. Nachteil: Die Bibliothek ist an den Technologie-Stack
-und die Spring-Boot-Hauptversion des Hosts gebunden.
+Runs in the process of the host application. Data access through in-process
+ports, security through the host's Spring Security. Drawback: the library is
+bound to the technology stack and the Spring Boot major version of the host.
 
-==== Option 2: Eigenständiger Service mit REST-API und eigener Datenbank
+==== Option 2: Standalone service with REST API and its own database
 
-Unabhängig deploybar und technologisch entkoppelt. Der Host muss jedoch Domänendaten
-über das Netz liefern, Identitäten durchreichen und einen weiteren Dienst betreiben.
+Independently deployable and decoupled in technology. However, the host must
+deliver domain data over the network, pass identities through and operate one
+more service.
 
-==== Option 3: Nur Frontend-Paket (Rendering im Browser)
+==== Option 3: Frontend package only (rendering in the browser)
 
-Kein Backend-Anteil. Widerspricht jedoch der Anforderung, im Backend zu persistieren,
-und erschwert PDF/A-konforme, reproduzierbare Erzeugung.
+No backend part. However, it contradicts the requirement to persist in the
+backend, and it makes PDF/A-conformant, reproducible generation harder.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Einfache Integration | +1 | 0 | +1
-| Kein zusätzlicher Betrieb | +1 | -1 | +1
-| Daten und Security beim Host | +1 | -1 | 0
-| Persistenz und PDF/A im Backend | +1 | +1 | -1
-| Unabhängigkeit vom Host-Stack | -1 | +1 | 0
-s| Summe s| +3 s| 0 s| +1
+| Criterion | Option 1 | Option 2 | Option 3
+| Simple integration | +1 | 0 | +1
+| No additional operations | +1 | -1 | +1
+| Data and security stay with the host | +1 | -1 | 0
+| Persistence and PDF/A in the backend | +1 | +1 | -1
+| Independence from the host stack | -1 | +1 | 0
+s| Sum s| +3 s| 0 s| +1
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Keine zusätzliche Laufzeitkomponente; Transaktionen mit Host-Daten sind möglich.
-* Autorisierung über die bestehende Spring Security des Hosts.
+* No additional runtime component; transactions with host data are possible.
+* Authorization through the host's existing Spring Security.
 
-==== Negativ
+==== Negative
 
-* Kompatibilität zu Java-, Spring-Boot- und React-Versionen des Hosts muss aktiv gepflegt werden.
-* Schwere Abhängigkeiten der Bibliothek (z. B. PDF-Rendering) landen im Host-Artefakt.
+* Compatibility with the host's Java, Spring Boot and React versions must be
+  actively maintained.
+* Heavy dependencies of the library (e.g. PDF rendering) end up in the host
+  artifact.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* ADR-002 legt die Ports zwischen Bibliothek und Host fest.
-* ADR-009 legt die unterstützten Versionen fest.
+* ADR-002 defines the ports between library and host.
+* ADR-009 defines the supported versions.
 
 === Impact
 
@@ -123,21 +127,22 @@ include::generated/adr-001-einbettbare-bibliothek-impact.adoc[leveloffset=+2]
 include::generated/adr-001-einbettbare-bibliothek-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-001-einbettbare-bibliothek-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Alle Ziel-Hosts nutzen Spring Boot und React.
+* All target hosts use Spring Boot and React.
 
 === Open Questions
 
-* Muss die Bibliothek auch in Hosts ohne React-Frontend nutzbar sein (nur REST)?
+* Must the library also be usable in hosts without a React frontend (REST only)?
 
 === Review Notes
 
-Owner hat die Produktform im Issue bestätigt. Vor `accepted` ist die offene Frage zu klären.
+The owner confirmed the product form in the issue. The open question must be
+resolved before `accepted`.

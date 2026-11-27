@@ -1,127 +1,127 @@
 ---
 id: ADR-008-platzhaltersprache
 type: ADR
-title: 'Platzhaltersprache mit Apache FreeMarker'
+title: 'Placeholder language with Apache FreeMarker'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Platzhalter in der Form ${empfaenger.name} mit Schleifen, Bedingungen und Defaultwerten werden mit Apache FreeMarker in einer abgesicherten Konfiguration ausgewertet; fehlende Werte erscheinen sichtbar als Platzhalter.'
+summary: 'Placeholders in the form ${recipient.name} with loops, conditions and default values are evaluated with Apache FreeMarker in a hardened configuration; missing values appear visibly as placeholders.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
-- platzhalter
-- vorlagen
-- sicherheit
+- placeholders
+- templates
+- security
 relations:
 - type: depends_on
   target: ADR-003-vorlagenformat-fuer-fachanwender
   status: proposed
-  rationale: 'Der Editor erzeugt Platzhalter, Schleifen und Bedingungen als Bausteine.'
+  rationale: 'The editor creates placeholders, loops and conditions as building blocks.'
   reviewed: false
 - type: addresses
   target: QS-010-fehlende-platzhalter-sichtbar
   status: proposed
-  rationale: 'Fehlende Werte werden sichtbar statt still leer.'
+  rationale: 'Missing values become visible instead of silently empty.'
   reviewed: false
 - type: introduces_risk
   target: R-004-template-injection-durch-vorlagen
   status: proposed
-  rationale: 'Eine mächtige Template-Sprache mit von Benutzern gepflegten Vorlagen eröffnet Template-Injection.'
+  rationale: 'A powerful template language with templates maintained by users opens up template injection.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-008-platzhaltersprache]]
-== ADR-008: Platzhaltersprache mit Apache FreeMarker
+== ADR-008: Placeholder language with Apache FreeMarker
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen **Apache FreeMarker** (Apache-2.0) als Auswertungssprache vor:
+We propose **Apache FreeMarker** (Apache-2.0) as the evaluation language:
 
-* Syntax `${empfaenger.name}`, wie vom Owner angedacht; Defaultwerte
-  `${empfaenger.anrede!"Sehr geehrte Damen und Herren"}`; Schleifen `<#list>`;
-  Bedingungen `<#if>`.
-* Fachanwender schreiben diese Syntax nicht von Hand: Der Editor (ADR-003) fügt
-  Platzhalter, Wiederholungs- und Bedingungsblöcke als Bausteine ein.
-* **Fehlende Werte** ohne Default werden in Vorschau und PDF sichtbar als Platzhalter
-  (z. B. `[empfaenger.name]`) dargestellt, die Vorschau markiert sie zusätzlich.
-  Ob Speichern mit fehlenden Werten erlaubt ist, ist konfigurierbar.
-* Werte kommen bereits formatiert vom Host (Beträge, Datum); es gibt keine
-  Schema-Validierung.
-* **Abgesicherte Konfiguration**: `api_builtin_enabled=false`,
-  `TemplateClassResolver.ALLOWS_NOTHING_RESOLVER`, Datenmodell nur aus Maps, Listen
-  und Strings, HTML-Escaping als Standard.
+* Syntax `${recipient.name}`, as the owner had in mind; default values
+  `${recipient.salutation!"Dear Sir or Madam"}`; loops `<#list>`;
+  conditions `<#if>`.
+* Business users do not write this syntax by hand: the editor (ADR-003) inserts
+  placeholders, repetition blocks and condition blocks as building blocks.
+* **Missing values** without a default are shown visibly as placeholders in the
+  preview and the PDF (e.g. `[recipient.name]`); the preview also marks them.
+  Whether saving with missing values is allowed is configurable.
+* Values come already formatted from the host (amounts, dates); there is no
+  schema validation.
+* **Hardened configuration**: `api_builtin_enabled=false`,
+  `TemplateClassResolver.ALLOWS_NOTHING_RESOLVER`, a data model made only of maps,
+  lists and strings, HTML escaping by default.
 
-=== Kontext
+=== Context
 
-Der Owner braucht Schleifen und Blöcke, sichtbare fehlende Platzhalter, Defaultwerte
-und keine Validierung gegen ein Datenschema. Die Syntax ist nicht ausschlaggebend,
-`${...}` ist angedacht. Thymeleaf wäre in Ordnung.
+The owner needs loops and blocks, visible missing placeholders, default values
+and no validation against a data schema. The syntax is not decisive;
+`${...}` is what he had in mind. Thymeleaf would be fine.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Schleifen, Bedingungen und Defaults.
-* Fehlende Werte sichtbar machen.
-* Sicherheit bei von Benutzern gepflegten Vorlagen.
-* Nähe zur gewünschten Syntax.
+* Loops, conditions and defaults.
+* Making missing values visible.
+* Security with templates maintained by users.
+* Closeness to the desired syntax.
 
-=== Betrachtete Optionen
+=== Considered Options
 
 ==== Option 1: Apache FreeMarker
 
-Syntax `${...}`, Defaults eingebaut, gut abzusichern. Erzeugt beliebigen Text, daher
-ist HTML-Escaping explizit zu konfigurieren.
+Syntax `${...}`, defaults built in, easy to harden. Produces arbitrary text, so
+HTML escaping must be configured explicitly.
 
 ==== Option 2: Thymeleaf
 
-Natürliches HTML-Templating, in Spring verbreitet. Platzhalter stehen in Attributen
-(`th:text`) oder als `[[${...}]]`; SpEL-Ausdrücke sind schwerer abzusichern.
+Natural HTML templating, widespread in Spring. Placeholders sit in attributes
+(`th:text`) or as `[[${...}]]`; SpEL expressions are harder to harden.
 
-==== Option 3: Mustache oder Handlebars
+==== Option 3: Mustache or Handlebars
 
-Logikarm und damit sicherer. Defaults und das gewünschte Verhalten bei fehlenden
-Werten müssen selbst gebaut werden; Syntax `{{...}}`.
+Low on logic and therefore safer. Defaults and the desired behaviour for missing
+values have to be built by us; syntax `{{...}}`.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Schleifen, Bedingungen, Defaults | +1 | +1 | 0
-| Fehlende Werte sichtbar | +1 | 0 | 0
-| Absicherbarkeit | 0 | -1 | +1
-| Nähe zur Syntax ${...} | +1 | 0 | -1
-s| Summe s| +3 s| 0 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Loops, conditions, defaults | +1 | +1 | 0
+| Missing values visible | +1 | 0 | 0
+| Hardenability | 0 | -1 | +1
+| Closeness to the syntax ${...} | +1 | 0 | -1
+s| Sum s| +3 s| 0 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Gewünschte Ausdrucksmächtigkeit ohne eigene Template-Engine.
+* The desired expressive power without a template engine of our own.
 
-==== Negativ
+==== Negative
 
-* Sicherheitskonfiguration muss getestet und eingefroren werden (R-004).
+* The security configuration must be tested and frozen (R-004).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Sicherheitstests für bekannte FreeMarker-SSTI-Payloads als Teil der Testsuite.
+* Security tests for known FreeMarker SSTI payloads as part of the test suite.
 
 === Impact
 
@@ -132,21 +132,21 @@ include::generated/adr-008-platzhaltersprache-impact.adoc[leveloffset=+2]
 include::generated/adr-008-platzhaltersprache-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-008-platzhaltersprache-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Der Editor kann FreeMarker-Konstrukte als Bausteine darstellen und zurücklesen.
+* The editor can show FreeMarker constructs as building blocks and read them back.
 
 === Open Questions
 
-* Darf ein Schreiben mit fehlenden Platzhalterwerten gespeichert werden? (Q-PO-007)
+* May a letter with missing placeholder values be saved? (Q-PO-007)
 
 === Review Notes
 
-Vor `accepted` ist das Verhalten beim Speichern mit fehlenden Werten zu klären.
+Before `accepted`, the behaviour when saving with missing values must be clarified.

@@ -1,270 +1,267 @@
 ---
 id: ADR-017-bereitstellung-der-schriften
 type: ADR
-title: 'Bereitstellung der Schriften für Vorschau und PDF'
+title: 'Providing the fonts for preview and PDF'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-19'
 reviewed: true
-summary: 'Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host stellt sie über einen konfigurierbaren Ordner bereit; fehlt eine Schrift, nutzt die Bibliothek eine mitgelieferte freie OFL-Ersatzschrift, mit gleichen Laufweiten, wo es eine gibt, und weist in der Administration darauf hin. Systemschriften des Zielsystems werden nicht verwendet.'
+summary: 'The library ships no fonts that require a license. The host provides them through a configurable folder. If a font is missing, the library uses a bundled free OFL substitute font, with the same character widths where one exists, and points this out in the administration. System fonts of the target system are not used.'
 derived_from:
 - type: question
-  description: 'Q-PO-010 Schriften der zentralen Vorgabe, Antwort des Owners vom 2026-11-19'
+  description: 'Q-PO-010 Fonts of the central specification, owner answer of 2026-11-19'
   anchor: q-po-010
 - type: external
-  description: 'Issue #39: Schriften: Bereitstellung durch den Host und freie Ersatzschriften'
+  description: 'Issue #39: Fonts: provided by the host, and free substitute fonts'
   uri: https://github.com/dieterbaier/standardschreiben/issues/39
 tags:
 - decision
 - rendering
-- schriften
-- lizenz
+- fonts
+- license
 relations:
 - type: refines
   target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
   status: accepted
-  rationale: 'ADR-004 legt fest, dass Vorschau und PDF dieselbe Schriftdatei laden; dieser ADR legt fest, woher diese Datei kommt und was gilt, wenn sie fehlt. Er ersetzt die dortige Folgearbeit „Schriftdateien gehören zum Briefpapier und werden hochgeladen“.'
+  rationale: 'ADR-004 states that preview and PDF load the same font file. This ADR states where that file comes from and what applies if it is missing. It replaces the follow-up work stated there, “font files belong to the letterhead and are uploaded”.'
   reviewed: true
 - type: addresses
   target: QS-004-wiedergabetreue-vorschau-und-pdf
   status: accepted
-  rationale: 'Vorschau und PDF lösen eine Schrift über dieselbe Reihenfolge zur selben Datei auf, auch wenn eine Ersatzschrift greift. Systemschriften, die sich zwischen Server und Browser unterscheiden, sind ausgeschlossen.'
+  rationale: 'Preview and PDF resolve a font to the same file through the same order, even when a substitute font applies. System fonts, which differ between server and browser, are excluded.'
   reviewed: true
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: accepted
-  rationale: 'Stellt der Host die Originalschriften bereit, entspricht das Schriftbild der Vorgabe; sonst greifen freie Ersatzschriften. Nur wo sie gleiche Laufweiten haben, bleiben Zeilen- und Seitenumbrüche gleich; für Arial Narrow gilt das nicht. Ob Umbrüche und Abstände mit Ersatzschrift halten, misst #3.'
+  rationale: 'If the host provides the original fonts, the typeface matches the specification; otherwise free substitute fonts apply. Line and page breaks stay the same only where they have the same character widths; this does not hold for Arial Narrow. #3 measures whether breaks and spacing hold with a substitute font.'
   reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Der Host konfiguriert zusätzlich einen Schriftordner und befüllt ihn in jeder Umgebung. Ohne Ordner läuft die Bibliothek mit den Ersatzschriften.'
+  rationale: 'The host additionally configures a font folder and fills it in every environment. Without a folder, the library runs with the substitute fonts.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-017-bereitstellung-der-schriften]]
-== ADR-017: Bereitstellung der Schriften für Vorschau und PDF
+== ADR-017: Providing the fonts for preview and PDF
 
 === Status
 
-Angenommen (accepted) am 2026-11-19.
+Accepted on 2026-11-19.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #40
-geprüft und angenommen.
+This ADR was written with AI assistance. The owner checked and accepted it in
+the review of PR #40.
 
-=== Entscheidung
+=== Decision
 
-Die Schriften kommen aus einem Ordner des Hosts, mit freien Ersatzschriften (Option 3):
+The fonts come from a folder of the host, with free substitute fonts (Option 3):
 
-* **Keine lizenzpflichtigen Schriften in der Bibliothek.** Maven-Artefakte und
-  npm-Paket enthalten nur Schriften unter freien Lizenzen, die Weitergabe,
-  Einbettung ins PDF und Auslieferung an den Browser erlauben.
-* **Der Host stellt Schriften bereit.** Er konfiguriert einen Ordner, aus dem die
-  Bibliothek Schriftdateien (TrueType oder OpenType) liest. Der Ordner ist die
-  einzige Quelle: Briefpapiere laden keine Schriften hoch, und eine Schnittstelle
-  in `spi` gibt es dafür nicht. Die Lizenz für
-  Server-Nutzung, Einbettung ins PDF und Auslieferung als Webfont verantwortet
-  der Host.
-* **Keine Systemschriften.** Die Bibliothek verlässt sich nicht darauf, dass auf
-  dem Zielsystem des Hosts oder im Browser des Nutzers Schriften installiert sind.
-* **Auflösung in fester Reihenfolge**, für Vorschau und PDF gleich:
-  . Schrift mit diesem Familiennamen im Ordner des Hosts.
-  . Sonst die freie Ersatzschrift aus der Zuordnungstabelle der Bibliothek.
-  . Sonst die freie Standardschrift der Bibliothek.
+* **No fonts that require a license in the library.** Maven artifacts and the
+  npm package contain only fonts under free licenses that allow redistribution,
+  embedding in the PDF and delivery to the browser.
+* **The host provides fonts.** It configures a folder from which the library
+  reads font files (TrueType or OpenType). The folder is the only source:
+  letterheads do not upload fonts, and there is no interface in `spi` for it.
+  The host is responsible for the license for server use, embedding in the PDF
+  and delivery as a web font.
+* **No system fonts.** The library does not rely on fonts being installed on
+  the host's target system or in the user's browser.
+* **Resolution in a fixed order**, the same for preview and PDF:
+  . Font with this family name in the host's folder.
+  . Otherwise the free substitute font from the library's mapping table.
+  . Otherwise the library's free default font.
 +
-Beide Engines laden die aufgelöste Datei: openhtmltopdf bettet sie ins PDF ein,
-Paged.js lädt sie per `@font-face` vom Backend der Bibliothek (ADR-004, ADR-014).
-* **Ersatzschriften erhalten das Schriftbild.** Die Zuordnungstabelle nennt nur
-  freie Schriften. Wo es eine OFL-Schrift mit gleichen Laufweiten gibt (metrisch
-  kompatibel), wird sie genommen, damit Zeilen- und Seitenumbrüche gleich bleiben.
-  Sonst wird eine OFL-Schrift ohne gleiche Laufweiten genommen, die dem Bild der
-  Originalschrift möglichst nahekommt.
-* **Hinweis in der Administration.** Verwendet ein Briefpapier oder ein
-  Standardschreiben eine Schrift, die im Ordner des Hosts fehlt, zeigt die
-  Administration einen Hinweis mit der Ersatzschrift, die stattdessen verwendet
-  wird. Der Hinweis blockiert nicht. Die Erzeugung von Schreiben läuft mit der
-  Ersatzschrift weiter.
-Zuordnung für die Schriften der Beispiel-DOCX. Die Kandidaten ohne geprüfte
-Lizenz prüft der Prototyp:
+Both engines load the resolved file: openhtmltopdf embeds it in the PDF,
+Paged.js loads it via `@font-face` from the library's backend (ADR-004, ADR-014).
+* **Substitute fonts preserve the typeface.** The mapping table lists only free
+  fonts. Where an OFL font with the same character widths exists (metrically
+  compatible), it is used, so that line and page breaks stay the same.
+  Otherwise an OFL font without the same character widths is used that comes
+  as close as possible to the look of the original font.
+* **Notice in the administration.** If a letterhead or a letter template uses a
+  font that is missing in the host's folder, the administration shows a notice
+  with the substitute font used instead. The notice does not block. Generating
+  letters continues with the substitute font.
+Mapping for the fonts of the sample DOCX. The prototype checks the candidates
+whose license has not been checked:
 
 [cols="1,1,2", options="header"]
 |===
-| Schrift der Vorgabe | Ersatzschrift | Anmerkung
-| Arial | Liberation Sans | SIL OFL 1.1, gleiche Laufweiten
-| Arial Narrow | PT Sans Narrow | SIL OFL 1.1, ohne gleiche Laufweiten; vom Prototyp gewählt, siehe Ergebnis. Liberation Sans Narrow (GPLv2 mit Ausnahmen, nicht mehr Teil von Liberation 2.x) wird nicht verwendet.
-| Times New Roman | Liberation Serif | SIL OFL 1.1, gleiche Laufweiten; nur Rückfallwert der DOCX
-| Courier New | Liberation Mono | SIL OFL 1.1, gleiche Laufweiten; nur deklariert
-| Calibri, Cambria | Carlito, Caladea | Lizenz im Prototyp prüfen; nur Theme-Schriften der DOCX
-| Segoe UI Symbol, MS Gothic (Kästchen ☐) | freie Schrift mit U+2610 | Kandidat Noto Sans Symbols 2 oder DejaVu Sans; nur für das Kästchen in `Formular_intern.docx`
+| Font in the specification | Substitute font | Note
+| Arial | Liberation Sans | SIL OFL 1.1, same character widths
+| Arial Narrow | PT Sans Narrow | SIL OFL 1.1, without the same character widths; chosen by the prototype, see result. Liberation Sans Narrow (GPLv2 with exceptions, no longer part of Liberation 2.x) is not used.
+| Times New Roman | Liberation Serif | SIL OFL 1.1, same character widths; only the fallback value of the DOCX
+| Courier New | Liberation Mono | SIL OFL 1.1, same character widths; only declared
+| Calibri, Cambria | Carlito, Caladea | Check the license in the prototype; only theme fonts of the DOCX
+| Segoe UI Symbol, MS Gothic (box ☐) | free font with U+2610 | Candidate Noto Sans Symbols 2 or DejaVu Sans; only for the box in `Formular_intern.docx`
 |===
 
-=== Kontext
+=== Context
 
-Die Beispiel-DOCX in `src/examples/` verwenden für sichtbaren Text nur Arial und
-Arial Narrow (`Geschaeftsbrief.docx`) sowie Arial und für das Kästchen ☐ Segoe UI
-Symbol oder MS Gothic (`Formular_intern.docx`). Ermittelt aus `document.xml`,
-Kopf- und Fußzeilen und den Formatvorlagen samt Vererbung, nicht nur aus der
-Schriftentabelle. Keine der DOCX bettet Schriften ein.
+For visible text, the sample DOCX files in `src/examples/` use only Arial and
+Arial Narrow (`Geschaeftsbrief.docx`), and Arial plus Segoe UI Symbol or
+MS Gothic for the box ☐ (`Formular_intern.docx`). Determined from
+`document.xml`, headers and footers and the styles including inheritance, not
+only from the font table. None of the DOCX files embeds fonts.
 
-Arial und Arial Narrow gehören Monotype. Die Kopien, die mit Betriebssystemen
-ausgeliefert werden, erlauben in ihrer Datei zwar die Einbettung in Dokumente.
-Ein Recht, sie auf einem Server zu nutzen oder an Browser auszuliefern, folgt
-daraus nicht. Die Bibliothek ist MIT-lizenziert und wird über GitHub Packages
-verteilt (ADR-012). Sie kann solche Schriften nicht mitliefern.
+Arial and Arial Narrow belong to Monotype. The copies shipped with operating
+systems do allow embedding in documents in their file. A right to use them on
+a server or to deliver them to browsers does not follow from that. The library
+is MIT-licensed and distributed through GitHub Packages (ADR-012). It cannot
+ship such fonts.
 
-ADR-004 sieht bisher vor, dass Schriftdateien zum Briefpapier gehören und vom
-Vorlagenverwalter hochgeladen werden. Die Verteilungssicht sagt dasselbe. Der
-Owner hat am 2026-11-19 entschieden: Der Host stellt die Schriften bereit, über
-einen konfigurierbaren Ordner, und die Bibliothek nutzt freie Ersatzschriften,
-wenn eine Schrift fehlt. Wie DOCX-Vorgaben importiert werden, ist noch offen
-(ADR-003). Der Hinweis auf fehlende Schriften gehört deshalb in die
-Administration, wo auch immer das Briefpapier entsteht.
+So far, ADR-004 provides that font files belong to the letterhead and are
+uploaded by the template manager. The deployment view says the same. The owner
+decided on 2026-11-19: the host provides the fonts, through a configurable
+folder, and the library uses free substitute fonts when a font is missing. How
+DOCX specifications are imported is still open (ADR-003). The notice about
+missing fonts therefore belongs in the administration, wherever the letterhead
+is created.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* **Lizenzverantwortung beim Betreiber:** Wer eine lizenzpflichtige Schrift nutzt,
-  besitzt die Lizenz und stellt die Datei bereit.
-* **Unabhängigkeit vom Zielsystem:** Das Ergebnis hängt nicht davon ab, welche
-  Schriften auf dem Server oder im Browser installiert sind.
-* **Wiedergabetreue (QS-004):** Vorschau und PDF verwenden dieselbe Datei.
-* **Stiltreue (QS-013):** Das Schriftbild der Vorgabe bleibt erhalten, auch mit
-  Ersatzschrift.
-* **Pflegeaufwand der Fachanwender:** Wer ein Briefpapier pflegt, muss keine
-  Schriftdateien beschaffen.
-* **Betriebsaufwand des Hosts:** Möglichst wenig zusätzliche Konfiguration und
-  Bereitstellung je Umgebung.
+* **License responsibility with the operator:** Whoever uses a font that
+  requires a license owns the license and provides the file.
+* **Independence from the target system:** The result does not depend on which
+  fonts are installed on the server or in the browser.
+* **Rendering fidelity (QS-004):** Preview and PDF use the same file.
+* **Style fidelity (QS-013):** The typeface of the specification is preserved,
+  even with a substitute font.
+* **Maintenance effort for business users:** Whoever maintains a letterhead
+  does not have to obtain font files.
+* **Operating effort for the host:** As little additional configuration and
+  provisioning per environment as possible.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Schriften als Teil des Briefpapiers hochladen
+==== Option 1: Upload fonts as part of the letterhead
 
-Bisheriger Stand in ADR-004. Der Vorlagenverwalter lädt die Schriftdateien mit
-dem Briefpapier hoch, sie liegen in der Datenbank des Hosts. Keine Konfiguration
-im Betrieb, Schriften wandern mit den Daten durch die Umgebungen. Aber ein
-Fachanwender muss Schriftdateien beschaffen und entscheidet faktisch über deren
-Lizenz, und dieselbe Schrift liegt je Briefpapier mehrfach in der Datenbank.
+Current state in ADR-004. The template manager uploads the font files with the
+letterhead; they are stored in the host's database. No configuration in
+operation, fonts move with the data through the environments. But a business
+user has to obtain font files and in effect decides on their license, and the
+same font is stored several times in the database, once per letterhead.
 
-==== Option 2: Systemschriften des Zielsystems
+==== Option 2: System fonts of the target system
 
-Die Engines nutzen installierte Schriften. Kein Aufwand in der Bibliothek. Der
-Server (oft ein schlanker Linux-Container) hat Arial meist nicht, und der Browser
-des Nutzers hat andere Schriften als der Server. Vorschau und PDF können sich
-dadurch unterscheiden, ohne dass es jemand bemerkt.
+The engines use installed fonts. No effort in the library. The server (often a
+slim Linux container) usually does not have Arial, and the user's browser has
+different fonts than the server. Preview and PDF can therefore differ without
+anyone noticing.
 
-==== Option 3: Schriftordner des Hosts mit freien Ersatzschriften (gewählt)
+==== Option 3: Font folder of the host with free substitute fonts (chosen)
 
-Der Host konfiguriert einen Ordner mit lizenzierten Schriften. Die Bibliothek
-bringt freie Ersatzschriften mit, wo möglich mit gleichen Laufweiten, und weist in der
-Administration auf fehlende Schriften hin. Der Host muss den Ordner in jeder
-Umgebung befüllen, etwa im Container-Image oder über ein Volume.
+The host configures a folder with licensed fonts. The library ships free
+substitute fonts, with the same character widths where possible, and points
+out missing fonts in the administration. The host has to fill the folder in
+every environment, for example in the container image or through a volume.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
-Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral, `-1` weaker support, and `?` a rating
+that needs a human check or a prototype. If a column contains a `?`, its sum is
+also `?`. The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Lizenzverantwortung beim Betreiber | -1 | 0 | +1
-| Unabhängigkeit vom Zielsystem | +1 | -1 | +1
-| Wiedergabetreue (QS-004) | +1 | -1 | +1
-| Stiltreue (QS-013) | +1 | -1 | ?
-| Pflegeaufwand der Fachanwender | -1 | +1 | +1
-| Betriebsaufwand des Hosts | +1 | 0 | -1
-s| Summe s| +2 s| -2 s| ?
+| Criterion | Option 1 | Option 2 | Option 3
+| License responsibility with the operator | -1 | 0 | +1
+| Independence from the target system | +1 | -1 | +1
+| Rendering fidelity (QS-004) | +1 | -1 | +1
+| Style fidelity (QS-013) | +1 | -1 | ?
+| Maintenance effort for business users | -1 | +1 | +1
+| Operating effort for the host | +1 | 0 | -1
+s| Sum s| +2 s| -2 s| ?
 |===
 
-Bei der Stiltreue bekommt Option 3 `?`: Mit den Originalschriften im Ordner ist
-sie gleichwertig zu Option 1. Ohne sie hängt das Ergebnis davon ab, wie gut die
-Ersatzschrift trifft, und das muss der Prototyp zeigen, vor allem für Arial
-Narrow. Die Ersatzschriften selbst ließen sich mit jeder Option kombinieren. Die
-Matrix vergleicht die Quelle der Originalschriften.
+For style fidelity, Option 3 gets `?`: with the original fonts in the folder,
+it is equivalent to Option 1. Without them, the result depends on how well the
+substitute font matches, and the prototype has to show that, above all for
+Arial Narrow. The substitute fonts themselves could be combined with any
+option. The matrix compares the source of the original fonts.
 
-Ohne die Stiltreue kommt Option 3 auf +3. Selbst mit `-1` bei der Stiltreue läge
-sie mit +2 gleichauf mit Option 1, die ihren Vorsprung beim Betriebsaufwand mit
-der Lizenzfrage beim Fachanwender bezahlt.
+Without style fidelity, Option 3 reaches +3. Even with `-1` for style fidelity,
+it would be level with Option 1 at +2. Option 1 pays for its lead in operating
+effort with the license question for the business user.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Die Bibliothek bleibt frei weitergebbar. Keine Schriftlizenz hängt an ihrem
-  Release.
-* Vorschau und PDF verwenden dieselbe Datei, unabhängig von Server und Browser.
-* Ohne Konfiguration läuft die Bibliothek mit Ersatzschriften. Das reicht für die
-  Beispielanwendung und für Tests.
-* Fachanwender sehen in der Administration, wenn ein Schreiben nicht mit der
-  Originalschrift erzeugt wird.
+* The library stays freely redistributable. No font license is attached to its
+  release.
+* Preview and PDF use the same file, independent of server and browser.
+* Without configuration, the library runs with substitute fonts. That is enough
+  for the sample application and for tests.
+* Business users see in the administration when a letter is not generated with
+  the original font.
 
-==== Negativ
+==== Negative
 
-* Der Host muss den Schriftordner in jeder Umgebung bereitstellen. Fehlt er in
-  einer Umgebung, erzeugt sie Schreiben mit Ersatzschrift. Das fällt nur über den
-  Hinweis in der Administration auf.
-* Eine Ersatzschrift ist nie identisch. Für Arial Narrow gibt es keine
-  OFL-Schrift mit gleichen Laufweiten. Ohne die Originalschrift im Ordner können
-  sich dort Zeilen- und Seitenumbrüche gegenüber der Vorgabe verschieben.
-* Ein PDF, das mit Ersatzschrift erzeugt und gespeichert wurde, bleibt so. Die
-  Unveränderlichkeit gespeicherter Schreiben (ADR-007) gilt auch hier.
-* Die Bibliothek braucht eine Zuordnungstabelle und eine Auflösung nach
-  Familiennamen, beides mit Tests.
+* The host has to provide the font folder in every environment. If it is
+  missing in an environment, that environment generates letters with a
+  substitute font. This is only noticed through the notice in the
+  administration.
+* A substitute font is never identical. For Arial Narrow there is no OFL font
+  with the same character widths. Without the original font in the folder, line
+  and page breaks can shift there compared with the specification.
+* A PDF that was generated with a substitute font and stored stays that way.
+  The immutability of stored letters (ADR-007) applies here too.
+* The library needs a mapping table and resolution by family name, both with
+  tests.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* ADR-004 und die Verteilungssicht sind mit Issue #39 angeglichen.
-* Der Prototyp (#3) prüft beide Wege getrennt: Referenzschriften vom Host laden
-  im sandboxed iframe unter CSP, werden ins PDF eingebettet und sind für beide
-  Nutzungen lizenziert; die Ersatzschriften werden gegen QS-004 und QS-013
-  gemessen (ADR-004).
-* Umsetzung des Schriftordners in der Rendering-Pipeline (Epic #7). Name und Form
-  der Konfiguration legt die Umsetzung fest, etwa eine Spring-Eigenschaft im
-  Starter.
-* Hinweis auf fehlende Schriften in der Administration: #41 (Epic #8, betrifft
-  auch Epic #9).
-* Die Bibliothek muss die Lizenzen der mitgelieferten Ersatzschriften in ihrer
-  Lizenzdokumentation nennen.
+* ADR-004 and the deployment view are aligned with issue #39.
+* The prototype (#3) checks both paths separately: reference fonts from the
+  host load in the sandboxed iframe under CSP, are embedded in the PDF and are
+  licensed for both uses; the substitute fonts are measured against QS-004 and
+  QS-013 (ADR-004).
+* Implementing the font folder in the rendering pipeline (Epic #7). The
+  implementation determines the name and form of the configuration, for example
+  a Spring property in the starter.
+* Notice about missing fonts in the administration: #41 (Epic #8, also affects
+  Epic #9).
+* The library must name the licenses of the bundled substitute fonts in its
+  license documentation.
 
 
-=== Ergebnis des Prototyps
+=== Prototype Result
 
-Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat beide Wege am
-`Geschaeftsbrief.docx` geprüft.
+The throwaway prototype from #3 (`prototyp/README.adoc`) checked both paths with
+`Geschaeftsbrief.docx`.
 
-* *Ordner des Hosts:* Familie, Gewicht und Stil kommen aus der Schriftdatei,
-  nicht aus dem Dateinamen. Keine Systemschriften, keine Schriften im
-  Repository. Arial und Arial Narrow laden im sandboxed iframe unter der CSP und
-  werden ins PDF eingebettet. Die Freigabe ihrer Lizenz für Einbettung und
-  Webfont steht aus.
-* *Auflösung:* Ordner des Hosts, dann Zuordnungstabelle, dann Standardschrift
-  Liberation Sans. Die Ersatzschrift wird unter dem Familiennamen der Vorlage
-  registriert, das CSS bleibt gleich, und PDF und Vorschau bekommen dieselbe
-  Datei. Je ersetzte Familie entsteht ein Hinweis.
-* *Arial → Liberation Sans 2.1.5:* gleiche Laufweiten, wie angenommen.
-* *Arial Narrow → PT Sans Narrow:* Eine OFL-Schrift mit gleichen Laufweiten gibt
-  es nicht. Verglichen wurden Encode Sans Condensed, Fira Sans Condensed, IBM
-  Plex Sans Condensed und PT Sans Narrow. Breitere Schriften brechen in den
-  Spalten fester Breite um; mit Encode Sans Condensed rückt der Infoblock
-  4,2 mm tiefer. PT Sans Narrow ist 6 bis 7 % schmaler und wirkt weicher, hält
-  aber alle Umbrüche. Die Zeilenanfänge liegen höchstens 0,1 mm neben Word. Ob
-  das Bild reicht, entscheidet die zentrale Abteilung (QS-013).
-* Beide Referenzschreiben bleiben mit Ersatzschriften PDF/A-2b und PDF/UA-1.
-* *Ligaturen:* PDFBox 3 schreibt die fi-Ligatur von PT Sans Narrow als U+FB01
-  in den Text des PDFs. Suche und Kopieren liefern je nach Viewer „ﬁ“. Abhilfe
-  fürs Produkt ist offen: Ligaturen beim Einbetten abschalten oder die
-  Ersatzschrift ohne `liga` ausliefern; Letzteres verlangt nach der OFL einen
-  neuen Namen.
-* *Variable Schriften* (etwa Archivo Narrow, Roboto Condensed) bettet PDFBox
-  nicht verlässlich ein. Die Zuordnungstabelle nennt nur statische Schriften.
-* Die Ersatzschriften lädt ein Skript mit fester Version und Prüfsumme; sie sind
-  nicht eingecheckt.
+* *Host's folder:* Family, weight and style come from the font file, not from
+  the file name. No system fonts, no fonts in the repository. Arial and Arial
+  Narrow load in the sandboxed iframe under the CSP and are embedded in the PDF.
+  Clearance of their license for embedding and web font use is pending.
+* *Resolution:* host's folder, then mapping table, then default font Liberation
+  Sans. The substitute font is registered under the family name of the
+  template, the CSS stays the same, and PDF and preview get the same file. Each
+  replaced family produces a notice.
+* *Arial → Liberation Sans 2.1.5:* same character widths, as assumed.
+* *Arial Narrow → PT Sans Narrow:* There is no OFL font with the same character
+  widths. Compared were Encode Sans Condensed, Fira Sans Condensed, IBM Plex Sans
+  Condensed and PT Sans Narrow. Wider fonts wrap in the fixed-width columns;
+  with Encode Sans Condensed the info block moves 4.2 mm lower. PT Sans Narrow
+  is 6 to 7 % narrower and looks softer, but keeps all breaks. The line starts
+  are at most 0.1 mm off from Word. The central department decides whether the
+  look is good enough (QS-013).
+* Both reference letters remain PDF/A-2b and PDF/UA-1 with substitute fonts.
+* *Ligatures:* PDFBox 3 writes the fi ligature of PT Sans Narrow as U+FB01 into
+  the text of the PDF. Depending on the viewer, search and copy return “ﬁ”. The
+  remedy for the product is open: switch off ligatures when embedding, or ship
+  the substitute font without `liga`; under the OFL the latter requires a new
+  name.
+* *Variable fonts* (for example Archivo Narrow, Roboto Condensed) are not
+  embedded reliably by PDFBox. The mapping table lists only static fonts.
+* A script with a fixed version and checksum loads the substitute fonts; they
+  are not checked in.
 
-Nicht geprüft: Carlito, Caladea, die Kandidaten für das Kästchen und Liberation
-Serif und Mono. Der Geschäftsbrief braucht sie nicht. Ebenso nicht, ob der
-Browser für fehlende Zeichen auf eine Systemschrift zurückfällt.
+Not checked: Carlito, Caladea, the candidates for the box, and Liberation Serif
+and Mono. The business letter does not need them. Also not checked: whether the
+browser falls back to a system font for missing characters.
 
 === Impact
 
@@ -275,47 +272,47 @@ include::generated/adr-017-bereitstellung-der-schriften-impact.adoc[leveloffset=
 include::generated/adr-017-bereitstellung-der-schriften-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-017-bereitstellung-der-schriften-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Lizenz der Originalschriften (Owner, 2026-11-21): Die Bibliothek liefert sie
-  weder im Repository noch in Artefakten oder Tests aus. Stellt der Host sie
-  bereit, bettet das PDF Teilmengen davon ein (PDF/A verlangt das), und die
-  Vorschau erhält sie als Webfont. Das Projekt nimmt an, dass der Host beides darf;
-  maßgeblich ist seine Lizenz.
-* Die Bibliothek erkennt eine Schrift am Familiennamen aus der Schriftdatei, nicht
-  am Dateinamen. Schnitte (fett, kursiv) liegen als eigene Dateien im Ordner.
-* openhtmltopdf und Paged.js setzen dieselbe TrueType- oder OpenType-Datei mit
-  gleichen Laufweiten. Das prüft der Prototyp.
-* Der Browser fällt nicht auf installierte Schriften zurück, weil die Vorschau
-  nur Schriften verwendet, die per `@font-face` vom Backend kommen. Für Zeichen,
-  die keine dieser Schriften enthält, kann der Browser trotzdem eine
-  Systemschrift nehmen. Das prüft der Prototyp ebenfalls.
+* License of the original fonts (owner, 2026-11-21): The library ships them
+  neither in the repository nor in artifacts or tests. If the host provides
+  them, the PDF embeds subsets of them (PDF/A requires this), and the preview
+  receives them as a web font. The project assumes that the host is allowed to
+  do both; its license is what counts.
+* The library recognizes a font by the family name from the font file, not by
+  the file name. Styles (bold, italic) are separate files in the folder.
+* openhtmltopdf and Paged.js set the same TrueType or OpenType file with the
+  same character widths. The prototype checks this.
+* The browser does not fall back to installed fonts, because the preview uses
+  only fonts that come from the backend via `@font-face`. For characters that
+  none of these fonts contains, the browser can still take a system font. The
+  prototype checks this as well.
 
 === Open Questions
 
-Der Owner hat im Review von PR #40 entschieden:
+The owner decided in the review of PR #40:
 
-* *Ersatz für Arial Narrow:* wie bei den anderen Schriften eine OFL-Schrift, hier
-  ohne gleiche Laufweiten.
-* *Weitere Schriftquelle:* Nein. Der Ordner des Hosts ist die einzige Quelle.
-* *Ordner oder Schnittstelle:* Der Ordner reicht.
+* *Substitute for Arial Narrow:* as with the other fonts, an OFL font, here
+  without the same character widths.
+* *Further font source:* No. The host's folder is the only source.
+* *Folder or interface:* The folder is enough.
 
-Offen bleibt, ob die Bibliothek fehlende Schriften zusätzlich beim Start oder bei
-der Erzeugung protokolliert. Die Frage steht in #41.
+It remains open whether the library additionally logs missing fonts at startup
+or during generation. The question is in #41.
 
 === Review Notes
 
-* Der Owner hat den ADR im Review von PR #40 am 2026-11-19 angenommen, die vier
-  Relationen zu ADR-004, QS-004, QS-013 und QS-007 ebenso.
-* Die Bewertung der Stiltreue in der Pugh-Matrix bleibt `?`. Der Prototyp hat die
-  Ersatzschriften gemessen; die Abnahme nach QS-013 steht aus.
-* Liberation Sans und PT Sans Narrow stehen unter SIL OFL 1.1. Die Lizenzen von
-  Carlito, Caladea und der Kandidaten für das Kästchen sind noch zu prüfen, wenn
-  eine Vorlage sie braucht.
+* The owner accepted the ADR in the review of PR #40 on 2026-11-19, as well as
+  the four relations to ADR-004, QS-004, QS-013 and QS-007.
+* The style fidelity rating in the Pugh matrix stays `?`. The prototype measured
+  the substitute fonts; acceptance under QS-013 is pending.
+* Liberation Sans and PT Sans Narrow are under SIL OFL 1.1. The licenses of
+  Carlito, Caladea and the candidates for the box still have to be checked when
+  a template needs them.

@@ -1,298 +1,306 @@
 ---
 id: ADR-024-sprache-der-ubiquitous-language-im-code
 type: ADR
-title: 'Sprache von Code, Ubiquitous Language und Dokumentation'
+title: 'Language of code, ubiquitous language and documentation'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-26'
 reviewed: true
-summary: 'Code, Gherkin-Features, README, Integrationsdoku und Architekturdokumentation einschließlich ADRs sind englisch. Das Glossar ist zweisprachig: Es nennt zu jedem Fachbegriff den deutschen Begriff der Fachsprache und verbindlich den englischen Begriff im Code. Projekt, Paket und Artefakte heißen letterwright. Der Code wird in einem Zug vor dem ersten Release und vor dem Rest von #10 umgestellt; die Architekturdokumentation übersetzt ein eigener Doku-PR. RB-12 entfällt zugunsten dieses ADR.'
+summary: 'Code, Gherkin features, README, integration documentation and architecture documentation including ADRs are in English. The glossary is bilingual: for every domain term it names the German term of the domain language and, as binding, the English term in the code. Project, package and artifacts are named letterwright. The code is migrated in one go before the first release and before the rest of #10; a separate docs PR translates the architecture documentation. RB-12 is dropped in favour of this ADR.'
 derived_from:
 - type: external
-  description: 'Issue #1, Frage 2 „Sprache der Dokumentation, der ADRs und des Codes“: damals entschieden „Doku, ADRs und Ubiquitous Language auf Deutsch“ (RB-12)'
+  description: 'Issue #1, question 2 “Language of the documentation, the ADRs and the code”: decided at the time “docs, ADRs and ubiquitous language in German” (RB-12)'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 - type: conversation
-  description: 'Überlegung des Owners am 2026-11-26: Seit SPI und Java-API öffentlich sind, passt deutsche Ubiquitous Language im Code womöglich nicht zu einem Open-Source-Werkzeug; Vorschlag, die damalige Option „Code englisch, Glossar DE↔EN“ als ADR-Entwurf zu prüfen'
+  description: 'Consideration of the owner on 2026-11-26: since the SPI and the Java API are public, a German ubiquitous language in the code may not fit an open source tool; proposal to examine the option of that time “code in English, glossary DE↔EN” as an ADR draft'
 - type: conversation
-  description: 'Antworten des Owners am 2026-11-26 auf die Open Questions des ersten Entwurfs: Gherkin englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als Basissprache; LetterTemplate und BusinessReference; Paket und Artefakt umbenennen; Migration vor dem Rest von #10'
+  description: 'Answers of the owner on 2026-11-26 to the open questions of the first draft: Gherkin in English; README and integration documentation in English with a note on German as the base language; LetterTemplate and BusinessReference; rename package and artifact; migration before the rest of #10'
 - type: conversation
-  description: 'Entscheidung des Owners am 2026-11-26 nach Prüfung: Der Name ist letterwright'
+  description: 'Decision of the owner on 2026-11-26 after checking: the name is letterwright'
 - type: conversation
-  description: 'Review des Owners am 2026-11-26: LetterSaveCallback statt AfterSave, weil AfterSave den Zeitpunkt offenlässt; die Javadoc nennt ihn ausdrücklich'
+  description: 'Review of the owner on 2026-11-26: LetterSaveCallback instead of AfterSave, because AfterSave leaves the point in time open; the Javadoc states it explicitly'
 - type: conversation
-  description: 'Annahme durch den Owner am 2026-11-26 mit Option 4 statt der vorgeschlagenen Option 2: Auch Architekturdoku und ADRs englisch, Fachglossar zweisprachig, weil Mitentwickler die Architekturdoku verstehen müssen; Übersetzung durch die KI in einem eigenen Doku-PR, den der Owner gesondert prüft'
+  description: 'Acceptance by the owner on 2026-11-26 with option 4 instead of the proposed option 2: architecture documentation and ADRs in English as well, domain glossary bilingual, because co-developers must understand the architecture documentation; translation by the AI in a separate docs PR, which the owner reviews separately'
 tags:
 - decision
-- sprache
+- language
 - ubiquitous-language
 - integration
 relations:
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
   status: accepted
-  rationale: 'ADR-018 setzt voraus, dass die Namen im Code die Begriffe des Glossars sind. Dieser ADR hält daran fest, legt aber fest, dass der Begriff im Code der englische Eintrag des Glossars ist.'
+  rationale: 'ADR-018 presupposes that the names in the code are the terms of the glossary. This ADR keeps that, but specifies that the term in the code is the English entry of the glossary.'
   reviewed: true
 - type: affects
   target: ADR-016-schnittstelle-zur-host-anwendung
   status: accepted
-  rationale: 'Die Typen von spi und api, die ADR-016 und ADR-023 festlegen, sind der Vertrag mit dem Host. Ihre Namen ändern sich mit diesem ADR; der Schnitt bleibt gleich.'
+  rationale: 'The types of spi and api, which ADR-016 and ADR-023 define, are the contract with the host. Their names change with this ADR; the cut stays the same.'
   reviewed: true
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Ein Entwicklerteam ohne Deutschkenntnisse kann SPI, Java-API, Javadoc, Integrationsdoku und Architekturdoku lesen. Das senkt den Integrationsaufwand für alle, die nicht Deutsch sprechen.'
+  rationale: 'A developer team without knowledge of German can read the SPI, Java API, Javadoc, integration documentation and architecture documentation. This lowers the integration effort for everyone who does not speak German.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-024-sprache-der-ubiquitous-language-im-code]]
-== ADR-024: Sprache von Code, Ubiquitous Language und Dokumentation
+== ADR-024: Language of code, ubiquitous language and documentation
 
 === Status
 
-Angenommen (accepted) am 2026-11-26.
+Accepted on 2026-11-26.
 
-Der ADR ist KI-gestützt formuliert. Vorgeschlagen war Option 2: Code englisch,
-Architekturdoku deutsch. Der Owner hat den ADR am 2026-11-26 angenommen, aber mit
-Option 4: Auch Architekturdoku und ADRs sind englisch, das Fachglossar ist
-zweisprachig. Sein Grund: Wer mitentwickeln will, muss die Architekturdoku
-verstehen. Eine deutsche Doku schließt alle aus, die kein Deutsch sprechen;
-Englisch ist in der IT üblich und akzeptiert. Zuvor hatte er die fünf offenen
-Fragen des ersten Entwurfs beantwortet und den Namen `letterwright` festgelegt.
+The ADR was drafted with AI support. Option 2 was proposed: code in English,
+architecture documentation in German. The owner accepted the ADR on 2026-11-26,
+but with option 4: architecture documentation and ADRs are in English as well,
+and the domain glossary is bilingual. His reason: whoever wants to contribute
+to development must understand the architecture documentation. German
+documentation excludes everyone who does not speak German; English is common
+and accepted in IT. Before that, he had answered the five open questions of the
+first draft and fixed the name `letterwright`.
 
-=== Entscheidung
+=== Decision
 
-Code und Dokumentation des Projekts sind englisch. Die deutsche Fachsprache bleibt
-über ein zweisprachiges Glossar erhalten (Option 4).
+Code and documentation of the project are in English. The German domain
+language is preserved through a bilingual glossary (option 4).
 
-* *Englisch im Code:* Typen, Methoden, Felder, Pakete, Module und Javadoc sind
-  englisch, ebenso die Typen und Komponenten des Frontends. Für Umlaute gibt es
-  dann keine Umschreibung mehr wie `Rueckrufergebnis` oder `Loeschanfrage`.
-* *Gherkin-Features englisch:* Die Features sind ausführbare Spezifikation des
-  Codes und nutzen dieselben Begriffe wie er. `# language: de` entfällt.
-* *Architekturdokumentation englisch:* arc42-Kapitel, ADRs, Qualitätsszenarien,
-  Risiken, Fragen und Antworten sowie Vision und Roadmap sind englisch.
-  Artefakt-IDs, Anker und Dateinamen bleiben stabil, auch wenn sie deutsche Wörter
-  enthalten.
-* *README und Integrationsdoku englisch:* Sie richten sich an Host-Entwickler
-  (#11). Das README sagt deutlich, dass die Basissprache der Fachdomäne Deutsch
-  ist, dass das Glossar die deutschen Begriffe nennt und dass die englischen
-  Begriffe Übersetzungen sind, die teils holpern.
-* *Zweisprachiges Fachglossar:* Das Glossar nennt zu jedem Fachbegriff den
-  deutschen Begriff der Fachsprache und verbindlich den englischen Begriff im Code.
-  Für jeden Fachbegriff gibt es genau einen englischen Begriff. Ein Synonym im Code
-  ist ein Fehler, wie heute auch. Die Definitionen sind englisch wie die übrige
-  Doku.
-* *Texte der Oberfläche* sind keine Bezeichner und nicht Gegenstand dieses ADR.
-* *Projekt, Paket und Artefakte heißen `letterwright`* (siehe unten).
-* *Zwei Schritte:*
-** Der Code wird in einem Zug in einem eigenen Issue umgestellt, vor dem Rest von
-   #10 und bevor weitere öffentliche Typen hinzukommen. Solange es kein Release
-   gibt, bricht das keinen Host. Diese Migration passt die Bezeichner in der noch
-   deutschen Doku an.
-** Die Architekturdokumentation übersetzt die KI in einem eigenen Doku-PR. Der
-   Owner prüft die Übersetzung gesondert. Bis dieser PR gemergt ist, entsteht neue
-   Architekturdoku weiter auf Deutsch, damit die Doku nicht halb übersetzt ist.
-* *RB-12 entfällt:* Die Randbedingung „Dokumentation und Ubiquitous Language auf
-  Deutsch“ gilt nicht mehr. An ihre Stelle tritt dieser ADR.
+* *English in the code:* Types, methods, fields, packages, modules and Javadoc
+  are in English, as are the types and components of the frontend. There is
+  then no longer any transcription of umlauts such as `Rueckrufergebnis` or
+  `Loeschanfrage`.
+* *Gherkin features in English:* The features are an executable specification
+  of the code and use the same terms as the code. `# language: de` is dropped.
+* *Architecture documentation in English:* arc42 chapters, ADRs, quality
+  scenarios, risks, questions and answers as well as vision and roadmap are in
+  English. Artifact IDs, anchors and file names stay stable, even if they
+  contain German words.
+* *README and integration documentation in English:* They address host
+  developers (#11). The README states clearly that the base language of the
+  business domain is German, that the glossary names the German terms and that
+  the English terms are translations, some of them clumsy.
+* *Bilingual domain glossary:* For every domain term, the glossary names the
+  German term of the domain language and, as binding, the English term in the
+  code. For every domain term there is exactly one English term. A synonym in
+  the code is an error, as it is today. The definitions are in English like
+  the rest of the documentation.
+* *User interface texts* are not identifiers and not the subject of this ADR.
+* *Project, package and artifacts are named `letterwright`* (see below).
+* *Two steps:*
+** The code is migrated in one go in a separate issue, before the rest of #10
+   and before further public types are added. As long as there is no release,
+   this breaks no host. This migration adjusts the identifiers in the still
+   German documentation.
+** The AI translates the architecture documentation in a separate docs PR. The
+   owner reviews the translation separately. Until this PR is merged, new
+   architecture documentation continues to be written in German, so that the
+   documentation is not half translated.
+* *RB-12 is dropped:* The constraint “Documentation and ubiquitous language in
+  German” no longer applies. This ADR takes its place.
 
-==== Kernbegriffe
+==== Core Terms
 
-`LetterTemplate`, `BusinessReference` und `LetterSaveCallback` hat der Owner am
-2026-11-26 festgelegt,
-die übrigen Übersetzungen gelten mit der Annahme dieses ADR. Die Migration
-übernimmt sie ins Glossar; danach führt nur noch das Glossar sie.
+The owner fixed `LetterTemplate`, `BusinessReference` and `LetterSaveCallback`
+on 2026-11-26;
+the other translations apply with the acceptance of this ADR. The migration
+transfers them into the glossary; after that, only the glossary maintains them.
 
 [cols="2,2,3", options="header"]
 |===
-| Begriff im Glossar | Vorschlag im Code | Anmerkung
-| Briefpapier | `Letterhead` | Üblicher englischer Begriff für das Seitenlayout eines Briefs.
-| Standardschreiben | `LetterTemplate` | Festgelegt vom Owner.
-| Vorlage (Briefpapier oder Standardschreiben) | `Template` | Oberbegriff; `LetterTemplate` ist eine Art davon.
+| Term in the glossary | Proposal in the code | Note
+| Briefpapier | `Letterhead` | Common English term for the page layout of a letter.
+| Standardschreiben | `LetterTemplate` | Fixed by the owner.
+| Vorlage (Briefpapier oder Standardschreiben) | `Template` | Generic term; `LetterTemplate` is one kind of it.
 | Vorlagenversion | `TemplateVersion` |
-| Schreiben | `Letter` | Anwendungsfälle etwa `SaveLetter`, `ListLetters`, `DownloadLetter`, `DeleteLetter`.
-| Fachlicher Bezug | `BusinessReference` | Festgelegt vom Owner.
+| Schreiben | `Letter` | Use cases such as `SaveLetter`, `ListLetters`, `DownloadLetter`, `DeleteLetter`.
+| Fachlicher Bezug | `BusinessReference` | Fixed by the owner.
 | Bezugstyp | `ReferenceType` |
 | Datenkontext | `DataContext` |
 | Platzhalter | `Placeholder` |
-| Platzhalterdaten-Anbieter | `PlaceholderDataProvider` | So schon in Issue #1 vorgeschlagen.
+| Platzhalterdaten-Anbieter | `PlaceholderDataProvider` | Already proposed like this in issue #1.
 | Berechtigungsprüfung | `AuthorizationCheck` |
 | Löschrichtlinie | `DeletionPolicy` |
 | Löschentscheidung | `DeletionDecision` |
-| Rückruf nach dem Speichern | `LetterSaveCallback` | Heute `NachDemSpeichern`. Festgelegt vom Owner statt `AfterSave`, das offenlässt, ob der Rückruf vor oder nach dem Commit läuft. Weil auch `LetterSaveCallback` den Zeitpunkt nicht nennt, sagt die Javadoc ausdrücklich: synchron in derselben Transaktion, vor dem Commit, Rollback bei Ablehnung (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
+| Rückruf nach dem Speichern | `LetterSaveCallback` | Today `NachDemSpeichern`. Fixed by the owner instead of `AfterSave`, which leaves open whether the callback runs before or after the commit. Because `LetterSaveCallback` does not name the point in time either, the Javadoc states it explicitly: synchronous in the same transaction, before the commit, rollback on rejection (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]).
 | Rückrufergebnis | `CallbackResult` |
 | Vorschau | `Preview` |
-| Snapshot | `Snapshot` | Unverändert.
+| Snapshot | `Snapshot` | Unchanged.
 | Prüfsumme | `Checksum` |
 | Benutzerkennung | `UserId` |
 | Dokumentverweis | `DocumentReference` |
 |===
 
-==== Name von Projekt, Paket und Artefakten
+==== Name of Project, Package and Artifacts
 
-Der Name `standardschreiben` ist an den deutschen Fachbegriff gebunden und folgt
-nicht mehr der Sprache des Codes. Der neue Name ist *Letterwright*:
+The name `standardschreiben` is tied to the German domain term and no longer
+follows the language of the code. The new name is *Letterwright*:
 
-* Gebildet wie _playwright_ oder _shipwright_: jemand, der Briefe fertigt. Die
-  Bibliothek fertigt aus Briefpapier, Standardschreiben und Daten des Hosts ein
-  Schreiben.
-* Am 2026-11-26 gab es weder ein npm-Paket noch ein GitHub-Repository dieses
-  Namens. Der Owner hat den Namen am selben Tag geprüft und festgelegt.
-* Daraus folgen die Gruppe `io.github.dieterbaier.letterwright`, das Paket
-  `dieterbaier.letterwright`, das Gradle-Projekt `letterwright` und das npm-Paket
-  `@dieterbaier/letterwright`.
+* Formed like _playwright_ or _shipwright_: someone who crafts letters. The
+  library crafts a letter from letterhead, letter template and data of the
+  host.
+* On 2026-11-26 there was neither an npm package nor a GitHub repository of
+  this name. The owner checked and fixed the name on the same day.
+* From this follow the group `io.github.dieterbaier.letterwright`, the package
+  `dieterbaier.letterwright`, the Gradle project `letterwright` and the npm
+  package `@dieterbaier/letterwright`.
 
-Betrachtete Alternativen: `letterkit` (ein Baukasten aus Starter und Komponenten;
-ein gleichnamiges GitHub-Repository existiert), `letterforge` (mehrere
-gleichnamige Projekte) und ein beschreibender Name wie `letter-templates` (eindeutig,
-aber kaum als Eigenname tauglich).
+Considered alternatives: `letterkit` (a construction kit of starter and
+components; a GitHub repository of the same name exists), `letterforge`
+(several projects of the same name) and a descriptive name such as
+`letter-templates` (unambiguous, but hardly usable as a proper name).
 
-=== Kontext
+=== Context
 
-Issue #1 hat in Frage 2 zwei Optionen genannt: Code und Ubiquitous Language im Code
-englisch mit einem Glossar DE↔EN oder alles deutsch. Der Owner hat sich damals für
-Deutsch entschieden. Daraus wurde RB-12, auf dem ADR-018 („Die Namen im Code sind
-die Begriffe des Glossars“) und die Lösungsstrategie (Code-Stil) aufbauen.
+Issue #1 named two options in question 2: code and ubiquitous language in the
+code in English with a glossary DE↔EN, or everything in German. The owner
+decided for German at the time. This became RB-12, on which ADR-018 (“The names
+in the code are the terms of the glossary”) and the solution strategy (code
+style) build.
 
-Seitdem hat sich die Lage geändert:
+Since then the situation has changed:
 
-* *Der Vertrag mit dem Host ist öffentlich.* Die Module `spi` (ADR-016) und `api`
-  (ADR-023) sind die einzigen Teile der Bibliothek, gegen die der Host kompiliert.
-  Ihre Namen und ihre Javadoc liest jedes Entwicklerteam, das die Bibliothek
-  einbindet. Heute heißen sie zum Beispiel `PlatzhalterdatenAnbieter`,
-  `NachDemSpeichern`, `Rueckrufergebnis` und `Loeschentscheidung`.
-* *Die Bibliothek ist Open Source (MIT, RB-07).* Wer beitragen will, liest den
-  Kern. Deutsche Namen neben englischer Java- und Spring-API und Umschreibungen
-  wie `ue` erschweren das auch für Deutschsprachige.
-* *Es gibt noch kein Release.* Eine Umbenennung kostet heute Arbeit, nach dem
-  ersten Release bricht sie die API des Hosts. Jedes weitere Issue mit öffentlichen
-  Typen macht sie teurer.
+* *The contract with the host is public.* The modules `spi` (ADR-016) and `api`
+  (ADR-023) are the only parts of the library that the host compiles against.
+  Every developer team that integrates the library reads their names and their
+  Javadoc. Today they are named, for example, `PlatzhalterdatenAnbieter`,
+  `NachDemSpeichern`, `Rueckrufergebnis` and `Loeschentscheidung`.
+* *The library is open source (MIT, RB-07).* Whoever wants to contribute reads
+  the core. German names next to the English Java and Spring API, and
+  transcriptions such as `ue`, make this harder even for German speakers.
+* *There is no release yet.* A rename costs work today; after the first
+  release it breaks the host's API. Every further issue with public types
+  makes it more expensive.
 
-Der Bestand bei Erstellung dieses Entwurfs, auf `main` bei `5f3ae6b`: etwa 250
-Java-Dateien in 16 Gradle-Modulen mit teils deutschen Modulnamen (`domaene-*`,
-`adapter-persistenz-jdbc`, `architekturtests`, `host-vertragstest`), das Paket
-`dieterbaier.standardschreiben`, zehn Gherkin-Dateien mit `# language: de` und das
-npm-Paket `komponenten`. Das Datenbankschema mit Liquibase (#6) gibt es noch nicht.
-Die Zahlen liefert zum Beispiel `find src/application -name '*.java' | wc -l`.
+The code base when this draft was written, on `main` at `5f3ae6b`: about 250
+Java files in 16 Gradle modules, some with German module names (`domaene-*`,
+`adapter-persistenz-jdbc`, `architekturtests`, `host-vertragstest`), the package
+`dieterbaier.standardschreiben`, ten Gherkin files with `# language: de` and
+the npm package `komponenten`. The database schema with Liquibase (#6) does not
+exist yet. The numbers come, for example, from
+`find src/application -name '*.java' | wc -l`.
 
-Die Fachsprache selbst ist deutsch und an deutsche Normen gebunden (DIN 5008,
-Form A und B). Für manche Begriffe gibt es kein eindeutiges englisches Wort, allen
-voran „Standardschreiben“.
+The domain language itself is German and tied to German standards (DIN 5008,
+form A and B). For some terms there is no unambiguous English word, above all
+“Standardschreiben”.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* **Zugänglichkeit des Vertrags:** Host-Entwickler und Beitragende ohne
-  Deutschkenntnisse verstehen SPI, Java-API und Kern.
-* **Nähe zur Fachsprache:** Das Gespräch mit Fachanwendern und die Gherkin-Szenarien
-  nutzen ihre Begriffe ohne Übersetzung.
-* **Eine Sprache im Code:** keine Mischung mit der englischen Java- und
-  Spring-API, keine Umschreibung von Umlauten.
-* **Eine Sprache im Modell:** Ein Fachbegriff hat im Code genau einen Namen. An der
-  Grenze zum Host wird nicht übersetzt.
-* **Zugänglichkeit der Architekturdoku:** Mitentwickler ohne Deutschkenntnisse
-  verstehen Entscheidungen, Qualitätsziele und Bausteine.
-* **Aufwand der Umstellung:** Code, Tests, Features, Doku und Glossar.
+* **Accessibility of the contract:** Host developers and contributors without
+  knowledge of German understand the SPI, the Java API and the core.
+* **Closeness to the domain language:** The conversation with domain users and
+  the Gherkin scenarios use their terms without translation.
+* **One language in the code:** no mix with the English Java and Spring API,
+  no transcription of umlauts.
+* **One language in the model:** A domain term has exactly one name in the
+  code. There is no translation at the boundary to the host.
+* **Accessibility of the architecture documentation:** Co-developers without
+  knowledge of German understand decisions, quality goals and building blocks.
+* **Effort of the migration:** code, tests, features, documentation and
+  glossary.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Alles bleibt deutsch (Status quo, RB-12)
+==== Option 1: Everything stays German (status quo, RB-12)
 
-Code, Glossar und Dokumentation bleiben deutsch. Es gibt keinen Aufwand und keine
-Übersetzung. Der öffentliche Vertrag bleibt für alle schwer lesbar, die kein Deutsch
-sprechen.
+Code, glossary and documentation stay German. There is no effort and no
+translation. The public contract stays hard to read for everyone who does not
+speak German.
 
-==== Option 2: Code englisch, Glossar DE↔EN, Architekturdoku deutsch
+==== Option 2: Code in English, glossary DE↔EN, architecture documentation in German
 
-Wie oben beschrieben. Code und Features stehen in einer Sprache, README und
-Integrationsdoku sprechen Host-Entwickler auf Englisch an, und das Glossar ist die
-verbindliche Brücke zur deutschen Fachsprache. Die Umstellung kostet einmal Arbeit.
-Wer mit Fachanwendern spricht, muss die Zuordnung im Glossar kennen.
+As described above. Code and features are in one language, README and
+integration documentation address host developers in English, and the glossary
+is the binding bridge to the German domain language. The migration costs work
+once. Whoever talks with domain users must know the mapping in the glossary.
 
-==== Option 3: Nur SPI und Java-API englisch, innen deutsch
+==== Option 3: Only SPI and Java API in English, German inside
 
-Der Host sieht englische Namen, der Kern bleibt deutsch. Der Adapter an der Grenze
-übersetzt zwischen beiden Sprachen. Jeder Begriff hat dann zwei Namen im Code. Das
-widerspricht der Ubiquitous Language mehr als jede einheitliche Lösung, und für
-Beitragende ändert sich nichts.
+The host sees English names, the core stays German. The adapter at the
+boundary translates between both languages. Every term then has two names in
+the code. This contradicts the ubiquitous language more than any uniform
+solution, and nothing changes for contributors.
 
-==== Option 4: Alles englisch, Fachglossar zweisprachig (gewählt)
+==== Option 4: Everything in English, domain glossary bilingual (chosen)
 
-Wie Option 2, dazu Architekturdokumentation und ADRs auf Englisch. Das Glossar
-nennt deutsche und englische Begriffe. Das ist am zugänglichsten, entfernt die Doku
-aber von deutschsprachigen Fachanwendern und verlangt die Übersetzung aller ADRs
-und arc42-Kapitel.
+Like option 2, plus architecture documentation and ADRs in English. The
+glossary names German and English terms. This is the most accessible, but
+moves the documentation away from German-speaking domain users and requires
+the translation of all ADRs and arc42 chapters.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` stands for better support, `0` for neutral and `-1` for weaker support.
+The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
-| Zugänglichkeit des Vertrags | -1 | +1 | +1 | +1
-| Nähe zur Fachsprache | +1 | 0 | 0 | -1
-| Eine Sprache im Code | -1 | +1 | -1 | +1
-| Eine Sprache im Modell | +1 | +1 | -1 | +1
-| Zugänglichkeit der Architekturdoku | -1 | -1 | -1 | +1
-| Aufwand der Umstellung | +1 | -1 | 0 | -1
-s| Summe s| 0 s| +1 s| -2 s| +2
+| Criterion | Option 1 | Option 2 | Option 3 | Option 4
+| Accessibility of the contract | -1 | +1 | +1 | +1
+| Closeness to the domain language | +1 | 0 | 0 | -1
+| One language in the code | -1 | +1 | -1 | +1
+| One language in the model | +1 | +1 | -1 | +1
+| Accessibility of the architecture documentation | -1 | -1 | -1 | +1
+| Effort of the migration | +1 | -1 | 0 | -1
+s| Total s| 0 s| +1 s| -2 s| +2
 |===
 
-Option 2 bekommt bei der Nähe zur Fachsprache `0`, weil Glossar,
-Architekturdoku und Gespräch deutsch bleiben, Code und Features aber nicht. Option 3 bekommt bei der
-Zugänglichkeit `+1`, weil Hosts nur den Vertrag sehen. Für Beitragende bliebe der
-Kern trotzdem deutsch. Beim Aufwand bekommt Option 3 `0`, weil zwar nur der
-Vertrag umbenannt wird, aber eine dauerhafte Übersetzungsschicht hinzukommt.
+Option 2 gets `0` for closeness to the domain language, because glossary,
+architecture documentation and conversation stay German, but code and features
+do not. Option 3 gets `+1` for accessibility, because hosts only see the
+contract. For contributors, the core would still stay German. For the effort,
+option 3 gets `0`, because only the contract is renamed, but a permanent
+translation layer is added.
 
-Der erste Entwurf kannte das Kriterium „Zugänglichkeit der Architekturdoku“ nicht
-und schlug deshalb Option 2 vor. Der Owner hat es bei der Annahme eingebracht.
-Option 4 bleibt bei der Nähe zur Fachsprache bei `-1`: Das zweisprachige Glossar
-mildert den Abstand, die Doku liest ein Fachanwender trotzdem nicht in seiner
-Sprache.
+The first draft did not have the criterion “Accessibility of the architecture
+documentation” and therefore proposed option 2. The owner introduced it at the
+acceptance. Option 4 stays at `-1` for closeness to the domain language: the
+bilingual glossary softens the distance, but a domain user still does not read
+the documentation in their language.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* SPI, Java-API, Javadoc und Architekturdoku sind ohne Deutschkenntnisse lesbar.
-  Das hilft bei der Integration (QS-007) und bei Beiträgen.
-* Im Code steht eine Sprache, ohne Umschreibung von Umlauten.
-* Geschieht die Umstellung vor dem ersten Release, bricht sie keinen Host.
+* SPI, Java API, Javadoc and architecture documentation are readable without
+  knowledge of German. This helps with integration (QS-007) and with
+  contributions.
+* The code is in one language, without transcription of umlauts.
+* If the migration happens before the first release, it breaks no host.
 
-==== Negativ
+==== Negative
 
-* Einmaliger Aufwand: Typen, Pakete, Module, Tests, Gherkin-Steps, Frontend,
-  Glossar, Bausteinsicht und alle ADRs, die Bezeichner im Code nennen.
-* Die Übersetzung der gesamten Architekturdoku kostet einen eigenen PR und eine
-  eigene Prüfung durch den Owner. Bis dahin ist die Doku deutsch und der Code
-  englisch.
-* Bis zur Migration laufen Issues mit deutschen Namen weiter, oder sie warten.
-  Beides kostet.
-* Fachbegriffe und Bezeichner unterscheiden sich. Wer zwischen Gespräch und Code
-  wechselt, braucht das Glossar. Das gilt auch für die Features: Ein Fachanwender
-  liest sie nicht mehr in seiner Sprache, ebenso wenig die Architekturdoku.
-* Der Name des Projekts ändert sich. Links, Pages-URL und Verweise in Issues
-  zeigen auf den alten Namen, bis das Repository umbenannt ist.
-* Eine schlechte Übersetzung eines Kernbegriffs prägt den Code dauerhaft. Sie ist
-  später so teuer zu ändern wie jetzt die Umstellung.
+* One-time effort: types, packages, modules, tests, Gherkin steps, frontend,
+  glossary, building block view and all ADRs that name identifiers in the code.
+* The translation of the entire architecture documentation costs a separate PR
+  and a separate review by the owner. Until then, the documentation is German
+  and the code English.
+* Until the migration, issues with German names continue, or they wait. Both
+  cost.
+* Domain terms and identifiers differ. Whoever switches between conversation
+  and code needs the glossary. This also applies to the features: a domain user
+  no longer reads them in their language, nor the architecture documentation.
+* The name of the project changes. Links, the Pages URL and references in
+  issues point to the old name until the repository is renamed.
+* A bad translation of a core term shapes the code permanently. Changing it
+  later is as expensive as the migration is now.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* #84: Migration des Codes, vor dem Rest von #10, mit Reihenfolge:
-  Glossar mit englischen Begriffen, Kern, SPI/API, Adapter, Starter, Frontend,
-  Features, Gruppe, Paket und Artefakte, README und Integrationsdoku.
-* #85: Übersetzung der Architekturdoku in einem eigenen Doku-PR,
-  gesondert vom Owner geprüft.
-* Das Glossar bekommt eine Spalte für den englischen Begriff oder führt ihn in der
-  Spalte „Im Code“. Das entscheidet die Migration.
-* RB-12 ist mit der Annahme dieses ADR gestrichen. `AGENTS.md` beschreibt die
-  Sprachregel nach diesem ADR.
-* Das GitHub-Repository umbenennen. GitHub leitet alte URLs weiter; die
-  Pages-URL und der lokale Ordner ändern sich. Das entscheidet der Owner mit der
-  Migration.
-* ADR-018 und die Lösungsstrategie (Code-Stil) verweisen auf diesen ADR.
-* Die Commit-Messages sind schon englisch. Für sie ändert sich nichts.
+* #84: Migration of the code, before the rest of #10, in this order:
+  glossary with English terms, core, SPI/API, adapters, starter, frontend,
+  features, group, package and artifacts, README and integration
+  documentation.
+* #85: Translation of the architecture documentation in a separate docs PR,
+  reviewed separately by the owner.
+* The glossary gets a column for the English term or lists it in the column
+  “In code”. The migration decides this.
+* RB-12 is removed with the acceptance of this ADR. `AGENTS.md` describes the
+  language rule according to this ADR.
+* Rename the GitHub repository. GitHub redirects old URLs; the Pages URL and
+  the local folder change. The owner decides this with the migration.
+* ADR-018 and the solution strategy (code style) refer to this ADR.
+* The commit messages are already in English. Nothing changes for them.
 
 === Impact
 
@@ -303,34 +311,34 @@ include::generated/adr-024-sprache-der-ubiquitous-language-im-code-impact.adoc[l
 include::generated/adr-024-sprache-der-ubiquitous-language-im-code-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-024-sprache-der-ubiquitous-language-im-code-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Bis zur Migration gibt es kein Release, und kein Host außerhalb des Projekts
-  kompiliert gegen `spi` oder `api`.
-* Die Zielgruppe der Bibliothek ist nicht auf deutschsprachige Entwicklerteams
-  beschränkt, auch wenn die Fachdomäne deutsch ist.
+* Until the migration there is no release, and no host outside the project
+  compiles against `spi` or `api`.
+* The target audience of the library is not limited to German-speaking
+  developer teams, even if the business domain is German.
 
 === Open Questions
 
-* Keine. Den Namen `letterwright` hat der Owner am 2026-11-26 festgelegt, die
-  fünf Fragen des ersten Entwurfs hat er am selben Tag beantwortet: Gherkin
-  englisch; README und Integrationsdoku englisch mit Hinweis auf Deutsch als
-  Basissprache; `LetterTemplate` und `BusinessReference`; Paket und Artefakt werden
-  umbenannt; Migration vor dem Rest von #10.
+* None. The owner fixed the name `letterwright` on 2026-11-26 and answered the
+  five questions of the first draft on the same day: Gherkin in English; README
+  and integration documentation in English with a note on German as the base
+  language; `LetterTemplate` and `BusinessReference`; package and artifact are
+  renamed; migration before the rest of #10.
 
 === Review Notes
 
-* Der Owner hat den ADR und seine drei Relationen am 2026-11-26 angenommen, mit
-  Option 4 statt der vorgeschlagenen Option 2. Kriterium, Matrix und Konsequenzen
-  sind daran angepasst.
-* Im Review hat der Owner `AfterSave` durch `LetterSaveCallback` ersetzt, mit
-  ausdrücklicher Javadoc zum Zeitpunkt. Die Tabelle der Kernbegriffe gilt damit;
-  die Migration übernimmt sie ins Glossar.
-* RB-12 ist gestrichen, `AGENTS.md` ist angepasst.
+* The owner accepted the ADR and its three relations on 2026-11-26, with
+  option 4 instead of the proposed option 2. Criterion, matrix and consequences
+  have been adjusted accordingly.
+* In the review, the owner replaced `AfterSave` with `LetterSaveCallback`, with
+  explicit Javadoc on the point in time. The table of core terms thus applies;
+  the migration transfers it into the glossary.
+* RB-12 is removed, `AGENTS.md` is adjusted.

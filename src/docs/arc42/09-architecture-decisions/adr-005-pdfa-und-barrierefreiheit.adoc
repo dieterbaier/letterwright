@@ -1,168 +1,171 @@
 ---
 id: ADR-005-pdfa-und-barrierefreiheit
 type: ADR
-title: 'PDF/A-, PDF/UA- und WCAG-Zielniveau'
+title: 'PDF/A, PDF/UA and WCAG target level'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Gespeicherte Schreiben sind PDF/A-2b und PDF/UA-1, die Vorschau erfüllt WCAG 2.1 AA; veraPDF und axe-core prüfen das im Build.'
+summary: 'Saved letters are PDF/A-2b and PDF/UA-1, the preview meets WCAG 2.1 AA; veraPDF and axe-core check this in the build.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
 - pdfa
-- barrierefreiheit
+- accessibility
 - compliance
 relations:
 - type: addresses
   target: QS-001-pdfa-konformitaet
   status: proposed
-  rationale: 'Legt das PDF/A-Niveau und seine Prüfung fest.'
+  rationale: 'Defines the PDF/A level and how it is checked.'
   reviewed: false
 - type: addresses
   target: QS-002-barrierefreies-pdf
   status: proposed
-  rationale: 'Legt PDF/UA-1 als Ziel und veraPDF als Prüfwerkzeug fest.'
+  rationale: 'Defines PDF/UA-1 as the target and veraPDF as the checking tool.'
   reviewed: false
 - type: addresses
   target: QS-003-barrierefreie-vorschau
   status: proposed
-  rationale: 'Legt WCAG 2.1 AA und axe-core für die Vorschau fest.'
+  rationale: 'Defines WCAG 2.1 AA and axe-core for the preview.'
   reviewed: false
 - type: depends_on
   target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
   status: proposed
-  rationale: 'Die Rendering-Bibliothek muss die Niveaus erzeugen können.'
+  rationale: 'The rendering library must be able to create these levels.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-005-pdfa-und-barrierefreiheit]]
-== ADR-005: PDF/A-, PDF/UA- und WCAG-Zielniveau
+== ADR-005: PDF/A, PDF/UA and WCAG target level
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor:
+We propose:
 
-* Gespeicherte Schreiben sind **PDF/A-2b** (Archivierbarkeit, einfachstes gängiges
-  Niveau mit Transparenz- und OpenType-Unterstützung) **und PDF/UA-1** (getaggtes,
-  barrierefreies PDF). PDF/A-2b plus PDF/UA-1 deckt inhaltlich ab, was PDF/A-2a
-  zusätzlich fordern würde.
-* Die HTML-Vorschau erfüllt **WCAG 2.1 Level AA**, die Grundlage von EN 301 549 und
+* Saved letters are **PDF/A-2b** (archivability, the simplest common level
+  with support for transparency and OpenType) **and PDF/UA-1** (tagged,
+  accessible PDF). PDF/A-2b plus PDF/UA-1 covers in content what PDF/A-2a
+  would additionally require.
+* The HTML preview meets **WCAG 2.1 Level AA**, the basis of EN 301 549 and
   BITV 2.0.
-* Der **Build prüft** beides automatisch: **veraPDF** (Open Source) validiert jedes
-  Referenz-PDF gegen PDF/A-2b und PDF/UA-1, **axe-core** prüft die gerenderte Vorschau
-  in Komponententests und E2E-Tests.
-* Zur Laufzeit wird **vor jedem Speichern** eine Konformitätsprüfung über den Port
-  `ConformanceChecker` ausgeführt. Der Starter **setzt einen Prüfer voraus**:
-** Default ist ein veraPDF-Adapter (veraPDF ist unter MPL 2.0 nutzbar und damit mit
-   MIT vereinbar), den der Starter mitbringt und automatisch konfiguriert.
-** **Kein Prüfer konfiguriert**: Der Anwendungskontext startet nicht (fail-fast mit
-   klarer Fehlermeldung). Ein Abschalten ist nicht vorgesehen.
-** **Prüfung schlägt fehl** (nicht konform): Es wird nichts persistiert; der Benutzer
-   erhält eine Meldung (fail-closed).
-** **Prüfung nicht ausführbar** (Fehler, Zeitüberschreitung): wie „nicht konform“,
-   es wird nichts persistiert. Ein Wiederholen ist möglich.
-* Zusätzlich wird beim **Veröffentlichen einer Vorlagenversion** ein Probe-PDF mit
-  Beispieldaten erzeugt und geprüft, damit Fehler aus neu gepflegten Vorlagen vor dem
-  ersten Speichern auffallen. Die Referenzfälle im CI sichern nur die Bibliothek ab,
-  nicht jede gepflegte Vorlage.
+* The **build checks** both automatically: **veraPDF** (open source) validates
+  every reference PDF against PDF/A-2b and PDF/UA-1, **axe-core** checks the
+  rendered preview in component tests and E2E tests.
+* At runtime, a conformance check runs through the port `ConformanceChecker`
+  **before every save**. The starter **requires a checker**:
+** The default is a veraPDF adapter (veraPDF can be used under MPL 2.0 and is
+   thus compatible with MIT), which the starter ships and configures
+   automatically.
+** **No checker configured**: the application context does not start (fail-fast
+   with a clear error message). Switching it off is not intended.
+** **Check fails** (not conformant): nothing is persisted; the user receives a
+   message (fail-closed).
+** **Check cannot be run** (error, timeout): as for “not conformant”, nothing
+   is persisted. A retry is possible.
+* In addition, when a **template version is published**, a proof PDF with
+  sample data is created and checked, so that errors from newly maintained
+  templates show up before the first save. The reference cases in CI only
+  safeguard the library, not every maintained template.
 
-=== Kontext
+=== Context
 
-Der Owner hat keine spezielle Vorgabe gemacht: mit dem einfachsten Niveau starten,
-aber im Build prüfen. Barrierefreiheit gilt für Vorschau und gespeichertes Dokument.
-Nur Stufe „a“ von PDF/A oder zusätzlich PDF/UA stellt Tagged PDF sicher; PDF/A-2b
-allein wäre nicht barrierefrei.
+The owner gave no specific requirement: start with the simplest level, but
+check it in the build. Accessibility applies to the preview and to the saved
+document. Only level “a” of PDF/A or additional PDF/UA ensures tagged PDF;
+PDF/A-2b alone would not be accessible.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Einfachstes Niveau, das Archivierung und Barrierefreiheit zugleich erfüllt.
-* Automatisch prüfbar mit Open-Source-Werkzeugen.
-* Unterstützt von der Rendering-Bibliothek.
+* The simplest level that meets archiving and accessibility at the same time.
+* Automatically checkable with open source tools.
+* Supported by the rendering library.
 
-=== Betrachtete Optionen
+=== Considered Options
 
 ==== Option 1: PDF/A-2b plus PDF/UA-1, WCAG 2.1 AA
 
-Gängige Kombination, von openhtmltopdf unterstützt, von veraPDF prüfbar.
+A common combination, supported by openhtmltopdf, checkable by veraPDF.
 
-==== Option 2: Nur PDF/A-2b
+==== Option 2: PDF/A-2b only
 
-Am einfachsten, aber ohne Tagging nicht barrierefrei. Erfüllt die Anforderung aus
-dem Issue nicht.
+The simplest, but not accessible without tagging. Does not meet the
+requirement from the issue.
 
 ==== Option 3: PDF/A-3a plus PDF/UA-2, WCAG 2.2 AA
 
-Höchstes Niveau, erlaubt eingebettete Dateien. Mehr Aufwand, geringere
-Werkzeugunterstützung für PDF/UA-2.
+The highest level, allows embedded files. More effort, less tool support for
+PDF/UA-2.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Einfach und ausreichend | +1 | +1 | -1
-| Barrierefreiheit | +1 | -1 | +1
-| Automatisch prüfbar | +1 | +1 | 0
-| Von Rendering-Bibliothek unterstützt | +1 | +1 | ?
-s| Summe s| +4 s| +2 s| ?
+| Criterion | Option 1 | Option 2 | Option 3
+| Simple and sufficient | +1 | +1 | -1
+| Accessibility | +1 | -1 | +1
+| Automatically checkable | +1 | +1 | 0
+| Supported by the rendering library | +1 | +1 | ?
+s| Sum s| +4 s| +2 s| ?
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Konformität ist im CI messbar und regressionssicher.
-* Der Weg zu höheren Niveaus bleibt offen.
+* Conformance is measurable in CI and safe against regressions.
+* The way to higher levels stays open.
 
-==== Negativ
+==== Negative
 
-* veraPDF als Pflicht-Laufzeitprüfung vergrößert das Host-Artefakt und verlängert
-  das Speichern (geht in QS-012 ein).
-* Ein Ausfall der Prüfung verhindert das Speichern; das ist gewollt (fail-closed).
-* Inhalte der Fachanwender (Alternativtexte, Überschriften) beeinflussen die Konformität (R-005).
+* veraPDF as a mandatory runtime check enlarges the host artifact and makes
+  saving take longer (feeds into QS-012).
+* A failure of the check prevents saving; this is intended (fail-closed).
+* Content from business users (alternative texts, headings) affects conformance (R-005).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* veraPDF-Integration in Gradle/CI im ersten Build-Epic.
+* veraPDF integration in Gradle/CI in the first build epic.
 
 
-=== Ergebnis des Prototyps
+=== Result of the prototype
 
-Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) erzeugt mit openhtmltopdf
-PDF/A-2b mit PDF/UA-1-Tagging und prüft es mit der veraPDF-Bibliothek
-(`validation-model`, Greenfield-Modell) in der JVM:
+The throwaway prototype from #3 (`prototyp/README.adoc`) uses openhtmltopdf to
+create PDF/A-2b with PDF/UA-1 tagging and checks it with the veraPDF library
+(`validation-model`, Greenfield model) in the JVM:
 
-* Beide Referenzschreiben und das bösartige Testschreiben sind ohne Verstöße
-  gegen PDF/A-2b und PDF/UA-1, auch mit Ersatzschriften. Die Gegenprobe mit dem
-  Word-PDF und dem Chrome-PDF der Vorschau zeigt die erwarteten Verstöße.
-* Ein Link ohne `title` erzeugt einen Hinweis von openhtmltopdf, aber keinen
-  veraPDF-Verstoß. Das ist ein Hinweis für Vorlagenautoren.
-* Was veraPDF nicht prüft, zeigt ein Strukturbaum mit Text je Element. Er ist die
-  Grundlage der manuellen Stichprobe aus QS-002, die noch aussteht.
-* Kopf- und Fußzeilen: Die inhaltliche Fußzeile wird einmal nach dem Brieftext
-  vorgelesen, Seitenzahlen und Wiederholungen bleiben Artefakte (Owner,
-  QS-002). Dafür braucht es einen Nachbearbeitungsschritt mit PDFBox
+* Both reference letters and the malicious test letter have no violations
+  against PDF/A-2b and PDF/UA-1, also with substitute fonts. The cross-check
+  with the Word PDF and the Chrome PDF of the preview shows the expected
+  violations.
+* A link without `title` produces a notice from openhtmltopdf, but no veraPDF
+  violation. This is a hint for template authors.
+* What veraPDF does not check is shown by a structure tree with the text per
+  element. It is the basis of the manual spot check from QS-002, which is still
+  pending.
+* Headers and footers: the content footer is read out once after the letter
+  text; page numbers and repetitions stay artifacts (owner, QS-002). This
+  needs a post-processing step with PDFBox
   (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]).
 
-Die Voraussetzung aus den Review Notes ist damit gezeigt: Erzeugung mit
-openhtmltopdf und Prüfung mit veraPDF. Wie lange die Prüfung beim Speichern
-dauert (QS-012), hat der Prototyp nicht gemessen.
+This shows the prerequisite from the Review Notes: generation with
+openhtmltopdf and checking with veraPDF. The prototype did not measure how long
+the check takes on saving (QS-012).
 
 === Impact
 
@@ -173,21 +176,21 @@ include::generated/adr-005-pdfa-und-barrierefreiheit-impact.adoc[leveloffset=+2]
 include::generated/adr-005-pdfa-und-barrierefreiheit-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-005-pdfa-und-barrierefreiheit-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Kein Ziel-Archiv verlangt PDF/A-3 oder ZUGFeRD-Anhänge.
+* No target archive requires PDF/A-3 or ZUGFeRD attachments.
 
 === Open Questions
 
-* Gibt es eine Zielanwendung oder ein Archiv mit eigenen PDF/A-Vorgaben? (Q-PO-002)
+* Is there a target application or an archive with its own PDF/A requirements? (Q-PO-002)
 
 === Review Notes
 
-Kann akzeptiert werden, sobald der Prototyp die Erzeugung mit openhtmltopdf und die Prüfung mit veraPDF gezeigt hat.
+Can be accepted as soon as the prototype has shown generation with openhtmltopdf and checking with veraPDF.
