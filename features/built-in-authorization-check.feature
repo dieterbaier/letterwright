@@ -1,55 +1,54 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# EingebauteBerechtigungspruefungTest im Modul spring-boot-starter, ein Test je Szenario,
-# benannt nach dem Szenariotitel.
-Funktionalität: Eingebaute Berechtigungsprüfung
-  Stellt die Host-Anwendung keine eigene Berechtigungsprüfung bereit, entscheidet
-  die Bibliothek über die Rollen aus der Spring Security des Hosts. Jede Aktion
-  braucht ihre eigene Rolle, standardmäßig ROLE_SSW_<AKTION>.
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# BuiltInAuthorizationCheckTest in the module spring-boot-starter, one test per
+# scenario, named after the scenario title.
+Feature: Built-in authorization check
+  If the host application provides no authorization check of its own, the library
+  decides based on the roles from the host's Spring Security. Each action needs
+  its own role, for letters by default ROLE_LETTERWRIGHT_LETTERS_<ACTION>.
 
-  Grundlage:
-    Angenommen die Host-Anwendung stellt keine eigene Berechtigungsprüfung bereit
+  Background:
+    Given the host application provides no authorization check of its own
 
-  Szenario: Mit der Rolle der Aktion ist sie erlaubt
-    Angenommen Erika ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es erlaubt
+  Scenario: With the role of the action, it is allowed
+    Given Erika is logged in and has the role "ROLE_LETTERWRIGHT_LETTERS_CREATE"
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is allowed
 
-  Szenario: Mit der Rolle einer anderen Aktion ist sie nicht erlaubt
-    Angenommen Erika ist angemeldet und hat nur die Rolle "ROLE_SSW_SCHREIBEN_ANSEHEN"
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es nicht erlaubt
+  Scenario: With the role of another action, it is not allowed
+    Given Erika is logged in and has only the role "ROLE_LETTERWRIGHT_LETTERS_VIEW"
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is not allowed
 
-  Szenariogrundriss: Ohne Anmeldung ist nichts erlaubt
-    Angenommen der Host hat für das Erzeugen von Schreiben die Rolle "ROLE_ANONYMOUS" konfiguriert
-    Und <zugriff>
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es nicht erlaubt
+  Scenario Outline: Without authentication, nothing is allowed
+    Given the host has configured the role "ROLE_ANONYMOUS" for creating letters
+    And <access>
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is not allowed
 
-    Beispiele:
-      | zugriff                                                           |
-      | niemand ist angemeldet                                            |
-      | Erika greift nur anonym zu, mit der Rolle "ROLE_ANONYMOUS"        |
+    Examples:
+      | access                                                          |
+      | nobody is logged in                                             |
+      | Erika accesses only anonymously, with the role "ROLE_ANONYMOUS" |
 
-  Szenario: Was als anonymer Zugriff gilt, bestimmt der Host
-    Angenommen der Host stuft mit einem eigenen AuthenticationTrustResolver jede Anmeldung als anonym ein
-    Und Erika ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es nicht erlaubt
+  Scenario: The host decides what counts as anonymous access
+    Given the host classifies every authentication as anonymous with its own AuthenticationTrustResolver
+    And Erika is logged in and has the role "ROLE_LETTERWRIGHT_LETTERS_CREATE"
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is not allowed
 
-  Szenario: Für einen anderen als den angemeldeten Benutzer ist nichts erlaubt
-    Angenommen Max ist angemeldet und hat die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es nicht erlaubt
+  Scenario: Nothing is allowed for a user other than the logged-in one
+    Given Max is logged in and has the role "ROLE_LETTERWRIGHT_LETTERS_CREATE"
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is not allowed
 
-  Szenario: Eine konfigurierte Rolle ersetzt die vorgegebene
-    Angenommen der Host hat für das Erzeugen von Schreiben die Rolle "ROLE_SACHBEARBEITUNG" konfiguriert
-    Und Erika ist angemeldet und hat nur die Rolle "ROLE_SSW_SCHREIBEN_ERZEUGEN"
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es nicht erlaubt
+  Scenario: A configured role replaces the predefined one
+    Given the host has configured the role "ROLE_CLERK" for creating letters
+    And Erika is logged in and has only the role "ROLE_LETTERWRIGHT_LETTERS_CREATE"
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is not allowed
 
-  Szenario: Eine eigene Berechtigungsprüfung des Hosts ersetzt die eingebaute
-    Angenommen die Host-Anwendung stellt doch eine eigene Berechtigungsprüfung bereit, die alles erlaubt
-    Und niemand ist angemeldet
-    Wenn die Bibliothek fragt, ob Erika zum Kunden 4711 ein Schreiben erzeugen darf
-    Dann ist es erlaubt
+  Scenario: A custom authorization check of the host replaces the built-in one
+    Given the host application does provide an authorization check of its own that allows everything
+    And nobody is logged in
+    When the library asks whether Erika may create a letter for customer 4711
+    Then it is allowed

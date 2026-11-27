@@ -1,76 +1,74 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# ApiSchreibenSpeichernTest im Modul adapter-api, ein Test je Szenario, benannt
-# nach dem Szenariotitel. Der Anwendungsfall ist dort eine Attrappe, seine Regeln
-# prüft schreiben-speichern.feature. Der Transaktionsmanager ist ein echter
-# AbstractPlatformTransactionManager ohne Datenbank.
-Funktionalität: Schreiben über die Java-API speichern
-  Ein Host speichert ein Schreiben in seinem eigenen Anwendungsfall, etwa beim
-  Abschließen einer Aufgabe, und committet seine eigenen Änderungen gemeinsam mit
-  dem Schreiben (ADR-023). Er erhält das Ergebnis als Rückgabewert und sieht dabei
-  weder das Domänenmodell noch die internen Ports der Bibliothek. Es gelten die
-  Regeln aus schreiben-speichern.feature: dieselbe Berechtigungsprüfung und
-  höchstens ein Schreiben je Snapshot (ADR-021).
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# ApiSaveLetterTest in the module adapter-api, one test per scenario, named
+# after the scenario title. There the use case is a fake; its rules are checked
+# by save-letter.feature. The transaction manager is a real
+# AbstractPlatformTransactionManager without a database.
+Feature: Save letter via the Java API
+  A host saves a letter in its own use case, for example when completing a task,
+  and commits its own changes together with the letter (ADR-023). It receives the
+  result as a return value and sees neither the domain model nor the internal
+  ports of the library. The rules from save-letter.feature apply: the same
+  authorization check and at most one letter per snapshot (ADR-021).
 
-  Grundlage:
-    Angenommen Erika hat eine Vorschau der "Mahnung" in Version 2 zum Kunden 4711 erzeugt
+  Background:
+    Given Erika has created a preview of the "Payment reminder" in version 2 for customer 4711
 
-  Szenario: Der Host erhält die Identifikatoren des gespeicherten Schreibens
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Dann ist das Schreiben gespeichert
-    Und das Ergebnis nennt die ID des Schreibens, den Kunden 4711, die "Mahnung" in Version 2, Erika und den Zeitpunkt der Erstellung
+  Scenario: The host receives the identifiers of the saved letter
+    When the host saves the preview for Erika via the API
+    Then the letter is saved
+    And the result names the ID of the letter, customer 4711, the "Payment reminder" in version 2, Erika and the time of creation
 
-  Szenario: Eine Wiederholung erhält das bereits gespeicherte Schreiben
-    Angenommen das Schreiben aus der Vorschau ist bereits gespeichert
-    Wenn der Host die Vorschau für Erika erneut über die API speichert
-    Dann erhält er das bereits gespeicherte Schreiben mit denselben Identifikatoren
+  Scenario: A repetition receives the already saved letter
+    Given the letter from the preview is already saved
+    When the host saves the preview for Erika again via the API
+    Then it receives the already saved letter with the same identifiers
 
-  Szenariogrundriss: Eine fachliche Ablehnung kommt als Ergebnis zurück
-    Angenommen der Anwendungsfall lehnt das Speichern ab: <Ablehnung>
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Dann erhält er die Ablehnung <Ablehnung>
+  Scenario Outline: A business rejection comes back as result
+    Given the use case rejects the saving: <rejection>
+    When the host saves the preview for Erika via the API
+    Then it receives the rejection <rejection>
 
-    Beispiele:
-      | Ablehnung             |
-      | SnapshotUnbekannt     |
-      | SnapshotAbgelaufen    |
-      | NichtErlaubt          |
-      | DatenkontextGeaendert |
-      | NichtKonform          |
+    Examples:
+      | rejection          |
+      | SnapshotUnknown    |
+      | SnapshotExpired    |
+      | NotAllowed         |
+      | DataContextChanged |
+      | NotConformant      |
 
-  Szenario: Das Speichern tritt der Transaktion des Hosts bei
-    Angenommen der Host hat eine Transaktion eröffnet
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Dann läuft das Speichern in der Transaktion des Hosts
-    Und es wurde keine weitere Transaktion eröffnet
+  Scenario: Saving joins the host's transaction
+    Given the host has opened a transaction
+    When the host saves the preview for Erika via the API
+    Then the saving runs in the host's transaction
+    And no further transaction was opened
 
-  Szenario: Ohne Transaktion des Hosts eröffnet das Speichern eine eigene
-    Wenn der Host die Vorschau für Erika ohne eigene Transaktion über die API speichert
-    Dann lief das Speichern in einer eigenen Transaktion, die committet wurde
+  Scenario: Without a host transaction, saving opens its own
+    When the host saves the preview for Erika via the API without a transaction of its own
+    Then the saving ran in a transaction of its own, which was committed
 
-  Szenario: Eine fachliche Ablehnung lässt die Transaktion des Hosts committen
-    Angenommen der Host hat eine Transaktion eröffnet
-    Und der Anwendungsfall lehnt das Speichern ab: NichtErlaubt
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Und der Host seine Transaktion committet
-    Dann ist die Transaktion des Hosts committet und nicht zurückgerollt
+  Scenario: A business rejection lets the host's transaction commit
+    Given the host has opened a transaction
+    And the use case rejects the saving: NotAllowed
+    When the host saves the preview for Erika via the API
+    And the host commits its transaction
+    Then the host's transaction is committed and not rolled back
 
-  Szenario: Ein technischer Fehler rollt die Transaktion des Hosts zurück
-    Angenommen der Host hat eine Transaktion eröffnet
-    Und der Anwendungsfall scheitert mit einem technischen Fehler
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Dann erhält der Host den Fehler
-    Und die Transaktion des Hosts kann nur noch zurückgerollt werden
+  Scenario: A technical error rolls back the host's transaction
+    Given the host has opened a transaction
+    And the use case fails with a technical error
+    When the host saves the preview for Erika via the API
+    Then the host receives the error
+    And the host's transaction can only be rolled back
 
-  Szenario: Eine ungültige Benutzerkennung rollt die Transaktion des Hosts zurück
-    Angenommen der Host hat eine Transaktion eröffnet
-    Wenn der Host die Vorschau mit einer leeren Benutzerkennung über die API speichert
-    Dann erhält der Host einen Fehler des Aufrufers
-    Und der Anwendungsfall wurde nicht aufgerufen
-    Und die Transaktion des Hosts kann nur noch zurückgerollt werden
+  Scenario: An invalid user ID rolls back the host's transaction
+    Given the host has opened a transaction
+    When the host saves the preview with an empty user ID via the API
+    Then the host receives a caller error
+    And the use case was not invoked
+    And the host's transaction can only be rolled back
 
-  Szenario: Rollt der Host zurück, rollt das Speichern mit zurück
-    Angenommen der Host hat eine Transaktion eröffnet
-    Wenn der Host die Vorschau für Erika über die API speichert
-    Und der Host seine Transaktion zurückrollt
-    Dann ist nichts committet
+  Scenario: If the host rolls back, saving rolls back too
+    Given the host has opened a transaction
+    When the host saves the preview for Erika via the API
+    And the host rolls back its transaction
+    Then nothing is committed

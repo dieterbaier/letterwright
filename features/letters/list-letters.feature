@@ -1,38 +1,36 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenuebersichtTest im Modul usecases-service, ein Test je Szenario,
-# benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
-# Gefiltert, sortiert und gezählt wird im SchreibenRepository; die Attrappe
-# hält dessen Vertrag ein. Den Nachweis für die Datenbank führt der Adapter (#6).
-Funktionalität: Schreiben auflisten
-  Ein Sachbearbeiter sieht die gespeicherten Schreiben zu einem fachlichen Bezug,
-  seitenweise und die neuesten zuerst. Ob er sie sehen darf, entscheidet der Host
-  je Bezug. Was er nicht sehen darf, zählt weder in die Seite noch in die
-  Gesamtzahl (QS-009).
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# ListLettersServiceTest in the module usecases-service, one test per scenario,
+# named after the scenario title. There the ports are replaced by fakes.
+# Filtering, sorting and counting happen in the LetterRepository; the fake
+# keeps its contract. The proof for the database is provided by the adapter (#6).
+Feature: List letters
+  A clerk sees the saved letters for a business reference, page by page and the
+  newest first. Whether they may see them is decided by the host per reference.
+  What they may not see counts neither in the page nor in the total (QS-009).
 
-  Grundlage:
-    Angenommen zum Kunden 4711 sind 3 Schreiben gespeichert
-    Und Erika darf die Schreiben zum Kunden 4711 ansehen
+  Background:
+    Given 3 letters are saved for customer 4711
+    And Erika may view the letters for customer 4711
 
-  Szenario: Die Übersicht zeigt die Schreiben zum Bezug seitenweise, die neuesten zuerst
-    Wenn Erika die erste Seite mit 2 Einträgen zum Kunden 4711 abruft
-    Dann sieht sie die 2 neuesten Schreiben, das neueste zuerst
-    Und die Gesamtzahl ist 3 auf 2 Seiten
+  Scenario: The list shows the letters for the reference page by page, newest first
+    When Erika requests the first page with 2 entries for customer 4711
+    Then she sees the 2 newest letters, the newest first
+    And the total is 3 on 2 pages
 
-  Szenario: Nicht sichtbare Schreiben zählen weder in die Seite noch in die Gesamtzahl
-    Angenommen zum Kunden 0815 sind 2 Schreiben gespeichert
-    Und das neueste Schreiben zum Kunden 4711 ist logisch gelöscht
-    Wenn Erika die erste Seite mit 2 Einträgen zum Kunden 4711 abruft
-    Dann sieht sie die 2 übrigen Schreiben zum Kunden 4711
-    Und die Gesamtzahl ist 2 auf 1 Seite
+  Scenario: Invisible letters count neither in the page nor in the total
+    Given 2 letters are saved for customer 0815
+    And the newest letter for customer 4711 is logically deleted
+    When Erika requests the first page with 2 entries for customer 4711
+    Then she sees the 2 remaining letters for customer 4711
+    And the total is 2 on 1 page
 
-  Szenario: Eine Seite hinter dem Ende ist leer und zählt die sichtbaren Schreiben
-    Wenn Erika die dritte Seite mit 2 Einträgen zum Kunden 4711 abruft
-    Dann sieht sie keine Schreiben
-    Und die Gesamtzahl ist 3 auf 2 Seiten
+  Scenario: A page beyond the end is empty and counts the visible letters
+    When Erika requests the third page with 2 entries for customer 4711
+    Then she sees no letters
+    And the total is 3 on 2 pages
 
-  Szenario: Ohne Berechtigung zum Ansehen wird nichts gelesen
-    Angenommen Erika darf die Schreiben zum Kunden 4711 nicht ansehen
-    Wenn Erika die erste Seite mit 2 Einträgen zum Kunden 4711 abruft
-    Dann ist die Übersicht nicht erlaubt
-    Und es wurden keine Schreiben gelesen oder gezählt
+  Scenario: Without permission to view, nothing is read
+    Given Erika may not view the letters for customer 4711
+    When Erika requests the first page with 2 entries for customer 4711
+    Then the list is not allowed
+    And no letters were read or counted

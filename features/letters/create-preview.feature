@@ -1,93 +1,91 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# VorschauerzeugungTest im Modul usecases-service, ein Test je Szenario,
-# benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
-# Ablage nach dem Vorschlag in #46 (features/<bereich>/).
-Funktionalität: Vorschau erzeugen
-  Ein Sachbearbeiter wählt zu einem fachlichen Bezug ein Standardschreiben und
-  sieht eine Vorschau, bevor er das Schreiben speichert. Die Bibliothek prüft
-  zuerst selbst, ob das Standardschreiben zum Bezug passt (ADR-020), und fragt
-  dann den Host nach der Berechtigung. Erst mit ihr prüft sie, ob es
-  veröffentlichte Versionen gibt, und erst dann liefert der Host den
-  Datenkontext. Jede Vorschau hält ihren Stand in einem Snapshot fest, der
-  30 Minuten verwendbar ist (ADR-007).
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# CreatePreviewServiceTest in the module usecases-service, one test per scenario,
+# named after the scenario title. There the ports are replaced by fakes.
+# Location as proposed in #46 (features/<area>/).
+Feature: Create preview
+  A clerk chooses a letter template for a business reference and sees a preview
+  before saving the letter. The library first checks by itself whether the letter
+  template fits the reference (ADR-020) and then asks the host for permission.
+  Only with permission does it check whether there are published versions, and
+  only then does the host deliver the data context. Each preview records its state
+  in a snapshot that can be used for 30 minutes (ADR-007).
 
-  Grundlage:
-    Angenommen das Standardschreiben "Mahnung" gehört zum Bezugstyp "Kunde"
-    Und seine veröffentlichte Version ist 2, Version 1 ist abgelöst, und es hat einen Entwurf 3
-    Und sein Briefpapier hat die veröffentlichte Version 1
-    Und der Host liefert zum Kunden 4711 den Datenkontext "name" = "Erika Mustermann GmbH"
+  Background:
+    Given the letter template "Payment reminder" belongs to the reference type "customer"
+    And its published version is 2, version 1 is superseded, and it has a draft 3
+    And its letterhead has the published version 1
+    And the host delivers for customer 4711 the data context "name" = "Erika Mustermann GmbH"
 
-  Szenario: Mit Berechtigung entsteht eine Vorschau mit Snapshot
-    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Dann zeigt die Vorschau "Erika Mustermann GmbH"
-    Und ein Snapshot ist gespeichert, gebunden an Erika, den Kunden 4711, Version 1 des Briefpapiers und Version 2 der "Mahnung"
-    Und der Snapshot läuft in 30 Minuten ab
+  Scenario: With permission, a preview with snapshot is created
+    Given Erika may create a letter from the "Payment reminder" for customer 4711
+    When Erika creates the preview of the "Payment reminder" for customer 4711
+    Then the preview shows "Erika Mustermann GmbH"
+    And a snapshot is saved, bound to Erika, customer 4711, version 1 of the letterhead and version 2 of the "Payment reminder"
+    And the snapshot expires in 30 minutes
 
-  Szenario: Ohne Berechtigung wird kein Datenkontext angefragt
-    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" kein Schreiben erzeugen
-    Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Dann ist die Vorschau nicht erlaubt
-    Und der Host wurde nicht nach dem Datenkontext gefragt
-    Und nichts wurde gerendert
-    Und kein Snapshot ist gespeichert
+  Scenario: Without permission, no data context is requested
+    Given Erika may not create a letter from the "Payment reminder" for customer 4711
+    When Erika creates the preview of the "Payment reminder" for customer 4711
+    Then the preview is not allowed
+    And the host was not asked for the data context
+    And nothing was rendered
+    And no snapshot is saved
 
-  Szenario: Zu einem Bezug anderen Typs wird der Host nicht gefragt
-    Wenn Erika die Vorschau der "Mahnung" zum Lieferanten 0815 erzeugt
-    Dann passt das Standardschreiben nicht zum Bezug
-    Und der Host wurde weder nach der Berechtigung noch nach dem Datenkontext gefragt
-    Und kein Snapshot ist gespeichert
+  Scenario: For a reference of another type, the host is not asked
+    When Erika creates the preview of the "Payment reminder" for supplier 0815
+    Then the letter template does not fit the reference
+    And the host was asked neither for permission nor for the data context
+    And no snapshot is saved
 
-  Szenario: Zu einem unbekannten Standardschreiben gibt es keine Vorschau
-    Wenn Erika die Vorschau eines unbekannten Standardschreibens zum Kunden 4711 erzeugt
-    Dann ist das Standardschreiben unbekannt
-    Und der Host wurde weder nach der Berechtigung noch nach dem Datenkontext gefragt
+  Scenario: For an unknown letter template, there is no preview
+    When Erika creates the preview of an unknown letter template for customer 4711
+    Then the letter template is unknown
+    And the host was asked neither for permission nor for the data context
 
-  Szenariogrundriss: Ohne veröffentlichte Version gibt es keine Vorschau
-    Angenommen <vorlage> hat keine veröffentlichte Version
-    Und Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Dann hat die Vorschau keine veröffentlichte Version
-    Und der Host wurde nach der Berechtigung, aber nicht nach dem Datenkontext gefragt
-    Und kein Snapshot ist gespeichert
+  Scenario Outline: Without published version, there is no preview
+    Given <template> has no published version
+    And Erika may create a letter from the "Payment reminder" for customer 4711
+    When Erika creates the preview of the "Payment reminder" for customer 4711
+    Then the preview has no published version
+    And the host was asked for permission but not for the data context
+    And no snapshot is saved
 
-    Beispiele:
-      | vorlage                |
-      | das Standardschreiben  |
-      | das Briefpapier        |
+    Examples:
+      | template            |
+      | the letter template |
+      | the letterhead      |
 
-  Szenariogrundriss: Ohne Berechtigung bleibt verborgen, ob eine Version veröffentlicht ist
-    Angenommen <vorlage> hat keine veröffentlichte Version
-    Und Erika darf zum Kunden 4711 aus der "Mahnung" kein Schreiben erzeugen
-    Wenn Erika die Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Dann ist die Vorschau nicht erlaubt
-    Und der Host wurde nicht nach dem Datenkontext gefragt
-    Und nichts wurde gerendert
-    Und kein Snapshot ist gespeichert
+  Scenario Outline: Without permission, it stays hidden whether a version is published
+    Given <template> has no published version
+    And Erika may not create a letter from the "Payment reminder" for customer 4711
+    When Erika creates the preview of the "Payment reminder" for customer 4711
+    Then the preview is not allowed
+    And the host was not asked for the data context
+    And nothing was rendered
+    And no snapshot is saved
 
-    Beispiele:
-      | vorlage                |
-      | das Standardschreiben  |
-      | das Briefpapier        |
+    Examples:
+      | template            |
+      | the letter template |
+      | the letterhead      |
 
-  Szenario: Eine aktualisierte Vorschau ersetzt den eigenen Snapshot
-    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Und Erika hat vor 20 Minuten eine Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Wenn Erika diese Vorschau aktualisiert
-    Dann ist der bisherige Snapshot gelöscht
-    Und der neue Snapshot läuft in 30 Minuten ab
+  Scenario: An updated preview replaces the own snapshot
+    Given Erika may create a letter from the "Payment reminder" for customer 4711
+    And Erika created a preview of the "Payment reminder" for customer 4711 20 minutes ago
+    When Erika updates this preview
+    Then the previous snapshot is deleted
+    And the new snapshot expires in 30 minutes
 
-  Szenario: Eine aktualisierte Vorschau lässt einen verbrauchten Snapshot stehen
-    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Und Erika hat aus ihrer bisherigen Vorschau schon ein Schreiben gespeichert
-    Wenn Erika diese Vorschau aktualisiert
-    Dann bleibt der bisherige, verbrauchte Snapshot bestehen
-    Und es gibt zusätzlich den neuen Snapshot
+  Scenario: An updated preview leaves a consumed snapshot in place
+    Given Erika may create a letter from the "Payment reminder" for customer 4711
+    And Erika has already saved a letter from her previous preview
+    When Erika updates this preview
+    Then the previous, consumed snapshot remains
+    And there is the new snapshot in addition
 
-  Szenario: Ein fremder Snapshot verhält sich wie ein nicht vorhandener
-    Angenommen Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Und Max hat eine Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Wenn Erika eine Vorschau aktualisiert und dabei den Snapshot von Max angibt
-    Dann entsteht für Erika eine neue Vorschau
-    Und der Snapshot von Max ist unverändert gespeichert
+  Scenario: A foreign snapshot behaves like a missing one
+    Given Erika may create a letter from the "Payment reminder" for customer 4711
+    And Max has created a preview of the "Payment reminder" for customer 4711
+    When Erika updates a preview and specifies the snapshot of Max
+    Then a new preview is created for Erika
+    And the snapshot of Max is still saved unchanged

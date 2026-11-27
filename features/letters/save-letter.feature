@@ -1,141 +1,140 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenspeicherungTest im Modul usecases-service, ein Test je Szenario,
-# benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
-Funktionalität: Schreiben speichern
-  Ein Sachbearbeiter speichert eine geprüfte Vorschau als Schreiben. Gespeichert
-  wird genau das PDF, das aus dem Snapshot der Vorschau entsteht, und nur, wenn es
-  konform ist (ADR-005, ADR-007). Die Bibliothek prüft die Berechtigung erneut und
-  liest den Datenkontext erneut; hat er sich seit der Vorschau geändert, ist eine
-  neue Vorschau nötig. Aus einem Snapshot entsteht höchstens ein Schreiben: Das
-  Speichern verbraucht ihn und gibt seinen Datenkontext frei (ADR-021).
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# SaveLetterServiceTest in the module usecases-service, one test per scenario,
+# named after the scenario title. There the ports are replaced by fakes.
+Feature: Save letter
+  A clerk saves a checked preview as a letter. Exactly the PDF that is created
+  from the snapshot of the preview is saved, and only if it is conformant
+  (ADR-005, ADR-007). The library checks the permission again and reads the data
+  context again; if it has changed since the preview, a new preview is needed. At
+  most one letter is created from a snapshot: saving consumes it and releases its
+  data context (ADR-021).
 
-  Grundlage:
-    Angenommen Erika hat vor 10 Minuten eine Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Und Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Und der Host liefert zum Kunden 4711 weiter denselben Datenkontext
+  Background:
+    Given Erika created a preview of the "Payment reminder" for customer 4711 10 minutes ago
+    And Erika may create a letter from the "Payment reminder" for customer 4711
+    And the host still delivers the same data context for customer 4711
 
-  Szenario: Aus einer unveränderten Vorschau wird das geprüfte PDF gespeichert
-    Wenn Erika die Vorschau speichert
-    Dann ist ein Schreiben gespeichert
-    Und sein PDF entstand aus den Versionen und dem Datenkontext des Snapshots
-    Und es trägt die Prüfsumme dieses PDFs
-    Und der Snapshot ist verbraucht und hält keinen Datenkontext mehr
+  Scenario: An unchanged preview saves the checked PDF
+    When Erika saves the preview
+    Then a letter is saved
+    And its PDF was created from the versions and the data context of the snapshot
+    And it carries the checksum of this PDF
+    And the snapshot is consumed and no longer holds a data context
 
-  Szenario: Wird die Berechtigung beim Speichern entzogen, wird nichts persistiert
-    Angenommen Erika darf inzwischen aus der "Mahnung" kein Schreiben mehr erzeugen
-    Wenn Erika die Vorschau speichert
-    Dann ist das Speichern nicht erlaubt
-    Und es wurde kein PDF erzeugt
-    Und nichts ist gespeichert oder abgelegt
-    Und der Snapshot ist offen und behält seinen Datenkontext
+  Scenario: If the permission is revoked while saving, nothing is persisted
+    Given Erika may no longer create a letter from the "Payment reminder"
+    When Erika saves the preview
+    Then the saving is not allowed
+    And no PDF was created
+    And nothing is saved or stored
+    And the snapshot is open and keeps its data context
 
-  Szenario: Ein nicht konformes PDF wird nicht gespeichert
-    Angenommen die Konformitätsprüfung findet "PDF/UA-1: Bild ohne Alternativtext"
-    Wenn Erika die Vorschau speichert
-    Dann ist das PDF nicht konform mit dem Befund "PDF/UA-1: Bild ohne Alternativtext"
-    Und nichts ist gespeichert oder abgelegt
-    Und der Snapshot ist offen und behält seinen Datenkontext
+  Scenario: A non-conformant PDF is not saved
+    Given the conformance check finds "PDF/UA-1: Image without alternative text"
+    When Erika saves the preview
+    Then the PDF is not conformant with the finding "PDF/UA-1: Image without alternative text"
+    And nothing is saved or stored
+    And the snapshot is open and keeps its data context
 
-  Szenario: Ein nicht prüfbares PDF wird nicht gespeichert
-    Angenommen die Konformitätsprüfung kann das PDF nicht prüfen
-    Wenn Erika die Vorschau speichert
-    Dann schlägt das Speichern mit einem Fehler fehl
-    Und nichts ist gespeichert oder abgelegt
-    Und der Snapshot ist offen und behält seinen Datenkontext
+  Scenario: An uncheckable PDF is not saved
+    Given the conformance check cannot check the PDF
+    When Erika saves the preview
+    Then the saving fails with an error
+    And nothing is saved or stored
+    And the snapshot is open and keeps its data context
 
-  Szenario: Nach einer Änderung des Datenkontexts wird kein PDF erzeugt
-    Angenommen der Host liefert zum Kunden 4711 inzwischen einen anderen Datenkontext
-    Wenn Erika die Vorschau speichert
-    Dann hat sich der Datenkontext geändert
-    Und es wurde kein PDF erzeugt
-    Und nichts ist gespeichert oder abgelegt
-    Und der Snapshot ist offen und behält seinen Datenkontext
+  Scenario: After a change of the data context, no PDF is created
+    Given the host now delivers a different data context for customer 4711
+    When Erika saves the preview
+    Then the data context has changed
+    And no PDF was created
+    And nothing is saved or stored
+    And the snapshot is open and keeps its data context
 
-  Szenario: Nach einer neuen Vorschau gelingt das Speichern
-    Angenommen der Host liefert zum Kunden 4711 inzwischen einen anderen Datenkontext
-    Und Erika hat die Vorschau danach aktualisiert
-    Wenn Erika die aktualisierte Vorschau speichert
-    Dann ist ein Schreiben mit dem neuen Datenkontext gespeichert
+  Scenario: After a new preview, saving succeeds
+    Given the host now delivers a different data context for customer 4711
+    And Erika has updated the preview afterwards
+    When Erika saves the updated preview
+    Then a letter with the new data context is saved
 
-  Szenario: Ein fremder Snapshot verhält sich wie ein nicht vorhandener
-    Wenn Max die Vorschau von Erika speichert
-    Dann ist der Snapshot unbekannt
-    Und der Host wurde nicht gefragt
+  Scenario: A foreign snapshot behaves like a missing one
+    When Max saves the preview of Erika
+    Then the snapshot is unknown
+    And the host was not asked
 
-  Szenario: Auch nach dem Speichern bleibt ein fremder Snapshot verborgen
-    Angenommen Erika hat die Vorschau bereits gespeichert
-    Wenn Max die Vorschau von Erika speichert
-    Dann ist der Snapshot unbekannt
+  Scenario: A foreign snapshot stays hidden even after saving
+    Given Erika has already saved the preview
+    When Max saves the preview of Erika
+    Then the snapshot is unknown
 
-  Szenario: Ein abgelaufener Snapshot wird nicht gespeichert
-    Angenommen seit der Vorschau sind 30 Minuten vergangen
-    Wenn Erika die Vorschau speichert
-    Dann ist der Snapshot abgelaufen
-    Und der Host wurde nicht gefragt
-    Und nichts ist gespeichert oder abgelegt
-    Und der Snapshot ist offen und behält seinen Datenkontext
+  Scenario: An expired snapshot is not saved
+    Given 30 minutes have passed since the preview
+    When Erika saves the preview
+    Then the snapshot has expired
+    And the host was not asked
+    And nothing is saved or stored
+    And the snapshot is open and keeps its data context
 
-  Szenario: Wiederholtes Speichern derselben Vorschau ergibt kein zweites Schreiben
-    Angenommen Erika hat die Vorschau bereits gespeichert, aber die Antwort nicht erhalten
-    Wenn Erika die Vorschau erneut speichert
-    Dann erhält sie das bereits gespeicherte Schreiben
-    Und der Host wurde nicht erneut nach dem Datenkontext gefragt
-    Und es wurde kein weiteres PDF erzeugt
+  Scenario: Repeated saving of the same preview yields no second letter
+    Given Erika has already saved the preview but did not receive the response
+    When Erika saves the preview again
+    Then she receives the already saved letter
+    And the host was not asked for the data context again
+    And no further PDF was created
 
-  Szenario: Bleibt der Ausgang des Speicherns ungewiss, bleibt das PDF erhalten
-    Angenommen die Persistenz speichert das Schreiben, aber ihre Bestätigung geht verloren
-    Wenn Erika die Vorschau speichert
-    Dann schlägt das Speichern mit einem Fehler fehl
-    Und das PDF ist weiter abgelegt
-    Wenn Erika die Vorschau erneut speichert
-    Dann erhält sie das gespeicherte Schreiben mit genau diesem PDF
+  Scenario: If the outcome of saving is uncertain, the PDF is kept
+    Given the persistence saves the letter, but its confirmation is lost
+    When Erika saves the preview
+    Then the saving fails with an error
+    And the PDF is still stored
+    When Erika saves the preview again
+    Then she receives the saved letter with exactly this PDF
 
-  Szenario: Speichert Erika, während sie die Vorschau aktualisiert, findet eine Wiederholung das Schreiben
-    Angenommen Erika aktualisiert ihre Vorschau, und der bisherige Snapshot ist dabei schon gelesen
-    Und bevor er gelöscht wird, speichert eine andere Anfrage diese Vorschau
-    Wenn das Aktualisieren den bisherigen Snapshot löschen will
-    Dann bleibt der verbrauchte Snapshot bestehen
-    Und eine Wiederholung des Speicherns erhält das gespeicherte Schreiben
+  Scenario: If Erika saves while updating the preview, a repetition finds the letter
+    Given Erika updates her preview, and the previous snapshot has already been read
+    And before it is deleted, another request saves this preview
+    When the update tries to delete the previous snapshot
+    Then the consumed snapshot remains
+    And a repetition of the saving receives the saved letter
 
-  Szenario: Ersetzt eine gleichzeitige Vorschau den Snapshot, wird nichts gespeichert
-    Angenommen Erika ersetzt die Vorschau in einem anderen Tab, während sie speichert
-    Wenn das Speichern den Snapshot verbrauchen will
-    Dann ist der Snapshot unbekannt
-    Und nichts ist gespeichert oder abgelegt
+  Scenario: If a concurrent preview replaces the snapshot, nothing is saved
+    Given Erika replaces the preview in another tab while she saves
+    When the saving tries to consume the snapshot
+    Then the snapshot is unknown
+    And nothing is saved or stored
 
-  Szenario: Gleichzeitiges Speichern derselben Vorschau ergibt ein Schreiben
-    Angenommen eine zweite Anfrage zur selben Vorschau verbraucht den Snapshot, während diese ihr PDF erzeugt
-    Wenn Erika die Vorschau speichert
-    Dann erhält sie das Schreiben der zweiten Anfrage
-    Und ihr eigenes PDF ist nicht mehr abgelegt
+  Scenario: Concurrent saving of the same preview yields one letter
+    Given a second request for the same preview consumes the snapshot while this one creates its PDF
+    When Erika saves the preview
+    Then she receives the letter of the second request
+    And her own PDF is no longer stored
 
-  Szenario: Eine neue Vorschau ergibt ein neues Schreiben
-    Angenommen Erika hat die Vorschau bereits gespeichert
-    Und Erika erzeugt eine neue Vorschau der "Mahnung" zum Kunden 4711
-    Wenn Erika die neue Vorschau speichert
-    Dann ist ein zweites Schreiben gespeichert
+  Scenario: A new preview yields a new letter
+    Given Erika has already saved the preview
+    And Erika creates a new preview of the "Payment reminder" for customer 4711
+    When Erika saves the new preview
+    Then a second letter is saved
 
-  Szenariogrundriss: Ist das Schreiben gelöscht, findet eine Wiederholung des Speicherns nichts mehr
-    Angenommen Erika hat die Vorschau bereits gespeichert
-    Und das Schreiben ist danach <Art> gelöscht worden
-    Wenn Erika die Vorschau erneut speichert
-    Dann ist der Snapshot unbekannt
-    Und es wurde kein weiteres PDF erzeugt
+  Scenario Outline: If the letter is deleted, a repeated save finds nothing
+    Given Erika has already saved the preview
+    And the letter has since been deleted (<kind>)
+    When Erika saves the preview again
+    Then the snapshot is unknown
+    And no further PDF was created
 
-    Beispiele:
-      | Art     |
-      | hart    |
-      | logisch |
+    Examples:
+      | kind    |
+      | hard    |
+      | logical |
 
-  Szenariogrundriss: Wird das Schreiben einer gleichzeitigen Anfrage gelöscht, bevor diese speichert, wird nichts gespeichert
-    Angenommen eine zweite Anfrage zur selben Vorschau verbraucht den Snapshot, während diese ihr PDF erzeugt
-    Und das Schreiben der zweiten Anfrage wird danach <Art> gelöscht
-    Wenn Erika die Vorschau speichert
-    Dann ist der Snapshot unbekannt
-    Und ihr eigenes PDF ist nicht mehr abgelegt
+  Scenario Outline: If the letter of a concurrent request is deleted, nothing is saved
+    Given a second request for the same preview consumes the snapshot while this one creates its PDF
+    And the letter of the second request is then deleted (<kind>) before this one saves
+    When Erika saves the preview
+    Then the snapshot is unknown
+    And her own PDF is no longer stored
 
-    Beispiele:
-      | Art     |
-      | hart    |
-      | logisch |
+    Examples:
+      | kind    |
+      | hard    |
+      | logical |
