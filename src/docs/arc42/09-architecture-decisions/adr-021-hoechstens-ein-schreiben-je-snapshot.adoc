@@ -12,10 +12,10 @@ derived_from:
   description: 'Decision of the owner on 2026-11-22 on #53: “snapshot = key”; if the data context has changed, the snapshot stays and a new preview is needed.'
 - type: external
   description: 'Issue #53: rule for repeated and parallel saving of the same snapshot ID, before the persistence design (#6)'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/53
+  uri: https://github.com/dieterbaier/letterwright/issues/53
 - type: external
   description: 'Issue #10: repeat after a lost response checked end to end'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/10
+  uri: https://github.com/dieterbaier/letterwright/issues/10
 tags:
 - decision
 - letters

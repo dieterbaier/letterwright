@@ -10,7 +10,7 @@ summary: 'Code, Gherkin features, README, integration documentation and architec
 derived_from:
 - type: external
   description: 'Issue #1, question 2 “Language of the documentation, the ADRs and the code”: decided at the time “docs, ADRs and ubiquitous language in German” (RB-12)'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+  uri: https://github.com/dieterbaier/letterwright/issues/1
 - type: conversation
   description: 'Consideration of the owner on 2026-11-26: since the SPI and the Java API are public, a German ubiquitous language in the code may not fit an open source tool; proposal to examine the option of that time “code in English, glossary DE↔EN” as an ADR draft'
 - type: conversation
@@ -298,7 +298,10 @@ the documentation in their language.
 * RB-12 is removed with the acceptance of this ADR. `AGENTS.md` describes the
   language rule according to this ADR.
 * Rename the GitHub repository. GitHub redirects old URLs; the Pages URL and
-  the local folder change. The owner decides this with the migration.
+  the local folder change. Done on 2026-11-27: the repository is
+  `dieterbaier/letterwright`, the documentation is published at
+  https://dieterbaier.github.io/letterwright/. Worktrees live under
+  `../worktree/letterwright/`; the local checkout folder keeps its name.
 * ADR-018 and the solution strategy (code style) refer to this ADR.
 * The commit messages are already in English. Nothing changes for them.
 

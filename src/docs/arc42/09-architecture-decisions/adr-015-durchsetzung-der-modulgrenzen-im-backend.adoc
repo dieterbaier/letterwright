@@ -10,7 +10,7 @@ summary: 'The boundaries of the hexagonal architecture are enforced through sepa
 derived_from:
 - type: external
   description: 'Decision of the owner in the review of PR #15 (backend skeleton, issue #12): enforce boundaries through separate modules, ArchUnit in addition (“fail fast”)'
-  uri: https://github.com/dieterbaier/standardschreiben/pull/15
+  uri: https://github.com/dieterbaier/letterwright/pull/15
 tags:
 - decision
 - architecture

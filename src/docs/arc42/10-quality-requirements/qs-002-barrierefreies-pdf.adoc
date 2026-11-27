@@ -41,7 +41,7 @@ assumptions until confirmed.
 
 Issue #1 requires an accessible saved document.
 
-On the footer, the owner decided in the https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[review of PR #47]: details such as opening hours and
+On the footer, the owner decided in the https://github.com/dieterbaier/letterwright/pull/47#pullrequestreview-5997431593[review of PR #47]: details such as opening hours and
 homepage belong in the reading order once, after the letter text. Until then,
 the response measure required headers and footers as artifacts across the board.
 openhtmltopdf achieves this only with a post-processing step

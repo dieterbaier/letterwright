@@ -12,10 +12,10 @@ derived_from:
   description: 'Decision of the owner on 2026-11-22 on #52: “Both” – reference type on the letter template and letter template in the authorization request.'
 - type: external
   description: 'Issue #5, open contract question: check the combination of template and business reference on the server before the host supplies placeholder data'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/5
+  uri: https://github.com/dieterbaier/letterwright/issues/5
 - type: external
   description: 'Issue #11: two entry points, an impermissible combination is rejected on the server'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/11
+  uri: https://github.com/dieterbaier/letterwright/issues/11
 tags:
 - decision
 - spi

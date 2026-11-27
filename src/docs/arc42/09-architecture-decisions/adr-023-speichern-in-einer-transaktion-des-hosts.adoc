@@ -16,7 +16,7 @@ derived_from:
   description: 'Decisions of the owner on 2026-11-23: atomic callback only, callback only on a new creation, business rejection as a sealed result, contract as an ADR draft'
 - type: external
   description: 'Review of the owner on PR #74 (2026-11-23): names, REQUIRED, file name deferred, clarifications on AlreadySaved, transaction boundary and rejection'
-  uri: https://github.com/dieterbaier/standardschreiben/pull/74
+  uri: https://github.com/dieterbaier/letterwright/pull/74
 tags:
 - decision
 - letters

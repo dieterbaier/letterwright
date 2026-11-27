@@ -10,7 +10,7 @@ summary: 'The DDD roles in the domain model are marked with the jMolecules annot
 derived_from:
 - type: external
   description: 'Review of PR #57 (domain model, #51) and decisions of the owner of 2026-11-21'
-  uri: https://github.com/dieterbaier/standardschreiben/pull/57
+  uri: https://github.com/dieterbaier/letterwright/pull/57
 tags:
 - decision
 - domain

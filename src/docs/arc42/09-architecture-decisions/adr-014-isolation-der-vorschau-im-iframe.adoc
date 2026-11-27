@@ -10,7 +10,7 @@ summary: 'The letter in the preview is shown in a sandboxed iframe without allow
 derived_from:
 - type: external
   description: 'Q-ARCH-003 in doc-005, owner answer of 2026-11-15, review in PR #17'
-  uri: https://github.com/dieterbaier/standardschreiben/pull/17
+  uri: https://github.com/dieterbaier/letterwright/pull/17
 tags:
 - decision
 - frontend
@@ -293,7 +293,7 @@ sanitization shows what each layer achieves: the CSP alone blocks all code. It
 does not help against `<meta http-equiv="refresh">`; only the sanitization
 prevents that.
 
-*Findings in templates* (owner, 2026-11-20 and https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[review of PR #47]): Template maintenance does not
+*Findings in templates* (owner, 2026-11-20 and https://github.com/dieterbaier/letterwright/pull/47#pullrequestreview-5997431593[review of PR #47]): Template maintenance does not
 sanitize silently. It shows the findings and requires a choice: Ablehnen,
 Trotzdem akzeptieren or Bereinigen. “Trotzdem akzeptieren” saves the template
 unchanged. Before every output the backend still sanitizes the merged HTML

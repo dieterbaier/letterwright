@@ -10,7 +10,7 @@ summary: 'Letterheads and letter templates are maintained in a building-block-ba
 derived_from:
 - type: external
   description: 'Issue #1 project idea and the owner''s answers in the issue'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+  uri: https://github.com/dieterbaier/letterwright/issues/1
 tags:
 - decision
 - templates

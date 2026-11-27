@@ -10,7 +10,7 @@ summary: 'Template and data are merged in the backend into one HTML document; th
 derived_from:
 - type: external
   description: 'Issue #1 project idea and the owner''s answers in the issue'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+  uri: https://github.com/dieterbaier/letterwright/issues/1
 tags:
 - decision
 - rendering
@@ -225,7 +225,7 @@ therefore tags the content footer as paragraphs at the end of the structure
 tree. On every generation it is checked that exactly the footer texts from the
 HTML are there in this order; otherwise the generation aborts.
 
-*Owner's decisions* in the https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[review of PR #47]:
+*Owner's decisions* in the https://github.com/dieterbaier/letterwright/pull/47#pullrequestreview-5997431593[review of PR #47]:
 
 * *Chromium (option 2) is not checked for now.* A different PDF renderer does
   not remove the limits of the Paged.js preview. The deviations stay open.
