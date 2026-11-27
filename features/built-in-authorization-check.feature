@@ -42,7 +42,7 @@ Feature: Built-in authorization check
     Then it is not allowed
 
   Scenario: A configured role replaces the predefined one
-    Given the host has configured the role "ROLE_CLERK" for creating letters
+    Given the host has configured the role "ROLE_CASEWORK" for creating letters
     And Erika is logged in and has only the role "ROLE_LETTERWRIGHT_LETTERS_CREATE"
     When the library asks whether Erika may create a letter for customer 4711
     Then it is not allowed

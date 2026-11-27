@@ -86,7 +86,7 @@ Feature: Publish template version
 
     Examples:
       | change                    | afterwards                   |
-      | superseded with version 2 | published in version 2       |
+      | superseded by version 2   | published in version 2       |
       | withdrawn                 | without a published version  |
 
   Scenario: A published version stays unchanged, a change starts a new draft
