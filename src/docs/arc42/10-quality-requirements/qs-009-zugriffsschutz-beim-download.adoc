@@ -1,49 +1,49 @@
 ---
 id: QS-009-zugriffsschutz-beim-download
 type: QualityScenario
-title: 'Zugriffsschutz beim Download'
+title: 'Access protection on download'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Ein Benutzer ohne Berechtigung erhält weder Inhalt noch vertrauliche Metadaten eines Schreibens.'
+summary: 'A user without permission receives neither the content nor confidential metadata of a letter.'
 tags:
 - quality
-- sicherheit
-- vertraulichkeit
+- security
+- confidentiality
 relations: []
 metadata_version: '1.0'
 ---
 [[qs-009-zugriffsschutz-beim-download]]
-== QS-009: Zugriffsschutz beim Download
+== QS-009: Access Protection on Download
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Angemeldeter Benutzer ohne Berechtigung für ein bestimmtes Schreiben
-| Stimulus | (a) Ruft Download oder Löschen mit der ID eines fremden Schreibens auf. (b) Ruft die Übersicht auf, während in der Datenbank sichtbare und fremde Schreiben liegen.
-| Environment | Normalbetrieb; Angreifer kennt oder errät IDs.
-| Artifact | REST-Endpunkte und Anwendungsfälle.
-| Response | (a) Die Anfrage wird abgelehnt; die Antwort unterscheidet nicht zwischen nicht vorhanden und nicht berechtigt. (b) Die Übersicht enthält nur Schreiben, die der Host freigibt; Filterung erfolgt vor Paginierung und Zählung.
-| Response Measure | (a) 100 % der Zugriffsversuche per ID liefern 404 ohne Dokumentinhalt, Dateinamen, Empfänger oder Betreff. (b) In einem Testfall mit sichtbaren und fremden Schreiben erscheinen 0 fremde Schreiben als Eintrag oder Metadaten; Gesamtzahl, Seitenzahl und Paginierungs-Cursor entsprechen ausschließlich den sichtbaren Schreiben.
+| Element | Description
+| Source | Logged-in user without permission for a specific letter
+| Stimulus | (a) Calls download or delete with the ID of someone else's letter. (b) Calls the list while the database holds visible letters and letters of others.
+| Environment | Normal operation; the attacker knows or guesses IDs.
+| Artifact | REST endpoints and use cases.
+| Response | (a) The request is rejected; the response does not distinguish between not present and not permitted. (b) The list contains only letters that the host releases; filtering happens before pagination and counting.
+| Response Measure | (a) 100 % of the access attempts by ID return 404 without document content, file name, recipient or subject. (b) In a test case with visible letters and letters of others, 0 letters of others appear as an entry or as metadata; the total count, page count and pagination cursor correspond only to the visible letters.
 |===
 
-=== Begründung
+=== Rationale
 
-Schreiben enthalten personenbezogene Daten.
+Letters contain personal data.
 
-=== Annahmen
+=== Assumptions
 
-* IDs sind nicht fortlaufend (UUID).
+* IDs are not sequential (UUID).
 
 === Impact
 
@@ -54,7 +54,7 @@ include::generated/qs-009-zugriffsschutz-beim-download-impact.adoc[leveloffset=+
 include::generated/qs-009-zugriffsschutz-beim-download-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -62,9 +62,9 @@ include::generated/qs-009-zugriffsschutz-beim-download-traceability.adoc[levelof
 
 === Open Questions
 
-* Keine. Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Q-PO-003).
+* None. The host application determines roles and visibility (Q-PO-003).
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.

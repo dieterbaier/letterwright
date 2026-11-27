@@ -1,12 +1,12 @@
 ---
 id: R-008-zugangshuerde-bei-github-packages
 type: Risk
-title: 'Zugangshürde bei GitHub Packages'
+title: 'Access hurdle with GitHub Packages'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Konsumenten brauchen für GitHub Packages auch bei öffentlichen Paketen ein Token.'
+summary: 'Consumers need a token for GitHub Packages, even for public packages.'
 tags:
 - risk
 - distribution
@@ -14,23 +14,23 @@ relations:
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: proposed
-  rationale: 'Zusätzliche Token-Konfiguration erhöht den Integrationsaufwand.'
+  rationale: 'Additional token configuration increases the integration effort.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-008-zugangshuerde-bei-github-packages]]
-== R-008: Zugangshürde bei GitHub Packages
+== R-008: Access Hurdle with GitHub Packages
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil GitHub Packages auch für öffentliche Maven- und npm-Pakete eine Authentifizierung verlangt, müssen Konsumenten Tokens konfigurieren, was die Integration erschwert und externe Nutzung bremst.
+Because GitHub Packages requires authentication even for public Maven and npm packages, consumers must configure tokens, which makes the integration harder and slows down external use.
 
 === Assessment
 
@@ -44,17 +44,17 @@ Weil GitHub Packages auch für öffentliche Maven- und npm-Pakete eine Authentif
 | Confidence | High.
 |===
 
-Bekanntes Verhalten von GitHub Packages; Auswirkung gering, solange Konsumenten intern sind.
+Known behavior of GitHub Packages; low impact as long as consumers are internal.
 
 === Mitigation Options
 
-* Konfiguration in der Integrationsdoku beschreiben.
-* Bei externer Nutzung Maven Central und npmjs.org bewerten.
+* Describe the configuration in the integration documentation.
+* For external use, evaluate Maven Central and npmjs.org.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -65,7 +65,7 @@ include::generated/r-008-zugangshuerde-bei-github-packages-impact.adoc[leveloffs
 include::generated/r-008-zugangshuerde-bei-github-packages-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -73,9 +73,9 @@ include::generated/r-008-zugangshuerde-bei-github-packages-traceability.adoc[lev
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

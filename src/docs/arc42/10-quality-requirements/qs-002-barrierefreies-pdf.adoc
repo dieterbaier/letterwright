@@ -1,63 +1,63 @@
 ---
 id: QS-002-barrierefreies-pdf
 type: QualityScenario
-title: 'Barrierefreies PDF'
+title: 'Accessible PDF'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Gespeicherte Schreiben sind getaggt und bestehen die veraPDF-Prüfung gegen PDF/UA-1.'
+summary: 'Saved letters are tagged and pass the veraPDF check against PDF/UA-1.'
 tags:
 - quality
-- barrierefreiheit
+- accessibility
 - pdfua
 relations: []
 metadata_version: '1.0'
 ---
 [[qs-002-barrierefreies-pdf]]
-== QS-002: Barrierefreies PDF
+== QS-002: Accessible PDF
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Empfänger, der einen Screenreader nutzt
-| Stimulus | Öffnet ein heruntergeladenes Schreiben.
-| Environment | Normalbetrieb; Referenzvorlagen im CI.
-| Artifact | Erzeugtes PDF.
-| Response | Lesereihenfolge, Überschriften, Absender- und Empfängerblock, Tabellen und Bilder mit Alternativtext sind korrekt getaggt; Dokumentsprache und Titel sind gesetzt.
-| Response Measure | Automatisch: 0 veraPDF-Fehler gegen PDF/UA-1 für alle Referenz-PDFs; das schließt eine gesetzte Dokumentsprache ein. Manuelle Stichprobe je Release an mindestens einem ein- und einem mehrseitigen Referenz-PDF (z. B. mit NVDA und dem PDF Accessibility Checker PAC): Lesereihenfolge entspricht der logischen Briefreihenfolge (Absender, Anschrift, Informationsblock, Betreff, Text, Grußformel, inhaltliche Fußzeile); Alternativtexte sind inhaltlich sinnvoll (kein Dateiname, kein „Bild“); eine inhaltliche Fußzeile (z. B. Öffnungszeiten, Homepage) wird genau einmal nach dem Brieftext vorgelesen; Seitenzahlen, dekorative Elemente, identische Wiederholungen von Kopf- und Fußzeilen sowie Falzmarken sind als Artefakt markiert; der Dokumenttitel wird angesagt. 0 offene Befunde.
+| Element | Description
+| Source | Recipient who uses a screen reader
+| Stimulus | Opens a downloaded letter.
+| Environment | Normal operation; reference templates in CI.
+| Artifact | Generated PDF.
+| Response | Reading order, headings, sender and recipient block, tables and images with alternative text are tagged correctly; document language and title are set.
+| Response Measure | Automated: 0 veraPDF errors against PDF/UA-1 for all reference PDFs; this includes a set document language. Manual sample per release on at least one single-page and one multi-page reference PDF (e.g. with NVDA and the PDF Accessibility Checker PAC): the reading order matches the logical letter order (sender, address, information block, subject, text, closing, content footer); alternative texts are meaningful in content (no file name, no “image”); a content footer (e.g. opening hours, homepage) is read out exactly once after the letter text; page numbers, decorative elements, identical repetitions of headers and footers as well as fold marks are marked as artifacts; the document title is announced. 0 open findings.
 |===
 
-=== Begründung
+=== Rationale
 
-Issue #1 fordert ein barrierefreies gespeichertes Dokument.
+Issue #1 requires an accessible saved document.
 
-Zur Fußzeile hat der Owner im https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[Review zu PR #47] entschieden: Angaben wie Öffnungszeiten und
-Homepage gehören einmal nach dem Brieftext in die Lesereihenfolge. Bis dahin
-verlangte das Antwortmaß Kopf- und Fußzeilen pauschal als Artefakt.
-openhtmltopdf schafft das nur mit einem Nachbearbeitungsschritt
+On the footer, the owner decided in the https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[review of PR #47]: details such as opening hours and
+homepage belong in the reading order once, after the letter text. Until then,
+the response measure required headers and footers as artifacts across the board.
+openhtmltopdf achieves this only with a post-processing step
 (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]).
 
-Zur Dokumentsprache hat der Owner nach der NVDA-Stichprobe am Prototyp (2026-11-23)
-entschieden: Das Antwortmaß verlangt nicht mehr, dass die Sprache angesagt wird;
-NVDA hat sie in der Stichprobe nicht angesagt. Eine manuelle Prüfung, ob der Text in der
-gesetzten Sprache vorgelesen wird, unterscheidet bei einem deutschen Schreiben und einer
-deutschen Standardstimme nicht. Ob die Sprache gesetzt ist, prüft deshalb nur die
-automatische Stufe: veraPDF meldet eine fehlende Sprachangabe als Verstoß gegen PDF/UA-1
-(Gegenprobe im Prototyp mit dem Word-PDF).
+On the document language, the owner decided after the NVDA sample on the prototype (2026-11-23):
+the response measure no longer requires that the language is announced;
+NVDA did not announce it in the sample. A manual check of whether the text is read
+in the set language cannot tell the difference for a German letter and a
+German default voice. That is why only the automated stage checks whether the
+language is set: veraPDF reports a missing language as a violation of PDF/UA-1
+(counter-check in the prototype with the Word PDF).
 
-=== Annahmen
+=== Assumptions
 
-* Automatische Prüfung deckt nur die maschinell prüfbaren Kriterien ab; eine manuelle Stichprobe mit Screenreader ergänzt sie.
+* The automated check covers only the machine-checkable criteria; a manual sample with a screen reader complements it.
 
 === Impact
 
@@ -68,7 +68,7 @@ include::generated/qs-002-barrierefreies-pdf-impact.adoc[leveloffset=+2]
 include::generated/qs-002-barrierefreies-pdf-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -76,9 +76,9 @@ include::generated/qs-002-barrierefreies-pdf-traceability.adoc[leveloffset=+2]
 
 === Open Questions
 
-* Wer führt die manuelle Stichprobe durch?
+* Who carries out the manual sample?
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.

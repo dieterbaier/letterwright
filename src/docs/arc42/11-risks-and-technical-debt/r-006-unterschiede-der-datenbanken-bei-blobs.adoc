@@ -1,37 +1,37 @@
 ---
 id: R-006-unterschiede-der-datenbanken-bei-blobs
 type: Risk
-title: 'Unterschiede der Datenbanken bei BLOBs'
+title: 'Differences between databases with BLOBs'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'BLOB-Typen, Größenlimits und Streaming verhalten sich je Datenbank unterschiedlich.'
+summary: 'BLOB types, size limits and streaming behave differently per database.'
 tags:
 - risk
-- persistenz
-- datenbank
+- persistence
+- database
 relations:
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: proposed
-  rationale: 'Datenbankspezifische Probleme erschweren die Integration.'
+  rationale: 'Database-specific problems make the integration harder.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-006-unterschiede-der-datenbanken-bei-blobs]]
-== R-006: Unterschiede der Datenbanken bei BLOBs
+== R-006: Differences Between Databases with BLOBs
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil die Bibliothek datenbankagnostisch sein soll, können BLOB-Typen, Größenlimits (z. B. MySQL BLOB 64 KB) oder Streaming-Verhalten je Datenbank abweichen, was zu Fehlern beim Speichern oder Laden in einzelnen Host-Datenbanken führt.
+Because the library is meant to be database-agnostic, BLOB types, size limits (e.g. MySQL BLOB 64 KB) or streaming behavior may differ per database, leading to errors when saving or loading in individual host databases.
 
 === Assessment
 
@@ -45,17 +45,17 @@ Weil die Bibliothek datenbankagnostisch sein soll, können BLOB-Typen, Größenl
 | Confidence | Medium.
 |===
 
-Liquibase bildet Typen ab, Größenlimits müssen aber geprüft werden.
+Liquibase maps types, but size limits must be checked.
 
 === Mitigation Options
 
-* Testcontainers-Matrix für jede unterstützte Datenbank.
-* Port DocumentStore erlaubt Ausweichen auf Objektspeicher.
+* Testcontainers matrix for every supported database.
+* Port DocumentStore allows falling back to object storage.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -66,7 +66,7 @@ include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-impact.adoc[leve
 include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -74,9 +74,9 @@ include::generated/r-006-unterschiede-der-datenbanken-bei-blobs-traceability.ado
 
 === Open Questions
 
-* Welche Datenbanken setzen die Hosts ein? (Q-ARCH-001)
+* Which databases do the hosts use? (Q-ARCH-001)
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

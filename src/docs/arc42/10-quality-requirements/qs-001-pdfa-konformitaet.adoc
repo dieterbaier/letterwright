@@ -1,12 +1,12 @@
 ---
 id: QS-001-pdfa-konformitaet
 type: QualityScenario
-title: 'PDF/A-Konformität gespeicherter Schreiben'
+title: 'PDF/A conformance of saved letters'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Jedes gespeicherte Schreiben besteht die veraPDF-Prüfung gegen PDF/A-2b ohne Fehler.'
+summary: 'Every saved letter passes the veraPDF check against PDF/A-2b without errors.'
 tags:
 - quality
 - pdfa
@@ -15,35 +15,35 @@ relations: []
 metadata_version: '1.0'
 ---
 [[qs-001-pdfa-konformitaet]]
-== QS-001: PDF/A-Konformität gespeicherter Schreiben
+== QS-001: PDF/A Conformance of Saved Letters
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Benutzer (Sachbearbeiter)
-| Stimulus | Speichert ein Standardschreiben, das mit aktuellen Daten befüllt ist.
-| Environment | Normalbetrieb, auch mit von Fachanwendern neu gepflegten Vorlagen; zusätzlich alle Referenzvorlagen im CI.
-| Artifact | Rendering-Adapter und Pflicht-Konformitätsprüfer (`ConformanceChecker`).
-| Response | Das System erzeugt ein PDF und persistiert es nur, wenn die Laufzeitprüfung es als konform bestätigt. Ist es nicht konform oder ist die Prüfung nicht ausführbar, wird nichts persistiert und der Benutzer informiert (fail-closed). Ohne konfigurierten Prüfer startet der Anwendungskontext nicht.
-| Response Measure | 100 % der persistierten PDFs haben eine bestandene Laufzeitprüfung gegen PDF/A-2b (0 persistierte PDFs ohne Prüfergebnis); alle Referenz-PDFs im CI: 0 veraPDF-Fehler; Tests belegen: nicht konform, Prüfung fehlgeschlagen und Prüfer fehlt führen zu keinem persistierten Schreiben.
+| Element | Description
+| Source | User (clerk)
+| Stimulus | Saves a letter template that is filled with current data.
+| Environment | Normal operation, also with templates newly maintained by business users; in addition, all reference templates in CI.
+| Artifact | Rendering adapter and required conformance checker (`ConformanceChecker`).
+| Response | The system creates a PDF and persists it only if the runtime check confirms it as conformant. If it is not conformant or the check cannot be run, nothing is persisted and the user is informed (fail-closed). Without a configured checker, the application context does not start.
+| Response Measure | 100 % of the persisted PDFs have a passed runtime check against PDF/A-2b (0 persisted PDFs without a check result); all reference PDFs in CI: 0 veraPDF errors; tests show: not conformant, check failed and checker missing lead to no persisted letter.
 |===
 
-=== Begründung
+=== Rationale
 
-Archivierbarkeit ist eine Kernanforderung aus Issue #1.
+Archivability is a core requirement from issue #1.
 
-=== Annahmen
+=== Assumptions
 
-* veraPDF läuft im CI und zur Laufzeit. Der Starter verwendet standardmäßig veraPDF als `ConformanceChecker`; ein konfigurierter Prüfer ist für jede Persistierung erforderlich (ADR-005).
+* veraPDF runs in CI and at runtime. The starter uses veraPDF as the `ConformanceChecker` by default; a configured checker is required for every persistence (ADR-005).
 
 === Impact
 
@@ -54,7 +54,7 @@ include::generated/qs-001-pdfa-konformitaet-impact.adoc[leveloffset=+2]
 include::generated/qs-001-pdfa-konformitaet-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -62,9 +62,9 @@ include::generated/qs-001-pdfa-konformitaet-traceability.adoc[leveloffset=+2]
 
 === Open Questions
 
-* Keine. Verhalten ist in ADR-005 festgelegt (fail-closed, Prüfer ist Pflicht).
+* None. The behavior is defined in ADR-005 (fail-closed, the checker is required).
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.

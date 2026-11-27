@@ -1,65 +1,66 @@
 ---
 id: QS-004-wiedergabetreue-vorschau-und-pdf
 type: QualityScenario
-title: 'Wiedergabetreue zwischen Vorschau und PDF'
+title: 'Fidelity between preview and PDF'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Vorschau und gespeichertes PDF haben gleiche Seitenanzahl und gleiche Umbruchstellen.'
+summary: 'Preview and saved PDF have the same page count and the same break points.'
 tags:
 - quality
-- wiedergabetreue
+- fidelity
 - rendering
 relations: []
 metadata_version: '1.0'
 ---
 [[qs-004-wiedergabetreue-vorschau-und-pdf]]
-== QS-004: Wiedergabetreue zwischen Vorschau und PDF
+== QS-004: Fidelity Between Preview and PDF
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Benutzer
-| Stimulus | Prüft die Vorschau und speichert anschließend.
-| Environment | Normalbetrieb; Referenzvorlagen mit ein bis drei Seiten im CI.
-| Artifact | Rendering-Pipeline (Paged.js und PDF-Renderer).
-| Response | Das gespeicherte PDF entspricht der Vorschau.
-| Response Measure | Für alle Referenzvorlagen: gleiche Seitenanzahl, gleiche erste und letzte Textzeile je Seite, Positionsabweichung zentraler Bausteine ≤ 1 mm.
+| Element | Description
+| Source | User
+| Stimulus | Checks the preview and then saves.
+| Environment | Normal operation; reference templates with one to three pages in CI.
+| Artifact | Rendering pipeline (Paged.js and PDF renderer).
+| Response | The saved PDF matches the preview.
+| Response Measure | For all reference templates: same page count, same first and last text line per page, position deviation of central building blocks ≤ 1 mm.
 |===
 
-=== Begründung
+=== Rationale
 
-Der Owner verlangt, dass Vorschau und endgültiges Dokument gleich aussehen.
+The owner requires that the preview and the final document look the same.
 
-=== Annahmen
+=== Assumptions
 
-* Gleiche eingebettete Schriften in beiden Wegen.
-* Gemessen wird die Vorschau, wie sie der Browser darstellt. Ein Druck-PDF der
-  Vorschau ist ein Hilfsmittel und belegt nur einen Teil.
+* The same embedded fonts in both paths.
+* What is measured is the preview as the browser displays it. A print PDF of the
+  preview is an aid and proves only part of it.
 
-=== Messstand
+=== Measurement Status
 
-Der Prototyp aus #3 erfüllt das Antwortmaß für beide Referenzschreiben am
-Chrome-Druck-PDF der Vorschau: gleiche Seitenzahl, gleiche erste und letzte
-Zeile je Seite, höchstens 0,3 mm Abweichung. Eine Gegenprobe belegt, dass der
-Vergleich zusätzliche Seiten und Zeilen findet.
+The prototype from #3 meets the response measure for both reference letters on
+the Chrome print PDF of the preview: same page count, same first and last
+line per page, at most 0.3 mm deviation. A counter-check shows that the
+comparison finds additional pages and lines.
 
-Die Bildschirmdarstellung hat der Owner am 2026-11-21 per Sichtprobe geprüft:
-Vorschau im Browser und PDF bei 100 % nebeneinander, kein Unterschied zu erkennen.
-Die Grenze von 1 mm lässt sich so nicht belegen, ein Bildschirmpixel misst etwa
-0,26 mm. Die genaue Messung wird ein automatischer Test in #7: Er liest nach dem
-Umbruch durch Paged.js die Zeilenpositionen aus dem DOM des Browsers, also genau
-das, was der Bildschirm zeigt, und vergleicht sie wie der Prototyp mit dem PDF.
+The owner checked the screen display by visual inspection on 2026-11-21:
+preview in the browser and PDF at 100 % side by side, no difference visible.
+The 1 mm limit cannot be proven this way; a screen pixel measures about
+0.26 mm. The exact measurement will be an automated test in #7: after
+pagination by Paged.js, it reads the line positions from the browser's DOM,
+that is exactly what the screen shows, and compares them with the PDF like the
+prototype.
 
 === Impact
 
@@ -70,7 +71,7 @@ include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-impact.adoc[leveloffs
 include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -78,9 +79,9 @@ include::generated/qs-004-wiedergabetreue-vorschau-und-pdf-traceability.adoc[lev
 
 === Open Questions
 
-* Ist eine Abweichung von 1 mm akzeptabel?
+* Is a deviation of 1 mm acceptable?
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.

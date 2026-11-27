@@ -1,50 +1,50 @@
 ---
 id: QS-006-briefpapier-pflege-durch-fachanwender
 type: QualityScenario
-title: 'Pflege von Briefpapier und Standardschreiben durch Fachanwender'
+title: 'Maintenance of letterheads and letter templates by business users'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Ein Fachanwender ändert Logo, Slogan oder einen Textbaustein ohne Entwickler und ohne Deployment.'
+summary: 'A business user changes the logo, slogan or a text block without developers and without a deployment.'
 tags:
 - quality
 - usability
-- pflegbarkeit
-- vorlagen
+- maintainability
+- templates
 relations: []
 metadata_version: '1.0'
 ---
 [[qs-006-briefpapier-pflege-durch-fachanwender]]
-== QS-006: Pflege von Briefpapier und Standardschreiben durch Fachanwender
+== QS-006: Maintenance of Letterheads and Letter Templates by Business Users
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Vorlagenverwalter ohne technische Kenntnisse
-| Stimulus | Will das Logo austauschen, den Slogan ändern und einen Absatz mit Platzhalter ergänzen.
-| Environment | Normalbetrieb; Fachanwender kennt Word, aber kein HTML.
-| Artifact | Editor für Briefpapier und Standardschreiben.
-| Response | Die Änderung ist als neue Version gespeichert, in der Vorschau sichtbar und nach Veröffentlichung wirksam.
-| Response Measure | In einem Usability-Test schaffen 4 von 5 Fachanwendern die Aufgabe ohne Hilfe in höchstens 15 Minuten; kein Deployment nötig.
+| Element | Description
+| Source | Template manager without technical knowledge
+| Stimulus | Wants to replace the logo, change the slogan and add a paragraph with a placeholder.
+| Environment | Normal operation; the business user knows Word but not HTML.
+| Artifact | Editor for letterheads and letter templates.
+| Response | The change is saved as a new version, visible in the preview and effective after publishing.
+| Response Measure | In a usability test, 4 out of 5 business users complete the task without help in at most 15 minutes; no deployment needed.
 |===
 
-=== Begründung
+=== Rationale
 
-Der Owner verlangt Pflege durch Nicht-Techniker.
+The owner requires maintenance by non-technical people.
 
-=== Annahmen
+=== Assumptions
 
-* Es stehen Fachanwender für einen Usability-Test zur Verfügung.
+* Business users are available for a usability test.
 
 === Impact
 
@@ -55,7 +55,7 @@ include::generated/qs-006-briefpapier-pflege-durch-fachanwender-impact.adoc[leve
 include::generated/qs-006-briefpapier-pflege-durch-fachanwender-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -63,9 +63,9 @@ include::generated/qs-006-briefpapier-pflege-durch-fachanwender-traceability.ado
 
 === Open Questions
 
-* Wer stellt Fachanwender für den Usability-Test?
+* Who provides business users for the usability test?
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.
