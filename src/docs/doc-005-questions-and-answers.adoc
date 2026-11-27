@@ -49,10 +49,10 @@ PDF/A-Vorgaben (ADR-005)?
 
 Wessen Schreiben darf ein Sachbearbeiter auflisten, herunterladen und löschen:
 alle, eigene oder die zu einem fachlichen Bezug? Vorschlag: Die Host-Anwendung
-entscheidet über den Port `Berechtigungspruefung`; die Übersicht filtert nach
+entscheidet über den Port `AuthorizationCheck`; die Übersicht filtert nach
 fachlichem Bezug.
 
-Answer: Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Owner, 2026-11-14). Umsetzung über den Port `Berechtigungspruefung` (ADR-002).
+Answer: Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Owner, 2026-11-14). Umsetzung über den Port `AuthorizationCheck` (ADR-002).
 
 [[q-po-004]]
 === Q-PO-004: Beispielvorlagen für den Prototyp
@@ -375,7 +375,7 @@ anderer Benutzer sie und damit dieses Standardschreiben erzeugen. Die Aufgabe
 bleibt blockiert, bis sie wieder freigegeben ist. Ist das Standardschreiben schon
 erzeugt, kann ein anderer Benutzer es nicht noch einmal erzeugen. Er bekommt das
 gespeicherte Standardschreiben angezeigt.
-. *Löschen:* Darf nach dem Löschen eines Schreibens über die `Loeschrichtlinie`
+. *Löschen:* Darf nach dem Löschen eines Schreibens über die `DeletionPolicy`
   unter demselben Schlüssel ein neues entstehen?
 +
 Antwort (Owner, 2026-11-16): Ja.
@@ -469,7 +469,7 @@ bietet beides an. Die beiden Wege erfüllen verschiedene Integrationsbedürfniss
 * *Die Bibliothek* verantwortet ihre eigene Idempotenz nach ADR-021, also
   höchstens ein Schreiben je Snapshot. Im Vertrag von API und Rückruf sichert
   sie zu, wann der Rückruf läuft (bei einer Neuanlage und/oder bei
-  `BereitsGespeichert`), welche stabilen Identifikatoren er erhält, dass er vor
+  `AlreadySaved`), welche stabilen Identifikatoren er erhält, dass er vor
   dem gemeinsamen Commit läuft und wie Fehler des Rückrufs auf die gemeinsame
   Transaktion wirken.
 * *Der Host* verantwortet die Idempotenz seiner eigenen Fachaktionen, das
@@ -559,7 +559,7 @@ xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], angenommen am
   entfällt der Vorschlag unter „Benachrichtigung des Hosts“: Die Bibliothek
   wiederholt nichts, ein Fehler im Rückruf verhindert das Speichern.
 * Der Rückruf läuft nur, wenn das Schreiben in dieser Transaktion entsteht. Bei
-  `BereitsGespeichert` läuft er nicht noch einmal.
+  `AlreadySaved` läuft er nicht noch einmal.
 * Der Rückruf lehnt fachlich über ein Sealed-Ergebnis mit einem Grund für den
   Benutzer ab. Eine Ablehnung rollt die gemeinsame Transaktion zurück, ebenso
   jede Ausnahme.
@@ -603,7 +603,7 @@ database "Datenbank\n(gemeinsame Transaktion)" as DB
 Host -> DB: Transaktion beginnen
 Host -> Api: Schreiben speichern (Snapshot-ID)
 Api -> DB: Schreiben anlegen, Snapshot verbrauchen
-Api --> Host: Ergebnis (Neuanlage oder BereitsGespeichert,\nDateiname, technischer Schlüssel)
+Api --> Host: Ergebnis (Neuanlage oder AlreadySaved,\nDateiname, technischer Schlüssel)
 Host -> DB: eigene Fachdaten ändern, Task abschließen
 alt alles erfolgreich
   Host -> DB: Commit
@@ -675,14 +675,14 @@ end
   genau den Snapshot und seine Prüfsumme gebunden. Beim Festschreiben werden
   Besitzer, Berechtigung, Ablauf, aktueller Datenkontext und der atomare
   Zustandswechsel weiter geprüft, sonst entsteht eine Lücke zur Treue des
-  Snapshots. Der heutige Anwendungsfall `Schreibenspeicherung` rendert und prüft
+  Snapshots. Der heutige Anwendungsfall `SaveLetterService` rendert und prüft
   erst beim Speichern; das wäre eine bewusste Umstrukturierung.
 * *Entfernte Engine:* Die Bibliothek bekommt keine Abhängigkeit zu einer Process
   Engine. Der Host kann in derselben lokalen Transaktion einen Outbox-Auftrag
   schreiben und den entfernten Aufruf wiederholbar ausführen. Idempotenz
   verhindert eine doppelte Wirkung, garantiert allein aber nicht, dass der
   zweite Schritt nach einem Absturz überhaupt noch ausgeführt wird.
-* Berechtigung (`ZumErzeugen`) und Idempotenz (ADR-021) gelten für beide Wege
+* Berechtigung (`ForCreation`) und Idempotenz (ADR-021) gelten für beide Wege
   gleich.
 * *Vor der Umsetzung* braucht es den konkreten Vertrag für API und Transaktion
   sowie Integrationsnachweise für den gemeinsamen Commit, einen späten Rollback

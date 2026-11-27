@@ -51,14 +51,14 @@ Wir legen fest:
 * **Monorepo**. Alle Quellen liegen unter `src/`, getrennt nach Art:
 ** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
    ADR-002:
-*** `domaene/modell` (Domänenmodell) und `domaene/service` (Domänenservices) als
+*** `domain/model` (Domänenmodell) und `domain/service` (Domänenservices) als
     zwei Module; Domänenservices sieht beim Kompilieren nur `usecases/service`
 *** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports) und
     `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
 *** `spi` (Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ADR-016)
 *** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,
-    `adapter/out/adapter-persistenz-jdbc`, `adapter/out/adapter-host`
-*** `spring-boot-starter` und das Testmodul `architekturtests`
+    `adapter/out/adapter-persistence-jdbc`, `adapter/out/adapter-host`
+*** `spring-boot-starter` und das Testmodul `architecture-tests`
 ** `src/application/frontend/` – npm-Workspace mit dem Paket der React-Komponenten
    (TypeScript, Vite, UnoCSS).
 ** `src/docs/` – Architekturdokumentation, `src/examples/` – Beispielvorlagen (DOCX).
@@ -75,8 +75,8 @@ Wir legen fest:
   (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Die
   Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
   xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
-* Die Gradle-Projekte sind flach benannt (`domaene-modell`, `usecases-in`,
-  `adapter-web`, …) und zeigen auf ihr Verzeichnis. Die Gruppenordner `domaene`,
+* Die Gradle-Projekte sind flach benannt (`domain-model`, `usecases-in`,
+  `adapter-web`, …) und zeigen auf ihr Verzeichnis. Die Gruppenordner `domain`,
   `adapter/in`, `adapter/out` und `usecases` sind keine eigenen Gradle-Projekte.
 * **Versionen**: die **aktuelle stabile Spring-Boot-Version (4.x)**, entwickelt und
   getestet mit **Java 25 (LTS)**, kompiliert mit `--release 21`, damit Hosts auf
@@ -89,7 +89,7 @@ Stand beim Anlegen des Gerüsts (#12): Gradle 9.9.1 (Wrapper), Spring Boot 4.1.2
 (BOM; 4.2 war nur als Release Candidate verfügbar), ArchUnit 1.5.1, JaCoCo 0.8.16.
 Mit #19 kam JSpecify 1.0.1 hinzu, im Versionskatalog unabhängig von der
 Spring-Boot-BOM geführt (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
-Die gemeinsamen Konventionen stehen im Convention-Plugin `standardschreiben.java-modul`
+Die gemeinsamen Konventionen stehen im Convention-Plugin `letterwright.java-module`
 (`gradle/build-logic`). Jedes Modul bindet es ausdrücklich ein; es gibt keine
 Konfiguration über `subprojects {}`. So bekommt nur ein Modul die Java-Regeln, das sie
 anfordert, und die Konfiguration bleibt mit dem Configuration-Cache verträglich.
@@ -102,8 +102,8 @@ lässt `npm ci` mit einer anderen Version scheitern. Dazu Vite 8.3,
 Vitest 5.1 mit V8-Abdeckung, React 19.3 (Peer-Abhängigkeit), UnoCSS 66.13,
 axe-core 4.14, ESLint 10 mit typescript-eslint 8.72. TypeScript bleibt bei 6.0,
 weil typescript-eslint TypeScript 7 noch nicht unterstützt. Das Paket heißt
-`@dieterbaier/standardschreiben` und liegt unter
-`src/application/frontend/packages/komponenten`. Die exakten Versionen stehen in
+`@dieterbaier/letterwright` und liegt unter
+`src/application/frontend/packages/components`. Die exakten Versionen stehen in
 `package-lock.json`.
 
 Antwort auf die Frage des Owners „Warum nicht die neueste Spring-Boot-Version?“:

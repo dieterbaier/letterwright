@@ -6,7 +6,7 @@ status: proposed
 owner: 'Architektur'
 created: '2026-11-14'
 reviewed: false
-summary: 'Persistenz über Spring JDBC mit portablem Liquibase-Changelog und konfigurierbarem Tabellenpräfix; PDFs als BLOB über den Port DokumentAblage; Tests gegen PostgreSQL und MariaDB.'
+summary: 'Persistenz über Spring JDBC mit portablem Liquibase-Changelog und konfigurierbarem Tabellenpräfix; PDFs als BLOB über den Port DocumentStore; Tests gegen PostgreSQL und MariaDB.'
 derived_from:
 - type: external
   description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
@@ -52,8 +52,8 @@ Wir schlagen vor:
   Bibliothek registriert damit keine Entitäten im `EntityManager` des Hosts.
 * Schema per **Liquibase-Changelog** mit portablen Liquibase-Typen, als Datei, die der
   Host in seinen Master-Changelog einbindet. Optional führt der Starter ihn selbst aus.
-* **Konfigurierbares Tabellenpräfix** (Default `ssw_`), um Namenskonflikte zu vermeiden.
-* PDFs als **BLOB** hinter dem Port `DokumentAblage`; ein Objektspeicher-Adapter kann
+* **Konfigurierbares Tabellenpräfix** (Default `lw_`), um Namenskonflikte zu vermeiden.
+* PDFs als **BLOB** hinter dem Port `DocumentStore`; ein Objektspeicher-Adapter kann
   später folgen.
 * **Unterstützte Datenbanken** im MVP: PostgreSQL und MariaDB/MySQL, beide per
   Testcontainers im CI getestet. H2 nur für schnelle Tests.

@@ -54,7 +54,7 @@ freizugeben.
 === Entscheidung
 
 * **Die Domäne verantwortet die Regel.** Ein Snapshot ist *offen*, solange aus
-  ihm kein Schreiben entstanden ist, danach *verbraucht*. `Schreiben.ausSnapshot`
+  ihm kein Schreiben entstanden ist, danach *verbraucht*. `Letter.fromSnapshot`
   nimmt nur einen offenen Snapshot und liefert das neue Schreiben zusammen mit
   dem verbrauchten Snapshot. Ein verbrauchter Snapshot lässt sich nicht noch
   einmal verbrauchen. Das ist im Fachmodell ohne Datenbank getestet.
@@ -69,7 +69,7 @@ freizugeben.
   das Speichern fachlich, bleibt der Snapshot offen mit seinem Datenkontext.
 * **Wiederholtes Speichern ist idempotent.** Nach einem Doppelklick oder einem
   Retry nach verlorener Antwort bekommt der Benutzer das schon gespeicherte
-  Schreiben zurück (`BereitsGespeichert`), ohne dass der Datenkontext gelesen
+  Schreiben zurück (`AlreadySaved`), ohne dass der Datenkontext gelesen
   oder ein PDF erzeugt wird. Die Befristung bleibt: Nach dem Ablauf verlangt auch
   eine Wiederholung eine neue Vorschau.
 * **Gleichzeitiges Speichern.** Meldet die Persistenz, dass der Snapshot schon
@@ -95,7 +95,7 @@ freizugeben.
   bekommt „Snapshot unbekannt“. Das gilt auch für eine gleichzeitige Anfrage, die
   den Snapshot noch offen gelesen hat: Meldet die Persistenz ein logisch
   gelöschtes vorhandenes Schreiben oder ein hart gelöschtes
-  (`SchreibenEntfernt`), entfernt die Anfrage ihr PDF und meldet den Snapshot als
+  (`LetterRemoved`), entfernt die Anfrage ihr PDF und meldet den Snapshot als
   unbekannt. Ein verbrauchter Snapshot ohne sichtbares Schreiben ist damit kein
   defekter Bestand. Das Schreiben wird nicht neu
   erzeugt; dazu braucht es eine neue Vorschau. Ergänzt am 2026-11-22 mit #54.
@@ -186,8 +186,8 @@ s| Summe s| +4 s| +2 s| +2
   Aktualisieren ist ebenfalls bedingt (nur solange offen); ein Test gegen beide
   Datenbanken weist nach, dass es einen gleichzeitig verbrauchten Snapshot nicht
   löscht.
-* #10: Die Oberfläche zeigt bei `BereitsGespeichert` denselben Download-Link wie
-  bei `Gespeichert`.
+* #10: Die Oberfläche zeigt bei `AlreadySaved` denselben Download-Link wie
+  bei `Saved`.
 * Ob verwaiste Dokumente aufgeräumt werden müssen, hängt von der Ablage ab (#60).
 
 === Impact

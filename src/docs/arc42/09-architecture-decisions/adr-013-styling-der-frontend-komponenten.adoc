@@ -53,10 +53,10 @@ Wir schlagen vor:
 * Die Styles liegen in einer **eigenen CSS-Ebene** (`@layer`). Styles des Hosts,
   die außerhalb dieser Ebene stehen, haben dadurch Vorrang. Der Host kann
   überschreiben, ohne `!important` zu verwenden.
-* Öffentlicher Vertrag seit dem Frontend-Gerüst (#13): das Klassenpräfix `ssw-`,
-  passend zum Tabellenpräfix `ssw_`
+* Öffentlicher Vertrag seit dem Frontend-Gerüst (#13): das Klassenpräfix `lw-`,
+  passend zum Tabellenpräfix `lw_`
   (xref:adr-006-datenbankagnostische-persistenz[ADR-006]), und die
-  CSS-Ebene `standardschreiben`. Eine Änderung daran bricht Hosts, die Klassen
+  CSS-Ebene `letterwright`. Eine Änderung daran bricht Hosts, die Klassen
   oder die Ebene in ihrem CSS ansprechen.
 * Farben, Schriften und Abstände kommen aus **CSS Custom Properties** mit eigenem
   Präfix. Der Host setzt sie, sonst gelten Standardwerte. Das gilt für die
@@ -173,4 +173,7 @@ Der Owner hat die Richtung am 2026-11-15 bestätigt: eigene Styles, vom Host
 überschreibbar, CSS Custom Properties, Render-Props als spätere Erweiterung.
 
 Im Review von PR #20 (2026-11-16) hat der Owner das Klassenpräfix `ssw-` und den
-Paketnamen `@dieterbaier/standardschreiben` übernommen.
+Paketnamen `@dieterbaier/standardschreiben` übernommen. Mit der Umbenennung nach
+xref:adr-024-sprache-der-ubiquitous-language-im-code[ADR-024] heißen sie `lw-`,
+`@dieterbaier/letterwright` und die CSS-Ebene `letterwright` (#84); vor dem ersten
+Release bricht das keinen Host.

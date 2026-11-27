@@ -61,19 +61,19 @@ Wir setzen eine **hexagonale Architektur** (Ports and Adapters) nach DDD ein:
   (Modul `usecases-service`).
 * **SPI zur Host-Anwendung** im eigenen Modul `spi`, mit eigenen Datentypen und
   ohne Abhängigkeit zum Domänenmodell. Der Host implementiert:
-** `PlatzhalterdatenAnbieter`: liefert den Datenkontext für ein Standardschreiben
+** `PlaceholderDataProvider`: liefert den Datenkontext für ein Standardschreiben
    und einen fachlichen Bezug (z. B. Kunde 4711). Werte dürfen bereits formatiert sein.
-** `Berechtigungspruefung` (Default-Implementierung auf Spring Security im Starter):
+** `AuthorizationCheck` (Default-Implementierung auf Spring Security im Starter):
    entscheidet über Pflegen, Erzeugen, Ansehen, Herunterladen und Löschen.
-** `Loeschrichtlinie`: entscheidet, ob und wie ein Schreiben gelöscht wird
+** `DeletionPolicy`: entscheidet, ob und wie ein Schreiben gelöscht wird
    (hart, logisch, gesperrt), siehe Aufbewahrungsfristen.
 * **Driven Ports** im Modul `usecases-out`, nur von Adaptern der Bibliothek
   implementiert:
 ** Ports für Platzhalterdaten, Berechtigung und Löschrichtlinie in Domänenbegriffen
    (Adapter `adapter-host`, bildet auf das SPI ab).
-** `DokumentAblage` (Adapter, Default JDBC/BLOB, später Objektspeicher).
-** `VorlagenRepository`, `SchreibenRepository` (Adapter JDBC).
-** `Renderer` und `KonformitaetsPruefer` (Adapter, siehe ADR-004 und ADR-005).
+** `DocumentStore` (Adapter, Default JDBC/BLOB, später Objektspeicher).
+** `TemplateRepository`, `LetterRepository` (Adapter JDBC).
+** `Renderer` und `ConformanceChecker` (Adapter, siehe ADR-004 und ADR-005).
 * **Driving Adapter**: REST-Controller und Spring-Boot-Autokonfiguration.
 
 Schnitt und Datentypen des SPI begründet
@@ -95,7 +95,7 @@ Zugelassen sind derzeit:
 * JSpecify für den Null-Vertrag (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
 * Die DDD-Annotationen aus `jmolecules-ddd`
   (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
-* Das projekteigene Modul `validierung` (ADR-018).
+* Das projekteigene Modul `validation` (ADR-018).
 
 Andere Bibliotheken sind damit nicht freigegeben, auch Lombok nicht. Eine Regel
 in den ArchUnit-Tests prüft diese Liste.
@@ -193,7 +193,7 @@ include::generated/adr-002-hexagonale-architektur-und-ports-traceability.adoc[le
 
 === Open Questions
 
-* Keine zur Sichtbarkeit: Rollen und Sichtbarkeit bestimmt die Host-Anwendung über `Berechtigungspruefung` (Q-PO-003). Die Übersicht fragt den Port je Schreiben bzw. per Filterkriterium ab.
+* Keine zur Sichtbarkeit: Rollen und Sichtbarkeit bestimmt die Host-Anwendung über `AuthorizationCheck` (Q-PO-003). Die Übersicht fragt den Port je Schreiben bzw. per Filterkriterium ab.
 
 === Review Notes
 
