@@ -19,7 +19,7 @@ metadata_version: '1.0'
 Source: issue #1 and the owner's answers in the issue.
 
 .Users (clerks)
-* View letter templates with current data as a preview.
+* Preview a letter generated from a letter template using current data.
 * Save letters; the result is a download link.
 * List of the saved letters.
 * Download or print saved letters.

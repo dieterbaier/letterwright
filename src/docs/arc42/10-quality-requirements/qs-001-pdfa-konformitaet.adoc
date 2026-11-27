@@ -30,7 +30,7 @@ assumptions until confirmed.
 |===
 | Element | Description
 | Source | User (clerk)
-| Stimulus | Saves a letter template that is filled with current data.
+| Stimulus | Requests to save the letter shown in the preview.
 | Environment | Normal operation, also with templates newly maintained by business users; in addition, all reference templates in CI.
 | Artifact | Rendering adapter and required conformance checker (`ConformanceChecker`).
 | Response | The system creates a PDF and persists it only if the runtime check confirms it as conformant. If it is not conformant or the check cannot be run, nothing is persisted and the user is informed (fail-closed). Without a configured checker, the application context does not start.
