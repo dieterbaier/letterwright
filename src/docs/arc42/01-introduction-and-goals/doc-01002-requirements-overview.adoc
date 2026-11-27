@@ -1,41 +1,41 @@
 ---
 id: DOC-01002-requirements-overview
 type: Document
-title: 'Aufgabenstellung'
+title: 'Requirements Overview'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Funktionale Anforderungen aus Issue #1.'
+summary: 'Functional requirements from issue #1.'
 tags:
 - requirements
 relations: []
 metadata_version: '1.0'
 ---
 [[requirements-overview]]
-== Aufgabenstellung
+== Requirements Overview
 
-Quelle: Issue #1 und die Antworten des Owners im Issue.
+Source: issue #1 and the owner's answers in the issue.
 
-.Benutzer (Sachbearbeiter)
-* Standardschreiben mit aktuellen Daten als Vorschau ansehen.
-* Schreiben speichern; als Ergebnis gibt es einen Download-Link.
-* Übersicht der gespeicherten Schreiben.
-* Gespeicherte Schreiben herunterladen oder drucken.
-* Gespeicherte Schreiben löschen (Regeln bestimmt die Host-Anwendung).
-* Mehrseitige Schreiben mit automatischem Seitenumbruch und Seitenzahlen (MVP).
-* Rollen und Sichtbarkeit bestimmt die Host-Anwendung.
+.Users (clerks)
+* View letter templates with current data as a preview.
+* Save letters; the result is a download link.
+* List of the saved letters.
+* Download or print saved letters.
+* Delete saved letters (the host application decides the rules).
+* Multi-page letters with automatic page breaks and page numbers (MVP).
+* The host application decides roles and visibility.
 
-.Vorlagenverwalter (Fachanwender)
-* Briefpapier definieren: Typ privat oder geschäftlich (DIN 5008 Form A oder B,
-  Default B), Stilvorgaben aus der zentralen DOCX-Vorgabe, Header mit Slogan und Logo, Absender, Empfängeranschrift, Betreff,
-  Informationsblöcke auf der ersten Seite, Fußzeile, Seitenzahlen.
-* Standardschreiben definieren, mit Platzhaltern, Wiederholungs- und
-  Bedingungsblöcken sowie Defaultwerten.
-* Briefpapier einem Standardschreiben zuweisen.
+.Template managers (business users)
+* Define letterheads: type private or business (DIN 5008 form A or B,
+  default B), style rules from the central DOCX specification, header with slogan and logo, sender, recipient address, subject,
+  information blocks on the first page, footer, page numbers.
+* Define letter templates, with placeholders, repeat and
+  condition blocks, and default values.
+* Assign a letterhead to a letter template.
 
-.Nicht im MVP (später, unter Umständen)
-* Mehrsprachigkeit von Vorlagen und UI.
-* Anlagen.
-* Mandantenfähigkeit (ausdrücklich nicht gefordert).
+.Not in the MVP (later, possibly)
+* Multiple languages for templates and UI.
+* Enclosures.
+* Multi-tenancy (explicitly not required).

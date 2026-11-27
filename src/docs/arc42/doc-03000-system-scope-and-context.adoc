@@ -1,13 +1,13 @@
 ---
 id: DOC-03000-system-scope-and-context
 type: Document
-title: 'Kontextabgrenzung'
+title: 'System Scope and Context'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Fachlicher und technischer Kontext der Bibliothek innerhalb einer Host-Anwendung.'
+summary: 'Business and technical context of the library within a host application.'
 tags:
 - arc42
 - context
@@ -15,45 +15,45 @@ relations: []
 metadata_version: '1.0'
 ---
 [[system-scope-and-context]]
-= Kontextabgrenzung
+= System Scope and Context
 
-== Fachlicher Kontext
+== Business Context
 
 [plantuml,kontext-fachlich,svg]
 ----
 @startuml
 !include <C4/C4_Context>
-Person(sb, "Sachbearbeiter", "Erzeugt, speichert, lädt und löscht Schreiben")
-Person(vv, "Vorlagenverwalter", "Pflegt Briefpapier und Standardschreiben")
-Person_Ext(emp, "Empfänger", "Erhält das Schreiben")
-System_Boundary(host, "Host-Anwendung") {
-  System(ssw, "Standardschreiben", "Einbettbare Bibliothek")
-  System(dom, "Fachdomäne des Hosts", "Liefert Platzhalterdaten, Berechtigungen, Löschregeln")
+Person(sb, "Clerk", "Creates, saves, loads and deletes letters")
+Person(vv, "Template manager", "Maintains letterheads and letter templates")
+Person_Ext(emp, "Recipient", "Receives the letter")
+System_Boundary(host, "Host application") {
+  System(ssw, "letterwright", "Embeddable library")
+  System(dom, "Host business domain", "Provides placeholder data, permissions, deletion rules")
 }
-Rel(sb, ssw, "Vorschau, Speichern, Download, Löschen")
-Rel(vv, ssw, "Pflegt Vorlagen")
-Rel(ssw, dom, "Fragt Daten und Berechtigungen an")
-Rel(sb, emp, "Versendet Schreiben (außerhalb des Systems)")
+Rel(sb, ssw, "Preview, save, download, delete")
+Rel(vv, ssw, "Maintains templates")
+Rel(ssw, dom, "Requests data and permissions")
+Rel(sb, emp, "Sends letters (outside the system)")
 @enduml
 ----
 
-== Technischer Kontext
+== Technical Context
 
 [cols="1,2,2", options="header"]
 |===
-| Nachbar | Schnittstelle | Richtung
-| React-Frontend des Hosts | npm-Paket mit React-Komponenten | Host bettet Komponenten ein
-| Spring-Boot-Backend des Hosts | Spring-Boot-Starter, REST unter konfigurierbarem Pfad | In-Process
-| Fachdomäne des Hosts | SPIs `PlaceholderDataProvider`, `AuthorizationCheck`, `DeletionPolicy` | Bibliothek ruft Host
-| Datenbank des Hosts | JDBC, Liquibase-Changelog | Bibliothek schreibt und liest eigene Tabellen
-| Spring Security des Hosts | Authentifizierter Benutzer, Rollen | Bibliothek liest
+| Neighbor | Interface | Direction
+| Host React frontend | npm package with React components | Host embeds components
+| Host Spring Boot backend | Spring Boot starter, REST under a configurable path | In-process
+| Host business domain | SPIs `PlaceholderDataProvider`, `AuthorizationCheck`, `DeletionPolicy` | Library calls host
+| Host database | JDBC, Liquibase changelog | Library writes and reads its own tables
+| Host Spring Security | Authenticated user, roles | Library reads
 |===
 
-Voraussetzung beim Host ist Java 21 oder neuer; die Bibliothek wird mit
-`--release 21` gebaut (xref:adr-009-build-monorepo-und-versionen[ADR-009]). Ab
-welcher Spring-Boot-Version der Starter läuft, weist #32 nach. Alle weiteren
-Versionen steuert der Versionskatalog; sie sind keine Architekturentscheidung.
+The host must run Java 21 or newer. The library is built with
+`--release 21` (xref:adr-009-build-monorepo-und-versionen[ADR-009]). #32
+establishes the minimum Spring Boot version the starter runs on. The version
+catalog controls all other versions; they are not an architecture decision.
 
-Systemgrenze: Alles innerhalb von *Standardschreiben* liefert die Bibliothek;
-Domänendaten, Identitäten, Datenbank und Betrieb gehören dem Host. Dieselbe Grenze
-zeigt die xref:building-block-view[Bausteinsicht].
+System boundary: the library delivers everything inside *letterwright*.
+Domain data, identities, database and operations belong to the host. The
+xref:building-block-view[building block view] shows the same boundary.

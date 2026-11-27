@@ -1,13 +1,13 @@
 ---
 id: DOC-06000-runtime-view
 type: Document
-title: 'Laufzeitsicht'
+title: 'Runtime View'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Laufzeitszenarien Vorschau, Speichern, Download, Übersicht, Löschen und Veröffentlichen einer Vorlagenversion sowie Fehlerfälle beim Speichern, darunter geänderte Daten und abgelaufener Snapshot.'
+summary: 'Runtime scenarios preview, save, download, list, delete and publish a template version, and error cases when saving, among them changed data and an expired snapshot.'
 tags:
 - arc42
 - runtime
@@ -15,317 +15,314 @@ relations: []
 metadata_version: '1.0'
 ---
 [[runtime-view]]
-= Laufzeitsicht
+= Runtime View
 
-== Vorschau anzeigen
+== Show Preview
 
 [plantuml,laufzeit-vorschau,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Vorschau (React)" as UI
+actor Clerk as SB
+participant "Preview (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: Berechtigungspruefung,\nPlatzhalterdatenAnbieter" as Host
+participant "Host: AuthorizationCheck,\nPlaceholderDataProvider" as Host
 participant "adapter-rendering" as Ren
-SB -> UI: Standardschreiben für Bezug wählen
-UI -> Web: POST /vorschau (Standardschreiben, Bezug,\nggf. bisherige Snapshot-ID)
-Web -> App: Vorschau erzeugen
-App -> App: Standardschreiben laden; passt sein Bezugstyp zum Bezug?
-App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ForCreation)
-Host --> App: erlaubt
-App -> App: Neueste veröffentlichte Versionen\nvon Standardschreiben und Briefpapier
-App -> Host: Datenkontext anfragen
-Host --> App: Datenkontext (formatiert)
-App -> Ren: Vorlagenversionen + Daten zusammenführen
+SB -> UI: Choose letter template for reference
+UI -> Web: POST /previews (letter template, reference,\nprevious snapshot ID if any)
+Web -> App: Create preview
+App -> App: Load letter template; does its reference type match the reference?
+App -> Host: May the user create from this letter template\nfor this reference? (ForCreation)
+Host --> App: allowed
+App -> App: Newest published versions\nof letter template and letterhead
+App -> Host: Request data context
+Host --> App: Data context (formatted)
+App -> Ren: Merge template versions + data
 Ren --> App: HTML
-App -> App: Snapshot speichern (läuft nach 30 Minuten ab; gebunden an Benutzer,\nfachlichen Bezug, Briefpapier- und Standardschreiben-Version;\nmit Hash des Datenkontexts). Eigenen bisherigen Snapshot löschen
-App --> Web: HTML, Snapshot-ID
+App -> App: Save snapshot (expires after 30 minutes; bound to user,\nbusiness reference, letterhead and letter template version;\nwith hash of the data context). Delete own previous snapshot
+App --> Web: HTML, snapshot ID
 Web --> UI: 200
-UI -> UI: Paged.js paginiert
+UI -> UI: Paged.js paginates
 @enduml
 ----
 
-== Schreiben speichern und herunterladen
+== Save and Download a Letter
 
 [plantuml,laufzeit-speichern,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Vorschau (React)" as UI
+actor Clerk as SB
+participant "Preview (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: Berechtigungspruefung" as Host
+participant "Host: AuthorizationCheck" as Host
 participant "adapter-rendering" as Ren
 participant "adapter-persistence-jdbc" as Per
-SB -> UI: Speichern
-UI -> Web: POST /schreiben (Snapshot-ID)
-Web -> App: Schreiben speichern (Snapshot-ID)
-App -> App: Snapshot laden; gehört er dem angemeldeten Benutzer?\nIst er noch nicht abgelaufen?
-App -> Host: Darf Benutzer aus diesem Standardschreiben\nzu diesem Bezug erzeugen? (ForCreation, erneut)
-Host --> App: erlaubt
-App -> App: Snapshot offen? (verbraucht: vorhandenes Schreiben zurück,\nohne Datenkontext und ohne PDF)
-App -> Host: Datenkontext anfragen (erneut)
-Host --> App: Datenkontext (formatiert)
-App -> App: Hash vergleichen: unverändert
-App -> Ren: PDF aus Snapshot erzeugen\n(mit den im Snapshot fixierten Vorlagenversionen)
+SB -> UI: Save
+UI -> Web: POST /letters (snapshot ID)
+Web -> App: Save letter (snapshot ID)
+App -> App: Load snapshot; does it belong to the logged-in user?\nHas it not expired yet?
+App -> Host: May the user create from this letter template\nfor this reference? (ForCreation, again)
+Host --> App: allowed
+App -> App: Snapshot open? (consumed: return existing letter,\nwithout data context and without PDF)
+App -> Host: Request data context (again)
+Host --> App: Data context (formatted)
+App -> App: Compare hash: unchanged
+App -> Ren: Create PDF from snapshot\n(with the template versions fixed in the snapshot)
 Ren --> App: PDF
-App -> Ren: Konformität prüfen (PDF/A-2b, PDF/UA-1)
-Ren --> App: konform
-App -> App: Schreiben aus Snapshot erzeugen; Snapshot wird verbraucht
-App -> Per: PDF ablegen; Schreiben und verbrauchten Snapshot\natomar speichern, nur wenn der Snapshot noch offen ist
-App --> Web: Schreiben-ID
-Web --> UI: 201, Download-Link
+App -> Ren: Check conformance (PDF/A-2b, PDF/UA-1)
+Ren --> App: conformant
+App -> App: Create letter from snapshot; snapshot is consumed
+App -> Per: Store PDF; save letter and consumed snapshot\natomically, only if the snapshot is still open
+App --> Web: Letter ID
+Web --> UI: 201, download link
 SB -> UI: Download
-UI -> Web: GET /schreiben/{id}/pdf
-Web -> App: Schreiben abrufen ({id})
-App -> App: Schreiben laden; sichtbar?
-App -> Host: Darf Benutzer zu diesem Bezug herunterladen? (ForLetter)
-Host --> App: erlaubt
-App -> Per: PDF lesen
+UI -> Web: GET /letters/{id}/pdf
+Web -> App: Retrieve letter ({id})
+App -> App: Load letter; visible?
+App -> Host: May the user download for this reference? (ForLetter)
+Host --> App: allowed
+App -> Per: Read PDF
 Per --> App: PDF
-App -> App: Prüfsumme gleich der vom Speichern?
-App --> Web: PDF (unverändert)
+App -> App: Checksum equal to the one from saving?
+App --> Web: PDF (unchanged)
 Web --> UI: 200, PDF
 @enduml
 ----
 
-Die Vorschau nimmt die neuesten veröffentlichten Versionen von Standardschreiben
-und Briefpapier. Passt der Bezugstyp nicht, fragt die Bibliothek den Host gar
-nicht. Ob es veröffentlichte Versionen gibt, prüft sie erst mit der Berechtigung;
-ein Unberechtigter bekommt immer „nicht erlaubt“. Ohne Berechtigung oder ohne
-veröffentlichte Version fragt sie den Host nicht nach dem Datenkontext
+The preview takes the newest published versions of letter template and
+letterhead. If the reference type does not match, the library does not ask the
+host at all. It checks whether there are published versions only once it has
+the permission; an unauthorized user always gets “not allowed”. Without
+permission or without a published version, it does not ask the host for the
+data context
 (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
-Eine aktualisierte Vorschau legt einen neuen Snapshot an, dessen 30 Minuten neu
-beginnen, und löscht den bisherigen, wenn er dem Benutzer gehört und noch offen
-ist. Ob er offen ist, prüft die Persistenz im selben Schritt wie das Löschen. Einen fremden
-oder unbekannten bisherigen Snapshot übergeht sie, als wäre keiner angegeben. Das
-Verhalten ist in `features/letters/create-preview.feature` spezifiziert.
+An updated preview creates a new snapshot, whose 30 minutes start anew, and
+deletes the previous one if it belongs to the user and is still open. The
+persistence checks whether it is open in the same step as the deletion. It
+ignores a foreign or unknown previous snapshot, as if none had been given. The
+behavior is specified in `features/letters/create-preview.feature`.
 
-Der Snapshot ist an den angemeldeten Benutzer, den fachlichen Bezug und beide
-Vorlagenversionen (Briefpapier und Standardschreiben) gebunden. Beim Speichern prüft
-die Bibliothek die Erzeugungsberechtigung **erneut** über den Host. Wurde die
-Berechtigung nach der Vorschau entzogen, wird nicht gespeichert. Ein Snapshot eines
-anderen Benutzers wird wie ein nicht vorhandener behandelt (404).
+The snapshot is bound to the logged-in user, the business reference and both
+template versions (letterhead and letter template). When saving, the library
+checks the creation permission **again** through the host. If the permission
+was revoked after the preview, nothing is saved. A snapshot of another user is
+treated like a non-existent one (404).
 
-Aus einem Snapshot entsteht höchstens ein Schreiben
-(xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021]). Das Speichern
-verbraucht den Snapshot; danach hält er keinen Datenkontext mehr, nur noch, was
-eine Wiederholung braucht. Speichert der Benutzer dieselbe Vorschau erneut, etwa
-nach einem Doppelklick oder weil die Antwort verloren ging, bekommt er das schon
-gespeicherte Schreiben zurück, ohne dass Daten gelesen oder ein PDF erzeugt wird.
-Speichern zwei Anfragen gleichzeitig, speichert die Persistenz nur die erste; die
-andere entfernt ihr PDF und bekommt das Schreiben der ersten. Bleibt der Ausgang
-ungewiss, wird nichts zurückgenommen. Ein neues Schreiben entsteht nur aus einer
-neuen Vorschau. Hat sich der Datenkontext geändert, entsteht kein PDF; der
-Snapshot bleibt offen, bis eine neue Vorschau ihn ersetzt oder er abläuft. Ein
-nicht konformes oder nicht prüfbares PDF wird nicht gespeichert (fail-closed). Ist
-das Schreiben inzwischen hart oder logisch gelöscht, findet eine Wiederholung
-nichts mehr und bekommt „Snapshot unbekannt“. Ebenso eine gleichzeitige Anfrage,
-deren Snapshot erst nach dem Löschen als verbraucht erkannt wird; sie entfernt
-ihr PDF. Das Verhalten ist in
-`features/letters/save-letter.feature` spezifiziert.
+At most one letter is created from a snapshot
+(xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021]). Saving consumes
+the snapshot; after that it no longer holds a data context, only what a retry
+needs. If the user saves the same preview again, for example after a double
+click or because the response was lost, they get back the letter already saved,
+without data being read or a PDF being created. If two requests save at the
+same time, the persistence saves only the first; the other removes its PDF and
+gets the letter of the first. If the outcome stays uncertain, nothing is rolled
+back. A new letter is created only from a new preview. If the data context has
+changed, no PDF is created; the snapshot stays open until a new preview
+replaces it or it expires. A PDF that is not conformant or cannot be checked is
+not saved (fail-closed). If the letter has meanwhile been hard or logically
+deleted, a retry finds nothing anymore and gets “snapshot unknown”. The same
+applies to a concurrent request whose snapshot is recognized as consumed only
+after the deletion; it removes its PDF. The behavior is specified in
+`features/letters/save-letter.feature`.
 
-Herunterladen liefert das PDF nur, wenn seine SHA-256-Prüfsumme der vom Speichern
-entspricht
-(xref:qs-008-unveraenderliche-schreiben[QS-008]). Weicht sie ab, ist der Bestand
-defekt: Der Download scheitert mit einem technischen Fehler, statt ein verändertes
-PDF auszuliefern. Ein nicht vorhandenes, ein logisch gelöschtes und ein nicht
-erlaubtes Schreiben sind für den Benutzer gleich „unbekannt“ (404,
-xref:qs-009-zugriffsschutz-beim-download[QS-009]). Das Verhalten ist in
-`features/letters/download-letter.feature` spezifiziert.
+Downloading delivers the PDF only if its SHA-256 checksum matches the one from
+saving
+(xref:qs-008-unveraenderliche-schreiben[QS-008]). If it differs, the stored data
+is defective: the download fails with a technical error instead of delivering a
+changed PDF. A non-existent, a logically deleted and a not allowed letter are
+all the same “unknown” for the user (404,
+xref:qs-009-zugriffsschutz-beim-download[QS-009]). The behavior is specified in
+`features/letters/download-letter.feature`.
 
-== Schreiben auflisten
+== List Letters
 
 [plantuml,laufzeit-auflisten,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Übersicht (React)" as UI
+actor Clerk as SB
+participant "List (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: Berechtigungspruefung" as Host
+participant "Host: AuthorizationCheck" as Host
 participant "adapter-persistence-jdbc" as Per
-SB -> UI: Schreiben zum Bezug anzeigen
-UI -> Web: GET Schreiben zum Bezug (Seite, Größe)
-Web -> App: Schreiben auflisten (Bezug, Seitenanfrage)
-App -> Host: Darf Benutzer die Schreiben zu diesem Bezug ansehen? (ForLetter)
-Host --> App: erlaubt
-App -> Per: sichtbare Schreiben zum Bezug,\nneueste zuerst, eine Seite
-Per -> Per: logisch gelöschte filtern,\ndann zählen und paginieren
-Per --> App: Seite mit Gesamtzahl
-App --> Web: Seite
-Web --> UI: 200, Seite
+SB -> UI: Show letters for the reference
+UI -> Web: GET letters for the reference (page, size)
+Web -> App: List letters (reference, page request)
+App -> Host: May the user view the letters for this reference? (ForLetter)
+Host --> App: allowed
+App -> Per: visible letters for the reference,\nnewest first, one page
+Per -> Per: filter out logically deleted ones,\nthen count and paginate
+Per --> App: Page with total count
+App --> Web: Page
+Web --> UI: 200, page
 @enduml
 ----
 
-Der Host erteilt die Berechtigung zum Ansehen je Bezug. Ohne sie liest die
-Bibliothek nichts und zählt nichts; die Übersicht ist „nicht erlaubt“. Schreiben
-zu anderen Bezügen und logisch gelöschte filtert die Persistenz in der Abfrage,
-also vor dem Paginieren und Zählen. Gesamtzahl und Seitenzahl beziehen sich nur
-auf die sichtbaren Schreiben
-(xref:qs-009-zugriffsschutz-beim-download[QS-009]). Das Verhalten ist in
-`features/letters/list-letters.feature` spezifiziert.
+The host grants the permission to view per reference. Without it the library
+reads nothing and counts nothing; the list is “not allowed”. The persistence
+filters out letters for other references and logically deleted ones in the
+query, that is, before paginating and counting. Total count and number of pages
+refer only to the visible letters
+(xref:qs-009-zugriffsschutz-beim-download[QS-009]). The behavior is specified in
+`features/letters/list-letters.feature`.
 
-== Schreiben löschen
+== Delete a Letter
 
 [plantuml,laufzeit-loeschen,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Übersicht (React)" as UI
+actor Clerk as SB
+participant "List (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: Berechtigungspruefung" as Host
-participant "Host: Loeschrichtlinie" as Richtlinie
+participant "Host: AuthorizationCheck" as Host
+participant "Host: DeletionPolicy" as Richtlinie
 participant "adapter-persistence-jdbc" as Per
-SB -> UI: Löschen
-UI -> Web: DELETE /schreiben/{id}
-Web -> App: Schreiben löschen ({id})
-App -> App: Schreiben laden; sichtbar?
-App -> Host: Darf Benutzer zu diesem Bezug löschen? (ForLetter)
-Host --> App: erlaubt
-App -> Richtlinie: Wie löschen? (Loeschanfrage)
-alt hart
-  Richtlinie --> App: hart
-  App -> Per: Schreiben entfernen, danach PDF entfernen
-else logisch
-  Richtlinie --> App: logisch
-  App -> Per: Schreiben als logisch gelöscht speichern; PDF bleibt
-else gesperrt
-  Richtlinie --> App: gesperrt (Grund)
+SB -> UI: Delete
+UI -> Web: DELETE /letters/{id}
+Web -> App: Delete letter ({id})
+App -> App: Load letter; visible?
+App -> Host: May the user delete for this reference? (ForLetter)
+Host --> App: allowed
+App -> Richtlinie: How to delete? (DeletionRequest)
+alt hard
+  Richtlinie --> App: hard
+  App -> Per: Remove letter, then remove PDF
+else logical
+  Richtlinie --> App: logical
+  App -> Per: Save letter as logically deleted; PDF remains
+else blocked
+  Richtlinie --> App: blocked (reason)
 end
-App --> Web: gelöscht oder gesperrt mit Grund
+App --> Web: deleted or blocked with reason
 @enduml
 ----
 
-Die Löschrichtlinie fragt die Bibliothek erst, wenn der Host das Löschen erlaubt
-hat. Ein nicht vorhandenes, ein schon logisch gelöschtes und ein nicht erlaubtes
-Schreiben sind für den Benutzer gleich „unbekannt“; die Löschrichtlinie wird dann
-nicht gefragt. Hart gelöscht wird erst das Schreiben, dann sein PDF: Scheitert das
-Entfernen des PDFs, bleibt ein PDF ohne Schreiben liegen statt eines Schreibens
-ohne PDF. Ein logisch gelöschtes Schreiben behält sein PDF, erscheint aber in
-keiner Übersicht und lässt sich nicht mehr herunterladen. Das Verhalten ist in
-`features/letters/delete-letter.feature` spezifiziert.
+The library asks the deletion policy only after the host has allowed the
+deletion. A non-existent, an already logically deleted and a not allowed letter
+are all the same “unknown” for the user; the deletion policy is then not asked.
+When hard deleting, first the letter is removed, then its PDF: if removing the
+PDF fails, a PDF without a letter remains instead of a letter without a PDF. A
+logically deleted letter keeps its PDF, but appears in no list and can no
+longer be downloaded. The behavior is specified in
+`features/letters/delete-letter.feature`.
 
-== Vorlagenversion veröffentlichen
+== Publish a Template Version
 
 [plantuml,laufzeit-veroeffentlichen,svg]
 ----
 @startuml
-actor Vorlagenverwalter as VV
+actor "Template manager" as VV
 participant "Editor (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Host: Berechtigungspruefung" as Host
+participant "Host: AuthorizationCheck" as Host
 participant "adapter-persistence-jdbc" as Per
 participant "adapter-rendering" as Ren
-VV -> UI: Veröffentlichen
-UI -> Web: POST /vorlagen/{id}/veroeffentlichung
-Web -> App: Vorlagenversion veröffentlichen ({id})
-App -> Host: Darf Benutzer veröffentlichen? (VEROEFFENTLICHEN)
-Host --> App: erlaubt
-App -> Per: Vorlage laden
-Per --> App: Vorlage mit Entwurf
-alt Standardschreiben
-  App -> Per: Briefpapier laden
-  Per --> App: veröffentlichte Version des Briefpapiers
-  App -> Ren: Probe-PDF (Briefpapier, Entwurf,\nBeispieldaten beider Versionen)
-else Briefpapier
-  App -> Ren: Probe-PDF (Entwurf, eingebauter Beispielinhalt,\nBeispieldaten)
+VV -> UI: Publish
+UI -> Web: POST /templates/{id}/publication
+Web -> App: Publish template version ({id})
+App -> Host: May the user publish? (PUBLISH)
+Host --> App: allowed
+App -> Per: Load template
+Per --> App: Template with draft
+alt Letter template
+  App -> Per: Load letterhead
+  Per --> App: published version of the letterhead
+  App -> Ren: Proof PDF (letterhead, draft,\nsample data of both versions)
+else Letterhead
+  App -> Ren: Proof PDF (draft, built-in sample content,\nsample data)
 end
 Ren --> App: PDF
-App -> Ren: PDF prüfen (PDF/A-2b, PDF/UA-1)
-Ren --> App: konform
-App -> Per: Vorlage ersetzen, nur wenn seit dem Laden unverändert:\nEntwurf veröffentlicht, bisherige Version abgelöst
-Per --> App: ersetzt
-App --> Web: veröffentlicht (Version)
+App -> Ren: Check PDF (PDF/A-2b, PDF/UA-1)
+Ren --> App: conformant
+App -> Per: Replace template, only if unchanged since loading:\ndraft published, previous version superseded
+Per --> App: replaced
+App --> Web: published (version)
 @enduml
 ----
 
-Veröffentlichen verlangt die Vorlagenaktion `PUBLISH`; ohne sie lädt die
-Bibliothek nichts und rendert nichts. Vor dem Veröffentlichen entsteht ein
-Probe-PDF mit den Beispieldaten der Version und wird mit demselben Prüfer geprüft
-wie jedes gespeicherte Schreiben
-(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). Ist es nicht konform, bleibt
-der Entwurf ein Entwurf, und der Vorlagenverwalter erhält die Befunde; lässt sich
-die Prüfung nicht ausführen, wird ebenfalls nichts veröffentlicht. Ein
-Standardschreiben ohne veröffentlichtes Briefpapier wird nicht veröffentlicht.
-Die Persistenz ersetzt die Vorlage nur, wenn sie seit dem Laden unverändert ist;
-sonst meldet die Bibliothek „veraltet“, und kein ungeprüfter Inhalt wird
-veröffentlicht. Das Briefpapier eines Standardschreibens sichert dieses Ersetzen
-nicht: Wird es während der Prüfung abgelöst oder zurückgezogen, zählt der
-Prüfzeitpunkt, als wäre das Briefpapier erst danach geändert worden. Danach ist die neue Version die einzige veröffentlichte, die
-bisherige ist abgelöst; gespeicherte Schreiben behalten ihre Versionen
+Publishing requires the template action `PUBLISH`; without it the library loads
+nothing and renders nothing. Before publishing, a proof PDF is created with the
+sample data of the version and checked with the same checker as every saved
+letter
+(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). If it is not conformant, the
+draft stays a draft, and the template manager receives the findings; if the
+check cannot be run, nothing is published either. A letter template without a
+published letterhead is not published. The persistence replaces the template
+only if it is unchanged since loading; otherwise the library reports
+“outdated”, and no unchecked content is published. This replacement does not
+protect the letterhead of a letter template: if it is superseded or withdrawn
+during the check, the time of the check counts, as if the letterhead had been
+changed only afterwards. After that, the new version is the only published one,
+and the previous one is superseded; saved letters keep their versions
 (xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022]).
 
-Zurückziehen verläuft ebenso, ohne Probe-PDF: Die veröffentlichte Version wird
-zurückgezogen, und bis zur nächsten Veröffentlichung entsteht mit der Vorlage
-keine Vorschau. Das Verhalten ist in
-`features/templates/publish-template-version.feature` und
-`features/templates/withdraw-template-version.feature` spezifiziert.
+Withdrawing works the same way, without a proof PDF: the published version is
+withdrawn, and until the next publication no preview is created with the
+template. The behavior is specified in
+`features/templates/publish-template-version.feature` and
+`features/templates/withdraw-template-version.feature`.
 
-== Gespeichertes Schreiben drucken
+== Print a Saved Letter
 
-Gedruckt wird nur ein gespeichertes Schreiben (Q-PO-002). Die Vorschau bietet
-kein „Drucken“ an.
+Only a saved letter is printed (Q-PO-002). The preview does not offer
+“Drucken”.
 
 [plantuml,laufzeit-drucken,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Übersicht (React)" as UI
+actor Clerk as SB
+participant "List (React)" as UI
 participant "adapter-web" as Web
 participant "usecases-service" as App
-participant "Browser: Druckfunktion" as Druck
-SB -> UI: Drucken (gespeichertes Schreiben)
-UI -> Web: GET /schreiben/{id}/pdf
-Web -> App: Schreiben abrufen ({id})
-App -> App: Berechtigung prüfen (Host)
-App --> Web: PDF (unverändert)
+participant "Browser: print function" as Druck
+SB -> UI: Print (saved letter)
+UI -> Web: GET /letters/{id}/pdf
+Web -> App: Retrieve letter ({id})
+App -> App: Check permission (host)
+App --> Web: PDF (unchanged)
 Web --> UI: 200, PDF
-UI -> Druck: PDF an die Druckfunktion des Browsers übergeben
+UI -> Druck: Pass PDF to the browser's print function
 @enduml
 ----
 
-Gedruckt wird dasselbe unveränderte PDF wie beim Download. Druckt ein Benutzer
-die Vorschau über die Druckfunktion des Browsers, verhindert die Bibliothek das
-nicht. Für dieses Ergebnis ist sie aber nicht verantwortlich.
+The same unchanged PDF as for the download is printed. If a user prints the
+preview through the browser's print function, the library does not prevent
+this. It is, however, not responsible for that result.
 
-== Fehlerfall: Berechtigung beim Speichern entzogen
+== Error Case: Permission Revoked When Saving
 
-Lehnt der Host beim Speichern ab, wird nichts erzeugt und nichts persistiert. Der
-Snapshot wird verworfen. Die Antwort verrät keine Inhalte des Snapshots.
+If the host refuses when saving, nothing is created and nothing is persisted.
+The snapshot is discarded. The response reveals no content of the snapshot.
 
-== Fehlerfall: PDF nicht konform, Rendering schlägt fehl oder Prüfung nicht ausführbar
+== Error Case: PDF Not Conformant, Rendering Fails or Check Cannot Be Run
 
-Schlägt die PDF-Erzeugung fehl, ist das PDF nicht konform oder lässt sich die
-Konformitätsprüfung nicht ausführen (Fehler, Zeitüberschreitung), wird **nichts
-persistiert** (fail-closed, siehe
-xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). Der Benutzer erhält eine
-verständliche Meldung. Der Fehler wird mit Vorlagenversionen und Korrelations-ID
-protokolliert, ohne personenbezogene Inhalte.
+If PDF generation fails, the PDF is not conformant, or the conformance check
+cannot be run (error, timeout), **nothing is persisted** (fail-closed, see
+xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]). The user receives an
+understandable message. The error is logged with template versions and
+correlation ID, without personal content.
 
-* Liegt die Ursache in der Vorlage, muss der Vorlagenverwalter eine **neue
-  Vorlagenversion** veröffentlichen. Der alte Snapshot bleibt an die fehlerhafte
-  Version gebunden; der Benutzer braucht eine **neue Vorschau** mit der korrigierten
-  Version.
-* Bei einem vorübergehenden technischen Fehler (z. B. Zeitüberschreitung) kann der
-  Benutzer das Speichern mit demselben Snapshot wiederholen, solange er nicht
-  abgelaufen ist.
+* If the cause lies in the template, the template manager must publish a **new
+  template version**. The old snapshot stays bound to the faulty version; the
+  user needs a **new preview** with the corrected version.
+* In case of a temporary technical error (e.g. timeout), the user can retry
+  saving with the same snapshot as long as it has not expired.
 
-== Fehlerfall: Daten seit der Vorschau geändert
+== Error Case: Data Changed Since the Preview
 
-Weicht der Hash des neu gelesenen Datenkontexts vom Hash im Snapshot ab, wird
-nichts erzeugt und nichts persistiert. Die Oberfläche meldet, dass sich die Daten
-geändert haben, und verlangt „Aktualisieren“. Das erzeugt eine neue Vorschau mit
-neuem Snapshot. Der alte Snapshot wird dabei gelöscht
+If the hash of the newly read data context differs from the hash in the
+snapshot, nothing is created and nothing is persisted. The user interface
+reports that the data has changed and requires “Aktualisieren”. This creates a new
+preview with a new snapshot. The old snapshot is deleted in the process
 (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
 
-== Fehlerfall: Snapshot abgelaufen
+== Error Case: Snapshot Expired
 
-Ein Snapshot läuft 30 Minuten nach der Vorschau ab und wird gelöscht. Ist er beim
-Speichern abgelaufen, lehnt die Bibliothek das Speichern ab und fordert eine neue
-Vorschau an, statt mit neu gelesenen Daten zu speichern. Ein Neuladen der Vorschau
-erzeugt einen neuen Snapshot
+A snapshot expires 30 minutes after the preview and is deleted. If it has
+expired when saving, the library refuses the saving and asks for a new
+preview, instead of saving with newly read data. Reloading the preview
+creates a new snapshot
 (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).

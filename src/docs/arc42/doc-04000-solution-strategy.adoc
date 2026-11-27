@@ -1,13 +1,13 @@
 ---
 id: DOC-04000-solution-strategy
 type: Document
-title: 'Lösungsstrategie'
+title: 'Solution Strategy'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Zentrale Lösungsansätze und ihre Zuordnung zu Qualitätszielen.'
+summary: 'Central solution approaches and their mapping to quality goals.'
 tags:
 - arc42
 - strategy
@@ -15,86 +15,88 @@ relations: []
 metadata_version: '1.0'
 ---
 [[solution-strategy]]
-= Lösungsstrategie
+= Solution Strategy
 
 [cols="2,3,1", options="header"]
 |===
-| Ansatz | Kurzbeschreibung | Ziel
-| Einbettbare Bibliothek | Spring-Boot-Starter und npm-Paket statt eigenem Service (xref:adr-001-einbettbare-bibliothek[ADR-001]) | QG-004
-| Ports and Adapters | Frameworkfreier Kern, Host liefert Daten, Berechtigung, Löschregeln per SPI (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) | QG-004
-| Ein internes Vorlagenformat | Semantisches HTML mit Paged-Media-CSS, gepflegt in bausteinbasiertem Editor (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | QG-001, QG-002, QG-003
-| Ein HTML für zwei Ausgaben | Paged.js für die Vorschau, openhtmltopdf für das PDF (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]) | QG-002
-| Konformität im Build | PDF/A-2b, PDF/UA-1, WCAG 2.1 AA, geprüft mit veraPDF und axe-core (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]) | QG-001
-| Unveränderlichkeit | Versionierte Vorlagen, PDF mit Prüfsumme, Speichern aus Vorschau-Snapshot (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]) | QG-005
+| Approach | Short description | Goal
+| Embeddable library | Spring Boot starter and npm package instead of a service of its own (xref:adr-001-einbettbare-bibliothek[ADR-001]) | QG-004
+| Ports and Adapters | Framework-free core; the host provides data, permission and deletion rules via SPI (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) | QG-004
+| One internal template format | Semantic HTML with Paged Media CSS, maintained in a building-block-based editor (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003]) | QG-001, QG-002, QG-003
+| One HTML for two outputs | Paged.js for the preview, openhtmltopdf for the PDF (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]) | QG-002
+| Conformance in the build | PDF/A-2b, PDF/UA-1, WCAG 2.1 AA, checked with veraPDF and axe-core (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]) | QG-001
+| Immutability | Versioned templates, PDF with checksum, saving from the preview snapshot (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]) | QG-005
 |===
 
-Vor der Umsetzung klärt ein *Prototyp* die beiden kritischen, offenen Punkte:
-Pflegbarkeit des Vorlagenformats durch Fachanwender und Wiedergabetreue zweier
-Render-Engines.
+Before implementation, a *prototype* clarifies the two critical open points:
+maintainability of the template format by business users, and fidelity of two
+render engines.
 
 [[loesungsstrategie-code-stil]]
-== Code-Stil
+== Code Style
 
-Die Architektur gibt vor, wie der Code entsteht. Für bekannte Muster verweist sie
-auf die Quelle, statt sie nachzuerzählen:
+The architecture defines how the code is written. For known patterns it refers
+to the source instead of retelling it:
 
-* *Der Code sagt das Wie, die Dokumentation das Warum* (Robert C. Martin,
-  _Clean Code_). Namen und Signaturen tragen die Bedeutung. Am SPI beschreibt die
-  Javadoc vollständig, wie die Schnittstelle zu benutzen ist, denn sie ist der
-  Vertrag mit dem Host. Im übrigen Code steht sie nur, wo sie einen Grund oder eine
-  Regel erklärt, die die Signatur nicht ausdrücken kann.
-* *Ubiquitous Language* (Eric Evans, _Domain-Driven Design_): Typen und Methoden
-  heißen wie im xref:glossary[Glossar]. Die DDD-Rollen legt
-  xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest.
-* *Statische Fabrikmethoden statt Konstruktoren* (Joshua Bloch, _Effective Java_,
-  Item 1): `create`, `fromSnapshot`, `generate()` und `restore` sagen, wofür
-  ein Objekt entsteht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
-* *Illegale Zustände sind nicht darstellbar* (Yaron Minsky, „Make illegal states
-  unrepresentable“): Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit.
-  Sealed Types und Records ersetzen Flags und optionale Felder
+* *The code says the how, the documentation the why* (Robert C. Martin,
+  _Clean Code_). Names and signatures carry the meaning. At the SPI, the
+  Javadoc fully describes how to use the interface, because it is the
+  contract with the host. In the rest of the code, Javadoc appears only where it
+  explains a reason or a rule that the signature cannot express.
+* *Ubiquitous Language* (Eric Evans, _Domain-Driven Design_): types and methods
+  are named as in the xref:glossary[glossary].
+  xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] defines
+  the DDD roles.
+* *Static factory methods instead of constructors* (Joshua Bloch, _Effective Java_,
+  Item 1): `create`, `fromSnapshot`, `generate()` and `restore` say what an
+  object is created for (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
+* *Illegal states are unrepresentable* (Yaron Minsky, “Make illegal states
+  unrepresentable”): what a type can express, nobody checks at runtime.
+  Sealed types and records replace flags and optional fields
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
-* *Validieren, wo der Wert entsteht* (Alexis King, „Parse, don't validate“): Der
-  Typ prüft sich beim Erzeugen. Anwendungsfälle und Adapter vertrauen ihm
+* *Validate where the value is created* (Alexis King, “Parse, don't validate”): the
+  type checks itself on creation. Use cases and adapters trust it
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
-* *Null-Vertrag:* Jedes Paket ist `@NullMarked` (JSpecify), NullAway setzt das beim
-  Kompilieren durch. Ein optionales Ergebnis ist ein `Optional`, nie `null`;
-  `Optional` ist kein Feld und kein Parameter
+* *Null contract:* every package is `@NullMarked` (JSpecify); NullAway enforces
+  this at compile time. An optional result is an `Optional`, never `null`;
+  `Optional` is neither a field nor a parameter
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
-* *Fachliche Ablehnungen sind Ergebnisse, keine Ausnahmen* (Scott Wlaschin,
-  „Railway Oriented Programming“): Ein Anwendungsfall gibt jede erwartbare
-  Ablehnung, etwa „nicht erlaubt“ oder „unbekannt“, als eigenen Fall eines Sealed
-  Type zurück, Vorbild `PreviewResult`. Der eingehende Adapter unterscheidet sie
-  mit einem `switch` ohne `default`, damit der Compiler einen neuen Fall meldet.
-  Technische Fehler wie ein ausgefallener Speicher oder ein verletzter
-  Host-Vertrag bleiben Ausnahmen und werden nicht zu fachlichen Ablehnungen
-  umetikettiert. Entschieden vom Owner im Review von PR #63.
+* *Business rejections are results, not exceptions* (Scott Wlaschin,
+  “Railway Oriented Programming”): a use case returns every expected
+  rejection, such as “not allowed” or “unknown”, as a separate case of a sealed
+  type; the model is `PreviewResult`. The inbound adapter distinguishes them
+  with a `switch` without `default`, so that the compiler reports a new case.
+  Technical errors such as a failed store or a violated host contract remain
+  exceptions and are not relabeled as business rejections. Decided by the owner
+  in the review of PR #63.
 
-* *Linting in Backend und Frontend:* Im Frontend prüft ESLint, im Backend Error
-  Prone mit seinen standardmäßig aktiven Prüfungen. Eine Ausnahme wird einzeln
-  und mit Begründung abgeschaltet
+* *Linting in backend and frontend:* in the frontend ESLint checks, in the
+  backend Error Prone with its checks that are active by default. An exception
+  is switched off individually and with a rationale
   (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
-* *Tests gehören zu ihrer Klasse* (Gerard Meszaros, _xUnit Test Patterns_,
-  „Testcase Class per Class“): Wer von einer Produktionsklasse ausgeht, findet
-  ihre Tests ohne Suche. Entschieden vom Owner in #65. Im Backend gilt:
-** Jede Klasse mit eigenem fachlichem oder technischem Vertrag hat eine
-   gleichnamige Testklasse im selben Paket (`Foo` → `FooTest`). Diese prüft ihr
-   beobachtbares Verhalten. Sammelklassen für mehrere Produktionsklassen gibt es
-   nicht.
-** Ein interner Helfer, etwa eine paketprivate Klasse, wird über seine Aufrufer
-   geprüft, und zwar gezielt.
-** Reine Datenträger ohne eigenes Verhalten brauchen keine eigene Testklasse:
-   Schnittstellen, Enums ohne Logik und Ausnahmen ohne Logik. Fachliche
-   Invarianten eines Records zählen dagegen als eigenes Verhalten.
-** Ein Anwendungsfall wird in der Testklasse seiner Implementierung geprüft, etwa
-   `SaveLetterService` in `SaveLetterServiceTest`. Diese Klasse ist zugleich
-   die Brücke zur Gherkin-Spezifikation: Die Feature-Datei nennt sie im Kopf, und
-   jede Testmethode heißt wie ihr Szenario.
-** Ein Test, der mehrere Klassen gemeinsam prüft, heißt nach dem Verhalten, das er
-   prüft. Beispiele sind `BuiltInAuthorizationCheckTest` und die
-   Architekturtests.
-** Erwartete Werte entstehen im Test unabhängig vom Produktionscode, der sie
-   berechnet. Baut ein Test etwa die erwartete SPI-Anfrage mit demselben Mapper
-   auf, den der Adapter benutzt, bleibt ein Fehler im Mapper unsichtbar.
+* *Tests belong to their class* (Gerard Meszaros, _xUnit Test Patterns_,
+  “Testcase Class per Class”): whoever starts from a production class finds
+  its tests without searching. Decided by the owner in #65. In the backend:
+** Every class with a business or technical contract of its own has a test
+   class of the same name in the same package (`Foo` → `FooTest`). It checks
+   the class's observable behavior. There are no collective test classes for
+   several production classes.
+** An internal helper, such as a package-private class, is tested through its
+   callers, and in a targeted way.
+** Pure data carriers without behavior of their own need no test class of their
+   own: interfaces, enums without logic and exceptions without logic. Business
+   invariants of a record, however, count as behavior of its own.
+** A use case is tested in the test class of its implementation, for example
+   `SaveLetterService` in `SaveLetterServiceTest`. This class is also
+   the bridge to the Gherkin specification: the feature file names it in its
+   header, and every test method is named like its scenario.
+** A test that checks several classes together is named after the behavior it
+   checks. Examples are `BuiltInAuthorizationCheckTest` and the
+   architecture tests.
+** Expected values are created in the test independently of the production code
+   that computes them. If a test builds the expected SPI request with the same
+   mapper that the adapter uses, for example, an error in the mapper stays
+   invisible.
 
-Wie ein Agent diese Regeln beim Schreiben von Code anwendet, beschreibt der Skill
-`skills/code-stil/SKILL.md`.
+The skill `skills/code-stil/SKILL.md` describes how an agent applies these rules
+when writing code.
