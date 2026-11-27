@@ -1,0 +1,77 @@
+= Projekttagebuch 2026-11-26
+
+Thema `domaene-und-host`, Nebenstrang Sprache. Rekonstruiert aus
+`git log main..origin/adr-024-sprache-im-code` (`5b4f8fe` bis `872633e`), PR #83
+und den Issues #84 und #85.
+
+== Was geschah
+
+* **ADR-024 entworfen und angenommen** (PR #83, offen, Checks grün): Sprache von
+  Code, Ubiquitous Language und Dokumentation. Anlass war die Frage des Owners, ob
+  deutsche Ubiquitous Language zu einem Open-Source-Werkzeug passt, seit SPI und
+  Java-API öffentlich sind. Grundlage war Frage 2 in Issue #1 und RB-12.
+* **Drei Runden am Entwurf:** zuerst Option 2 (Code englisch, Architekturdoku
+  deutsch), dann die Antworten des Owners auf fünf offene Fragen, zuletzt die
+  Annahme mit Option 4: Auch Architekturdoku und ADRs werden englisch, das
+  Fachglossar ist zweisprachig.
+* **Name `letterwright`** für Projekt, Paket und Artefakte. Der Owner hat ihn nach
+  eigener Prüfung festgelegt.
+* **Review des Owners nach der Annahme:** `AfterSave` wird `LetterSaveCallback`,
+  dessen Javadoc den Zeitpunkt nennt (`872633e`). Seine Hinweise zu #84 und #85
+  stehen jetzt in den Issues.
+* **RB-12 entfallen**, `AGENTS.md` beschreibt die Sprachregel nach ADR-024 mit
+  einer Regel für den Übergang.
+* **Neue Issues:** #84 stellt den Code um und benennt ihn in `letterwright` um,
+  einschließlich der Bezeichner in #10. #85 übersetzt die Architekturdoku in einem
+  eigenen Doku-PR und vergleicht dabei inhaltlich mit dem deutschen Stand.
+
+== Entscheidungen des Owners
+
+* Code, Gherkin-Features, README, Integrationsdoku, Architekturdoku und ADRs
+  englisch; Fachglossar zweisprachig. Grund: Mitentwickler müssen die
+  Architekturdoku verstehen, und Englisch ist in der IT üblich.
+* Das README sagt, dass Deutsch die Basissprache der Fachdomäne ist und die
+  englischen Begriffe teils holprige Übersetzungen sind.
+* `LetterTemplate`, `BusinessReference`, `LetterSaveCallback`; Name `letterwright`.
+* Der Code wird vor dem Rest von #10 umgestellt (#84). Die Übersetzung der Doku
+  macht die KI, der Owner prüft sie gesondert (#85).
+
+== Gelernt
+
+* **Ein Name mit Zeitwort verspricht einen Zeitpunkt.** `AfterSave` ließ offen, ob
+  der Rückruf vor oder nach dem Commit läuft. Den Zeitpunkt sagt die Javadoc, nicht
+  der Name.
+* **Ein fehlendes Kriterium entscheidet die Matrix.** Der Entwurf bewertete nur
+  den Vertrag, nicht die Architekturdoku. Erst das Kriterium des Owners drehte das
+  Ergebnis zu Option 4.
+* **Erinnerte Entscheidungen prüfen.** Der Owner erinnerte ein ADR. Tatsächlich war
+  es eine Antwort in Issue #1, aus der eine Randbedingung wurde.
+* **Nach dem Entfernen eines Worktrees kann die IDE auf einem leeren Ordner
+  stehen.** `../worktree/standardschreiben/issue_78` enthielt nur noch `.idea`;
+  `git worktree list` kannte ihn nicht mehr, und die IDE zeigte keine Doku.
+
+== Offen
+
+* PR #83: Der Owner schaut ihn nach dem Clock-in noch einmal an, danach Merge.
+* #84 vor dem Rest von #10, danach #85.
+* Umbenennen des GitHub-Repositorys: entscheidet der Owner bei #84.
+* Der leere Ordner `../worktree/standardschreiben/issue_78` kann weg.
+
+== Gelesen
+
+* Toolkit-Skills: `clock-in`, `adr` mit `references/adr-writing-guide.md`,
+  `clock-out`; Vorlage `templates/adr.adoc`.
+* Projekt: `AGENTS.md`, `diary/2026-11-25.adoc`, `progress/domaene-und-host.adoc`,
+  RB-12 in `doc-02000-architecture-constraints.adoc`, Code-Stil in
+  `doc-04000-solution-strategy.adoc`, `doc-12000-glossary.adoc`,
+  `doc-09000-architecture-decisions.adoc`, ADR-018, ADR-023,
+  `doc-005-questions-and-answers.adoc` (Ausschnitte), `settings.gradle.kts`,
+  `gradle.properties`, `package.json` des Frontends.
+* GitHub: Issue #1 mit Kommentaren, Issue #10 (Text), offene Issues und PRs,
+  PR #74 und #83 (Status, Reviews, Checks), Issues #84 und #85 nach dem Anlegen.
+* Repository: Branch-Abgleich zu Beginn und am Ende (`SWEEP: CLEAR`),
+  `git worktree list`.
+* Extern: npm und GitHub-Suche nach den Namen `letterkit`, `letterwright`,
+  `letterforge`, `briefkit` und `letterpress-templates`.
+* Private Ebene beim Clock-in im delegierten Modus gelesen, beim Clock-out auf
+  Wunsch des Owners übersprungen.

@@ -11,6 +11,9 @@ es ohne Persistenz und REST geht: die Java-API (PR #81, #78) und der Rückruf
 `NachDemSpeichern` (PR #82, #79). #78 bleibt offen, bis #10 die Bean für die
 Java-API liefert. Offen sind außerdem der ADR zur Ablage im DMS des Hosts (#60) und
 der schmale BOM-Export (#32).
+Seit ADR-024 (PR #83, angenommen, noch nicht gemergt) werden Code und Doku
+englisch, und das Projekt heißt `letterwright`. Bevor #10 weitergeht, stellt #84
+den Code um; danach übersetzt #85 die Architekturdoku.
 
 == The plan
 
@@ -22,6 +25,9 @@ Testkonvention (#65) kam dazwischen, bevor mehr Code entstand.
 Nach dem Vertrag der Bezugs-ID (#69) kam das Speichern in der Transaktion des
 Hosts: erst die Entscheidung (ADR-023), dann die Umsetzung, zuerst die Java-API
 (#78), weil sie die Exporte des Starters festlegt, dann der Rückruf (#79).
+Vor dem Rest von #10 kommt die Sprachumstellung nach ADR-024 (#84), weil jeder
+weitere öffentliche Typ sie teurer macht. Die Übersetzung der Doku (#85) folgt,
+damit sie gleich die englischen Namen nennt.
 
 [options="checklist"]
 * [x] Fachmodell mit DDD-Rollen und Selbstvalidierung (PR #57, ADR-018): #51
@@ -36,6 +42,9 @@ Hosts: erst die Entscheidung (ADR-023), dann die Umsetzung, zuerst die Java-API
 * [x] Speichern in einer Transaktion des Hosts (PR #74, ADR-023): Q-ARCH-004
 * [ ] Java-API nach ADR-023: Module `api` und `adapter-api` gemergt (PR #81); #78 bleibt offen, bis #10 die Bean liefert (unter #77)
 * [x] Rückruf `NachDemSpeichern` nach ADR-023 (PR #82): #79 (unter #77)
+* [ ] Sprache von Code und Doku (ADR-024): PR #83 angenommen, Merge nach erneuter Durchsicht des Owners
+* [ ] Code auf Englisch umstellen und in `letterwright` umbenennen, einschließlich der Bezeichner in #10: #84, vor dem Rest von #10
+* [ ] Architekturdoku übersetzen, eigener Doku-PR mit Vergleich zum deutschen Stand: #85, nach #84
 * [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60
 * [ ] Spring-Boot-BOM schmal exportieren: #32
 
@@ -52,6 +61,9 @@ Issues kommentiert. #6: atomares Speichern mit verbrauchtem Snapshot und den
 Ausgängen von `Speicherausgang` (ADR-021), Filtern vor dem Paginieren (QS-009),
 Beispieldaten je Vorlagenversion und bedingtes Ersetzen von Vorlagen (ADR-022).
 #7: `erzeugeProbePdf` mit eingebautem Beispielinhalt.
+
+Die Namen unten sind noch die deutschen; #84 benennt sie nach der Tabelle in
+ADR-024 um (etwa `NachDemSpeichern` zu `LetterSaveCallback`).
 
 Nach ADR-023 gibt es die Java-API `api.SchreibenSpeichern` (Modul `api`,
 umgesetzt in `adapter-api`) und den optionalen Rückruf `spi.NachDemSpeichern`, den
