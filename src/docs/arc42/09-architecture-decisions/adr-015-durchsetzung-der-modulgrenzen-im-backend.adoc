@@ -46,7 +46,7 @@ geprüft und angenommen.
 
 Ergänzt am 2026-11-16 um die Trennung von Domänenmodell und Domänenservices
 (<<adr-015-domaenenservices>>, Issue #25). Diese Ergänzung hat der Owner
-entschieden: Option 1 aus drei Varianten, beide Module unter `domaene`.
+entschieden: Option 1 aus drei Varianten, beide Module unter `domain`.
 
 Verfeinert am 2026-11-17 durch xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28).
 `usecases-out` ist seitdem ein internes Modul; der Host kompiliert nur gegen das
@@ -68,19 +68,19 @@ Wir erzwingen die Grenzen der hexagonalen Architektur
 Gradle-Module** und nicht nur über eine Paketkonvention:
 
 * Jede Grenze, über die eine Abhängigkeit nur in eine Richtung laufen darf, ist
-  eine Modulgrenze: `domaene-modell`, `domaene-service`, `usecases-in`,
+  eine Modulgrenze: `domain-model`, `domain-service`, `usecases-in`,
   `usecases-out`, `usecases-service`, `spi` und je Adapter ein Modul (Schnitt in
   xref:adr-009-build-monorepo-und-versionen[ADR-009] und
   xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]).
-* Domänenmodell und Domänenservices sind getrennte Module unter `domaene`. Nur
-  `usecases-service` bindet `domaene-service` ein, als `implementation`. Ports
+* Domänenmodell und Domänenservices sind getrennte Module unter `domain`. Nur
+  `usecases-service` bindet `domain-service` ein, als `implementation`. Ports
   und Adapter sehen beim Kompilieren nur das Modell
   (<<adr-015-domaenenservices>>).
 * Die erlaubten Richtungen stehen als Projektabhängigkeiten in den
   `build.gradle.kts`-Dateien. Ein eingehender Adapter sieht nur `usecases-in`,
   ein ausgehender nur `usecases-out`. Eine falsche Abhängigkeit scheitert damit
   beim Kompilieren („fail fast“) und nicht erst im Testlauf.
-* **ArchUnit bleibt zusätzlich bestehen** (Modul `architekturtests`). Es prüft
+* **ArchUnit bleibt zusätzlich bestehen** (Modul `architecture-tests`). Es prüft
   auf Paketebene einen Teil derselben Regeln und dazu, was die
   Modulabhängigkeiten nicht ausdrücken: Die Domäne und die Ports sind frei von
   Spring, eingehende und ausgehende Ports kennen einander nicht, der Service
@@ -91,7 +91,7 @@ Gradle-Module** und nicht nur über eine Paketkonvention:
   xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Keine Regel lässt
   einen leeren Selektor zu (<<adr-015-leere-selektoren>>).
 * Gemeinsame Build-Regeln stehen im Convention-Plugin
-  `standardschreiben.java-modul`, damit die Zahl der Module den Pflegeaufwand
+  `letterwright.java-module`, damit die Zahl der Module den Pflegeaufwand
   nicht vervielfacht.
 
 Die Pugh-Matrix ungewichtet ergibt keinen klaren Sieger (siehe unten). Den
@@ -108,15 +108,15 @@ einer Paketkonvention in einem Modul. Diese Begründung liefert dieser ADR.
 Geprüfte Belege im Repository:
 
 * `src/application/backend/**/build.gradle.kts`: `adapter-web` hängt nur an
-  `usecases-in`, `adapter-rendering` und `adapter-persistenz-jdbc` nur an
+  `usecases-in`, `adapter-rendering` und `adapter-persistence-jdbc` nur an
   `usecases-out`, `adapter-host` an `usecases-out` und `spi`;
   `usecases-service` exportiert `usecases-in` per `api` und
-  nutzt `usecases-out` und `domaene-service` per `implementation`;
+  nutzt `usecases-out` und `domain-service` per `implementation`;
   `spring-boot-starter` exportiert nur `spi` per `api` und bindet Ports, Service
   und Adapter als `implementation` ein (Nachtrag 2026-11-24: seit #78 auch
-  `api`; `adapter-api` hängt an `api` und `usecases-in`). `domaene-service` sieht er beim
+  `api`; `adapter-api` hängt an `api` und `usecases-in`). `domain-service` sieht er beim
   Kompilieren nicht, er bringt es nur transitiv zur Laufzeit mit.
-* `src/application/backend/architekturtests/`: die ArchUnit-Regeln, jede mit
+* `src/application/backend/architecture-tests/`: die ArchUnit-Regeln, jede mit
   einer Fixture, die einen Verstoß nachstellt.
 
 Zwei Eigenschaften des Projekts machen die Frage schärfer als in einer
@@ -274,20 +274,20 @@ Der Schnitt:
 [cols="1,2,2", options="header"]
 |===
 | Modul | Verzeichnis | Hängt an
-| `domaene-modell` | `domaene/modell` | nichts
-| `domaene-service` | `domaene/service` | `domaene-modell` (`api`)
-| `usecases-in`, `usecases-out` | `usecases/in`, `usecases/out` | `domaene-modell` (`api`)
-| `usecases-service` | `usecases/service` | `usecases-in` (`api`), `usecases-out` und `domaene-service` (`implementation`)
+| `domain-model` | `domain/model` | nichts
+| `domain-service` | `domain/service` | `domain-model` (`api`)
+| `usecases-in`, `usecases-out` | `usecases/in`, `usecases/out` | `domain-model` (`api`)
+| `usecases-service` | `usecases/service` | `usecases-in` (`api`), `usecases-out` und `domain-service` (`implementation`)
 |===
 
 Ob ein Domänenservice sichtbar ist, legt damit der Build fest und nicht eine
 Konvention. Zwei ArchUnit-Regeln prüfen das zusätzlich auf Paketebene, jede mit
-Fixture: Das Modell (`domaene.modell`) kennt keine Domänenservices
-(`domaene.service`), und Ports und Adapter kennen sie nicht. Der Starter bindet
+Fixture: Das Modell (`domain.model`) kennt keine Domänenservices
+(`domain.service`), und Ports und Adapter kennen sie nicht. Der Starter bindet
 `usecases-service` als `implementation` ein. Beim Kompilieren sieht er die
 Domänenservices deshalb nicht, und auch ein Host über den Starter bekommt sie
 nur zur Laufzeit. Braucht die Autokonfiguration sie später als Beans, muss der
-Starter `domaene-service` ausdrücklich einbinden.
+Starter `domain-service` ausdrücklich einbinden.
 
 [[adr-015-leere-selektoren]]
 === Ergänzung: Isolation der Adapter und leere Selektoren
@@ -295,7 +295,7 @@ Starter `domaene-service` ausdrücklich einbinden.
 Das Review von PR #18 hat zwei Lücken in der ArchUnit-Prüfung gefunden
 (Issue #19). Beide sind mit dieser Ergänzung geschlossen.
 
-*Isolation der Adapter.* Die Regel `adapterSindVoneinanderIsoliert` schneidet
+*Isolation der Adapter.* Die Regel `adaptersAreIsolatedFromEachOther` schneidet
 `adapter.<richtung>.<adapter>` in Slices, und keine Slice darf von einer anderen
 abhängen. Sie deckt eingehende und ausgehende Adapter ab, auch `adapter-host`.
 Zwei Fixtures stellen den Verstoß nach: ein eingehender Adapter, der einen
@@ -326,11 +326,11 @@ Betrachtet wurden vier Varianten:
   Liste im Test. Das kostet Pflege, und die Liste kann veralten.
 
 *Was der Nachweis abdeckt.* Mit einem absichtlich falschen Basispaket schlagen
-alle Prüfungen in `HexagonaleArchitekturTest` mit „failed to check any classes“
+alle Prüfungen in `HexagonalArchitectureTest` mit „failed to check any classes“
 fehl, mit `-Xpkginfo:always` allein ebenso wie mit `@NullMarked` allein. Belegt
 ist damit: Ein Selektor, der *gar nichts* mehr trifft, fällt auf. Nicht belegt
 ist, dass jedes einzelne Paket getroffen wird. Viele Regeln wählen mehrere
-Pakete auf einmal aus, etwa `domaene..`, `adapter..` oder das Slice-Muster
+Pakete auf einmal aus, etwa `domain..`, `adapter..` oder das Slice-Muster
 `adapter.(*).(*)..`. Fällt ein einzelnes Paket aus einem solchen Selektor, weil
 es umbenannt wurde, und treffen andere weiterhin, bleibt die Regel grün. Die
 Schwäche, die Hombergs nennt, ist damit verkleinert, aber nicht beseitigt.
@@ -511,7 +511,7 @@ ist.
   Regel ihren Verstoß erkennt. Die schmale Host-Abhängigkeit gilt nur für den
   Compile-Classpath eines Moduls, das ausschließlich SPIs implementiert.
 * Ergänzt am 2026-11-16 auf Entscheidung des Owners (Issue #25): Domänenmodell und
-  Domänenservices als getrennte Module unter `domaene`. Der Owner hatte darauf
+  Domänenservices als getrennte Module unter `domain`. Der Owner hatte darauf
   hingewiesen, dass ein Domänenservice im Modul der Domäne für Ports und Adapter
   sichtbar wäre.
 * Ergänzt am 2026-11-18 mit Issue #19: Isolation der Adapter per ArchUnit,

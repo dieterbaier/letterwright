@@ -50,7 +50,7 @@ Liquibase bildet Typen ab, Größenlimits müssen aber geprüft werden.
 === Mitigation Options
 
 * Testcontainers-Matrix für jede unterstützte Datenbank.
-* Port DokumentAblage erlaubt Ausweichen auf Objektspeicher.
+* Port DocumentStore erlaubt Ausweichen auf Objektspeicher.
 
 === Decision or Acceptance
 

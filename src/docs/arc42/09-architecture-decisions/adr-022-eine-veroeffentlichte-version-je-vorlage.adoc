@@ -69,8 +69,8 @@ Prüfzeitpunkt für das Gegenstück entschieden hatte.
   zurückgenommen; danach gibt es keine veröffentlichte Version, und eine Vorschau
   ist nicht möglich, bis ein Entwurf veröffentlicht ist. Abgelöste und
   zurückgezogene Versionen bleiben unverändert erhalten.
-* **Das Aggregat setzt die Regel durch.** `veroeffentlicheEntwurf` löst die
-  bisherige Version im selben Zustandswechsel ab; `zurueckziehen` nimmt die
+* **Das Aggregat setzt die Regel durch.** `publishDraft` löst die
+  bisherige Version im selben Zustandswechsel ab; `withdraw` nimmt die
   veröffentlichte Version zurück. Beim Wiederherstellen lehnt das Modell mehr als
   eine veröffentlichte Version ab
   (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
@@ -83,7 +83,7 @@ Prüfzeitpunkt für das Gegenstück entschieden hatte.
   Host-Schnittstelle widerspräche
   xref:qs-007-integration-in-host-anwendung[QS-007].
 * **Probe-PDF mit dem veröffentlichten Gegenstück.** Vor dem Veröffentlichen
-  entsteht ein Probe-PDF und wird mit dem `KonformitaetsPruefer` geprüft, wie vor
+  entsteht ein Probe-PDF und wird mit dem `ConformanceChecker` geprüft, wie vor
   jedem Speichern
   (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]):
 ** Ein Standardschreiben wird mit der veröffentlichten Version seines Briefpapiers
@@ -97,7 +97,7 @@ Prüfzeitpunkt für das Gegenstück entschieden hatte.
   und der Vorlagenverwalter erhält die Befunde. Lässt sich die Prüfung nicht
   ausführen, wird ebenfalls nicht veröffentlicht.
 * **Berechtigung.** Veröffentlichen und Zurückziehen verlangen
-  `VorlagenAktion.VEROEFFENTLICHEN`. Die Bibliothek fragt den Host, bevor sie die
+  `TemplateAction.PUBLISH`. Die Bibliothek fragt den Host, bevor sie die
   Vorlage lädt.
 * **Gleichzeitige Änderungen.** Zwischen Laden und Speichern kann ein anderer
   Vorlagenverwalter den Entwurf ändern oder dieselbe Vorlage veröffentlichen. Das
@@ -187,7 +187,7 @@ s| Summe s| +3 s| +2 s| 0
 * Ein Briefpapier wird nur mit dem eingebauten Beispielinhalt geprüft; ein
   Standardschreiben, das mit dem neuen Briefpapier nicht mehr konform ist, fällt
   erst beim Speichern auf (fail-closed bleibt).
-* Der Port `VorlagenRepository` braucht eine bedingte Ersetzung.
+* Der Port `TemplateRepository` braucht eine bedingte Ersetzung.
 
 ==== Neutral oder Folgearbeiten
 
@@ -224,7 +224,7 @@ Briefpapier zählt, wenn es sich während der Prüfung eines Standardschreibens
 ändert. Am 2026-11-22 entschied er: der Prüfzeitpunkt. Der Port prüft das
 Briefpapier beim Ersetzen nicht mit; Entscheidung „Für das Gegenstück zählt der
 Prüfzeitpunkt“ und das Szenario dazu in
-`features/vorlagen/vorlagenversion-veroeffentlichen.feature`.
+`features/templates/publish-template-version.feature`.
 
 Danach hat der Owner den ADR und seine fünf Relationen am 2026-11-22 im Review
 von PR #68 angenommen.

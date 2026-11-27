@@ -71,7 +71,7 @@ Wir schlagen vor:
   Minute). Bis dahin wird er wie ein nicht vorhandener behandelt. „Aktualisieren“
   oder ein Neuladen erzeugt eine neue Vorschau mit neuem Snapshot. Der ersetzte
   Snapshot wird im selben Schritt gelöscht.
-* Das Löschen eines Schreibens entscheidet die `Loeschrichtlinie` des Hosts (ADR-002).
+* Das Löschen eines Schreibens entscheidet die `DeletionPolicy` des Hosts (ADR-002).
 
 === Kontext
 

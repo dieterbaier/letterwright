@@ -52,13 +52,13 @@ Die Schnittstelle zur Host-Anwendung ist ein eigenes Modul `spi` mit eigenen
 Datentypen (Option 3):
 
 * **`spi`** (Verzeichnis `src/application/backend/spi`) enthält die Schnittstellen,
-  die der Host implementiert: `PlatzhalterdatenAnbieter`, `Berechtigungspruefung`
-  und `Loeschrichtlinie` (ADR-002). Dazu kommen eigene Datentypen für alles, was
+  die der Host implementiert: `PlaceholderDataProvider`, `AuthorizationCheck`
+  und `DeletionPolicy` (ADR-002). Dazu kommen eigene Datentypen für alles, was
   über diese Schnittstellen fließt, etwa den fachlichen Bezug, den Datenkontext
   und die Anfrage an die Berechtigungsprüfung. Das Modul ist reines Java ohne
   Spring und hängt an keinem anderen Modul der Bibliothek.
 * **`usecases-out`** enthält nur noch interne Ports: Repositories,
-  `DokumentAblage`, `Renderer`, `KonformitaetsPruefer` und die Ports, über die
+  `DocumentStore`, `Renderer`, `ConformanceChecker` und die Ports, über die
   der Kern Platzhalterdaten, Berechtigung und Löschrichtlinie in Domänenbegriffen
   anfragt. Kein Host implementiert `usecases-out`.
 * **`adapter-host`** (Verzeichnis `adapter/out/adapter-host`) ist ein ausgehender
@@ -71,7 +71,7 @@ Datentypen (Option 3):
   Domänenmodell, Domänenservices und Adapter bekommt er nur zur Laufzeit.
   Nachtrag 2026-11-23: Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] exportiert der Starter
   zusätzlich das Modul `api` der Java-API.
-* Die Default-Implementierung von `Berechtigungspruefung` auf Spring Security
+* Die Default-Implementierung von `AuthorizationCheck` auf Spring Security
   implementiert die SPI-Schnittstelle wie jede Host-Implementierung. Sie liegt im
   Starter und tritt zurück, sobald der Host eine eigene Bean bereitstellt.
 * Eine eingehende Java-API für den Host gibt es nicht. Der Host nutzt die
@@ -81,7 +81,7 @@ Datentypen (Option 3):
   seiner eigenen Transaktion bekommt der Host eine Java-API nach dem Muster
   dieses ADR, ein eigenes Modul `api` mit eigenen Typen und einem eingehenden
   Adapter. `spi` bekommt dazu die optionale Schnittstelle
-  `spi.NachDemSpeichern`.
+  `spi.LetterSaveCallback`.
 
 Der Schnitt:
 
@@ -89,7 +89,7 @@ Der Schnitt:
 |===
 | Modul | Verzeichnis | Hängt an
 | `spi` | `spi` | nichts
-| `usecases-out` | `usecases/out` | `domaene-modell` (`api`)
+| `usecases-out` | `usecases/out` | `domain-model` (`api`)
 | `adapter-host` | `adapter/out/adapter-host` | `usecases-out` und `spi` (`implementation`)
 | `spring-boot-starter` | `spring-boot-starter` | `spi` (`api`), alle übrigen Module (`implementation`)
 |===
@@ -115,7 +115,7 @@ Nachtrag 2026-11-24: Für die Java-API aus
 xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] gelten die
 entsprechenden Regeln, ebenfalls mit Fixture: `api` hängt von keinem anderen
 Paket der Bibliothek ab, auch nicht von `spi`, und nur `adapter-api` und der
-Starter benutzen `api`. `host-vertragstest` prüft, dass ein Host beim
+Starter benutzen `api`. `host-contract-test` prüft, dass ein Host beim
 Kompilieren `spi` und `api` sieht und sonst nichts.
 
 === Kontext
@@ -292,7 +292,7 @@ include::generated/adr-016-schnittstelle-zur-host-anwendung-traceability.adoc[le
 * Keine. Beide Fragen hat der Owner im Review von PR #28 beantwortet:
 ** *Versionierung von `spi`:* Wir starten mit einer Version für das gesamte
    Paket. Eine getrennte Versionierung von `spi` ist vorerst nicht nötig.
-** *Ort der Default-`Berechtigungspruefung`:* Vorerst reicht der Starter, ein
+** *Ort der Default-`AuthorizationCheck`:* Vorerst reicht der Starter, ein
    eigenes Modul ist nicht nötig.
 
 === Review Notes

@@ -63,8 +63,8 @@ angenommen.
 
 Der Host kann das Speichern eines Schreibens auf zwei Wegen mit eigenen
 Datenbankaktionen atomar verbinden. Beide nutzen denselben
-Anwendungsfall `SchreibenSpeichern`, dieselbe Berechtigungsprüfung
-(`ZumErzeugen`) und dieselbe Idempotenz nach
+Anwendungsfall `SaveLetter`, dieselbe Berechtigungsprüfung
+(`ForCreation`) und dieselbe Idempotenz nach
 xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
 
 ==== Java-API, der primäre Weg
@@ -75,7 +75,7 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   exportiert `api` neben `spi`.
 * Der Host ruft in seinem eigenen Anwendungsfall „Schreiben speichern“ mit
   Benutzerkennung und Snapshot-ID auf. Er erhält ein
-  Sealed-Ergebnis mit denselben Fällen wie `Speicherergebnis`. Gespeichert und
+  Sealed-Ergebnis mit denselben Fällen wie `SaveResult`. Gespeichert und
   bereits gespeichert tragen die Identifikatoren, die auch der Rückruf erhält
   (siehe unten).
 * *Transaktion (`REQUIRED`):* Die Bibliothek tritt einer laufenden Transaktion
@@ -90,7 +90,7 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
 
 ==== Speichern über die Oberfläche: optionaler synchroner Rückruf
 
-* `spi` bekommt die optionale Schnittstelle `spi.NachDemSpeichern`. Stellt der
+* `spi` bekommt die optionale Schnittstelle `spi.LetterSaveCallback`. Stellt der
   Host keine Implementierung bereit, verhält sich die Bibliothek wie heute.
 * *Transaktionsgrenze:* Beim Speichern über REST ist der Endpunkt der Bibliothek
   die äußere Grenze der Transaktion. Rückruf und Datenbankaktionen des Hosts
@@ -99,7 +99,7 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   Datenbankänderungen der Bibliothek und vor dem Commit. Einen Listener nach dem
   Commit (`AFTER_COMMIT`) gibt es nicht.
 * *Nur bei einer Neuanlage:* Der Rückruf läuft nur, wenn der aktuelle Aufruf das
-  Schreiben anlegt. Liefert er `BereitsGespeichert`, legt er kein neues
+  Schreiben anlegt. Liefert er `AlreadySaved`, legt er kein neues
   Schreiben an und löst keinen Rückruf aus. Mehr sichert der Vertrag dabei nicht
   zu: Das vorhandene Schreiben kann über die Java-API ohne Rückruf entstanden
   sein, oder ein anderer Aufruf in derselben äußeren Transaktion hat es angelegt,
@@ -108,11 +108,11 @@ xref:adr-021-hoechstens-ein-schreiben-je-snapshot[ADR-021].
   (technischer Schlüssel), über die der Host seine Daten mit dem Schreiben
   verknüpft, den fachlichen Bezug, das Standardschreiben, die Benutzerkennung und den Zeitpunkt der
   Erstellung.
-* *Ergebnis:* Der Rückruf liefert ein `Rueckrufergebnis`, `Angenommen` oder
-  `Abgelehnt` mit einem Grund für den Benutzer. Ein Rückgabewert löst in Spring
-  für sich allein keinen Rollback aus. Die Bibliothek rollt bei `Abgelehnt`
+* *Ergebnis:* Der Rückruf liefert ein `CallbackResult`, `Accepted` oder
+  `Rejected` mit einem Grund für den Benutzer. Ein Rückgabewert löst in Spring
+  für sich allein keinen Rollback aus. Die Bibliothek rollt bei `Rejected`
   deshalb ausdrücklich an ihrer äußeren Grenze zurück und meldet erst danach
-  einen eigenen Fall von `Speicherergebnis` mit dem Grund. Innere, teilnehmende
+  einen eigenen Fall von `SaveResult` mit dem Grund. Innere, teilnehmende
   Grenzen markieren die Transaktion dafür nicht als rollback-only und kehren
   dann regulär zurück. Sonst verdrängt eine `UnexpectedRollbackException` das
   fachliche Ergebnis, und der Grund kommt beim Benutzer nicht an. Der Snapshot
@@ -166,7 +166,7 @@ jemand muss wiederholen. Ein Rückruf kann nicht beides liefern.
 
 Das Speichern rendert heute das PDF, prüft es und legt es in der Dokumentablage
 ab, bevor es Schreiben und verbrauchten Snapshot in einem Schritt speichert
-(`Schreibenspeicherung`, ADR-021). Die Dokumentablage nimmt an der Transaktion
+(`SaveLetterService`, ADR-021). Die Dokumentablage nimmt an der Transaktion
 nicht teil.
 
 === Entscheidungstreiber
@@ -255,13 +255,13 @@ Wahl der Semantik.
 
 ==== Neutral oder Folgearbeiten
 
-* `Speicherergebnis` bekommt einen Fall für die Ablehnung durch den Host, mit
+* `SaveResult` bekommt einen Fall für die Ablehnung durch den Host, mit
   Gherkin-Szenario und Test.
 * Bereinigung verwaister PDFs: gehört zum Ablagevertrag (#60) und zur Persistenz
   (#6).
 * Vorbereiten und Festschreiben trennen, damit Rendering und Prüfung vor einer
   kurzen Schreibtransaktion liegen (Q-ARCH-004). Das ist eine bewusste
-  Umstrukturierung von `Schreibenspeicherung` und eine eigene Entscheidung.
+  Umstrukturierung von `SaveLetterService` und eine eigene Entscheidung.
 * Integrationsnachweise im Host-Vertragstest:
 ** gemeinsamer Commit und später Rollback des Hosts,
 ** Speichern über die Java-API ohne äußere Transaktion,
@@ -298,15 +298,15 @@ include::generated/adr-023-speichern-in-einer-transaktion-des-hosts-traceability
 === Open Questions
 
 * Keine. Die drei offenen Fragen des ersten Entwurfs hat der Owner im Review
-  von PR #74 beantwortet: Modul `api`, Schnittstelle `spi.NachDemSpeichern` mit
-  `Rueckrufergebnis` (`Angenommen`, `Abgelehnt`); die Java-API arbeitet mit
+  von PR #74 beantwortet: Modul `api`, Schnittstelle `spi.LetterSaveCallback` mit
+  `CallbackResult` (`Accepted`, `Rejected`); die Java-API arbeitet mit
   `REQUIRED`; der Dateiname ist zurückgestellt und steht in Q-ARCH-004.
 
 === Review Notes
 
 * Die drei Grundsatzentscheidungen hat der Owner am 2026-11-23 getroffen, die
   offenen Fragen des ersten Entwurfs im Review von PR #74. Seine Präzisierungen
-  zur Transaktionsgrenze, zu `BereitsGespeichert` und zur Begründung der
+  zur Transaktionsgrenze, zu `AlreadySaved` und zur Begründung der
   Relation zu ADR-006 sind eingearbeitet.
 * Danach hat der Owner den ADR und seine vier Relationen am 2026-11-23
   angenommen.

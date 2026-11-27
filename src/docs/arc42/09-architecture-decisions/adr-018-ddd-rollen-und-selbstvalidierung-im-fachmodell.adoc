@@ -52,42 +52,42 @@ KI-gestützt formuliert; der Owner hat ihn im Review von PR #57 angenommen.
   `org.jmolecules:jmolecules-ddd` mit `@AggregateRoot`, `@Entity`, `@ValueObject`
   und `@Identity`. Es enthält nur Annotationen und Interfaces und hängt nur an
   `jstereotype`, das ebenfalls nur Annotationen enthält. Die Klassennamen bleiben
-  Ubiquitous Language, also `Briefpapier` und nicht `BriefpapierAggregate`.
+  Ubiquitous Language, also `Letterhead` und nicht `BriefpapierAggregate`.
   Integrationen von jMolecules (Spring, Jackson, ByteBuddy) und dessen
   ArchUnit-Regeln sind damit nicht zugelassen.
 * **Aggregate.**
-** `Briefpapier` und `Standardschreiben` sind Aggregate Roots über ihre
-   Versionen. `Vorlagenversion` ist eine Entität in ihrem Aggregat. Jede Änderung
+** `Letterhead` und `LetterTemplate` sind Aggregate Roots über ihre
+   Versionen. `TemplateVersion` ist eine Entität in ihrem Aggregat. Jede Änderung
    an einer Version geht über die Root. Die Root sichert die Regeln über alle
    Versionen: Die Nummern laufen lückenlos von 1, es gibt höchstens einen
    Entwurf, und er ist die neueste Version.
-** `Snapshot` und `Schreiben` sind eigene Aggregate. Sie verweisen auf
-   Vorlagenversionen nur per `Versionsverweis`, das Standardschreiben auf sein
+** `Snapshot` und `Letter` sind eigene Aggregate. Sie verweisen auf
+   Vorlagenversionen nur per `VersionReference`, das Standardschreiben auf sein
    Briefpapier nur per ID.
 * **Gleichheit.** Aggregate und Entitäten sind finale Klassen und über ihre
   Identität gleich. Zwei Stände desselben Briefpapiers sind also gleich. Value
   Objects sind Records, Enums oder unveränderliche Klassen mit Wertgleichheit.
   Die Identität ist mit `@Identity` markiert: bei den Aggregaten das ID-Feld, bei
-  `Vorlagenversion` die Methode `verweis()`, die Vorlage und Nummer liefert.
+  `TemplateVersion` die Methode `reference()`, die Vorlage und Nummer liefert.
 * **Selbstvalidierung.**
 ** Jeder Typ prüft jedes Pflichtattribut im Konstruktor, auch zusammengesetzte
    Typen. Dass ein enthaltener Value Object sich selbst prüft, ersetzt nicht die
    Prüfung, ob er vorhanden ist.
-** Die allgemeinen Prüfungen liegen im Modul `validierung`: Pflichtwert, nicht
+** Die allgemeinen Prüfungen liegen im Modul `validation`: Pflichtwert, nicht
    leer, nicht blank, Untergrenze, Sammlung ohne Lücken. Es ist frameworkfrei und
    kennt kein anderes Modul.
 ** Welche Prüfung für ein Attribut gilt, entscheidet der Typ selbst. Fachliche
    Regeln wie Zustandsübergänge bleiben im Modell.
 * **Fehlervertrag.**
-** Ein ungültiger oder fehlender Wert ergibt `Validierungsfehler` (eine
+** Ein ungültiger oder fehlender Wert ergibt `ValidationException` (eine
    `IllegalArgumentException`), dessen Meldung das Attribut nennt. Nie eine
    `NullPointerException`.
-** Ein fachlich verbotener Schritt ergibt `UnzulaessigerZustandswechsel` (eine
+** Ein fachlich verbotener Schritt ergibt `IllegalStateTransition` (eine
    `IllegalStateException`), etwa eine veröffentlichte Version ändern.
 * **Erzeugung.**
-** Neue Objekte entstehen über sprechende Fabrikmethoden wie `anlegen`,
-   `ausSnapshot` und `neu()`.
-** Gespeicherte Objekte entstehen über `wiederherstellen`. Auch dabei gelten
+** Neue Objekte entstehen über sprechende Fabrikmethoden wie `create`,
+   `fromSnapshot` und `generate()`.
+** Gespeicherte Objekte entstehen über `restore`. Auch dabei gelten
    alle Prüfungen.
 * **Zeit als Parameter.** Das Modell liest keine Uhr. Der Anwendungsfall liest
   seine Uhr einmal und übergibt den Zeitpunkt.
@@ -95,14 +95,14 @@ KI-gestützt formuliert; der Owner hat ihn im Review von PR #57 angenommen.
   Veröffentlichen verlangt Inhalt, der nicht nur aus Leerraum besteht.
 
 ArchUnit prüft, dass die Domäne außer dem JDK nur JSpecify, die
-jMolecules-Annotationen und `validierung` benutzt. Ebenso prüft es, dass
-`validierung` kein anderes Paket der Bibliothek kennt. Das SPI nutzt
-`validierung` nicht, es bleibt nach ADR-016 eigenständig.
+jMolecules-Annotationen und `validation` benutzt. Ebenso prüft es, dass
+`validation` kein anderes Paket der Bibliothek kennt. Das SPI nutzt
+`validation` nicht, es bleibt nach ADR-016 eigenständig.
 
 === Kontext
 
 Das Review zu PR #57 hat gezeigt, dass das erste Fachmodell ungültige Objekte
-zuließ. `new Briefpapier(null, "Name", null)` war möglich, ein fehlender Text
+zuließ. `new Letterhead(null, "Name", null)` war möglich, ein fehlender Text
 ergab eine `NullPointerException` statt einer verständlichen Meldung. Records
 verglichen alle Komponenten, sodass zwei Stände desselben Briefpapiers ungleich
 waren. Dass jede Versionsnummer nur einmal vergeben wird, konnte kein Objekt
@@ -181,7 +181,7 @@ Option dieselben. Die Matrix vergleicht nur die Kennzeichnung.
   2026-11-21 stammt aus dem Review zu PR #57.
 * Das Querschnittskonzept „Fachmodell“ beschreibt die Konventionen für neue
   Typen.
-* Die Persistenz (#6) stellt Aggregate über `wiederherstellen` her. Gleichzeitige
+* Die Persistenz (#6) stellt Aggregate über `restore` her. Gleichzeitige
   Änderungen derselben Vorlage regelt sie, etwa über eine Versionsspalte.
 * Ob es neben der neuesten veröffentlichten Version weitere gültige geben darf,
   legt #55 fest. Das Modell erlaubt mehrere veröffentlichte Versionen.

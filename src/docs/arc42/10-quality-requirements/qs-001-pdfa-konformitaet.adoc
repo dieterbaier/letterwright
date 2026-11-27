@@ -32,7 +32,7 @@ bis sie bestätigt sind.
 | Source | Benutzer (Sachbearbeiter)
 | Stimulus | Speichert ein Standardschreiben, das mit aktuellen Daten befüllt ist.
 | Environment | Normalbetrieb, auch mit von Fachanwendern neu gepflegten Vorlagen; zusätzlich alle Referenzvorlagen im CI.
-| Artifact | Rendering-Adapter und Pflicht-Konformitätsprüfer (`KonformitaetsPruefer`).
+| Artifact | Rendering-Adapter und Pflicht-Konformitätsprüfer (`ConformanceChecker`).
 | Response | Das System erzeugt ein PDF und persistiert es nur, wenn die Laufzeitprüfung es als konform bestätigt. Ist es nicht konform oder ist die Prüfung nicht ausführbar, wird nichts persistiert und der Benutzer informiert (fail-closed). Ohne konfigurierten Prüfer startet der Anwendungskontext nicht.
 | Response Measure | 100 % der persistierten PDFs haben eine bestandene Laufzeitprüfung gegen PDF/A-2b (0 persistierte PDFs ohne Prüfergebnis); alle Referenz-PDFs im CI: 0 veraPDF-Fehler; Tests belegen: nicht konform, Prüfung fehlgeschlagen und Prüfer fehlt führen zu keinem persistierten Schreiben.
 |===
@@ -43,7 +43,7 @@ Archivierbarkeit ist eine Kernanforderung aus Issue #1.
 
 === Annahmen
 
-* veraPDF läuft im CI und zur Laufzeit. Der Starter verwendet standardmäßig veraPDF als `KonformitaetsPruefer`; ein konfigurierter Prüfer ist für jede Persistierung erforderlich (ADR-005).
+* veraPDF läuft im CI und zur Laufzeit. Der Starter verwendet standardmäßig veraPDF als `ConformanceChecker`; ein konfigurierter Prüfer ist für jede Persistierung erforderlich (ADR-005).
 
 === Impact
 

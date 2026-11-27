@@ -20,30 +20,30 @@ Die Regeln und ihre Begründung stehen in der Architekturdokumentation, nicht hi
 
 Was der Build durchsetzt, steht hier nicht: Modulgrenzen und Paketregeln
 (ArchUnit), Linting (Error Prone), den Null-Vertrag (NullAway), Abdeckung (JaCoCo) und den
-Kompilier-Klassenpfad des Hosts (`host-vertragstest`). Lass `./gradlew check`
+Kompilier-Klassenpfad des Hosts (`host-contract-test`). Lass `./gradlew check`
 laufen; was dort scheitert, ist ein Fehler, keine Stilfrage.
 
 ## Beim Schreiben
 
 1. **Eine Prüfung gehört in den Typ.** Willst du einen Parameter prüfen, frag, ob
-   du in einem Konstruktor oder einer Fabrikmethode bist. Nur dort steht `Pruefe`
-   (Domäne) oder `Pflicht` (SPI). In Anwendungsfällen, Ports, Adaptern und
+   du in einem Konstruktor oder einer Fabrikmethode bist. Nur dort steht `Validate`
+   (Domäne) oder `Require` (SPI). In Anwendungsfällen, Ports, Adaptern und
    Abfragemethoden prüfst du nicht.
 2. **Ein Flag oder ein optionales Feld ist ein fehlender Typ.** Hängt an einem
    `boolean` oder einem `@Nullable`-Feld, welche anderen Werte gültig sind, entwirf
    stattdessen einen Sealed Type mit einem Record je Fall. Vorbild:
-   `Berechtigungsanfrage` mit `ZuVorlagen`, `ZuSchreiben` und `ZumErzeugen`.
+   `AuthorizationRequest` mit `ForTemplates`, `ForLetter` und `ForCreation`.
 3. **Eine fachliche Ablehnung ist ein Ergebnis.** Gibt ein Anwendungsfall
    erwartbar „nicht erlaubt“, „unbekannt“ o. Ä. zurück, ist das ein Fall seines
-   Sealed-Ergebnistyps (Vorbild `Vorschauergebnis`), keine Ausnahme. Unterscheide
+   Sealed-Ergebnistyps (Vorbild `PreviewResult`), keine Ausnahme. Unterscheide
    die Fälle mit `switch` ohne `default`. Technische Fehler bleiben Ausnahmen.
 4. **Kein `null` als Ergebnis.** Darf ein Ergebnis fehlen, gib ein `Optional`
    zurück. `Optional` ist kein Feld und kein Parameter.
 5. **Die Grenze bleibt geprüft.** Werte vom Host (SPI-Rückgaben) sind nicht
    vertrauenswürdig. Prüfe sie in `adapter-host` und melde Verstöße als
-   `HostVertragVerletzt`.
-6. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `anlegen`,
-   `ausSnapshot`, `neu()`, `wiederherstellen`.
+   `HostContractViolated`.
+6. **Neue Objekte über Fabrikmethoden** mit sprechendem Namen: `create`,
+   `fromSnapshot`, `generate()`, `restore`.
 7. **Zu jeder Klasse mit eigenem Verhalten ihre Testklasse.** `Foo` bekommt
    `FooTest` im selben Paket, keine Sammelklasse für mehrere Klassen. Ein
    Anwendungsfall wird in der Testklasse seiner Implementierung geprüft, zugleich

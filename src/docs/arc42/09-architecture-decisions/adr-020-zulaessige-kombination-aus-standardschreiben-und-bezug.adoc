@@ -24,12 +24,12 @@ relations:
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
   status: accepted
-  rationale: 'Die Berechtigungsprüfung des SPI bekommt eine dritte Anfrageart, ZumErzeugen, mit fachlichem Bezug und Standardschreiben.'
+  rationale: 'Die Berechtigungsprüfung des SPI bekommt eine dritte Anfrageart, ForCreation, mit fachlichem Bezug und Standardschreiben.'
   reviewed: true
 - type: refines
   target: ADR-019-validierung-in-den-typen-und-null-vertrag
   status: accepted
-  rationale: 'Die Berechtigungsanfrage ist ein Sealed Type mit drei statt zwei Arten; das Erzeugen ist keine SchreibenAktion mehr, weil es andere Daten braucht.'
+  rationale: 'Die Berechtigungsanfrage ist ein Sealed Type mit drei statt zwei Arten; das Erzeugen ist keine LetterAction mehr, weil es andere Daten braucht.'
   reviewed: true
 - type: addresses
   target: QS-009-zugriffsschutz-beim-download
@@ -60,17 +60,17 @@ Prüfungen.
 
 * **Ein Standardschreiben gehört zu genau einem Bezugstyp,** etwa `Kunde` oder
   `Vorgang`. Der Bezugstyp ist dieselbe Zeichenkette wie der Typ des
-  `FachlicherBezug`, den der Host vergibt. Passt der Typ des Bezugs nicht, lehnt
+  `BusinessReference`, den der Host vergibt. Passt der Typ des Bezugs nicht, lehnt
   die Bibliothek die Vorschau selbst ab, ohne den Host zu fragen.
-* **Das Erzeugen ist eine eigene Berechtigungsanfrage.** Neben `ZuVorlagen` und
-  `ZuSchreiben` gibt es `ZumErzeugen` mit Benutzer, fachlichem Bezug und
-  Standardschreiben. `ERZEUGEN` ist keine `SchreibenAktion` mehr. Der Host kann so
+* **Das Erzeugen ist eine eigene Berechtigungsanfrage.** Neben `ForTemplates` und
+  `ForLetter` gibt es `ForCreation` mit Benutzer, fachlichem Bezug und
+  Standardschreiben. `CREATE` ist keine `LetterAction` mehr. Der Host kann so
   festlegen, welche Standardschreiben an welchem Einstiegspunkt zulässig sind
   (#11), etwa nur Mahnungen zu Kunden mit offenem Posten.
 * **Reihenfolge.**
   1. Gibt es das Standardschreiben?
   2. Passt sein Bezugstyp zum Bezug?
-  3. Erlaubt der Host das Erzeugen (`ZumErzeugen`)?
+  3. Erlaubt der Host das Erzeugen (`ForCreation`)?
   4. Haben Standardschreiben und Briefpapier eine veröffentlichte Version?
   5. Erst dann fragt die Bibliothek den Datenkontext an.
 +
@@ -78,9 +78,9 @@ Ein Unberechtigter bekommt so immer „nicht erlaubt“ und erfährt nicht, ob e
 Version veröffentlicht ist. Ob es das Standardschreiben gibt und ob sein
 Bezugstyp passt, bleibt für ihn dagegen unterscheidbar; dieser ADR schützt nur
 den Veröffentlichungsstatus. Beim Speichern wird die Berechtigung erneut mit
-`ZumErzeugen` gefragt.
-* **Default-Berechtigungsprüfung.** Der Starter bildet `ZumErzeugen` weiter auf die
-  Rolle `ROLE_SSW_SCHREIBEN_ERZEUGEN` ab; die Konfiguration bleibt unverändert.
+`ForCreation` gefragt.
+* **Default-Berechtigungsprüfung.** Der Starter bildet `ForCreation` weiter auf die
+  Rolle `ROLE_LETTERWRIGHT_LETTERS_CREATE` ab; die Konfiguration bleibt unverändert.
   Das Standardschreiben wertet er nicht aus.
 
 === Kontext
@@ -95,7 +95,7 @@ Standardschreiben füllen, das nicht dafür gedacht ist, und der Host müsste je
 Kombination selbst abfangen.
 
 Bis hierhin kannte das Standardschreiben keinen Bezug, und die
-`Berechtigungsanfrage` zum Erzeugen kannte das Standardschreiben nicht.
+`AuthorizationRequest` zum Erzeugen kannte das Standardschreiben nicht.
 
 === Entscheidungstreiber
 
@@ -156,7 +156,7 @@ Hosts geändert werden kann.
 
 ==== Negativ
 
-* Die SPI-Änderung bricht jeden Host, der `SchreibenAktion.ERZEUGEN` benutzt.
+* Die SPI-Änderung bricht jeden Host, der `LetterAction.CREATE` benutzt.
   Vor dem ersten Release betrifft das nur die Tests der Bibliothek.
 * Ein Standardschreiben, das zu mehreren Bezugstypen passen soll, muss es mehrfach
   geben.

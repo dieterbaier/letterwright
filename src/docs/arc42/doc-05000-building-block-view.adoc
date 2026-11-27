@@ -44,11 +44,11 @@ System_Boundary(host, "Host-Anwendung") {
     Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
     Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
     Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
-    Component(dom, "domaene-modell", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben")
-    Component(val, "validierung", "Java, ohne Spring", "Allgemeine Prüfungen für selbstvalidierende Typen")
-    Component(dsvc, "domaene-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
+    Component(dom, "domain-model", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben")
+    Component(val, "validation", "Java, ohne Spring", "Allgemeine Prüfungen für selbstvalidierende Typen")
+    Component(dsvc, "domain-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
     Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Zusammenführen, Bereinigen, PDF, Konformität")
-    Component(per, "adapter-persistenz-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
+    Component(per, "adapter-persistence-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
     Component(ahost, "adapter-host", "Java", "Bildet interne Ports auf das SPI ab")
   }
   Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie, optional Rückruf nach dem Speichern")
@@ -69,8 +69,8 @@ Rel(app, dom, "nutzt")
 Rel(app, dsvc, "nutzt")
 Rel(dsvc, dom, "arbeitet auf")
 Rel(dom, val, "prüft mit")
-Rel(ren, uout, "implementiert Renderer, KonformitaetsPruefer")
-Rel(per, uout, "implementiert VorlagenRepository, Snapshotablage, SchreibenRepository, DokumentAblage")
+Rel(ren, uout, "implementiert Renderer, ConformanceChecker")
+Rel(per, uout, "implementiert TemplateRepository, SnapshotStore, LetterRepository, DocumentStore")
 Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie, Rückruf")
 Rel(ahost, spiapi, "ruft, bildet ab")
 Rel(spi, spiapi, "implementiert")
@@ -93,20 +93,20 @@ Java 21 und JSpecify; das steht deshalb nicht in jeder Zeile.
 [cols="2,5,3", options="header"]
 |===
 | Baustein | Verantwortung | Tragende Bibliotheken
-| domaene-modell | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]. Ein Paket je Aggregat (`vorlage`, `snapshot`, `schreiben`), geteilte Werttypen im Wurzelpaket (xref:crosscutting-concepts[Querschnittskonzept Fachmodell]) | jMolecules DDD (nur Annotationen)
-| validierung | Allgemeine Prüfungen (Pflichtwert, nicht leer, nicht blank, Untergrenze) mit einheitlichem Fehlervertrag; kennt kein anderes Modul, das SPI nutzt es nicht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | –
-| domaene-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | –
+| domain-model | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]. Ein Paket je Aggregat (`template`, `snapshot`, `letter`), geteilte Werttypen im Wurzelpaket (xref:crosscutting-concepts[Querschnittskonzept Fachmodell]) | jMolecules DDD (nur Annotationen)
+| validation | Allgemeine Prüfungen (Pflichtwert, nicht leer, nicht blank, Untergrenze) mit einheitlichem Fehlervertrag; kennt kein anderes Modul, das SPI nutzt es nicht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | –
+| domain-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | –
 | usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | –
-| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert; darunter `Speicherrueckruf`, über den der Anwendungsfall „Schreiben speichern“ ein neu angelegtes Schreiben vor dem Commit meldet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
-| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; neben `api` das einzige Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommt die optionale Schnittstelle `NachDemSpeichern` hinzu: ein Rückruf vor dem gemeinsamen Commit, nur bei einer Neuanlage, mit dem Ergebnis `Rueckrufergebnis` | –
-| api | Java-API für den Host mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek: Schreiben in der Transaktion des Hosts speichern (`SchreibenSpeichern`) und das Ergebnis als Rückgabewert erhalten (`Speicherergebnis`). Sie tritt einer laufenden Transaktion bei und eröffnet eine eigene, wenn keine läuft (Spring `REQUIRED`). Gemeinsam atomar mit weiteren Aktionen des Hosts ist das Speichern nur, wenn der Host die Transaktion vor dem Aufruf eröffnet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
+| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert; darunter `SaveCallback`, über den der Anwendungsfall „Schreiben speichern“ ein neu angelegtes Schreiben vor dem Commit meldet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
+| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; neben `api` das einzige Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommt die optionale Schnittstelle `LetterSaveCallback` hinzu: ein Rückruf vor dem gemeinsamen Commit, nur bei einer Neuanlage, mit dem Ergebnis `CallbackResult` | –
+| api | Java-API für den Host mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek: Schreiben in der Transaktion des Hosts speichern (`SaveLetter`) und das Ergebnis als Rückgabewert erhalten (`SaveResult`). Sie tritt einer laufenden Transaktion bei und eröffnet eine eigene, wenn keine läuft (Spring `REQUIRED`). Gemeinsam atomar mit weiteren Aktionen des Hosts ist das Speichern nur, wenn der Host die Transaktion vor dem Aufruf eröffnet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
 | usecases-service | Implementierung der Anwendungsfälle | –
 | adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung. Beim Speichern äußere Grenze der Transaktion; lehnt der Rückruf des Hosts ab, rollt er ausdrücklich zurück und meldet danach den Grund (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | _Spring MVC_
 | adapter-api | Eingehender Adapter: implementiert `api`, ruft die Anwendungsfälle und bildet zwischen API-Typen und Domänenmodell ab. Steuert die Transaktion mit `REQUIRED` selbst über ein `TransactionTemplate`, nicht über einen Proxy; eine fachliche Ablehnung kehrt regulär zurück und markiert die Transaktion nicht als rollback-only (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | Spring Transaction
 | adapter-rendering | Ausgehender Adapter: Zusammenführen, HTML-Bereinigung, Schriftauflösung, PDF-Erzeugung und Konformitätsprüfung; Whitebox in xref:bausteine-ebene-2-adapter-rendering[Ebene 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox und FontBox, veraPDF_, freie OFL-Ersatzschriften
-| adapter-persistenz-jdbc | Ausgehender Adapter: Repositories, DokumentAblage, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006])
-| adapter-host | Ausgehender Adapter: implementiert die Ports `Platzhalterdatenquelle`, `Berechtigungen` und `Loeschregeln`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostVertragVerletzt`. Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] implementiert `HostSpeicherrueckruf` den Port `Speicherrueckruf` und ruft den optionalen Rückruf `NachDemSpeichern`; ohne Rückruf des Hosts nimmt er jedes Schreiben an | –
-| spring-boot-starter | Autokonfiguration `StandardschreibenAutoKonfiguration`, Default-Adapter, Default-`Berechtigungspruefung` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi` und, mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], `api`; `adapter-api` bleibt intern. Eine Bean für `api.SchreibenSpeichern` verdrahtet er noch nicht, weil die Anwendungsfälle selbst noch nicht verdrahtet sind (#10). Den Port `Speicherrueckruf` verdrahtet er mit dem Rückruf `NachDemSpeichern` des Hosts, falls es ihn gibt. Fehlt `PlatzhalterdatenAnbieter` oder `Loeschrichtlinie`, startet der Kontext nicht | Spring Boot Autoconfigure, _Spring Security_
+| adapter-persistence-jdbc | Ausgehender Adapter: Repositories, DocumentStore, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006])
+| adapter-host | Ausgehender Adapter: implementiert die Ports `PlaceholderDataSource`, `Permissions` und `DeletionRules`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostContractViolated`. Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] implementiert `HostSaveCallback` den Port `SaveCallback` und ruft den optionalen Rückruf `LetterSaveCallback`; ohne Rückruf des Hosts nimmt er jedes Schreiben an | –
+| spring-boot-starter | Autokonfiguration `LetterwrightAutoConfiguration`, Default-Adapter, Default-`AuthorizationCheck` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi` und, mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], `api`; `adapter-api` bleibt intern. Eine Bean für `api.SaveLetter` verdrahtet er noch nicht, weil die Anwendungsfälle selbst noch nicht verdrahtet sind (#10). Den Port `SaveCallback` verdrahtet er mit dem Rückruf `LetterSaveCallback` des Hosts, falls es ihn gibt. Fehlt `PlaceholderDataProvider` oder `DeletionPolicy`, startet der Kontext nicht | Spring Boot Autoconfigure, _Spring Security_
 | Frontend-Paket | Vorschau, Übersicht, Editor. Die Vorschau soll barrierefrei sein (xref:qs-003-barrierefreie-vorschau[QS-003]); der Nachweis ist in #3 noch offen (VoiceOver am Seitenwechsel, Reflow bei 200 %, Einzelkriterien mit NVDA). | React, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003])
 |===
 
@@ -116,12 +116,12 @@ Querschnittlich, ohne eigenen Baustein:
   `gradle/libs.versions.toml`, Versionen über die Spring-Boot-BOM
   (xref:adr-009-build-monorepo-und-versionen[ADR-009]); JUnit 5, Mockito, AssertJ,
   JaCoCo als Abdeckungs-Gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
-  ArchUnit im Modul `architekturtests`
+  ArchUnit im Modul `architecture-tests`
   (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); Error Prone
   als Linter, mit NullAway für den Null-Vertrag
   (xref:adr-011-qualitaetsgates-im-build[ADR-011],
   xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]); im Modul
-  `host-vertragstest` der Nachweis, dass ein Host mit dem Starter nur SPI und
+  `host-contract-test` der Nachweis, dass ein Host mit dem Starter nur SPI und
   Java-API kompiliert sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016],
   xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]); für die
   Persistenz _Testcontainers_ mit PostgreSQL und MariaDB.
@@ -142,7 +142,7 @@ Die Implementierungen in `adapter-rendering` sind der Kern des Werkzeugs: Aus
 Vorlagenversionen und Datenkontext entstehen hier Vorschau-HTML und PDF
 (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]). Das Modul
 kennt nur `usecases-out` und implementiert zwei Ports: `Renderer` und
-`KonformitaetsPruefer` (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]).
+`ConformanceChecker` (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]).
 
 Der Schnitt ist ein Entwurf. Er folgt dem Wegwerf-Prototyp aus #3
 (`prototyp/README.adoc`), dessen Code nicht übernommen wird. Die Unterpakete
@@ -152,7 +152,7 @@ sind ein Vorschlag, bis das Epic #7 das Modul umsetzt.
 ----
 @startuml
 !include <C4/C4_Component>
-Component_Ext(uout, "usecases-out", "Java", "Ports Renderer und KonformitaetsPruefer")
+Component_Ext(uout, "usecases-out", "Java", "Ports Renderer und ConformanceChecker")
 ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType")
 Container_Boundary(ren, "adapter-rendering") {
   Component(steuerung, "Rendering-Steuerung", "Java", "Implementiert Renderer; steuert die Pipeline für Vorschau und PDF")
@@ -163,10 +163,10 @@ Container_Boundary(ren, "adapter-rendering") {
   Component(vor, "Vorschau-Aufbereitung", "Java", "Ergänzt CSP, @font-face und Bildschirmdarstellung, ohne das Layout zu ändern")
   Component(pdf, "PDF-Erzeugung", "openhtmltopdf mit PDFBox-Backend", "PDF/A-2b mit PDF/UA-1-Tagging, Schriften eingebettet")
   Component(nach, "PDF-Nachbearbeitung", "Apache PDFBox", "Taggt die inhaltliche Fußzeile und weist das Ergebnis nach")
-  Component(kon, "Konformitätsprüfung", "veraPDF, Greenfield-Modell", "Implementiert KonformitaetsPruefer: PDF/A-2b und PDF/UA-1")
+  Component(kon, "Konformitätsprüfung", "veraPDF, Greenfield-Modell", "Implementiert ConformanceChecker: PDF/A-2b und PDF/UA-1")
 }
 Rel(steuerung, uout, "implementiert Renderer")
-Rel(kon, uout, "implementiert KonformitaetsPruefer")
+Rel(kon, uout, "implementiert ConformanceChecker")
 Rel(steuerung, zus, "1. zusammenführen")
 Rel(steuerung, ber, "2. bereinigen")
 Rel(steuerung, vor, "3a. Vorschau")
@@ -241,7 +241,7 @@ nicht ausführbar, wird nichts gespeichert
   `@font-face` und eine Bildschirmdarstellung der Seiten.
 | Intern: XHTML rein, Vorschau-HTML raus; geht über `Renderer` an `adapter-web`
 | Java 21; CSP mit SHA-256-Hash für das Skript von Paged.js
-| `…rendering.vorschau`
+| `…rendering.preview`
 
 | PDF-Erzeugung
 | Rendert das bereinigte XHTML zu einem PDF/A-2b mit PDF/UA-1-Tagging und bettet
@@ -269,12 +269,12 @@ nicht ausführbar, wird nichts gespeichert
   automatisch konfiguriert; ohne Prüfer startet der Host nicht (fail-fast), bei
   nicht konformem PDF oder nicht ausführbarer Prüfung wird nichts gespeichert
   (fail-closed).
-| Implementiert `KonformitaetsPruefer` aus `usecases-out`
+| Implementiert `ConformanceChecker` aus `usecases-out`
 | veraPDF-Bibliothek mit Greenfield-Modell (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005])
 | `…rendering.konformitaet`
 |===
 
-`…` steht für `dieterbaier.standardschreiben.adapter.out`.
+`…` steht für `dieterbaier.letterwright.adapter.out`.
 
 ==== Bibliotheken
 

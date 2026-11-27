@@ -63,7 +63,7 @@ Wir schlagen vor:
   Referenz-PDF gegen PDF/A-2b und PDF/UA-1, **axe-core** prüft die gerenderte Vorschau
   in Komponententests und E2E-Tests.
 * Zur Laufzeit wird **vor jedem Speichern** eine Konformitätsprüfung über den Port
-  `KonformitaetsPruefer` ausgeführt. Der Starter **setzt einen Prüfer voraus**:
+  `ConformanceChecker` ausgeführt. Der Starter **setzt einen Prüfer voraus**:
 ** Default ist ein veraPDF-Adapter (veraPDF ist unter MPL 2.0 nutzbar und damit mit
    MIT vereinbar), den der Starter mitbringt und automatisch konfiguriert.
 ** **Kein Prüfer konfiguriert**: Der Anwendungskontext startet nicht (fail-fast mit

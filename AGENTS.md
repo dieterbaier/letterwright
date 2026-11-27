@@ -146,9 +146,9 @@ thin routing wrappers instead of hand-writing them:
   (`src/docs/arc42/doc-12000-glossary.adoc`) ist zweisprachig und nennt zu jedem
   deutschen Fachbegriff verbindlich den englischen Begriff im Code. Übergang: Bis
   der Doku-PR mit der Übersetzung gemergt ist, entsteht Architekturdoku weiter auf
-  Deutsch; bis zur Migration des Codes tragen neue Bezeichner noch die bisherigen
-  deutschen Namen. Artefakt-IDs, Anker und Dateinamen bleiben stabil und folgen
-  dem Toolkit-Schema (ASCII, Kleinbuchstaben, ohne Umlaute).
+  Deutsch, nennt aber die englischen Bezeichner des Codes (seit #84).
+  Artefakt-IDs, Anker und Dateinamen bleiben stabil und folgen dem
+  Toolkit-Schema (ASCII, Kleinbuchstaben, ohne Umlaute).
 - Architekturdokumentation einschließlich ADRs kommt als Pull Request auf
   einem Feature-Branch. Epics und Stories werden als GitHub-Issues mit
   Sub-Issues geführt.
