@@ -22,7 +22,7 @@ class HostSaveCallbackTest {
     @Test
     void theHostReceivesTheIdentifiersOfTheNewLetter() {
         List<SavedLetter> received = new ArrayList<>();
-        var callback = HostSaveCallback.forReference(letter -> {
+        var callback = HostSaveCallback.withCallback(letter -> {
             received.add(letter);
             return dieterbaier.letterwright.spi.CallbackResult.accepted();
         });
@@ -34,7 +34,7 @@ class HostSaveCallbackTest {
 
     @Test
     void theHostsRejectionComesWithItsReason() {
-        var callback = HostSaveCallback.forReference(
+        var callback = HostSaveCallback.withCallback(
                 letter -> dieterbaier.letterwright.spi.CallbackResult.rejected("Task is done"));
 
         assertThat(callback.created(ERIKA, LETTER)).isEqualTo(CallbackResult.rejected("Task is done"));
@@ -42,7 +42,7 @@ class HostSaveCallbackTest {
 
     @Test
     void nullFromTheCallbackIsAContractViolation() {
-        var callback = HostSaveCallback.forReference(letter -> nullFromHost());
+        var callback = HostSaveCallback.withCallback(letter -> nullFromHost());
 
         assertThatThrownBy(() -> callback.created(ERIKA, LETTER))
                 .isInstanceOf(HostContractViolated.class)
@@ -52,7 +52,7 @@ class HostSaveCallbackTest {
     @Test
     void anExceptionOfTheHostStaysUnchanged() {
         var error = new IllegalStateException("Task management unreachable");
-        var callback = HostSaveCallback.forReference(letter -> {
+        var callback = HostSaveCallback.withCallback(letter -> {
             throw error;
         });
 

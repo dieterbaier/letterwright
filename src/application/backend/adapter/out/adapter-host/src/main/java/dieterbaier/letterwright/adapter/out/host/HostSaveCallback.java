@@ -21,7 +21,7 @@ public final class HostSaveCallback implements SaveCallback {
     }
 
     /** For a host that provides the callback. */
-    public static SaveCallback forReference(LetterSaveCallback callback) {
+    public static SaveCallback withCallback(LetterSaveCallback callback) {
         return new HostSaveCallback(callback);
     }
 
