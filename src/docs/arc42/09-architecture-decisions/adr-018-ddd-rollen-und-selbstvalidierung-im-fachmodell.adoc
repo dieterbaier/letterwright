@@ -1,191 +1,193 @@
 ---
 id: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
 type: ADR
-title: 'DDD-Rollen und Selbstvalidierung im Fachmodell'
+title: 'DDD roles and self-validation in the domain model'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-21'
 reviewed: true
-summary: 'Die DDD-Rollen im Fachmodell sind mit den Annotationen von jMolecules gekennzeichnet. Briefpapier und Standardschreiben sind Aggregate über ihre Versionen. Aggregate und Entitäten sind über ihre Identität gleich, Value Objects über ihren Wert. Jeder Typ prüft seine Pflichtattribute im Konstruktor mit den allgemeinen Prüfungen aus dem Modul validierung.'
+summary: 'The DDD roles in the domain model are marked with the jMolecules annotations. Letterhead and letter template are aggregates over their versions. Aggregates and entities are equal by their identity, value objects by their value. Every type checks its required attributes in the constructor with the general checks from the validation module.'
 derived_from:
 - type: external
-  description: 'Review zu PR #57 (Fachmodell, #51) und Entscheidungen des Owners vom 2026-11-21'
+  description: 'Review of PR #57 (domain model, #51) and decisions of the owner of 2026-11-21'
   uri: https://github.com/dieterbaier/standardschreiben/pull/57
 tags:
 - decision
-- domaene
+- domain
 - ddd
-- validierung
+- validation
 relations:
 - type: refines
   target: ADR-002-hexagonale-architektur-und-ports
   status: accepted
-  rationale: 'ADR-002 verlangt eine frameworkfreie Domäne nach DDD. Dieser ADR legt fest, wie die DDD-Rollen sichtbar werden und welche Bibliotheken die Domäne dafür nutzen darf.'
+  rationale: 'ADR-002 requires a framework-free domain following DDD. This ADR states how the DDD roles become visible and which libraries the domain may use for that.'
   reviewed: true
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
   status: accepted
-  rationale: 'ADR-007 legt Versionen, Zustände und Snapshot fest. Dieser ADR legt fest, wer die Regeln über alle Versionen einer Vorlage sichert: das Aggregat der Vorlage.'
+  rationale: 'ADR-007 defines versions, states and snapshot. This ADR states who secures the rules across all versions of a template: the aggregate of the template.'
   reviewed: true
 - type: addresses
   target: QS-008-unveraenderliche-schreiben
   status: accepted
-  rationale: 'Veröffentlichte Versionen lassen sich nur über das Aggregat ihrer Vorlage ändern, und das lässt es nicht zu. Ungültige Modellobjekte entstehen gar nicht erst.'
+  rationale: 'Published versions can only be changed through the aggregate of their template, and it does not allow this. Invalid model objects are never created in the first place.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell]]
-== ADR-018: DDD-Rollen und Selbstvalidierung im Fachmodell
+== ADR-018: DDD roles and self-validation in the domain model
 
 === Status
 
-Angenommen (accepted) am 2026-11-21.
+Accepted on 2026-11-21.
 
-Der Owner hat die vier Einzelentscheidungen am 2026-11-21 nach dem Review von
-PR #57 getroffen: jMolecules-Annotationen, die Version als Teil der Vorlage,
-Gleichheit über die Identität und leerer Inhalt nur im Entwurf. Der ADR ist
-KI-gestützt formuliert; der Owner hat ihn im Review von PR #57 angenommen.
+The owner made the four individual decisions on 2026-11-21 after the review of
+PR #57: jMolecules annotations, the version as part of the template, equality
+by identity, and empty content only in the draft. The ADR was worded with AI
+assistance; the owner accepted it in the review of PR #57.
 
-=== Entscheidung
+=== Decision
 
-* **DDD-Rollen mit jMolecules-Annotationen.** Die Domäne nutzt nur das Artefakt
-  `org.jmolecules:jmolecules-ddd` mit `@AggregateRoot`, `@Entity`, `@ValueObject`
-  und `@Identity`. Es enthält nur Annotationen und Interfaces und hängt nur an
-  `jstereotype`, das ebenfalls nur Annotationen enthält. Die Klassennamen bleiben
-  Ubiquitous Language, also `Letterhead` und nicht `BriefpapierAggregate`.
-  Integrationen von jMolecules (Spring, Jackson, ByteBuddy) und dessen
-  ArchUnit-Regeln sind damit nicht zugelassen.
-* **Aggregate.**
-** `Letterhead` und `LetterTemplate` sind Aggregate Roots über ihre
-   Versionen. `TemplateVersion` ist eine Entität in ihrem Aggregat. Jede Änderung
-   an einer Version geht über die Root. Die Root sichert die Regeln über alle
-   Versionen: Die Nummern laufen lückenlos von 1, es gibt höchstens einen
-   Entwurf, und er ist die neueste Version.
-** `Snapshot` und `Letter` sind eigene Aggregate. Sie verweisen auf
-   Vorlagenversionen nur per `VersionReference`, das Standardschreiben auf sein
-   Briefpapier nur per ID.
-* **Gleichheit.** Aggregate und Entitäten sind finale Klassen und über ihre
-  Identität gleich. Zwei Stände desselben Briefpapiers sind also gleich. Value
-  Objects sind Records, Enums oder unveränderliche Klassen mit Wertgleichheit.
-  Die Identität ist mit `@Identity` markiert: bei den Aggregaten das ID-Feld, bei
-  `TemplateVersion` die Methode `reference()`, die Vorlage und Nummer liefert.
-* **Selbstvalidierung.**
-** Jeder Typ prüft jedes Pflichtattribut im Konstruktor, auch zusammengesetzte
-   Typen. Dass ein enthaltener Value Object sich selbst prüft, ersetzt nicht die
-   Prüfung, ob er vorhanden ist.
-** Die allgemeinen Prüfungen liegen im Modul `validation`: Pflichtwert, nicht
-   leer, nicht blank, Untergrenze, Sammlung ohne Lücken. Es ist frameworkfrei und
-   kennt kein anderes Modul.
-** Welche Prüfung für ein Attribut gilt, entscheidet der Typ selbst. Fachliche
-   Regeln wie Zustandsübergänge bleiben im Modell.
-* **Fehlervertrag.**
-** Ein ungültiger oder fehlender Wert ergibt `ValidationException` (eine
-   `IllegalArgumentException`), dessen Meldung das Attribut nennt. Nie eine
+* **DDD roles with jMolecules annotations.** The domain uses only the artifact
+  `org.jmolecules:jmolecules-ddd` with `@AggregateRoot`, `@Entity`,
+  `@ValueObject` and `@Identity`. It contains only annotations and interfaces
+  and depends only on `jstereotype`, which also contains only annotations. The
+  class names stay Ubiquitous Language, so `Letterhead` and not
+  `LetterheadAggregate`. Integrations of jMolecules (Spring, Jackson,
+  ByteBuddy) and its ArchUnit rules are therefore not permitted.
+* **Aggregates.**
+** `Letterhead` and `LetterTemplate` are aggregate roots over their
+   versions. `TemplateVersion` is an entity in its aggregate. Every change to a
+   version goes through the root. The root secures the rules across all
+   versions: the numbers run from 1 without gaps, there is at most one draft,
+   and it is the newest version.
+** `Snapshot` and `Letter` are separate aggregates. They refer to template
+   versions only via `VersionReference`, and the letter template refers to its
+   letterhead only by ID.
+* **Equality.** Aggregates and entities are final classes and equal by their
+  identity. Two states of the same letterhead are therefore equal. Value
+  objects are records, enums or immutable classes with value equality. The
+  identity is marked with `@Identity`: for the aggregates the ID field, for
+  `TemplateVersion` the method `reference()`, which returns template and number.
+* **Self-validation.**
+** Every type checks every required attribute in the constructor, composite
+   types too. That a contained value object checks itself does not replace the
+   check whether it is present.
+** The general checks are in the module `validation`: required value, not
+   empty, not blank, lower bound, collection without gaps. It is framework-free
+   and knows no other module.
+** The type itself decides which check applies to an attribute. Business rules
+   such as state transitions stay in the model.
+* **Error contract.**
+** An invalid or missing value results in `ValidationException` (an
+   `IllegalArgumentException`) whose message names the attribute. Never a
    `NullPointerException`.
-** Ein fachlich verbotener Schritt ergibt `IllegalStateTransition` (eine
-   `IllegalStateException`), etwa eine veröffentlichte Version ändern.
-* **Erzeugung.**
-** Neue Objekte entstehen über sprechende Fabrikmethoden wie `create`,
-   `fromSnapshot` und `generate()`.
-** Gespeicherte Objekte entstehen über `restore`. Auch dabei gelten
-   alle Prüfungen.
-* **Zeit als Parameter.** Das Modell liest keine Uhr. Der Anwendungsfall liest
-  seine Uhr einmal und übergibt den Zeitpunkt.
-* **Leerer Inhalt.** Ein Entwurf darf leeren Inhalt haben, aber keinen fehlenden.
-  Veröffentlichen verlangt Inhalt, der nicht nur aus Leerraum besteht.
+** A step that is forbidden by the business rules results in
+   `IllegalStateTransition` (an `IllegalStateException`), for example changing
+   a published version.
+* **Creation.**
+** New objects are created through descriptive factory methods such as
+   `create`, `fromSnapshot` and `generate()`.
+** Stored objects are created through `restore`. All checks apply there
+   too.
+* **Time as a parameter.** The model reads no clock. The use case reads its
+  clock once and passes the point in time.
+* **Empty content.** A draft may have empty content, but not missing content.
+  Publishing requires content that does not consist only of whitespace.
 
-ArchUnit prüft, dass die Domäne außer dem JDK nur JSpecify, die
-jMolecules-Annotationen und `validation` benutzt. Ebenso prüft es, dass
-`validation` kein anderes Paket der Bibliothek kennt. Das SPI nutzt
-`validation` nicht, es bleibt nach ADR-016 eigenständig.
+ArchUnit checks that, apart from the JDK, the domain uses only JSpecify, the
+jMolecules annotations and `validation`. It also checks that `validation`
+knows no other package of the library. The SPI does not use `validation`; it
+stays self-contained according to ADR-016.
 
-=== Kontext
+=== Context
 
-Das Review zu PR #57 hat gezeigt, dass das erste Fachmodell ungültige Objekte
-zuließ. `new Letterhead(null, "Name", null)` war möglich, ein fehlender Text
-ergab eine `NullPointerException` statt einer verständlichen Meldung. Records
-verglichen alle Komponenten, sodass zwei Stände desselben Briefpapiers ungleich
-waren. Dass jede Versionsnummer nur einmal vergeben wird, konnte kein Objekt
-sichern.
+The review of PR #57 showed that the first domain model allowed invalid
+objects. `new Letterhead(null, "Name", null)` was possible, and a missing text
+resulted in a `NullPointerException` instead of an understandable message.
+Records compared all components, so two states of the same letterhead were
+unequal. No object could ensure that each version number is assigned only once.
 
-Der Owner möchte die DDD-Rollen im Code erkennen und die allgemeinen Prüfungen
-in einem eigenen Modul haben. ADR-002 hält fest, welche Bibliotheken die Domäne
-nutzen darf.
+The owner wants to recognize the DDD roles in the code and to have the general
+checks in a separate module. ADR-002 records which libraries the domain may
+use.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Ubiquitous Language: Die Namen im Code sind die Begriffe des Glossars.
-* Kein ungültiges Modellobjekt, Fehler am Ort ihrer Entstehung.
-* Invarianten über mehrere Objekte liegen im Modell, nicht im Anwendungsfall.
-* Möglichst wenige und möglichst kleine Abhängigkeiten in der Domäne.
+* Ubiquitous Language: the names in the code are the terms of the glossary.
+* No invalid model object; errors where they arise.
+* Invariants across several objects are in the model, not in the use case.
+* As few and as small dependencies in the domain as possible.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Namenskonvention
+==== Option 1: Naming convention
 
-Suffixe wie `…Aggregate`, `…Entity` und `…Value`, mit dokumentierten Varianten
-wie `…Id` und `…Verweis`. Keine Abhängigkeit, aber technische Namen im Code und
-im Glossar.
+Suffixes such as `…Aggregate`, `…Entity` and `…Value`, with documented variants
+such as `…Id` and `…Reference`. No dependency, but technical names in the code and
+in the glossary.
 
-==== Option 2: jMolecules-Annotationen (gewählt)
+==== Option 2: jMolecules annotations (chosen)
 
-Standardisierte Annotationen, Namen bleiben fachlich. Eine kleine Abhängigkeit
-nur aus Annotationen. Die ArchUnit-Regeln von jMolecules lassen sich später
-nutzen, wenn ein Anlass besteht.
+Standardized annotations; names stay domain names. A small dependency made only
+of annotations. The ArchUnit rules of jMolecules can be used later if there is
+a reason.
 
-==== Option 3: Rolle nur im Glossar
+==== Option 3: Role only in the glossary
 
-Keine Änderung am Code; die Rolle steht im Glossar. Nichts prüft, ob Code und
-Glossar übereinstimmen.
+No change to the code; the role is stated in the glossary. Nothing checks
+whether code and glossary match.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral and `-1` weaker support. The matrix is
+unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Rolle im Code erkennbar | +1 | +1 | -1
-| Namen bleiben Ubiquitous Language | -1 | +1 | +1
-| Keine zusätzliche Abhängigkeit | +1 | -1 | +1
-| Später automatisch prüfbar | 0 | +1 | -1
-s| Summe s| +1 s| +2 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Role recognizable in the code | +1 | +1 | -1
+| Names stay Ubiquitous Language | -1 | +1 | +1
+| No additional dependency | +1 | -1 | +1
+| Can be checked automatically later | 0 | +1 | -1
+s| Sum s| +1 s| +2 s| 0
 |===
 
-Die Selbstvalidierung, die Aggregatgrenzen und die Gleichheit sind mit jeder
-Option dieselben. Die Matrix vergleicht nur die Kennzeichnung.
+Self-validation, aggregate boundaries and equality are the same with every
+option. The matrix compares only the marking.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Ein Modellobjekt ist immer gültig. Wer es erzeugt, bekommt einen Fehler mit
-  Attributnamen statt einer späteren `NullPointerException`.
-* Die Regeln über alle Versionen einer Vorlage sichert das Aggregat. Der
-  Anwendungsfall und die Persistenz müssen sie nicht nachbauen.
-* Die Rollen sind im Code sichtbar, die Namen bleiben fachlich.
+* A model object is always valid. Whoever creates it gets an error with the
+  attribute name instead of a later `NullPointerException`.
+* The aggregate secures the rules across all versions of a template. The use
+  case and the persistence do not have to rebuild them.
+* The roles are visible in the code; the names stay domain names.
 
-==== Negativ
+==== Negative
 
-* Eine Vorlage wird mit all ihren Versionen geladen. Bei vielen Versionen kann
-  das teuer werden; dann wäre ein eigenes Aggregat für die Version neu zu bewerten.
-* Aggregate sind Klassen mit handgeschriebenem `equals`, `hashCode` und Zugriffen
-  statt Records.
-* Eine zusätzliche Abhängigkeit in der Domäne, die bei Updates mitzuprüfen ist.
+* A template is loaded with all its versions. With many versions this can
+  become expensive; then a separate aggregate for the version would have to be
+  reassessed.
+* Aggregates are classes with hand-written `equals`, `hashCode` and accessors
+  instead of records.
+* An additional dependency in the domain that has to be checked as well on
+  updates.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* ADR-002 hält fest, welche Bibliotheken die Domäne nutzen darf. Die Fassung vom
-  2026-11-21 stammt aus dem Review zu PR #57.
-* Das Querschnittskonzept „Fachmodell“ beschreibt die Konventionen für neue
-  Typen.
-* Die Persistenz (#6) stellt Aggregate über `restore` her. Gleichzeitige
-  Änderungen derselben Vorlage regelt sie, etwa über eine Versionsspalte.
-* Ob es neben der neuesten veröffentlichten Version weitere gültige geben darf,
-  legt #55 fest. Das Modell erlaubt mehrere veröffentlichte Versionen.
-  Nachtrag 2026-11-22: höchstens eine, entschieden in
+* ADR-002 records which libraries the domain may use. The version of
+  2026-11-21 comes from the review of PR #57.
+* The crosscutting concept “Domain Model” describes the conventions for new
+  types.
+* The persistence (#6) restores aggregates via `restore`. It handles concurrent
+  changes to the same template, for example with a version column.
+* #55 determines whether there may be further valid versions besides the newest
+  published version. The model allows several published versions.
+  Addendum 2026-11-22: at most one, decided in
   xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
 
 === Impact
@@ -197,7 +199,7 @@ include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-impact
 include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -206,12 +208,12 @@ include::generated/adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell-tracea
 
 === Open Questions
 
-* Gibt es höchstens eine veröffentlichte Version je Vorlage, oder bleiben ältere
-  veröffentlicht, bis sie zurückgezogen werden? Das klärt #55. Der Owner hat am
-  2026-11-22 entschieden: höchstens eine; festgehalten in
+* Is there at most one published version per template, or do older ones stay
+  published until they are withdrawn? #55 clarifies this. The owner decided on
+  2026-11-22: at most one; recorded in
   xref:adr-022-eine-veroeffentlichte-version-je-vorlage[ADR-022].
 
 === Review Notes
 
-Der Owner hat den ADR und seine drei Relationen am 2026-11-21 im Review von
-PR #57 angenommen, ebenso die Präzisierung von ADR-002.
+The owner accepted the ADR and its three relations on 2026-11-21 in the review
+of PR #57, as well as the refinement of ADR-002.

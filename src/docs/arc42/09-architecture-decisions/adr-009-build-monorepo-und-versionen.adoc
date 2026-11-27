@@ -1,173 +1,173 @@
 ---
 id: ADR-009-build-monorepo-und-versionen
 type: ADR
-title: 'Monorepo, Gradle und aktuelle Plattformversionen'
+title: 'Monorepo, Gradle and current platform versions'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'Monorepo mit Gradle (Kotlin DSL) für das Backend und npm-Workspaces für das Frontend; aktuelle stabile Spring-Boot-Version (4.x) auf Java 25 mit Bytecode-Ziel 21; ArchUnit und Testcontainers.'
+summary: 'Monorepo with Gradle (Kotlin DSL) for the backend and npm workspaces for the frontend; current stable Spring Boot version (4.x) on Java 25 with bytecode target 21; ArchUnit and Testcontainers.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
 - build
-- versionen
+- versions
 - monorepo
 relations:
 - type: depends_on
   target: ADR-001-einbettbare-bibliothek
   status: accepted
-  rationale: 'Die unterstützten Versionen bestimmen, welche Hosts die Bibliothek nutzen können.'
+  rationale: 'The supported versions determine which hosts can use the library.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Aktuelle, unterstützte Versionen erleichtern die Integration in neue Hosts.'
+  rationale: 'Current, supported versions make integration into new hosts easier.'
   reviewed: true
 - type: introduces_risk
   target: R-007-bindung-an-spring-boot-hauptversion
   status: accepted
-  rationale: 'Hosts auf älteren Spring-Boot-Hauptversionen können den Starter nicht nutzen.'
+  rationale: 'Hosts on older Spring Boot major versions cannot use the starter.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-009-build-monorepo-und-versionen]]
-== ADR-009: Monorepo, Gradle und aktuelle Plattformversionen
+== ADR-009: Monorepo, Gradle and current platform versions
 
 === Status
 
-Angenommen (accepted) am 2026-11-17.
+Accepted on 2026-11-17.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #28
-geprüft und angenommen.
+This ADR was created with AI assistance. The owner reviewed and accepted it in
+the review of PR #28.
 
-=== Entscheidung
+=== Decision
 
-Wir legen fest:
+We decide:
 
-* **Monorepo**. Alle Quellen liegen unter `src/`, getrennt nach Art:
-** `src/application/backend/` – Gradle-Multiprojekt (Kotlin DSL), geschnitten nach
+* **Monorepo**. All sources live under `src/`, separated by kind:
+** `src/application/backend/` – Gradle multi-project (Kotlin DSL), cut according to
    ADR-002:
-*** `domain/model` (Domänenmodell) und `domain/service` (Domänenservices) als
-    zwei Module; Domänenservices sieht beim Kompilieren nur `usecases/service`
-*** `usecases/in` (eingehende Ports), `usecases/out` (ausgehende Ports) und
-    `usecases/service` (Implementierung der Anwendungsfälle) als drei Module
-*** `spi` (Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ADR-016)
+*** `domain/model` (domain model) and `domain/service` (domain services) as
+    two modules; at compile time, domain services sees only `usecases/service`
+*** `usecases/in` (inbound ports), `usecases/out` (outbound ports) and
+    `usecases/service` (implementation of the use cases) as three modules
+*** `spi` (interface to the host application with its own data types, ADR-016)
 *** `adapter/in/adapter-web`, `adapter/out/adapter-rendering`,
     `adapter/out/adapter-persistence-jdbc`, `adapter/out/adapter-host`
-*** `spring-boot-starter` und das Testmodul `architecture-tests`
-** `src/application/frontend/` – npm-Workspace mit dem Paket der React-Komponenten
+*** `spring-boot-starter` and the test module `architecture-tests`
+** `src/application/frontend/` – npm workspace with the package of the React components
    (TypeScript, Vite, UnoCSS).
-** `src/docs/` – Architekturdokumentation, `src/examples/` – Beispielvorlagen (DOCX).
-** `src/beispiel/` – Beispiel-Host-Anwendung (Spring Boot und React), sobald
-   Anwendungsfälle gefunden sind.
-* **Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren.** Ein
-  eingehender Adapter hängt nur an `usecases/in`, ein ausgehender nur an
-  `usecases/out`; `adapter-host` zusätzlich an `spi`. Eine falsche Abhängigkeit scheitert damit schon am Compiler,
-  ArchUnit prüft zusätzlich Paketregeln aus ADR-002. Der Host bekommt zum
-  Kompilieren nur `spi`, auch wenn er den Starter einbindet (Nachtrag
-  2026-11-24: seit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]
-  `spi` und `api`). Ports,
-  Anwendungsfälle, Domäne und Adapter bringt der Starter nur zur Laufzeit mit
-  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Die
-  Abwägung gegen Paketkonvention, Sichtbarkeit und JPMS steht in
+** `src/docs/` – architecture documentation, `src/examples/` – sample templates (DOCX).
+** `src/example/` – sample host application (Spring Boot and React), as soon as
+   use cases are found.
+* **Module boundaries enforce the dependency direction at compile time.** An
+  inbound adapter depends only on `usecases/in`, an outbound one only on
+  `usecases/out`; `adapter-host` also on `spi`. A wrong dependency therefore already fails at the compiler;
+  ArchUnit additionally checks package rules from ADR-002. For compiling, the
+  host gets only `spi`, even if it includes the starter (addendum
+  2026-11-24: since xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]
+  `spi` and `api`). The starter brings ports,
+  use cases, domain and adapters only at runtime
+  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). The
+  trade-off against a package convention, visibility and JPMS is in
   xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
-* Die Gradle-Projekte sind flach benannt (`domain-model`, `usecases-in`,
-  `adapter-web`, …) und zeigen auf ihr Verzeichnis. Die Gruppenordner `domain`,
-  `adapter/in`, `adapter/out` und `usecases` sind keine eigenen Gradle-Projekte.
-* **Versionen**: die **aktuelle stabile Spring-Boot-Version (4.x)**, entwickelt und
-  getestet mit **Java 25 (LTS)**, kompiliert mit `--release 21`, damit Hosts auf
-  Java 21 die Bibliothek nutzen können. Die genauen Patch-Versionen werden beim
-  Anlegen des Builds festgelegt.
-* **ArchUnit** prüft die hexagonalen Abhängigkeitsregeln, **Testcontainers** die
-  Persistenz gegen echte Datenbanken.
+* The Gradle projects have flat names (`domain-model`, `usecases-in`,
+  `adapter-web`, …) and point to their directory. The group folders `domain`,
+  `adapter/in`, `adapter/out` and `usecases` are not Gradle projects of their own.
+* **Versions**: the **current stable Spring Boot version (4.x)**, developed and
+  tested with **Java 25 (LTS)**, compiled with `--release 21`, so that hosts on
+  Java 21 can use the library. The exact patch versions are set when the
+  build is created.
+* **ArchUnit** checks the hexagonal dependency rules, **Testcontainers** the
+  persistence against real databases.
 
-Stand beim Anlegen des Gerüsts (#12): Gradle 9.9.1 (Wrapper), Spring Boot 4.1.2
-(BOM; 4.2 war nur als Release Candidate verfügbar), ArchUnit 1.5.1, JaCoCo 0.8.16.
-Mit #19 kam JSpecify 1.0.1 hinzu, im Versionskatalog unabhängig von der
-Spring-Boot-BOM geführt (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
-Die gemeinsamen Konventionen stehen im Convention-Plugin `letterwright.java-module`
-(`gradle/build-logic`). Jedes Modul bindet es ausdrücklich ein; es gibt keine
-Konfiguration über `subprojects {}`. So bekommt nur ein Modul die Java-Regeln, das sie
-anfordert, und die Konfiguration bleibt mit dem Configuration-Cache verträglich.
-Der Workflow `build.yml` baut das Backend mit dem Wrapper auf Java 21 (Baseline)
-und Java 25 (#14).
+State when the scaffold was created (#12): Gradle 9.9.1 (wrapper), Spring Boot 4.1.2
+(BOM; 4.2 was only available as a release candidate), ArchUnit 1.5.1, JaCoCo 0.8.16.
+With #19, JSpecify 1.0.1 was added, kept in the version catalog independently of the
+Spring Boot BOM (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
+The shared conventions are in the convention plugin `letterwright.java-module`
+(`gradle/build-logic`). Each module applies it explicitly; there is no
+configuration via `subprojects {}`. This way only a module that asks for the Java
+rules gets them, and the configuration stays compatible with the configuration cache.
+The workflow `build.yml` builds the backend with the wrapper on Java 21 (baseline)
+and Java 25 (#14).
 
-Stand beim Anlegen des Frontend-Gerüsts (#13): Node.js `^22.22.2 || ^24.15.0 ||
->=26.0.0`, die Schnittmenge der Bereiche von jsdom und Vitest. `engine-strict`
-lässt `npm ci` mit einer anderen Version scheitern. Dazu Vite 8.3,
-Vitest 5.1 mit V8-Abdeckung, React 19.3 (Peer-Abhängigkeit), UnoCSS 66.13,
-axe-core 4.14, ESLint 10 mit typescript-eslint 8.72. TypeScript bleibt bei 6.0,
-weil typescript-eslint TypeScript 7 noch nicht unterstützt. Das Paket heißt
-`@dieterbaier/letterwright` und liegt unter
-`src/application/frontend/packages/components`. Die exakten Versionen stehen in
+State when the frontend scaffold was created (#13): Node.js `^22.22.2 || ^24.15.0 ||
+>=26.0.0`, the intersection of the ranges of jsdom and Vitest. `engine-strict`
+makes `npm ci` fail with a different version. In addition Vite 8.3,
+Vitest 5.1 with V8 coverage, React 19.3 (peer dependency), UnoCSS 66.13,
+axe-core 4.14, ESLint 10 with typescript-eslint 8.72. TypeScript stays at 6.0
+because typescript-eslint does not yet support TypeScript 7. The package is named
+`@dieterbaier/letterwright` and lives under
+`src/application/frontend/packages/components`. The exact versions are in
 `package-lock.json`.
 
-Antwort auf die Frage des Owners „Warum nicht die neueste Spring-Boot-Version?“:
-Der ursprüngliche Vorschlag 3.x war Vorsicht wegen der Kompatibilität mit Hosts.
-Ein Starter ist an die Spring-Boot-Hauptversion des Hosts gebunden. Da noch keine
-Bestands-Hosts feststehen und ältere Linien aus der freien Unterstützung fallen,
-ist die neueste stabile Version die bessere Wahl.
+Answer to the owner's question “Why not the newest Spring Boot version?”:
+The original proposal 3.x was caution about compatibility with hosts.
+A starter is bound to the host's Spring Boot major version. Since no
+existing hosts are known yet and older lines drop out of free support,
+the newest stable version is the better choice.
 
-=== Kontext
+=== Context
 
-Owner bestätigt Gradle mit Kotlin DSL, Monorepo, ArchUnit und Testcontainers und
-fragt, warum nicht die neueste Spring-Boot-Version gewählt wird.
+The owner confirms Gradle with Kotlin DSL, monorepo, ArchUnit and Testcontainers and
+asks why the newest Spring Boot version is not chosen.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Lange Unterstützung der Plattform.
-* Breite Nutzbarkeit in Hosts.
-* Ein Repository für Backend, Frontend, Beispiel und Doku.
+* Long support of the platform.
+* Broad usability in hosts.
+* One repository for backend, frontend, sample and docs.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Spring Boot 4.x, Java 25 mit Ziel 21, Monorepo
+==== Option 1: Spring Boot 4.x, Java 25 with target 21, monorepo
 
-Lange Unterstützung, modernste Plattform. Hosts auf Spring Boot 3 sind ausgeschlossen.
+Long support, the most modern platform. Hosts on Spring Boot 3 are excluded.
 
-==== Option 2: Spring Boot 3.x, Java 21, Monorepo
+==== Option 2: Spring Boot 3.x, Java 21, monorepo
 
-Breiter kompatibel mit bestehenden Hosts, aber kürzere verbleibende Unterstützung
-und baldiger Migrationsaufwand.
+More broadly compatible with existing hosts, but shorter remaining support
+and migration effort soon.
 
-==== Option 3: Spring Boot 4.x, getrennte Repositories für Backend und Frontend
+==== Option 3: Spring Boot 4.x, separate repositories for backend and frontend
 
-Unabhängige Releases, aber API-Änderungen über Repository-Grenzen hinweg schwerer
-abzustimmen, Doku verstreut.
+Independent releases, but API changes across repository boundaries are harder
+to coordinate, docs scattered.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Lange Unterstützung | +1 | -1 | +1
-| Breite Nutzbarkeit in Hosts | 0 | +1 | 0
-| Ein Repository | +1 | +1 | -1
-s| Summe s| +2 s| +1 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Long support | +1 | -1 | +1
+| Broad usability in hosts | 0 | +1 | 0
+| One repository | +1 | +1 | -1
+s| Sum s| +2 s| +1 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Keine absehbare Migration einer Hauptversion während des MVP.
+* No foreseeable migration of a major version during the MVP.
 
-==== Negativ
+==== Negative
 
-* Hosts auf Spring Boot 3 können die Bibliothek nicht nutzen (R-007).
+* Hosts on Spring Boot 3 cannot use the library (R-007).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Bei Bedarf eines Hosts auf Spring Boot 3: eigene Kompatibilitätslinie bewerten.
+* If a host on Spring Boot 3 needs it: assess a separate compatibility line.
 
 === Impact
 
@@ -178,24 +178,24 @@ include::generated/adr-009-build-monorepo-und-versionen-impact.adoc[leveloffset=
 include::generated/adr-009-build-monorepo-und-versionen-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-009-build-monorepo-und-versionen-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Die geplanten Hosts sind neu oder können auf die aktuelle Spring-Boot-Version gehen.
+* The planned hosts are new or can move to the current Spring Boot version.
 
 === Open Questions
 
-* Keine. Zu bekannten Hosts (Q-ARCH-002) hat der Owner am 2026-11-16 geantwortet:
-  Eine bestehende Host-Anwendung verwendet Java 21 und Spring Boot 4.2.x. Das
-  passt zur Baseline. Sobald 4.2.0 erscheint, wird die BOM angehoben.
+* None. On known hosts (Q-ARCH-002), the owner answered on 2026-11-16:
+  An existing host application uses Java 21 and Spring Boot 4.2.x. That
+  fits the baseline. As soon as 4.2.0 is released, the BOM is raised.
 
 === Review Notes
 
-* Versionen beim Anlegen des Builds gegen die dann aktuellen Releases prüfen.
-* Der Owner hat den ADR im Review von PR #28 am 2026-11-17 angenommen.
+* Check the versions against the then current releases when the build is created.
+* The owner accepted the ADR in the review of PR #28 on 2026-11-17.

@@ -1,194 +1,192 @@
 ---
 id: ADR-021-hoechstens-ein-schreiben-je-snapshot
 type: ADR
-title: 'Höchstens ein Schreiben je Snapshot'
+title: 'At most one letter per snapshot'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-22'
 reviewed: true
-summary: 'Aus einem Snapshot entsteht höchstens ein Schreiben. Die Domäne verantwortet die Regel: Ein Snapshot ist offen, bis ein Schreiben aus ihm entsteht, dann verbraucht und ohne Datenkontext. Die Persistenz speichert Schreiben und verbrauchten Snapshot atomar und nur bei noch offenem Snapshot. Eine Wiederholung bekommt das vorhandene Schreiben. Bei ungewissem Ausgang wird nichts zurückgenommen. Ein neues Schreiben entsteht nur aus einer neuen Vorschau.'
+summary: 'At most one letter is created from a snapshot. The domain owns the rule: a snapshot is open until a letter is created from it, then consumed and without a data context. The persistence stores the letter and the consumed snapshot atomically, and only while the snapshot is still open. A repeat gets the existing letter. If the outcome is uncertain, nothing is undone. A new letter is created only from a new preview.'
 derived_from:
 - type: conversation
-  description: 'Entscheidung des Owners am 2026-11-22 zu #53: „Snapshot = Schlüssel“; bei geändertem Datenkontext bleibt der Snapshot, eine neue Vorschau ist nötig.'
+  description: 'Decision of the owner on 2026-11-22 on #53: “snapshot = key”; if the data context has changed, the snapshot stays and a new preview is needed.'
 - type: external
-  description: 'Issue #53: Regel für wiederholtes und paralleles Speichern derselben Snapshot-ID, vor dem Persistenzentwurf (#6)'
+  description: 'Issue #53: rule for repeated and parallel saving of the same snapshot ID, before the persistence design (#6)'
   uri: https://github.com/dieterbaier/standardschreiben/issues/53
 - type: external
-  description: 'Issue #10: Wiederholung nach einer verlorenen Antwort durchgängig geprüft'
+  description: 'Issue #10: repeat after a lost response checked end to end'
   uri: https://github.com/dieterbaier/standardschreiben/issues/10
 tags:
 - decision
-- schreiben
-- persistenz
+- letters
+- persistence
 relations:
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
   status: accepted
-  rationale: 'ADR-007 bindet das Speichern an den Snapshot der Vorschau. Dieser ADR legt fest, dass aus einem Snapshot höchstens ein Schreiben entsteht und was ein wiederholtes Speichern zurückgibt.'
+  rationale: 'ADR-007 binds saving to the snapshot of the preview. This ADR specifies that at most one letter is created from a snapshot and what a repeated save returns.'
   reviewed: true
 - type: constrains
   target: ADR-006-datenbankagnostische-persistenz
   status: accepted
-  rationale: 'Technische Absicherung einer Domänenregel: Die Persistenz speichert Schreiben und verbrauchten Snapshot in einer Transaktion, nur wenn der gespeicherte Snapshot noch offen ist (bedingtes Update), und sichert die Snapshot-ID am Schreiben zusätzlich mit einem Unique Constraint ab, auf allen unterstützten Datenbanken.'
+  rationale: 'Technical safeguard for a domain rule: the persistence stores the letter and the consumed snapshot in one transaction, only if the stored snapshot is still open (conditional update), and additionally secures the snapshot ID on the letter with a unique constraint, on all supported databases.'
   reviewed: true
 - type: addresses
   target: QS-008-unveraenderliche-schreiben
   status: accepted
-  rationale: 'Ein Retry ersetzt kein gespeichertes Schreiben und legt kein zweites mit abweichendem PDF an; das zuerst gespeicherte bleibt das einzige.'
+  rationale: 'A retry does not replace a stored letter and does not create a second one with a different PDF; the letter stored first remains the only one.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-021-hoechstens-ein-schreiben-je-snapshot]]
-== ADR-021: Höchstens ein Schreiben je Snapshot
+== ADR-021: At most one letter per snapshot
 
 === Status
 
-Angenommen (accepted) am 2026-11-22.
+Accepted on 2026-11-22.
 
-Der Owner hat die Richtung am 2026-11-22 bei #53 vorgegeben: Die Snapshot-ID ist
-der Schlüssel. Der ADR ist KI-gestützt formuliert; der Owner hat ihn und seine
-drei Relationen am selben Tag im Review von PR #64 angenommen, mit der Vorgabe,
-die Regel in der Domäne zu verantworten und den Datenkontext nach dem Speichern
-freizugeben.
+The owner set the direction on 2026-11-22 in #53: the snapshot ID is the key.
+The ADR was drafted with AI support. The owner accepted it and its three
+relations on the same day in the review of PR #64, with the requirement that the
+domain owns the rule and that the data context is released after saving.
 
-=== Entscheidung
+=== Decision
 
-* **Die Domäne verantwortet die Regel.** Ein Snapshot ist *offen*, solange aus
-  ihm kein Schreiben entstanden ist, danach *verbraucht*. `Letter.fromSnapshot`
-  nimmt nur einen offenen Snapshot und liefert das neue Schreiben zusammen mit
-  dem verbrauchten Snapshot. Ein verbrauchter Snapshot lässt sich nicht noch
-  einmal verbrauchen. Das ist im Fachmodell ohne Datenbank getestet.
-* **Die Persistenz sichert die Regel technisch ab.** Sie speichert Schreiben und
-  verbrauchten Snapshot in einem Schritt und nur, wenn der gespeicherte Snapshot
-  noch offen ist. Sonst speichert sie nichts und meldet das vorhandene Schreiben.
-  Eine bloße Vorabprüfung genügt nicht, weil gleichzeitige Anfragen beide einen
-  offenen Snapshot lesen.
-* **Ein verbrauchter Snapshot hat keinen Datenkontext mehr.** Er behält, was eine
-  Wiederholung braucht: Besitzer, fachlichen Bezug, Vorlagenversionen (für die
-  Berechtigungsprüfung) und Ablauf. Das Schreiben kennt die Snapshot-ID. Scheitert
-  das Speichern fachlich, bleibt der Snapshot offen mit seinem Datenkontext.
-* **Wiederholtes Speichern ist idempotent.** Nach einem Doppelklick oder einem
-  Retry nach verlorener Antwort bekommt der Benutzer das schon gespeicherte
-  Schreiben zurück (`AlreadySaved`), ohne dass der Datenkontext gelesen
-  oder ein PDF erzeugt wird. Die Befristung bleibt: Nach dem Ablauf verlangt auch
-  eine Wiederholung eine neue Vorschau.
-* **Gleichzeitiges Speichern.** Meldet die Persistenz, dass der Snapshot schon
-  verbraucht ist, ist sicher, dass auf das eigene PDF kein Schreiben verweist.
-  Nur dann entfernt die Anfrage ihr PDF und liefert das Schreiben der anderen.
-  Hat eine neue Vorschau den offenen Snapshot inzwischen gelöscht, speichert die
-  Persistenz ebenfalls nichts; die Anfrage entfernt ihr PDF und meldet den
-  Snapshot als unbekannt.
-* **Ungewisser Ausgang.** Wirft die Persistenz eine Ausnahme, ist offen, ob
-  gespeichert wurde. Dann wird nichts zurückgenommen, auch das PDF nicht. Eine
-  Wiederholung klärt den Ausgang.
-* **Reihenfolge.** Erst Snapshot, Besitzer, Ablauf und Berechtigung, dann der
-  Zustand des Snapshots. Ein Unberechtigter erfährt so nicht, ob schon
-  gespeichert wurde
+* **The domain owns the rule.** A snapshot is *open* as long as no letter has
+  been created from it, and *consumed* afterwards. `Letter.fromSnapshot`
+  accepts only an open snapshot and returns the new letter together with the
+  consumed snapshot. A consumed snapshot cannot be consumed again. This is
+  tested in the domain model without a database.
+* **The persistence secures the rule technically.** It stores the letter and
+  the consumed snapshot in one step, and only if the stored snapshot is still
+  open. Otherwise it stores nothing and reports the existing letter. A mere
+  check beforehand is not enough, because concurrent requests both read an open
+  snapshot.
+* **A consumed snapshot no longer has a data context.** It keeps what a repeat
+  needs: owner, business reference, template versions (for the authorization
+  check) and expiry. The letter knows the snapshot ID. If saving fails for
+  business reasons, the snapshot stays open with its data context.
+* **Repeated saving is idempotent.** After a double click or a retry after a
+  lost response, the user gets back the letter that is already stored
+  (`AlreadySaved`), without the data context being read or a PDF being
+  created. The time limit remains: after expiry, a repeat also requires a new
+  preview.
+* **Concurrent saving.** If the persistence reports that the snapshot is
+  already consumed, it is certain that no letter refers to the request's own
+  PDF. Only then does the request remove its PDF and return the other request's
+  letter. If a new preview has meanwhile deleted the open snapshot, the
+  persistence also stores nothing; the request removes its PDF and reports the
+  snapshot as unknown.
+* **Uncertain outcome.** If the persistence throws an exception, it is unknown
+  whether the save happened. Then nothing is undone, not even the PDF. A repeat
+  clarifies the outcome.
+* **Order.** First snapshot, owner, expiry and permission, then the state of the
+  snapshot. This way an unauthorized user does not learn whether a save already
+  happened
   (xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]).
-* **Eine aktualisierte Vorschau** löscht nur einen offenen eigenen Snapshot.
-  Einen verbrauchten lässt sie stehen, damit eine Wiederholung ihn noch findet.
-  Ob er offen ist, entscheidet die Persistenz beim Löschen selbst, im selben
-  Schritt (bedingtes Löschen). Eine Prüfung vorher genügt nicht: Dazwischen kann
-  eine gleichzeitige Anfrage ihn verbrauchen.
-* **Gelöschtes Schreiben.** Ist das Schreiben eines verbrauchten Snapshots
-  inzwischen hart oder logisch gelöscht, findet eine Wiederholung nichts mehr und
-  bekommt „Snapshot unbekannt“. Das gilt auch für eine gleichzeitige Anfrage, die
-  den Snapshot noch offen gelesen hat: Meldet die Persistenz ein logisch
-  gelöschtes vorhandenes Schreiben oder ein hart gelöschtes
-  (`LetterRemoved`), entfernt die Anfrage ihr PDF und meldet den Snapshot als
-  unbekannt. Ein verbrauchter Snapshot ohne sichtbares Schreiben ist damit kein
-  defekter Bestand. Das Schreiben wird nicht neu
-  erzeugt; dazu braucht es eine neue Vorschau. Ergänzt am 2026-11-22 mit #54.
-* **Bewusst neu erzeugen** heißt: neue Vorschau, also neuer Snapshot, also neues
-  Schreiben.
-* **Geänderter Datenkontext.** Es entsteht kein PDF, und der Snapshot bleibt
-  offen, bis eine neue Vorschau ihn ersetzt oder er abläuft.
+* **An updated preview** deletes only an open snapshot of the same user. It
+  leaves a consumed one in place, so that a repeat can still find it. Whether
+  it is open is decided by the persistence itself when deleting, in the same
+  step (conditional delete). A check beforehand is not enough: in between, a
+  concurrent request can consume it.
+* **Deleted letter.** If the letter of a consumed snapshot has meanwhile been
+  hard deleted or logically deleted, a repeat finds nothing anymore and gets
+  “snapshot unknown”. This also applies to a concurrent request that still read
+  the snapshot as open: if the persistence reports a logically deleted existing
+  letter or a hard deleted one (`LetterRemoved`), the request removes its PDF
+  and reports the snapshot as unknown. A consumed snapshot without a visible
+  letter is therefore not defective data. The letter is not created again; that
+  requires a new preview. Added on 2026-11-22 with #54.
+* **Deliberately creating anew** means: new preview, hence new snapshot, hence
+  new letter.
+* **Changed data context.** No PDF is created, and the snapshot stays open
+  until a new preview replaces it or it expires.
 
-=== Kontext
+=== Context
 
-Speichern ist teuer: Es rendert ein PDF, prüft es auf PDF/A-2b und PDF/UA-1 und
-legt es ab. Ein Doppelklick, ein Retry des Browsers nach einem Timeout oder zwei
-offene Tabs schicken dieselbe Anfrage mehrfach. Ohne Regel entstünden mehrere
-Schreiben zur selben Vorschau, und der Benutzer wüsste nicht, welches gilt. Nach
-einer verlorenen Antwort muss die Wiederholung trotzdem die ID des Schreibens
-liefern, damit die Oberfläche den Download-Link zeigen kann (#10). Die Regel muss
-vor dem Persistenzentwurf (#6) feststehen, weil sie eine Spalte und eine
-Eindeutigkeitsregel in der Datenbank verlangt.
+Saving is expensive: it renders a PDF, checks it against PDF/A-2b and PDF/UA-1
+and stores it. A double click, a browser retry after a timeout or two open tabs
+send the same request several times. Without a rule, several letters would be
+created for the same preview, and the user would not know which one is valid.
+After a lost response, the repeat must still return the ID of the letter, so
+that the user interface can show the download link (#10). The rule must be
+fixed before the persistence design (#6), because it requires a column and a
+uniqueness rule in the database.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Ein Doppelklick oder Retry erzeugt kein zweites Schreiben.
-* Eine Wiederholung nach verlorener Antwort bekommt das Ergebnis des ersten
-  Versuchs.
-* Eine bewusst neue Erzeugung bleibt möglich.
-* Kein zusätzliches Konzept, das Frontend und Persistenz mittragen müssen.
+* A double click or retry does not create a second letter.
+* A repeat after a lost response gets the result of the first attempt.
+* A deliberate new creation remains possible.
+* No additional concept that the frontend and the persistence have to carry.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Die Snapshot-ID ist der Schlüssel (gewählt)
+==== Option 1: The snapshot ID is the key (chosen)
 
-Wie oben. Der Snapshot ist ohnehin eindeutig, an den Benutzer gebunden und
-befristet; er taugt als natürlicher Idempotenzschlüssel. Sein Zustandswechsel
-von offen zu verbraucht macht die Regel zu einer Regel des Fachmodells.
+As above. The snapshot is unique anyway, bound to the user and time-limited; it
+serves as a natural idempotency key. Its state change from open to consumed
+makes the rule a rule of the domain model.
 
-==== Option 2: Der Snapshot wird beim Speichern verbraucht
+==== Option 2: The snapshot is consumed on saving
 
-Speichern löscht den Snapshot, ein zweites Speichern findet ihn nicht. Einfach,
-aber eine Wiederholung nach verlorener Antwort bekommt nur „unbekannt“ statt der
-ID des Schreibens. Gleichzeitige Anfragen brauchen trotzdem eine atomare Regel.
+Saving deletes the snapshot; a second save does not find it. Simple, but a
+repeat after a lost response only gets “unknown” instead of the ID of the
+letter. Concurrent requests still need an atomic rule.
 
-==== Option 3: Idempotenzschlüssel des Clients
+==== Option 3: Idempotency key of the client
 
-Das Frontend schickt je Speicherversuch einen Schlüssel, die Bibliothek merkt sich
-Schlüssel und Ergebnis. Flexibel, aber ein weiteres Konzept mit eigener Ablage und
-eigener Lebensdauer, das jeder Aufrufer richtig benutzen muss.
+The frontend sends a key per save attempt; the library remembers key and
+result. Flexible, but another concept with its own storage and its own
+lifetime, which every caller has to use correctly.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` stands for better support, `0` for neutral and `-1` for weaker support.
+The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Kein zweites Schreiben bei Doppelklick oder Retry | +1 | +1 | +1
-| Wiederholung bekommt das Ergebnis des ersten Versuchs | +1 | -1 | +1
-| Bewusst neue Erzeugung möglich | +1 | +1 | +1
-| Kein zusätzliches Konzept | +1 | +1 | -1
-s| Summe s| +4 s| +2 s| +2
+| Criterion | Option 1 | Option 2 | Option 3
+| No second letter on double click or retry | +1 | +1 | +1
+| Repeat gets the result of the first attempt | +1 | -1 | +1
+| Deliberate new creation possible | +1 | +1 | +1
+| No additional concept | +1 | +1 | -1
+s| Total s| +4 s| +2 s| +2
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Die Oberfläche kann Speichern gefahrlos wiederholen.
-* Die Regel steht im Fachmodell und ist ohne Datenbank prüfbar; die Persistenz
-  setzt sie nur gegen gleichzeitige Zugriffe durch.
-* Nach dem Speichern liegt kein Datenkontext mehr im Snapshot.
+* The user interface can repeat saving safely.
+* The rule lives in the domain model and can be tested without a database; the
+  persistence only enforces it against concurrent access.
+* After saving, no data context remains in the snapshot.
 
-==== Negativ
+==== Negative
 
-* Gewinnt eine gleichzeitige Anfrage, wurde ein PDF umsonst erzeugt und geprüft.
-  Das ist selten und kostet nur Rechenzeit.
-* Bei ungewissem Ausgang oder wenn das Entfernen eines unterlegenen PDFs scheitert,
-  kann ein verwaistes Dokument in der Ablage bleiben. Das ist der Preis dafür, nie
-  das PDF eines gespeicherten Schreibens zu löschen.
-* Der Zustandswechsel und das Schreiben müssen in einer Transaktion gespeichert
-  werden; Snapshot und Schreiben liegen deshalb in derselben Persistenz.
+* If a concurrent request wins, a PDF was created and checked for nothing. This
+  is rare and only costs computing time.
+* If the outcome is uncertain, or if removing a losing PDF fails, an orphaned
+  document can remain in the document store. That is the price for never
+  deleting the PDF of a stored letter.
+* The state change and the letter must be stored in one transaction; snapshot
+  and letter therefore live in the same persistence.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* #6: Zustand des Snapshots mit bedingtem Update von offen auf verbraucht, Spalte
-  für die Snapshot-ID am Schreiben mit Unique Constraint, beides in einer
-  Transaktion. Der Datenkontext wird beim Verbrauchen entfernt. Das Löschen beim
-  Aktualisieren ist ebenfalls bedingt (nur solange offen); ein Test gegen beide
-  Datenbanken weist nach, dass es einen gleichzeitig verbrauchten Snapshot nicht
-  löscht.
-* #10: Die Oberfläche zeigt bei `AlreadySaved` denselben Download-Link wie
-  bei `Saved`.
-* Ob verwaiste Dokumente aufgeräumt werden müssen, hängt von der Ablage ab (#60).
+* #6: State of the snapshot with a conditional update from open to consumed, a
+  column for the snapshot ID on the letter with a unique constraint, both in
+  one transaction. The data context is removed when the snapshot is consumed.
+  Deleting on update is conditional as well (only while open); a test against
+  both databases proves that it does not delete a snapshot consumed
+  concurrently.
+* #10: For `AlreadySaved`, the user interface shows the same download link as
+  for `Saved`.
+* Whether orphaned documents must be cleaned up depends on the document store
+  (#60).
 
 === Impact
 
@@ -199,7 +197,7 @@ include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-impact.adoc[leve
 include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -208,27 +206,27 @@ include::generated/adr-021-hoechstens-ein-schreiben-je-snapshot-traceability.ado
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Der Owner hat am 2026-11-22 im Review von PR #64 entschieden:
+On 2026-11-22, in the review of PR #64, the owner decided:
 
-* ADR-021 und seine drei Relationen sind in der Richtung angenommen.
-* Die Regel „höchstens ein Schreiben je Snapshot“ verantwortet die Domäne als
-  Zustandswechsel. Die Persistenz setzt sie zusätzlich atomar durch; eine bloße
-  Vorabprüfung oder ein Unique Constraint allein genügt nicht.
-* Nach erfolgreichem Speichern wird kein Datenkontext allein für die
-  Wiederholung aufbewahrt. Die Metadaten für die Wiederholung bleiben.
+* ADR-021 and its three relations are accepted in their direction.
+* The rule “at most one letter per snapshot” is owned by the domain as a state
+  change. The persistence additionally enforces it atomically; a mere check
+  beforehand or a unique constraint alone is not enough.
+* After a successful save, no data context is kept just for the repeat. The
+  metadata for the repeat remain.
 
-Aus dem Review kam außerdem:
+The review also brought:
 
-* Bei ungewissem Ausgang des Speicherns wird das PDF nicht entfernt. Der erste
-  Entwurf entfernte es bei jeder Ausnahme.
-* Das Löschen beim Aktualisieren ist bedingt und atomar. Der zweite Entwurf
-  prüfte den Zustand vorher und löschte dann unbedingt; eine gleichzeitige
-  Speicherung dazwischen hätte die Wiederholung unmöglich gemacht.
+* If the outcome of saving is uncertain, the PDF is not removed. The first
+  draft removed it on every exception.
+* Deleting on update is conditional and atomic. The second draft checked the
+  state beforehand and then deleted unconditionally; a concurrent save in
+  between would have made the repeat impossible.
 
-Am 2026-11-22 hat der Owner bei #54 (PR #66) entschieden, dass eine Wiederholung
-nach dem Löschen des Schreibens „Snapshot unbekannt“ bekommt, und den Hinweis
-in diesem ADR verlangt. Die Entscheidung oben ist entsprechend ergänzt.
+On 2026-11-22, in #54 (PR #66), the owner decided that a repeat after the
+letter has been deleted gets “snapshot unknown”, and asked for the note in this
+ADR. The decision above has been extended accordingly.

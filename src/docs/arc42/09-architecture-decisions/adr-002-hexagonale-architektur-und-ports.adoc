@@ -1,175 +1,179 @@
 ---
 id: ADR-002-hexagonale-architektur-und-ports
 type: ADR
-title: 'Hexagonale Architektur mit Ports zur Host-Anwendung'
+title: 'Hexagonal architecture with ports to the host application'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'Der Kern ist frameworkfrei; Platzhalterdaten, Autorisierung, Dokumentablage und Rendering sind Ports, die Adapter oder der Host implementieren.'
+summary: 'The core is framework-free; placeholder data, authorization, document store and rendering are ports that adapters or the host implement.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
-- architektur
+- architecture
 - ddd
 - hexagonal
 relations:
 - type: depends_on
   target: ADR-001-einbettbare-bibliothek
   status: accepted
-  rationale: 'Die Ports beschreiben die Grenze zwischen Bibliothek und Host.'
+  rationale: 'The ports describe the boundary between library and host.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Klar definierte SPIs machen die Integration planbar.'
+  rationale: 'Clearly defined SPIs make the integration plannable.'
   reviewed: true
 - type: addresses
   target: QS-009-zugriffsschutz-beim-download
   status: accepted
-  rationale: 'Ein Autorisierungs-Port erzwingt die Prüfung bei jedem Zugriff.'
+  rationale: 'An authorization port enforces the check on every access.'
   reviewed: true
 - type: addresses
   target: QS-011-testabdeckung-als-build-gate
   status: accepted
-  rationale: 'Ports erlauben isolierte Tests des Kerns mit Mockito.'
+  rationale: 'Ports allow isolated tests of the core with Mockito.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-002-hexagonale-architektur-und-ports]]
-== ADR-002: Hexagonale Architektur mit Ports zur Host-Anwendung
+== ADR-002: Hexagonal architecture with ports to the host application
 
 === Status
 
-Angenommen (accepted) am 2026-11-17.
+Accepted on 2026-11-17.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #28
-geprüft und angenommen.
+This ADR was created with AI assistance. The owner reviewed and accepted it in
+the review of PR #28.
 
-=== Entscheidung
+=== Decision
 
-Wir setzen eine **hexagonale Architektur** (Ports and Adapters) nach DDD ein:
+We use a **hexagonal architecture** (Ports and Adapters) following DDD:
 
-* **Domäne** (ohne Spring): Briefpapier, Standardschreiben, Vorlagenversion, Schreiben,
-  Platzhalter, Bausteine.
-* **Anwendung**: Anwendungsfälle wie „Vorschau erzeugen“, „Schreiben speichern“,
-  „Schreiben herunterladen“, „Vorlage veröffentlichen“. Ihre Schnittstellen sind die
-  **Driving Ports** (Modul `usecases-in`), ihre Implementierung liegt getrennt davon
-  (Modul `usecases-service`).
-* **SPI zur Host-Anwendung** im eigenen Modul `spi`, mit eigenen Datentypen und
-  ohne Abhängigkeit zum Domänenmodell. Der Host implementiert:
-** `PlaceholderDataProvider`: liefert den Datenkontext für ein Standardschreiben
-   und einen fachlichen Bezug (z. B. Kunde 4711). Werte dürfen bereits formatiert sein.
-** `AuthorizationCheck` (Default-Implementierung auf Spring Security im Starter):
-   entscheidet über Pflegen, Erzeugen, Ansehen, Herunterladen und Löschen.
-** `DeletionPolicy`: entscheidet, ob und wie ein Schreiben gelöscht wird
-   (hart, logisch, gesperrt), siehe Aufbewahrungsfristen.
-* **Driven Ports** im Modul `usecases-out`, nur von Adaptern der Bibliothek
-  implementiert:
-** Ports für Platzhalterdaten, Berechtigung und Löschrichtlinie in Domänenbegriffen
-   (Adapter `adapter-host`, bildet auf das SPI ab).
-** `DocumentStore` (Adapter, Default JDBC/BLOB, später Objektspeicher).
-** `TemplateRepository`, `LetterRepository` (Adapter JDBC).
-** `Renderer` und `ConformanceChecker` (Adapter, siehe ADR-004 und ADR-005).
-* **Driving Adapter**: REST-Controller und Spring-Boot-Autokonfiguration.
+* **Domain** (without Spring): letterhead, letter template, template version,
+  letter, placeholders, building blocks.
+* **Application**: use cases such as “create preview”, “save letter”,
+  “download letter”, “publish template”. Their interfaces are the
+  **driving ports** (module `usecases-in`); their implementation lives
+  separately (module `usecases-service`).
+* **SPI to the host application** in its own module `spi`, with its own data
+  types and without a dependency on the domain model. The host implements:
+** `PlaceholderDataProvider`: delivers the data context for a letter template
+   and a business reference (e.g. customer 4711). Values may already be
+   formatted.
+** `AuthorizationCheck` (default implementation on Spring Security in the
+   starter): decides on maintaining, creating, viewing, downloading and
+   deleting.
+** `DeletionPolicy`: decides whether and how a letter is deleted
+   (hard, logically, blocked), see retention periods.
+* **Driven ports** in the module `usecases-out`, implemented only by adapters
+  of the library:
+** Ports for placeholder data, permission and deletion policy in domain terms
+   (adapter `adapter-host`, maps to the SPI).
+** `DocumentStore` (adapter, default JDBC/BLOB, later object storage).
+** `TemplateRepository`, `LetterRepository` (adapter JDBC).
+** `Renderer` and `ConformanceChecker` (adapters, see ADR-004 and ADR-005).
+* **Driving adapters**: REST controllers and Spring Boot auto-configuration.
 
-Schnitt und Datentypen des SPI begründet
-xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016].
+xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] gives the reasons for
+the cut and the data types of the SPI.
 
-**Frameworkfreiheit der Domäne** (präzisiert am 2026-11-21 im Review zu PR #57, vom Owner angenommen):
-Die Domäne bleibt unabhängig von Anwendungs-, DI- und Persistenzframeworks. Ihr
-fachliches Verhalten muss ohne Container, Proxies und Technologieintegration
-ausführbar und testbar sein. Externe Bibliotheken werden einzeln anhand von Zweck,
-transitiven Abhängigkeiten, Einfluss auf das Modell und Austauschaufwand bewertet.
-Rein beschreibende Annotationen oder allgemeine Hilfsbibliotheken können
-ausdrücklich zugelassen werden; daraus folgt keine pauschale Freigabe weiterer
-Abhängigkeiten. Codegenerierung wird gesondert bewertet, auch wenn sie keine
-Laufzeitabhängigkeit erzeugt. Spring-Komponenten bleiben außerhalb der Domäne;
-Spring kann reine Domänenservices von außen über die Konfiguration instanziieren.
+**Framework-free domain** (made more precise on 2026-11-21 in the review of
+PR #57, accepted by the owner):
+The domain stays independent of application, DI and persistence frameworks. Its
+business behaviour must be executable and testable without containers, proxies
+and technology integration. External libraries are assessed one by one by
+purpose, transitive dependencies, influence on the model and effort to replace
+them. Purely descriptive annotations or general helper libraries can be
+explicitly allowed; this does not mean a blanket approval of further
+dependencies. Code generation is assessed separately, even if it creates no
+runtime dependency. Spring components stay outside the domain; Spring can
+instantiate pure domain services from the outside through the configuration.
 
-Zugelassen sind derzeit:
+Currently allowed:
 
-* JSpecify für den Null-Vertrag (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
-* Die DDD-Annotationen aus `jmolecules-ddd`
+* JSpecify for the null contract (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
+* The DDD annotations from `jmolecules-ddd`
   (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
-* Das projekteigene Modul `validation` (ADR-018).
+* The project's own module `validation` (ADR-018).
 
-Andere Bibliotheken sind damit nicht freigegeben, auch Lombok nicht. Eine Regel
-in den ArchUnit-Tests prüft diese Liste.
+This does not approve any other library, Lombok included. A rule in the
+ArchUnit tests checks this list.
 
-Die Modulgrenzen erzwingen die Abhängigkeitsrichtung beim Kompilieren: Driving
-Adapter kennen nur `usecases-in`, Driven Adapter nur `usecases-out` (ADR-009).
-`adapter-host` kennt zusätzlich `spi`, der Kern kennt `spi` nicht.
-ArchUnit-Tests prüfen dieselben Regeln zusätzlich auf Paketebene. Warum Module
-statt einer Paketkonvention, begründet
-xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015].
+The module boundaries enforce the direction of dependencies at compile time:
+driving adapters know only `usecases-in`, driven adapters only `usecases-out`
+(ADR-009). `adapter-host` also knows `spi`; the core does not know `spi`.
+ArchUnit tests additionally check the same rules at package level.
+xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015] gives the reasons
+for modules instead of a package convention.
 
-=== Kontext
+=== Context
 
-Issue #1 fordert DDD und hexagonale bzw. Clean Architecture. Der Owner hat den
-SPI-Ansatz für Domänendaten bestätigt, Autorisierung über die Spring Security des
-Hosts, keine Mandantenfähigkeit. Lösch- und Aufbewahrungsregeln entscheidet die
-Host-Anwendung.
+Issue #1 asks for DDD and hexagonal or Clean Architecture. The owner confirmed
+the SPI approach for domain data, authorization through the host's Spring
+Security, and no multi-tenancy. The host application decides the deletion and
+retention rules.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Austauschbarkeit von Rendering, Ablage und Datenbank.
-* Testbarkeit des Kerns ohne Spring-Kontext.
-* Klare, stabile Integrationsgrenze zum Host.
+* Replaceability of rendering, storage and database.
+* Testability of the core without a Spring context.
+* A clear, stable integration boundary to the host.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Hexagonal mit SPI-Ports für Daten, Berechtigung und Löschung
+==== Option 1: Hexagonal with SPI ports for data, permission and deletion
 
-Der Host implementiert schmale Interfaces. Die Bibliothek ruft Daten selbst ab, wenn
-sie eine Vorschau erzeugt.
+The host implements narrow interfaces. The library fetches data itself when it
+creates a preview.
 
-==== Option 2: Hexagonal, Host übergibt Datenobjekt bei jedem Aufruf
+==== Option 2: Hexagonal, the host passes a data object with every call
 
-Weniger Kopplung an Host-Interfaces, aber jeder Aufrufer muss den passenden
-Datenkontext kennen und mitschicken; das React-Frontend bräuchte Domänenwissen.
+Less coupling to host interfaces, but every caller must know the matching data
+context and send it along; the React frontend would need domain knowledge.
 
-==== Option 3: Klassische Schichtenarchitektur mit Spring überall
+==== Option 3: Classic layered architecture with Spring everywhere
 
-Weniger Struktur, schneller Start; verletzt die Vorgabe aus dem Issue und erschwert
-Austausch und isoliertes Testen.
+Less structure, quick start; violates the requirement from the issue and makes
+replacement and isolated testing harder.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Austauschbarkeit | +1 | +1 | -1
-| Testbarkeit des Kerns | +1 | +1 | -1
-| Klare Integrationsgrenze | +1 | 0 | -1
-| Integrationsaufwand für den Host | 0 | -1 | +1
-s| Summe s| +3 s| +1 s| -2
+| Criterion | Option 1 | Option 2 | Option 3
+| Replaceability | +1 | +1 | -1
+| Testability of the core | +1 | +1 | -1
+| Clear integration boundary | +1 | 0 | -1
+| Integration effort for the host | 0 | -1 | +1
+s| Sum s| +3 s| +1 s| -2
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Domäne und Anwendungsfälle lassen sich mit JUnit 5 und Mockito ohne Spring testen.
-* Host-spezifische Regeln (Berechtigung, Löschung) bleiben beim Host.
+* Domain and use cases can be tested with JUnit 5 and Mockito without Spring.
+* Host-specific rules (permission, deletion) stay with the host.
 
-==== Negativ
+==== Negative
 
-* Mehr Module und Mapping-Code als bei einer Schichtenarchitektur.
-* Die SPIs sind öffentliche API; Änderungen brauchen Versionierung.
+* More modules and mapping code than with a layered architecture.
+* The SPIs are public API; changes need versioning.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Modulschnitt in ADR-009 (Monorepo) festhalten.
-* SPI-Verträge mit Beispielimplementierung in der Beispielanwendung belegen.
+* Record the module cut in ADR-009 (monorepo).
+* Prove the SPI contracts with a sample implementation in the sample
+  application.
 
 === Impact
 
@@ -180,25 +184,25 @@ include::generated/adr-002-hexagonale-architektur-und-ports-impact.adoc[leveloff
 include::generated/adr-002-hexagonale-architektur-und-ports-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-002-hexagonale-architektur-und-ports-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Der fachliche Bezug eines Schreibens lässt sich als (Typ, ID) an die Bibliothek geben.
+* The business reference of a letter can be passed to the library as (type, ID).
 
 === Open Questions
 
-* Keine zur Sichtbarkeit: Rollen und Sichtbarkeit bestimmt die Host-Anwendung über `AuthorizationCheck` (Q-PO-003). Die Übersicht fragt den Port je Schreiben bzw. per Filterkriterium ab.
+* None on visibility: the host application determines roles and visibility through `AuthorizationCheck` (Q-PO-003). The letter list queries the port per letter or per filter criterion.
 
 === Review Notes
 
-* Vor `accepted` sollten die SPI-Namen und der fachliche Bezug mit dem Owner
-  abgestimmt werden. Der Owner hat den ADR im Review von PR #28 am 2026-11-17
-  angenommen, mit den SPI-Namen und dem fachlichen Bezug als (Typ, ID) aus
-  diesem ADR und dem Schnitt des SPI aus
+* Before `accepted`, the SPI names and the business reference should be
+  agreed with the owner. The owner accepted the ADR in the review of PR #28 on
+  2026-11-17, with the SPI names and the business reference as (type, ID) from
+  this ADR and the cut of the SPI from
   xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016].

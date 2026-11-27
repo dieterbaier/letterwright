@@ -1,149 +1,149 @@
 ---
 id: ADR-011-qualitaetsgates-im-build
 type: ADR
-title: 'Qualitätsgates im Build'
+title: 'Quality gates in the build'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'GitHub Actions erzwingt je Modul 80 Prozent Zeilen- und Zweigabdeckung (JaCoCo, Vitest), ArchUnit-Regeln, axe-Prüfungen und die Validierung der Architekturdoku; veraPDF kommt mit der Rendering-Pipeline (#7) dazu.'
+summary: 'GitHub Actions enforces 80 percent line and branch coverage per module (JaCoCo, Vitest), ArchUnit rules, axe checks and the validation of the architecture docs; veraPDF is added with the rendering pipeline (#7).'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
 - build
 - ci
 - test
-- qualitaet
+- quality
 relations:
 - type: addresses
   target: QS-011-testabdeckung-als-build-gate
   status: accepted
-  rationale: 'Setzt das Abdeckungsgate um.'
+  rationale: 'Implements the coverage gate.'
   reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
   status: accepted
-  rationale: 'veraPDF soll im Build laufen; der Schritt kommt mit der Rendering-Pipeline (#7).'
+  rationale: 'veraPDF is to run in the build; the step comes with the rendering pipeline (#7).'
   reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
   status: accepted
-  rationale: 'axe-Prüfungen laufen im Build.'
+  rationale: 'axe checks run in the build.'
   reviewed: true
 - type: depends_on
   target: ADR-010-frontend-tests-mit-vitest
   status: accepted
-  rationale: 'Die Frontend-Abdeckung kommt aus Vitest.'
+  rationale: 'The frontend coverage comes from Vitest.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-011-qualitaetsgates-im-build]]
-== ADR-011: Qualitätsgates im Build
+== ADR-011: Quality gates in the build
 
 === Status
 
-Angenommen (accepted) am 2026-11-18.
+Accepted on 2026-11-18.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
-Epic #4 angenommen (Issue #37), ebenso seine ausgehenden Relationen.
+This ADR was created with AI assistance. The owner accepted it when reviewing
+Epic #4 (issue #37), together with its outgoing relations.
 
-=== Entscheidung
+=== Decision
 
-Wir setzen eine **GitHub-Actions-Pipeline** ein, die bei jedem Pull Request
-fehlschlägt, wenn eines dieser Gates verletzt ist:
+We use a **GitHub Actions pipeline** that fails on every pull request
+if one of these gates is violated:
 
-* **Abdeckung ≥ 80 % Zeilen *und* Zweige**, für **jedes** Backend-Modul (JaCoCo
-  `jacocoTestCoverageVerification`) und **jedes** Frontend-Paket (Vitest
-  `coverage.thresholds`). Generierter Code ist ausgenommen.
-* **ArchUnit**-Regeln für die hexagonale Struktur.
-* **Linting**, im Frontend mit ESLint, im Backend mit Error Prone. Error Prone
-  läuft beim Kompilieren des Produktionscodes mit seinen standardmäßig aktiven
-  Prüfungen, dazu NullAway für den Null-Vertrag
-  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]). Eine
-  Ausnahme schaltet eine einzelne Prüfung an der kleinsten möglichen Stelle mit
-  `@SuppressWarnings("<Prüfung>")` ab und begründet sie im Kommentar daneben. Eine
-  Prüfung im ganzen Build abzuschalten, entscheidet der Owner.
-* **veraPDF** für alle Referenz-PDFs (PDF/A-2b, PDF/UA-1). Geplant: Der Schritt
-  kommt mit der Rendering-Pipeline (#7). Heute gibt es ihn in `build.yml` nicht.
-* **axe-core** ohne Verstöße der Stufen *serious* und *critical*.
-* **Architekturdoku**: `./build.sh check-adapters` und `./build.sh build` (validiert,
-  generiert und rendert inklusive PlantUML) im Workflow
-  `.github/workflows/architekturdoku.yml`. Veröffentlicht auf **GitHub Pages** wird
-  nur der Stand von `main`; Pull Requests bauen nur.
+* **Coverage ≥ 80 % of lines *and* branches**, for **each** backend module (JaCoCo
+  `jacocoTestCoverageVerification`) and **each** frontend package (Vitest
+  `coverage.thresholds`). Generated code is excluded.
+* **ArchUnit** rules for the hexagonal structure.
+* **Linting**, in the frontend with ESLint, in the backend with Error Prone. Error Prone
+  runs when the production code is compiled, with its checks that are active by
+  default, plus NullAway for the null contract
+  (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]). An
+  exception turns off a single check at the smallest possible place with
+  `@SuppressWarnings("<check>")` and justifies it in the comment next to it. The owner
+  decides whether a check is turned off for the whole build.
+* **veraPDF** for all reference PDFs (PDF/A-2b, PDF/UA-1). Planned: the step
+  comes with the rendering pipeline (#7). Today it does not exist in `build.yml`.
+* **axe-core** without violations of the levels *serious* and *critical*.
+* **Architecture docs**: `./build.sh check-adapters` and `./build.sh build` (validates,
+  generates and renders, including PlantUML) in the workflow
+  `.github/workflows/architekturdoku.yml`. Only the state of `main` is published on
+  **GitHub Pages**; pull requests only build.
 
-Umsetzung (#14): Der Workflow `.github/workflows/build.yml` läuft bei jedem Pull
-Request auf `main` und bei jedem Push auf `main`, mit zwei Jobs:
+Implementation (#14): the workflow `.github/workflows/build.yml` runs on every pull
+request to `main` and on every push to `main`, with two jobs:
 
-* *Backend:* `./gradlew build` mit dem validierten Wrapper auf Java 21 (Baseline)
-  und Java 25. Der Build umfasst Tests, das JaCoCo-Gate je Modul, ArchUnit und
-  Error Prone mit NullAway.
-  Test- und Abdeckungsberichte werden als Artefakt gesichert.
-* *Frontend:* `npm ci`, `npm run lint`, `npm run build` und `npm test` auf
-  Node 22.22.2 (Untergrenze aus `engines.node`) sowie den neuesten Versionen der
-  Linien 24 und 26. `npm test` enthält das Vitest-Gate und die axe-Prüfung. Der
-  Abdeckungsbericht wird als Artefakt gesichert.
+* *Backend:* `./gradlew build` with the validated wrapper on Java 21 (baseline)
+  and Java 25. The build includes tests, the JaCoCo gate per module, ArchUnit and
+  Error Prone with NullAway.
+  Test and coverage reports are kept as an artifact.
+* *Frontend:* `npm ci`, `npm run lint`, `npm run build` and `npm test` on
+  Node 22.22.2 (lower bound from `engines.node`) and on the newest versions of the
+  lines 24 and 26. `npm test` contains the Vitest gate and the axe check. The
+  coverage report is kept as an artifact.
 
-Der Workflow baut immer beides. Ein Filter nach geänderten Pfaden lohnt sich bei
-etwa einer Minute Laufzeit je Job nicht. veraPDF kommt mit der Rendering-Pipeline
-(#7) dazu.
+The workflow always builds both. A filter by changed paths does not pay off at
+about one minute of run time per job. veraPDF is added with the rendering pipeline
+(#7).
 
-=== Kontext
+=== Context
 
-Issue #1 fordert 80 % Testabdeckung. Der Owner präzisiert: gilt für beides (Zeilen und
-Zweige) und alles (Backend und Frontend) und soll überprüft werden.
+Issue #1 asks for 80 % test coverage. The owner makes this precise: it applies to both (lines and
+branches) and everything (backend and frontend) and is to be checked.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Abdeckung messbar und nicht verhandelbar.
-* Frühes Feedback im PR.
-* Konformität dauerhaft sichern.
+* Coverage measurable and not negotiable.
+* Early feedback in the PR.
+* Securing conformance permanently.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Gates pro Modul in GitHub Actions
+==== Option 1: Gates per module in GitHub Actions
 
-Lokale Ausreißer fallen sofort auf. Strenger, gelegentlich lästig für kleine Module.
+Local outliers show up at once. Stricter, occasionally annoying for small modules.
 
-==== Option 2: Gates aggregiert über das Repository
+==== Option 2: Gates aggregated across the repository
 
-Toleranter; schwach getestete Module können sich hinter gut getesteten verstecken.
+More tolerant; weakly tested modules can hide behind well tested ones.
 
-==== Option 3: Nur Berichte, keine Gates
+==== Option 3: Reports only, no gates
 
-Kein Blockieren, aber die Anforderung aus dem Issue ist nicht sichergestellt.
+Nothing is blocked, but the requirement from the issue is not ensured.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Anforderung sicher erfüllt | +1 | 0 | -1
-| Frühes Feedback | +1 | +1 | 0
-| Geringe Reibung | -1 | 0 | +1
-s| Summe s| +1 s| +1 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Requirement reliably met | +1 | 0 | -1
+| Early feedback | +1 | +1 | 0
+| Low friction | -1 | 0 | +1
+s| Sum s| +1 s| +1 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Qualitätsziele sind in jedem PR sichtbar und erzwungen.
+* Quality goals are visible and enforced in every PR.
 
-==== Negativ
+==== Negative
 
-* Längere CI-Laufzeit durch Testcontainers und veraPDF.
+* Longer CI run time because of Testcontainers and veraPDF.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Pipeline im ersten Build-Epic aufsetzen, bevor Fachcode entsteht.
+* Set up the pipeline in the first build epic, before domain code is written.
 
 === Impact
 
@@ -154,35 +154,35 @@ include::generated/adr-011-qualitaetsgates-im-build-impact.adoc[leveloffset=+2]
 include::generated/adr-011-qualitaetsgates-im-build-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-011-qualitaetsgates-im-build-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* GitHub Actions steht für das Repository zur Verfügung.
+* GitHub Actions is available for the repository.
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Das Linting im Backend mit Error Prone hat der Owner am 2026-11-22 im Review
-von PR #62 als Gate festgelegt: Die standardmäßig aktiven Prüfungen bleiben
-eingeschaltet, Ausnahmen werden einzeln begründet.
+The owner set linting in the backend with Error Prone as a gate on 2026-11-22 in
+the review of PR #62: the checks active by default stay
+turned on, exceptions are justified one by one.
 
-Der Owner hat die Gates inhaltlich bestätigt und den ADR am 2026-11-18
-angenommen (Issue #37), mit dem Umfang der Entscheidung oben. Dazu gehört die
-Ausnahme für generierten Code vom Abdeckungsgate. Heute gibt es keinen
-generierten Code und deshalb keine Ausschlussregel in JaCoCo oder Vitest. Eine
-solche Regel wird erst konfiguriert, wenn generierter Code entsteht, und ist
-dann im Build-Skript sichtbar.
+The owner confirmed the content of the gates and accepted the ADR on 2026-11-18
+(issue #37), with the scope of the decision above. This includes the
+exclusion of generated code from the coverage gate. Today there is no
+generated code and therefore no exclusion rule in JaCoCo or Vitest. Such a
+rule is configured only once generated code appears, and is
+then visible in the build script.
 
-Die veraPDF-Präzisierung (geplant mit #7) hat der Owner im Review von PR #38
-gegengelesen. Die ausgehenden Relationen hat er im
-https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen. Die Relation zu QS-001 beschreibt eine
-geplante Maßnahme, keinen erfüllten Konformitätsnachweis.
+The owner proofread the veraPDF clarification (planned with #7) in the review of PR #38.
+He accepted the outgoing relations in the
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[review of PR #38]. The relation to QS-001 describes a
+planned measure, not a fulfilled proof of conformance.

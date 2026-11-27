@@ -1,191 +1,189 @@
 ---
 id: ADR-019-validierung-in-den-typen-und-null-vertrag
 type: ADR
-title: 'Wo validiert wird und wie der Null-Vertrag durchgesetzt wird'
+title: 'Where validation happens and how the null contract is enforced'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-22'
 reviewed: true
-summary: 'Nur die Typen validieren, beim Erzeugen. Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht. Was ein Typ ausdrücken kann, prüft niemand zur Laufzeit. NullAway setzt den Null-Vertrag aus @NullMarked beim Kompilieren durch; ein optionales Ergebnis ist ein Optional. Die Zusage, nie eine NullPointerException, gilt an den Grenzen.'
+summary: 'Only the types validate, on creation. Use cases, ports, adapters and query methods do not check their parameters. What a type can express, nobody checks at runtime. NullAway enforces the null contract from @NullMarked at compile time; an optional result is an Optional. The promise of never a NullPointerException applies at the boundaries.'
 derived_from:
 - type: conversation
-  description: 'TODOs und Gespräch mit dem Owner am 2026-11-22 nach PR #59 (#30): „Die Typen sollen validieren. Usecases brauchen nicht.“'
+  description: 'TODOs and conversation with the owner on 2026-11-22 after PR #59 (#30): “The types should validate. Use cases don’t need to.”'
 - type: external
-  description: 'Issue #61: Typen validieren, Anwendungsfälle nicht'
+  description: 'Issue #61: Types validate, use cases do not'
   uri: https://github.com/dieterbaier/standardschreiben/issues/61
 tags:
 - decision
-- domaene
-- validierung
-- code-stil
+- domain
+- validation
+- code-style
 relations:
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
   status: accepted
-  rationale: 'ADR-018 legt fest, dass jeder Typ seine Pflichtattribute prüft und nie eine NullPointerException entsteht. Dieser ADR legt fest, dass nur die Typen prüfen, und beschränkt die Zusage zur NullPointerException auf die Grenze: Typen beim Erzeugen und Werte, die der Host liefert.'
+  rationale: 'ADR-018 states that every type checks its required attributes and that a NullPointerException never occurs. This ADR states that only the types check, and limits the NullPointerException promise to the boundary: types on creation and values that the host supplies.'
   reviewed: true
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
   status: accepted
-  rationale: 'Die SPI-Typen drücken über Sealed Types aus, ob eine Aktion einen fachlichen Bezug hat. Der Host unterscheidet die Anfragen per switch statt über ein optionales Feld.'
+  rationale: 'The SPI types express through sealed types whether an action has a business reference. The host distinguishes the requests with a switch instead of through an optional field.'
   reviewed: true
 - type: refines
   target: ADR-011-qualitaetsgates-im-build
   status: accepted
-  rationale: 'NullAway kommt als weiteres Gate in den Build: Eine Verletzung des Null-Vertrags im Produktionscode bricht die Kompilierung ab.'
+  rationale: 'NullAway is added to the build as a further gate: a violation of the null contract in production code aborts compilation.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Der Host sieht an der Signatur, welche Anfrage einen fachlichen Bezug trägt, und der Compiler prüft, dass er beide Arten behandelt.'
+  rationale: 'The host sees from the signature which request carries a business reference, and the compiler checks that it handles both kinds.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-019-validierung-in-den-typen-und-null-vertrag]]
-== ADR-019: Wo validiert wird und wie der Null-Vertrag durchgesetzt wird
+== ADR-019: Where validation happens and how the null contract is enforced
 
 === Status
 
-Angenommen (accepted) am 2026-11-22.
+Accepted on 2026-11-22.
 
-Der Owner hat die Richtung am 2026-11-22 vorgegeben: „Die Typen sollen
-validieren. Usecases brauchen nicht.“ Der ADR ist KI-gestützt formuliert; der
-Owner hat ihn und seine vier Relationen am selben Tag im Review von PR #62
-angenommen.
+The owner set the direction on 2026-11-22: “The types should validate. Use
+cases don’t need to.” The ADR was worded with AI assistance; the owner accepted
+it and its four relations on the same day in the review of PR #62.
 
-=== Entscheidung
+=== Decision
 
-* **Nur die Typen validieren.** Value Objects, Aggregate, Entitäten und die
-  Datentypen des SPI prüfen ihre Pflichtattribute im Konstruktor oder in der
-  Fabrikmethode (wie in
+* **Only the types validate.** Value objects, aggregates, entities and the data
+  types of the SPI check their required attributes in the constructor or in the
+  factory method (as in
   xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
-  Anwendungsfälle, Ports, Adapter und Abfragemethoden prüfen ihre Parameter nicht.
-* **Illegale Zustände sind nicht darstellbar.** Was ein Typ ausdrücken kann, prüft
-  niemand zur Laufzeit und erklärt keine Javadoc. Statt eines Flags oder eines
-  optionalen Felds gibt es eigene Typen. Erstes Beispiel: `TemplateAction` und
-  `LetterAction` statt `Aktion` mit `brauchtBezug`, und im SPI die
-  `AuthorizationRequest` als Sealed Type mit `ForTemplates` und `ForLetter`.
-* **Null-Vertrag beim Kompilieren.** Jedes Paket ist `@NullMarked` (JSpecify).
-  NullAway prüft das beim Kompilieren des Produktionscodes im JSpecify-Modus, also
-  auch die Nullbarkeit von Typargumenten; eine Verletzung bricht den Build ab.
-  `RequireExplicitNullMarking` lässt keine Klasse ohne Markierung zu, damit ein
-  neues Paket das Gate nicht still umgeht. Tests sind ausgenommen, weil sie
-  absichtlich `null` übergeben, um die Selbstvalidierung der Typen zu prüfen.
-* **Nachweis, dass das Gate greift.** Die Aufgabe `checkNullContract` im Modul
-  `architecture-tests` kompiliert kleine Proben mit genau den Argumenten des
-  Produktionscodes: Eine unmarkierte Klasse, eine `null`-Rückgabe und ein
-  nullbares Typargument müssen scheitern, eine korrekte Klasse muss kompilieren.
-  Sie ist Teil von `check`.
-* **Optionale Ergebnisse.** Kein Rückgabewert ist `null`. Ein Ergebnis, das fehlen
-  darf, ist ein `Optional`. `Optional` ist kein Feld und kein Parameter.
-* **Die Zusage gilt an den Grenzen.** Die Zusage aus ADR-018 „nie eine
-  `NullPointerException`“ gilt an den Grenzen: beim Erzeugen eines Typs und für
-  Werte, die der Host liefert. Liefert eine SPI-Implementierung `null`, meldet
-  `adapter-host` weiter `HostContractViolated`. Wer eine interne Signatur falsch
-  benutzt, bekommt eine `NullPointerException`.
-* **Was NullAway nicht garantiert.** NullAway ist eine statische Analyse und
-  verhindert die meisten solchen Fehler im Produktionscode, aber nicht jeden.
-  Bibliotheken ohne JSpecify-Annotationen gelten als nicht annotiert, ihre
-  Rückgaben also als vorhanden. Und die Analyse ist nicht in jedem Fall
-  vollständig, etwa bei Feldern, die ein Framework per Reflection setzt.
-* **Error Prone als Linter.** NullAway läuft als Plugin von Error Prone. Die
-  standardmäßig aktiven Prüfungen von Error Prone bleiben eingeschaltet; das ist
-  das Linting des Backends (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+  Use cases, ports, adapters and query methods do not check their parameters.
+* **Illegal states cannot be represented.** What a type can express, nobody
+  checks at runtime and no Javadoc explains. Instead of a flag or an optional
+  field, there are separate types. First example: `TemplateAction` and
+  `LetterAction` instead of `Aktion` with `brauchtBezug`, and in the SPI the
+  `AuthorizationRequest` as a sealed type with `ForTemplates` and `ForLetter`.
+* **Null contract at compile time.** Every package is `@NullMarked` (JSpecify).
+  NullAway checks this when compiling the production code in JSpecify mode, so
+  it also checks the nullability of type arguments; a violation aborts the
+  build. `RequireExplicitNullMarking` allows no class without marking, so that a
+  new package does not silently bypass the gate. Tests are exempt, because they
+  pass `null` on purpose to check the self-validation of the types.
+* **Proof that the gate works.** The task `checkNullContract` in the module
+  `architecture-tests` compiles small probes with exactly the arguments of the
+  production code: an unmarked class, a `null` return and a nullable type
+  argument must fail, a correct class must compile. It is part of `check`.
+* **Optional results.** No return value is `null`. A result that may be absent
+  is an `Optional`. `Optional` is not a field and not a parameter.
+* **The promise applies at the boundaries.** The promise from ADR-018 “never a
+  `NullPointerException`” applies at the boundaries: when a type is created and
+  for values that the host supplies. If an SPI implementation returns `null`,
+  `adapter-host` still reports `HostContractViolated`. Whoever uses an internal
+  signature incorrectly gets a `NullPointerException`.
+* **What NullAway does not guarantee.** NullAway is a static analysis and
+  prevents most such errors in production code, but not every one. Libraries
+  without JSpecify annotations count as unannotated, so their return values
+  count as present. And the analysis is not complete in every case, for example
+  for fields that a framework sets via reflection.
+* **Error Prone as a linter.** NullAway runs as a plugin of Error Prone. The
+  checks of Error Prone that are active by default stay switched on; that is the
+  linting of the backend (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
 
-=== Kontext
+=== Context
 
-ADR-018 verlangt, dass jeder Typ seine Pflichtattribute prüft. Der Code nach
-PR #59 prüfte darüber hinaus Parameter in Adaptern und Abfragemethoden, etwa
-`Validate.required(user, …)` in `HostPermissions` oder in
-`Snapshot.isExpired`. Diese Prüfungen wiederholen, was die Typen schon
-sichern, und machen die Signaturen unklarer statt klarer.
+ADR-018 requires that every type checks its required attributes. The code after
+PR #59 additionally checked parameters in adapters and query methods, for
+example `Validate.required(user, …)` in `HostPermissions` or in
+`Snapshot.isExpired`. These checks repeat what the types already ensure, and
+make the signatures less clear instead of clearer.
 
-`Aktion` trug ein Flag, ob sie einen fachlichen Bezug hat. Jeder Aufrufer musste
-es zur Laufzeit prüfen und die Prüfung in Javadoc und `@throws` dokumentieren;
-das SPI führte den Bezug als `@Nullable`.
+`Aktion` carried a flag stating whether it has a business reference. Every
+caller had to check it at runtime and document the check in Javadoc and
+`@throws`; the SPI carried the reference as `@Nullable`.
 
-Die Pakete waren schon `@NullMarked`, aber nichts setzte das durch. Die
-Annotation war Dokumentation.
+The packages were already `@NullMarked`, but nothing enforced it. The
+annotation was documentation.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Fehler so früh wie möglich, am besten beim Kompilieren.
-* Die Signatur sagt, was gebraucht wird; Code und Javadoc wiederholen es nicht.
-* Verständliche Meldungen dort, wo fremde Werte hereinkommen.
-* Wenig zusätzlicher Aufwand im Build.
+* Errors as early as possible, ideally at compile time.
+* The signature says what is needed; code and Javadoc do not repeat it.
+* Understandable messages where foreign values come in.
+* Little additional effort in the build.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Jeder prüft seine Parameter
+==== Option 1: Everyone checks their parameters
 
-Wie bisher: Typen, Adapter, Anwendungsfälle und Abfragen prüfen jeden Parameter
-zur Laufzeit. Überall verständliche Meldungen, aber dieselbe Prüfung an vielen
-Stellen, und ein Fehler fällt erst beim Aufruf auf.
+As before: types, adapters, use cases and queries check every parameter at
+runtime. Understandable messages everywhere, but the same check in many
+places, and an error only shows up at the call.
 
-==== Option 2: Typen prüfen, NullAway sichert den Rest (gewählt)
+==== Option 2: Types check, NullAway secures the rest (chosen)
 
-Nur die Typen prüfen beim Erzeugen. Für alles andere sorgt der Compiler: NullAway
-für `null`, Sealed Types für die Fallunterscheidung. Ein zusätzliches
-Compiler-Plugin im Build.
+Only the types check, on creation. The compiler takes care of everything else:
+NullAway for `null`, sealed types for distinguishing cases. One additional
+compiler plugin in the build.
 
-==== Option 3: Typen prüfen, sonst nur Konvention
+==== Option 3: Types check, otherwise only convention
 
-Nur die Typen prüfen. `@NullMarked` bleibt Dokumentation, nichts setzt es durch.
-Kein zusätzliches Werkzeug, aber ein Fehler im Inneren fällt erst als
-`NullPointerException` ohne Attributnamen auf, irgendwo nach seiner Ursache.
+Only the types check. `@NullMarked` stays documentation; nothing enforces it.
+No additional tool, but an error inside only shows up as a
+`NullPointerException` without an attribute name, somewhere after its cause.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral and `-1` weaker support. The matrix is
+unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Fehler früh erkannt | 0 | +1 | -1
-| Signatur statt Wiederholung | -1 | +1 | +1
-| Verständliche Meldung an der Grenze | +1 | +1 | +1
-| Wenig Aufwand im Build | +1 | -1 | +1
-s| Summe s| +1 s| +2 s| +2
+| Criterion | Option 1 | Option 2 | Option 3
+| Errors detected early | 0 | +1 | -1
+| Signature instead of repetition | -1 | +1 | +1
+| Understandable message at the boundary | +1 | +1 | +1
+| Little effort in the build | +1 | -1 | +1
+s| Sum s| +1 s| +2 s| +2
 |===
 
-Option 2 und 3 haben dieselbe Summe. Den Ausschlag gibt der Owner-Grundsatz „fail
-fast über den Compiler“: Ohne Werkzeug wäre der Verzicht auf Prüfungen im Inneren
-nur ein Versprechen.
+Options 2 and 3 have the same sum. The deciding factor is the owner’s
+principle “fail fast through the compiler”: without a tool, dropping checks
+inside would only be a promise.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Anwendungsfälle und Adapter enthalten nur ihre Logik. Wer eine Signatur liest,
-  sieht, was gebraucht wird.
-* Ein Host sieht an der `AuthorizationRequest`, ob ein Bezug dabei ist, und der
-  Compiler prüft, dass er beide Arten behandelt.
-* `null` an einer Stelle, die es nicht erlaubt, fällt beim Kompilieren auf und
-  nicht erst im Betrieb.
-* Error Prone läuft mit seinen Standardprüfungen mit und hat beim Einführen
-  bereits einen Referenzvergleich in `VersionSequence` gefunden.
+* Use cases and adapters contain only their logic. Whoever reads a signature
+  sees what is needed.
+* A host sees from the `AuthorizationRequest` whether a reference is included,
+  and the compiler checks that it handles both kinds.
+* `null` in a place that does not allow it is caught at compile time and not
+  only in operation.
+* Error Prone runs along with its default checks and, when it was introduced,
+  already found a reference comparison in `VersionSequence`.
 
-==== Negativ
+==== Negative
 
-* Zwei Werkzeuge mehr im Build (Error Prone, NullAway), die bei Updates von JDK
-  und Gradle mitzuprüfen sind.
-* Die SPI-Änderung bricht jeden Host, der gegen die alte `Aktion` kompiliert hat.
-  Vor dem ersten Release betrifft das nur die Tests der Bibliothek.
-* Die Rollen-Properties des Starters hießen mit dieser Entscheidung
-  `standardschreiben.berechtigung.rollen.vorlagen.<AKTION>` und
-  `….rollen.schreiben.<AKTION>`; die Default-Authorities behielten ihre Namen
-  (`ROLE_SSW_*`). Das ist der Stand dieser Entscheidung. Seit ADR-024 (#84)
-  heißen Properties und Default-Authorities anders; den aktuellen Stand nennt
-  der Abschnitt „Sicherheit“ der <<crosscutting-concepts>>.
+* Two more tools in the build (Error Prone, NullAway) that have to be checked
+  as well on updates of JDK and Gradle.
+* The SPI change breaks every host that compiled against the old `Aktion`.
+  Before the first release, this affects only the tests of the library.
+* With this decision, the role properties of the starter were named
+  `standardschreiben.berechtigung.rollen.vorlagen.<AKTION>` and
+  `….rollen.schreiben.<AKTION>`; the default authorities kept their names
+  (`ROLE_SSW_*`). That is the state of this decision. Since ADR-024 (#84),
+  properties and default authorities have different names; the section
+  “Security” of the <<crosscutting-concepts>> gives the current state.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Neue Fallunterscheidungen in Modell und SPI werden zuerst als Typ entworfen,
-  nicht als Flag.
-* Wie ein Agent die Regeln beim Schreiben von Code anwendet, beschreibt der Skill
-  `skills/code-stil/SKILL.md`; die Lösungsstrategie fasst den Code-Stil zusammen.
+* New case distinctions in model and SPI are designed as a type first, not as a
+  flag.
+* The skill `skills/code-stil/SKILL.md` describes how an agent applies the
+  rules when writing code; the solution strategy summarizes the code style.
 
 === Impact
 
@@ -196,7 +194,7 @@ include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-impact.adoc
 include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -205,18 +203,19 @@ include::generated/adr-019-validierung-in-den-typen-und-null-vertrag-traceabilit
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Der Owner hat am 2026-11-22 im Review von PR #62 entschieden:
+The owner decided on 2026-11-22 in the review of PR #62:
 
-* Die Zusage „nie eine `NullPointerException`“ gilt an den Grenzen.
-* Die standardmäßig aktiven Prüfungen von Error Prone bleiben zusätzlich zu
-  NullAway eingeschaltet; einzelne Ausnahmen werden gezielt begründet
+* The promise “never a `NullPointerException`” applies at the boundaries.
+* The checks of Error Prone that are active by default stay switched on in
+  addition to NullAway; individual exceptions are justified specifically
   (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
-* Die neuen Namen der Rollen-Properties passen.
-* ADR-019 und seine vier Relationen sind angenommen.
+* The new names of the role properties fit.
+* ADR-019 and its four relations are accepted.
 
-Aus dem Review kamen dazu `RequireExplicitNullMarking`, der JSpecify-Modus, die
-Proben in `checkNullContract` und der Abschnitt „Was NullAway nicht garantiert“.
+The review also added `RequireExplicitNullMarking`, the JSpecify mode, the
+probes in `checkNullContract` and the section “What NullAway does not
+guarantee”.

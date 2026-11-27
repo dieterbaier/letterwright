@@ -1,179 +1,180 @@
 ---
 id: ADR-020-zulaessige-kombination-aus-standardschreiben-und-bezug
 type: ADR
-title: 'Wie die Kombination aus Standardschreiben und fachlichem Bezug geprüft wird'
+title: 'How the combination of letter template and business reference is checked'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-22'
 reviewed: true
-summary: 'Ein Standardschreiben gehört zu genau einem Bezugstyp; zu einem Bezug anderen Typs lehnt die Bibliothek selbst ab. Danach fragt sie den Host mit einer eigenen Berechtigungsanfrage zum Erzeugen, die das Standardschreiben enthält, damit der Host je Einstiegspunkt feiner einschränken kann. Erst mit dieser Berechtigung prüft sie die veröffentlichten Versionen und fragt Platzhalterdaten an.'
+summary: 'A letter template belongs to exactly one reference type; the library itself rejects it for a reference of a different type. After that, it asks the host with a separate authorization request for creation that contains the letter template, so that the host can restrict further per entry point. Only with this permission does it check the published versions and request placeholder data.'
 derived_from:
 - type: conversation
-  description: 'Entscheidung des Owners am 2026-11-22 zu #52: „Beides“ – Bezugstyp am Standardschreiben und Standardschreiben in der Berechtigungsanfrage.'
+  description: 'Decision of the owner on 2026-11-22 on #52: “Both” – reference type on the letter template and letter template in the authorization request.'
 - type: external
-  description: 'Issue #5, offene Vertragsfrage: Kombination aus Vorlage und fachlichem Bezug serverseitig prüfen, bevor der Host Platzhalterdaten liefert'
+  description: 'Issue #5, open contract question: check the combination of template and business reference on the server before the host supplies placeholder data'
   uri: https://github.com/dieterbaier/standardschreiben/issues/5
 - type: external
-  description: 'Issue #11: zwei Einstiegspunkte, eine unzulässige Kombination wird serverseitig abgelehnt'
+  description: 'Issue #11: two entry points, an impermissible combination is rejected on the server'
   uri: https://github.com/dieterbaier/standardschreiben/issues/11
 tags:
 - decision
 - spi
-- sicherheit
+- security
 relations:
 - type: refines
   target: ADR-016-schnittstelle-zur-host-anwendung
   status: accepted
-  rationale: 'Die Berechtigungsprüfung des SPI bekommt eine dritte Anfrageart, ForCreation, mit fachlichem Bezug und Standardschreiben.'
+  rationale: 'The authorization check of the SPI gets a third kind of request, ForCreation, with business reference and letter template.'
   reviewed: true
 - type: refines
   target: ADR-019-validierung-in-den-typen-und-null-vertrag
   status: accepted
-  rationale: 'Die Berechtigungsanfrage ist ein Sealed Type mit drei statt zwei Arten; das Erzeugen ist keine LetterAction mehr, weil es andere Daten braucht.'
+  rationale: 'The authorization request is a sealed type with three kinds instead of two; creation is no longer a LetterAction, because it needs different data.'
   reviewed: true
 - type: addresses
   target: QS-009-zugriffsschutz-beim-download
   status: accepted
-  rationale: 'Beitrag zum Zugriffsschutz: Daten eines fachlichen Bezugs fließen nur in ein Standardschreiben, das zu diesem Bezug passt und das der Host für den Benutzer freigibt. Die Prüfungen beim Download, Löschen und in der Übersicht belegt das nicht.'
+  rationale: 'Contribution to access protection: data of a business reference flows only into a letter template that matches this reference and that the host releases for the user. This does not prove the checks for download, deletion and in the list.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Der Host bestimmt zulässige Standardschreiben je Einstiegspunkt mit einer Fallunterscheidung im switch, ohne eigene Konfiguration der Bibliothek.'
+  rationale: 'The host determines permissible letter templates per entry point with a case distinction in the switch, without a configuration of its own in the library.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug]]
-== ADR-020: Wie die Kombination aus Standardschreiben und fachlichem Bezug geprüft wird
+== ADR-020: How the combination of letter template and business reference is checked
 
 === Status
 
-Angenommen (accepted) am 2026-11-22.
+Accepted on 2026-11-22.
 
-Der Owner hat die Richtung am 2026-11-22 bei #52 vorgegeben: Bezugstyp am
-Standardschreiben **und** das Standardschreiben in der Berechtigungsanfrage. Der
-ADR ist KI-gestützt formuliert; der Owner hat ihn und seine vier Relationen am
-selben Tag im Review von PR #63 angenommen, mit korrigierter Reihenfolge der
-Prüfungen.
+The owner set the direction on 2026-11-22 in #52: reference type on the letter
+template **and** the letter template in the authorization request. The ADR was
+worded with AI assistance; the owner accepted it and its four relations on the
+same day in the review of PR #63, with a corrected order of the checks.
 
-=== Entscheidung
+=== Decision
 
-* **Ein Standardschreiben gehört zu genau einem Bezugstyp,** etwa `Kunde` oder
-  `Vorgang`. Der Bezugstyp ist dieselbe Zeichenkette wie der Typ des
-  `BusinessReference`, den der Host vergibt. Passt der Typ des Bezugs nicht, lehnt
-  die Bibliothek die Vorschau selbst ab, ohne den Host zu fragen.
-* **Das Erzeugen ist eine eigene Berechtigungsanfrage.** Neben `ForTemplates` und
-  `ForLetter` gibt es `ForCreation` mit Benutzer, fachlichem Bezug und
-  Standardschreiben. `CREATE` ist keine `LetterAction` mehr. Der Host kann so
-  festlegen, welche Standardschreiben an welchem Einstiegspunkt zulässig sind
-  (#11), etwa nur Mahnungen zu Kunden mit offenem Posten.
-* **Reihenfolge.**
-  1. Gibt es das Standardschreiben?
-  2. Passt sein Bezugstyp zum Bezug?
-  3. Erlaubt der Host das Erzeugen (`ForCreation`)?
-  4. Haben Standardschreiben und Briefpapier eine veröffentlichte Version?
-  5. Erst dann fragt die Bibliothek den Datenkontext an.
+* **A letter template belongs to exactly one reference type,** for example
+  `Customer` or `Case`. The reference type is the same string as the type of
+  the `BusinessReference` that the host assigns. If the type of the reference
+  does not match, the library itself rejects the preview, without asking the
+  host.
+* **Creation is a separate authorization request.** Besides `ForTemplates` and
+  `ForLetter` there is `ForCreation` with user, business reference and letter
+  template. `CREATE` is no longer a `LetterAction`. The host can thus determine
+  which letter templates are permissible at which entry point (#11), for
+  example only payment reminders for customers with an open item.
+* **Order.**
+  1. Does the letter template exist?
+  2. Does its reference type match the reference?
+  3. Does the host allow creation (`ForCreation`)?
+  4. Do letter template and letterhead have a published version?
+  5. Only then does the library request the data context.
 +
-Ein Unberechtigter bekommt so immer „nicht erlaubt“ und erfährt nicht, ob eine
-Version veröffentlicht ist. Ob es das Standardschreiben gibt und ob sein
-Bezugstyp passt, bleibt für ihn dagegen unterscheidbar; dieser ADR schützt nur
-den Veröffentlichungsstatus. Beim Speichern wird die Berechtigung erneut mit
-`ForCreation` gefragt.
-* **Default-Berechtigungsprüfung.** Der Starter bildet `ForCreation` weiter auf die
-  Rolle zum Erzeugen von Schreiben ab; diese Entscheidung ändert die
-  Konfiguration nicht. Zum Zeitpunkt der Entscheidung hieß die Rolle
-  `ROLE_SSW_SCHREIBEN_ERZEUGEN`, seit ADR-024 (#84)
+An unauthorized user thus always gets “not permitted” and does not learn
+whether a version is published. Whether the letter template exists and whether
+its reference type matches, on the other hand, remains distinguishable for
+them; this ADR protects only the publication status. On saving, permission is
+requested again with `ForCreation`.
+* **Default authorization check.** The starter still maps `ForCreation` to the
+  role for creating letters; this decision does not change the configuration.
+  At the time of the decision the role was named
+  `ROLE_SSW_SCHREIBEN_ERZEUGEN`, since ADR-024 (#84)
   `ROLE_LETTERWRIGHT_LETTERS_CREATE`.
-  Das Standardschreiben wertet er nicht aus.
+  It does not evaluate the letter template.
 
-=== Kontext
+=== Context
 
-Ein Sachbearbeiter kommt über zwei Einstiegspunkte zu einer Vorschau (#11): aus
-einem fachlichen Bezug heraus, für den er ein Standardschreiben wählt, oder aus
-einem Standardschreiben, für das er einen Bezug wählt. In beiden Fällen kommen
-Standardschreiben und Bezug vom Browser und sind damit nicht vertrauenswürdig.
-Epic #5 verlangt, dass die Kombination serverseitig geprüft wird, bevor der Host
-Platzhalterdaten liefert. Sonst ließe sich der Datenkontext eines Bezugs in ein
-Standardschreiben füllen, das nicht dafür gedacht ist, und der Host müsste jede
-Kombination selbst abfangen.
+A clerk reaches a preview through two entry points (#11): from a business
+reference, for which they choose a letter template, or from a letter template,
+for which they choose a reference. In both cases, letter template and
+reference come from the browser and are therefore not trustworthy. Epic #5
+requires that the combination is checked on the server before the host
+supplies placeholder data. Otherwise the data context of a reference could be
+filled into a letter template that is not intended for it, and the host would
+have to catch every combination itself.
 
-Bis hierhin kannte das Standardschreiben keinen Bezug, und die
-`AuthorizationRequest` zum Erzeugen kannte das Standardschreiben nicht.
+Until now, the letter template knew no reference, and the
+`AuthorizationRequest` for creation did not know the letter template.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Kein Datenkontext für eine unzulässige Kombination.
-* Der Host soll fachliche Regeln je Einstiegspunkt ausdrücken können.
-* Ein Host ohne eigene Regeln soll keine zusätzliche Konfiguration brauchen.
-* Der Vertrag soll beim Kompilieren sagen, welche Daten eine Anfrage trägt
+* No data context for an impermissible combination.
+* The host should be able to express business rules per entry point.
+* A host without rules of its own should need no additional configuration.
+* The contract should state at compile time which data a request carries
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Nur der Bezugstyp am Standardschreiben
+==== Option 1: Only the reference type on the letter template
 
-Die Bibliothek prüft den Typ selbst; das SPI bleibt, wie es ist. Feinere Regeln,
-etwa je Einstiegspunkt oder je Zustand des Bezugs, kann der Host nicht ausdrücken.
+The library checks the type itself; the SPI stays as it is. The host cannot
+express finer rules, for example per entry point or per state of the
+reference.
 
-==== Option 2: Nur der Host entscheidet
+==== Option 2: Only the host decides
 
-Die Anfrage zum Erzeugen enthält das Standardschreiben, und der Host entscheidet
-allein. Jeder Host muss dann auch die offensichtliche Regel „Mahnung nur zu
-Kunden“ selbst implementieren; die Default-Prüfung des Starters ließe jede
-Kombination zu.
+The request for creation contains the letter template, and the host decides
+alone. Every host then also has to implement the obvious rule “payment
+reminder only for customers” itself; the default check of the starter would
+allow every combination.
 
-==== Option 3: Beides (gewählt)
+==== Option 3: Both (chosen)
 
-Die Bibliothek prüft den Bezugstyp, der Host bekommt das Standardschreiben in einer
-eigenen Anfrageart und kann zusätzlich einschränken.
+The library checks the reference type; the host gets the letter template in a
+separate kind of request and can restrict further.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral and `-1` weaker support. The matrix is
+unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Kein Datenkontext für unzulässige Kombination ohne eigenen Code des Hosts | +1 | -1 | +1
-| Feine Regeln je Einstiegspunkt | -1 | +1 | +1
-| Keine zusätzliche Konfiguration für den Host | +1 | 0 | +1
-| Stabiles SPI | +1 | -1 | -1
-s| Summe s| +2 s| -1 s| +2
+| Criterion | Option 1 | Option 2 | Option 3
+| No data context for an impermissible combination without the host's own code | +1 | -1 | +1
+| Fine-grained rules per entry point | -1 | +1 | +1
+| No additional configuration for the host | +1 | 0 | +1
+| Stable SPI | +1 | -1 | -1
+s| Sum s| +2 s| -1 s| +2
 |===
 
-Option 1 und 3 haben dieselbe Summe. Den Ausschlag gibt, dass #11 Regeln je
-Einstiegspunkt verlangt und das SPI vor dem ersten Release noch ohne Kosten für
-Hosts geändert werden kann.
+Options 1 and 3 have the same sum. The deciding factor is that #11 requires
+rules per entry point and that the SPI can still be changed before the first
+release without cost for hosts.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Eine unpassende Kombination erreicht den Host nicht; er liefert dafür keine
-  Daten.
-* Ein Host unterscheidet die drei Anfragearten per `switch`; der Compiler prüft,
-  dass er keine vergisst.
-* Die Rollenkonfiguration des Starters bleibt gleich.
+* An unsuitable combination does not reach the host; it supplies no data for
+  it.
+* A host distinguishes the three kinds of request with a `switch`; the
+  compiler checks that it does not forget one.
+* The role configuration of the starter stays the same.
 
-==== Negativ
+==== Negative
 
-* Die SPI-Änderung bricht jeden Host, der `LetterAction.CREATE` benutzt.
-  Vor dem ersten Release betrifft das nur die Tests der Bibliothek.
-* Ein Standardschreiben, das zu mehreren Bezugstypen passen soll, muss es mehrfach
-  geben.
-* Der Bezugstyp ist eine freie Zeichenkette. Ein Tippfehler beim Anlegen eines
-  Standardschreibens fällt erst auf, wenn keine Vorschau entsteht.
+* The SPI change breaks every host that uses `LetterAction.CREATE`.
+  Before the first release, this affects only the tests of the library.
+* A letter template that is to match several reference types has to exist
+  several times.
+* The reference type is a free string. A typo when creating a letter template
+  only shows up when no preview is produced.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Die Vorlagenverwaltung muss den Bezugstyp beim Anlegen eines Standardschreibens
-  erfassen; welche Typen ein Host kennt, liefert heute niemand. Wie sie zur
-  Auswahl kommen, klärt die Vorlagenverwaltung als Folgearbeit. Eine weitere
-  verpflichtende Host-Schnittstelle entsteht dabei nicht beiläufig: QS-007 erlaubt
-  höchstens drei.
-* Die Persistenz muss den Bezugstyp speichern.
+* The template administration has to capture the reference type when a letter
+  template is created; today nobody supplies which types a host knows. How
+  they become available for selection is clarified by the template
+  administration as follow-up work. No further mandatory host interface is
+  created along the way: QS-007 allows at most three.
+* The persistence has to store the reference type.
 
 === Impact
 
@@ -184,7 +185,7 @@ include::generated/adr-020-zulaessige-kombination-aus-standardschreiben-und-bezu
 include::generated/adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -193,17 +194,16 @@ include::generated/adr-020-zulaessige-kombination-aus-standardschreiben-und-bezu
 
 === Open Questions
 
-* Keine. Die Auswahl der Bezugstypen ist Folgearbeit der Vorlagenverwaltung
-  (siehe Folgearbeiten).
+* None. The selection of reference types is follow-up work of the template
+  administration (see follow-up work).
 
 === Review Notes
 
-Der Owner hat am 2026-11-22 im Review von PR #63 entschieden:
+The owner decided on 2026-11-22 in the review of PR #63:
 
-* ADR-020 und seine vier Relationen sind angenommen. Die Relation zu QS-009 ist ein
-  Beitrag zum Zugriffsschutz, kein Beleg für die Prüfungen beim Download, Löschen
-  und in der Übersicht.
-* Die Berechtigung wird vor den veröffentlichten Versionen geprüft, damit
-  Unberechtigte deren Stand nicht erfahren. Der erste Entwurf prüfte die Versionen
-  vorher.
-* Genau ein Bezugstyp je Standardschreiben trägt für diesen Stand.
+* ADR-020 and its four relations are accepted. The relation to QS-009 is a
+  contribution to access protection, not proof of the checks for download,
+  deletion and in the list.
+* Permission is checked before the published versions, so that unauthorized
+  users do not learn their state. The first draft checked the versions before.
+* Exactly one reference type per letter template is sufficient for this state.

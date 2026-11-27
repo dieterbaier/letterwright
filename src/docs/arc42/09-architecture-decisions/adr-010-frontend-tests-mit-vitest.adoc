@@ -1,15 +1,15 @@
 ---
 id: ADR-010-frontend-tests-mit-vitest
 type: ADR
-title: 'Frontend-Tests mit Vitest statt Jest'
+title: 'Frontend tests with Vitest instead of Jest'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'Die React-Komponenten werden mit Vitest und React Testing Library getestet, weil Vitest die Vite-Konfiguration direkt nutzt und Jest-kompatibel ist.'
+summary: 'The React components are tested with Vitest and React Testing Library, because Vitest uses the Vite configuration directly and is Jest-compatible.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
@@ -19,87 +19,87 @@ relations:
 - type: addresses
   target: QS-011-testabdeckung-als-build-gate
   status: accepted
-  rationale: 'Vitest liefert die Frontend-Abdeckung für das Build-Gate.'
+  rationale: 'Vitest provides the frontend coverage for the build gate.'
   reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
   status: accepted
-  rationale: 'axe-core läuft in den Vitest-Komponententests.'
+  rationale: 'axe-core runs in the Vitest component tests.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-010-frontend-tests-mit-vitest]]
-== ADR-010: Frontend-Tests mit Vitest statt Jest
+== ADR-010: Frontend tests with Vitest instead of Jest
 
 === Status
 
-Angenommen (accepted) am 2026-11-18.
+Accepted on 2026-11-18.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn bei der Prüfung von
-Epic #4 angenommen (Issue #37), ebenso seine ausgehenden Relationen.
+This ADR was created with AI assistance. The owner accepted it when reviewing
+Epic #4 (issue #37), together with its outgoing relations.
 
-=== Entscheidung
+=== Decision
 
-Wir verwenden **Vitest** mit **React Testing Library**, **jsdom** und
-**vitest-axe** bzw. axe-core. Die Abdeckung misst Vitest mit dem V8-Provider.
+We use **Vitest** with **React Testing Library**, **jsdom** and
+**vitest-axe** or axe-core. Vitest measures coverage with the V8 provider.
 
-=== Kontext
+=== Context
 
-Das Issue nennt „Nest“; gemeint war Jest. Der Owner akzeptiert Vitest, verlangt aber
-eine Begründung per ADR. Gebaut wird mit Vite.
+The issue says “Nest”; Jest was meant. The owner accepts Vitest, but asks for
+a justification in an ADR. The build uses Vite.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Gleiche Transformations-Pipeline in Build und Test (TypeScript, UnoCSS, ESM).
-* Jest-kompatible API, geringe Einarbeitung.
-* Geschwindigkeit und Wartungsaufwand der Konfiguration.
+* The same transformation pipeline in build and test (TypeScript, UnoCSS, ESM).
+* Jest-compatible API, little ramp-up.
+* Speed and maintenance effort of the configuration.
 
-=== Betrachtete Optionen
+=== Considered Options
 
 ==== Option 1: Vitest
 
-Nutzt `vite.config.ts` direkt, native ESM- und TypeScript-Unterstützung, Jest-kompatible
-API (`describe`, `it`, `expect`, `vi.fn` statt `jest.fn`).
+Uses `vite.config.ts` directly, native ESM and TypeScript support, Jest-compatible
+API (`describe`, `it`, `expect`, `vi.fn` instead of `jest.fn`).
 
 ==== Option 2: Jest
 
-Sehr verbreitet. Braucht eigene Transformation (ts-jest oder Babel), ESM-Unterstützung
-ist experimentell, Vite-Plugins (UnoCSS) müssen separat nachgebildet werden.
+Very widespread. Needs its own transformation (ts-jest or Babel), ESM support
+is experimental, Vite plugins (UnoCSS) must be reproduced separately.
 
-==== Option 3: Jest mit vite-jest-Brücke
+==== Option 3: Jest with the vite-jest bridge
 
-Behält Jest, nutzt teilweise die Vite-Pipeline. Zusätzliche, wenig gepflegte
-Abhängigkeit.
+Keeps Jest, partly uses the Vite pipeline. An additional, poorly maintained
+dependency.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` means better support, `0` neutral, `-1` weaker
+support and `?` a rating that needs human review or
+a prototype. If a column contains a `?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Gleiche Pipeline wie der Build | +1 | -1 | 0
-| Jest-kompatible API | +1 | +1 | +1
-| Geringer Konfigurationsaufwand | +1 | -1 | -1
-s| Summe s| +3 s| -1 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Same pipeline as the build | +1 | -1 | 0
+| Jest-compatible API | +1 | +1 | +1
+| Low configuration effort | +1 | -1 | -1
+s| Sum s| +3 s| -1 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Keine doppelte Build-Konfiguration für Tests.
+* No duplicate build configuration for tests.
 
-==== Negativ
+==== Negative
 
-* Einige Jest-spezifische Plugins sind nicht direkt nutzbar.
+* Some Jest-specific plugins cannot be used directly.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Testkonventionen im Frontend-README festhalten.
+* Record test conventions in the frontend README.
 
 === Impact
 
@@ -110,23 +110,23 @@ include::generated/adr-010-frontend-tests-mit-vitest-impact.adoc[leveloffset=+2]
 include::generated/adr-010-frontend-tests-mit-vitest-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-010-frontend-tests-mit-vitest-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Keine Abhängigkeit zu Jest-spezifischen Werkzeugen in den Hosts.
+* No dependency on Jest-specific tools in the hosts.
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Der Owner hat die Begründung bestätigt und den ADR am 2026-11-18 angenommen
-(Issue #37). Die ausgehenden Relationen hat er im
-https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen.
+The owner confirmed the justification and accepted the ADR on 2026-11-18
+(issue #37). He accepted the outgoing relations in the
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[review of PR #38].

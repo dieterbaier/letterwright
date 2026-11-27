@@ -1,123 +1,126 @@
 ---
 id: ADR-006-datenbankagnostische-persistenz
 type: ADR
-title: 'Datenbankagnostische Persistenz mit JDBC und Liquibase'
+title: 'Database-agnostic persistence with JDBC and Liquibase'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Persistenz über Spring JDBC mit portablem Liquibase-Changelog und konfigurierbarem Tabellenpräfix; PDFs als BLOB über den Port DocumentStore; Tests gegen PostgreSQL und MariaDB.'
+summary: 'Persistence through Spring JDBC with a portable Liquibase changelog and a configurable table prefix; PDFs as BLOBs through the port DocumentStore; tests against PostgreSQL and MariaDB.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
-- persistenz
-- datenbank
+- persistence
+- database
 - liquibase
 relations:
 - type: depends_on
   target: ADR-002-hexagonale-architektur-und-ports
   status: proposed
-  rationale: 'Persistenz ist ein Adapter hinter Repository- und Ablage-Ports.'
+  rationale: 'Persistence is an adapter behind repository and storage ports.'
   reviewed: false
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: proposed
-  rationale: 'Kein Eingriff in die JPA-Konfiguration des Hosts.'
+  rationale: 'No interference with the host''s JPA configuration.'
   reviewed: false
 - type: introduces_risk
   target: R-006-unterschiede-der-datenbanken-bei-blobs
   status: proposed
-  rationale: 'BLOB-Typen und Größenlimits unterscheiden sich je Datenbank.'
+  rationale: 'BLOB types and size limits differ per database.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-006-datenbankagnostische-persistenz]]
-== ADR-006: Datenbankagnostische Persistenz mit JDBC und Liquibase
+== ADR-006: Database-agnostic persistence with JDBC and Liquibase
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor:
+We propose:
 
-* Persistenz-Adapter auf Basis von **Spring JDBC** (`JdbcClient`), nicht JPA. Die
-  Bibliothek registriert damit keine Entitäten im `EntityManager` des Hosts.
-* Schema per **Liquibase-Changelog** mit portablen Liquibase-Typen, als Datei, die der
-  Host in seinen Master-Changelog einbindet. Optional führt der Starter ihn selbst aus.
-* **Konfigurierbares Tabellenpräfix** (Default `lw_`), um Namenskonflikte zu vermeiden.
-* PDFs als **BLOB** hinter dem Port `DocumentStore`; ein Objektspeicher-Adapter kann
-  später folgen.
-* **Unterstützte Datenbanken** im MVP: PostgreSQL und MariaDB/MySQL, beide per
-  Testcontainers im CI getestet. H2 nur für schnelle Tests.
+* Persistence adapters based on **Spring JDBC** (`JdbcClient`), not JPA. This
+  way the library registers no entities in the host's `EntityManager`.
+* Schema through a **Liquibase changelog** with portable Liquibase types, as a
+  file that the host includes in its master changelog. Optionally the starter
+  runs it itself.
+* **Configurable table prefix** (default `lw_`) to avoid name conflicts.
+* PDFs as **BLOBs** behind the port `DocumentStore`; an object storage adapter
+  can follow later.
+* **Supported databases** in the MVP: PostgreSQL and MariaDB/MySQL, both
+  tested with Testcontainers in CI. H2 only for fast tests.
 
-=== Kontext
+=== Context
 
-Der Owner will Datenbankagnostik, Liquibase und BLOB-Speicherung mit Port für einen
-späteren Objektspeicher. Es gibt kein Mengengerüst. Die Bibliothek läuft in der
-Datenbank der Host-Anwendung.
+The owner wants database agnosticism, Liquibase and BLOB storage with a port
+for a later object storage. There is no volume estimate. The library runs in
+the database of the host application.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Datenbankagnostik.
-* Keine Seiteneffekte auf die Persistenzkonfiguration des Hosts.
-* Einfache Integration des Schemas über Liquibase.
+* Database agnosticism.
+* No side effects on the host's persistence configuration.
+* Simple integration of the schema through Liquibase.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Spring JDBC und Liquibase
+==== Option 1: Spring JDBC and Liquibase
 
-Explizites SQL über wenige Tabellen, volle Kontrolle über BLOB-Streaming, keine
-Konflikte mit dem Persistence-Unit des Hosts. Etwas mehr Mapping-Code.
+Explicit SQL over a few tables, full control over BLOB streaming, no conflicts
+with the host's persistence unit. Somewhat more mapping code.
 
-==== Option 2: JPA (Hibernate) und Liquibase
+==== Option 2: JPA (Hibernate) and Liquibase
 
-Vertraut, weniger Mapping-Code. Entitäten müssen im Host gescannt werden; Konflikte
-mit Hibernate-Einstellungen des Hosts sind möglich; BLOB-Handling ist dialektabhängig.
+Familiar, less mapping code. Entities must be scanned in the host; conflicts
+with the host's Hibernate settings are possible; BLOB handling depends on the
+dialect.
 
-==== Option 3: Spring Data JDBC und Liquibase
+==== Option 3: Spring Data JDBC and Liquibase
 
-Aggregat-orientiert und DDD-nah, aber eigene Konventionen (Namensstrategie,
-Repositories) können mit Host-Konfiguration kollidieren.
+Aggregate-oriented and close to DDD, but its own conventions (naming strategy,
+repositories) can collide with the host configuration.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Datenbankagnostik | +1 | +1 | +1
-| Keine Seiteneffekte im Host | +1 | -1 | 0
-| Wenig Code | -1 | +1 | 0
-| Kontrolle über BLOB-Streaming | +1 | -1 | 0
-s| Summe s| +2 s| 0 s| +1
+| Criterion | Option 1 | Option 2 | Option 3
+| Database agnosticism | +1 | +1 | +1
+| No side effects in the host | +1 | -1 | 0
+| Little code | -1 | +1 | 0
+| Control over BLOB streaming | +1 | -1 | 0
+s| Sum s| +2 s| 0 s| +1
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Bibliothek ist mit Hosts mit und ohne JPA kombinierbar.
-* Speicherort der PDFs kann später ohne Domänenänderung wechseln.
+* The library can be combined with hosts with and without JPA.
+* The storage location of the PDFs can change later without a change to the
+  domain.
 
-==== Negativ
+==== Negative
 
-* Mapping-Code muss getestet werden (zählt zur Testabdeckung).
+* Mapping code must be tested (counts towards test coverage).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Liste unterstützter Datenbanken erweitern, wenn ein Host Oracle oder SQL Server verlangt.
+* Extend the list of supported databases if a host requires Oracle or SQL Server.
 
 === Impact
 
@@ -128,21 +131,21 @@ include::generated/adr-006-datenbankagnostische-persistenz-impact.adoc[leveloffs
 include::generated/adr-006-datenbankagnostische-persistenz-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-006-datenbankagnostische-persistenz-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Gespeicherte Schreiben sind wenige hundert KB groß.
+* Saved letters are a few hundred KB in size.
 
 === Open Questions
 
-* Welche Datenbanken setzen die geplanten Host-Anwendungen ein? (Q-ARCH-001)
+* Which databases do the planned host applications use? (Q-ARCH-001)
 
 === Review Notes
 
-Die Liste der unterstützten Datenbanken ist mit dem Owner zu bestätigen.
+The list of supported databases must be confirmed with the owner.

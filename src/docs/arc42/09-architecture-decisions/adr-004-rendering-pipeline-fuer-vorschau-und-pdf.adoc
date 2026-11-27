@@ -1,264 +1,266 @@
 ---
 id: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
 type: ADR
-title: 'Rendering-Pipeline für Vorschau und PDF'
+title: 'Rendering pipeline for preview and PDF'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'Vorlage und Daten werden im Backend zu einem HTML-Dokument zusammengeführt; die Vorschau paginiert es im Browser mit Paged.js, das PDF erzeugt openhtmltopdf aus demselben HTML. Ein Wiedergabetreue-Test sichert die Gleichheit.'
+summary: 'Template and data are merged in the backend into one HTML document; the preview paginates it in the browser with Paged.js, and openhtmltopdf creates the PDF from the same HTML. A fidelity test ensures they are identical.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
 - rendering
 - pdf
-- vorschau
+- preview
 relations:
 - type: depends_on
   target: ADR-003-vorlagenformat-fuer-fachanwender
   status: accepted
-  rationale: 'Die Pipeline setzt HTML mit Paged-Media-CSS als Vorlagenformat voraus.'
+  rationale: 'The pipeline requires HTML with Paged Media CSS as the template format.'
   reviewed: true
 - type: addresses
   target: QS-004-wiedergabetreue-vorschau-und-pdf
   status: accepted
-  rationale: 'Beide Ausgaben entstehen aus demselben HTML.'
+  rationale: 'Both outputs are created from the same HTML.'
   reviewed: true
 - type: addresses
   target: QS-003-barrierefreie-vorschau
   status: accepted
-  rationale: 'Die Vorschau bleibt echtes HTML und damit für Hilfstechnologien zugänglich.'
+  rationale: 'The preview stays real HTML and thus accessible to assistive technologies.'
   reviewed: true
 - type: addresses
   target: QS-012-erzeugungsdauer
   status: accepted
-  rationale: 'Die PDF-Erzeugung läuft in der JVM ohne externen Prozess.'
+  rationale: 'PDF generation runs in the JVM without an external process.'
   reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
   status: accepted
-  rationale: 'Die Rendering-Bibliothek muss PDF/A-2b erzeugen; Abnahmekriterium des Prototyps.'
+  rationale: 'The rendering library must create PDF/A-2b; acceptance criterion of the prototype.'
   reviewed: true
 - type: addresses
   target: QS-002-barrierefreies-pdf
   status: accepted
-  rationale: 'Die Rendering-Bibliothek muss getaggtes PDF/UA-1 erzeugen; Abnahmekriterium des Prototyps.'
+  rationale: 'The rendering library must create tagged PDF/UA-1; acceptance criterion of the prototype.'
   reviewed: true
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: accepted
-  rationale: 'Die Rendering-Bibliothek muss die Stilvorgaben exakt umsetzen; Abnahmekriterium des Prototyps.'
+  rationale: 'The rendering library must apply the style specifications exactly; acceptance criterion of the prototype.'
   reviewed: true
 - type: introduces_risk
   target: R-002-abweichung-zweier-render-engines
   status: accepted
-  rationale: 'Paged.js und openhtmltopdf sind zwei verschiedene Layout-Engines.'
+  rationale: 'Paged.js and openhtmltopdf are two different layout engines.'
   reviewed: true
 - type: introduces_risk
   target: R-003-reife-der-html-zu-pdf-bibliothek
   status: accepted
-  rationale: 'openhtmltopdf ist ein Community-Projekt mit begrenzter Wartungskapazität.'
+  rationale: 'openhtmltopdf is a community project with limited maintenance capacity.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-004-rendering-pipeline-fuer-vorschau-und-pdf]]
-== ADR-004: Rendering-Pipeline für Vorschau und PDF
+== ADR-004: Rendering pipeline for preview and PDF
 
 === Status
 
-Angenommen (accepted) am 2026-11-21.
+Accepted on 2026-11-21.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn nach dem Prototyp (#3)
-geprüft und angenommen. Die PDF/UA-Stichprobe und der Test mit NVDA sind am
-2026-11-23 durchgeführt (Owner); offen ist die Einordnung von zwei Warnungen aus
-axesCheck (siehe Ergebnis des Prototyps).
+This ADR was created with AI assistance. The owner reviewed and accepted it
+after the prototype (#3). The PDF/UA spot check and the test with NVDA were
+carried out on 2026-11-23 (owner); the classification of two warnings from
+axesCheck is still open (see Result of the prototype).
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen eine zweistufige Pipeline vor:
+We propose a two-stage pipeline:
 
-. **Zusammenführen** (Backend): Vorlagenversion (Briefpapier und Standardschreiben)
-  und Datenkontext werden mit der Platzhaltersprache (ADR-008) zu **einem
-  vollständigen HTML-Dokument** mit Paged-Media-CSS zusammengeführt.
-. **Ausgabe**:
-** **Vorschau**: Das HTML wird an das Frontend geliefert und dort mit
-   **Paged.js** (MIT) in Seiten umbrochen, inklusive Seitenzahlen. Paged.js hat der
-   Owner bereits erfolgreich eingesetzt.
-** **PDF**: Dasselbe HTML wird im Backend mit **openhtmltopdf** (LGPL, basiert auf
-   Apache PDFBox) gerendert, das CSS Paged Media, PDF/A und PDF/UA unterstützt.
+. **Merge** (backend): the template version (letterhead and letter template)
+  and the data context are merged with the placeholder language (ADR-008) into
+  **one complete HTML document** with Paged Media CSS.
+. **Output**:
+** **Preview**: the HTML is delivered to the frontend and paginated there with
+   **Paged.js** (MIT), including page numbers. The owner has already used
+   Paged.js successfully.
+** **PDF**: the same HTML is rendered in the backend with **openhtmltopdf**
+   (LGPL, based on Apache PDFBox), which supports CSS Paged Media, PDF/A and
+   PDF/UA.
 
-=== Abnahmekriterien für den Prototyp
+=== Acceptance criteria for the prototype
 
-Jede Option, die gewählt werden soll, muss für **dieselben Referenzschreiben**
-(nachgelieferte DOCX-Vorgaben, ein- und mehrseitig) alle folgenden Kriterien
-belegen:
+Every option that is to be chosen must prove all of the following criteria for
+**the same reference letters** (DOCX specifications supplied later,
+single-page and multi-page):
 
-* PDF/A-2b ohne veraPDF-Fehler (xref:qs-001-pdfa-konformitaet[QS-001]).
-* PDF/UA-1 ohne veraPDF-Fehler und bestandene manuelle Stichprobe
+* PDF/A-2b without veraPDF errors (xref:qs-001-pdfa-konformitaet[QS-001]).
+* PDF/UA-1 without veraPDF errors and a passed manual spot check
   (xref:qs-002-barrierefreies-pdf[QS-002]).
-* Barrierefreie paginierte Vorschau: Prüfung der gerenderten Vorschau am mehrseitigen
-  Referenzschreiben nach xref:qs-003-barrierefreie-vorschau[QS-003], automatisch (axe-core,
-  Tastatur) und manuell mit Screenreader (Lesereihenfolge, wiederholte Kopf- und
-  Fußzeilen, Fokus, Statusmeldungen). Das Ergebnis geht in die Entscheidung ein.
-* Wiedergabetreue zwischen Vorschau und PDF (xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]).
-* Stiltreue zur zentralen DOCX-Vorgabe (xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]).
+* Accessible paginated preview: check of the rendered preview on the multi-page
+  reference letter according to xref:qs-003-barrierefreie-vorschau[QS-003], automatically (axe-core,
+  keyboard) and manually with a screen reader (reading order, repeated headers
+  and footers, focus, status messages). The result feeds into the decision.
+* Fidelity between preview and PDF (xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]).
+* Style fidelity to the central DOCX specification (xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]).
 
-Option 1 wird nur angenommen, wenn sie alle Kriterien erfüllt. **Option 2 ist keine
-gesicherte Rückfallebene**, sondern ein Kandidat: Sie wird im Spike gegen dieselben
-Kriterien geprüft, falls Option 1 scheitert. Insbesondere ist offen, ob ein von
-Chromium erzeugtes, mit PDFBox nachbearbeitetes PDF PDF/UA-1 erfüllt.
+Option 1 is accepted only if it meets all criteria. **Option 2 is not a secured
+fallback**, but a candidate: it is checked against the same criteria in the
+spike if option 1 fails. In particular, it is open whether a PDF created by
+Chromium and post-processed with PDFBox meets PDF/UA-1.
 
-=== Kontext
+=== Context
 
-Vorschau und gespeichertes Dokument sollen gleich aussehen. Die Vorschau darf HTML
-sein. Kommerzielle Werkzeuge und iText (AGPL) sind ausgeschlossen. Thymeleaf und
-Apache FOP wären für den Owner in Ordnung, openhtmltopdf ist ihm unbekannt und soll
-per ADR bewertet werden.
+Preview and saved document shall look the same. The preview may be HTML.
+Commercial tools and iText (AGPL) are excluded. Thymeleaf and Apache FOP would
+be fine for the owner; openhtmltopdf is unknown to him and shall be assessed in
+an ADR.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Gleiches Aussehen von Vorschau und PDF.
-* PDF/A und PDF/UA ohne kommerzielle Werkzeuge.
-* Barrierefreie HTML-Vorschau.
-* Geringe Laufzeitabhängigkeiten im Host (keine externen Prozesse).
+* Identical look of preview and PDF.
+* PDF/A and PDF/UA without commercial tools.
+* Accessible HTML preview.
+* Few runtime dependencies in the host (no external processes).
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Paged.js für Vorschau, openhtmltopdf für PDF (gleiches HTML)
+==== Option 1: Paged.js for the preview, openhtmltopdf for the PDF (same HTML)
 
-Leichtgewichtig, rein JVM-basiert im Backend, PDF/A und PDF/UA eingebaut. Zwei
-Layout-Engines können sich in Details (Silbentrennung, Schriftmetriken,
-Umbruchregeln) unterscheiden.
+Lightweight, purely JVM-based in the backend, PDF/A and PDF/UA built in. Two
+layout engines can differ in details (hyphenation, font metrics, line and page
+breaking rules).
 
-==== Option 2: Paged.js in Headless-Chromium für Vorschau und PDF, PDF/A-Nachbearbeitung mit PDFBox
+==== Option 2: Paged.js in headless Chromium for preview and PDF, PDF/A post-processing with PDFBox
 
-Eine Engine, höchste Wiedergabetreue. Erfordert Chromium als Laufzeitabhängigkeit
-im Host. Chromium erzeugt kein PDF/A; die Nachbearbeitung (XMP, OutputIntent,
-Schrifteinbettung) ist eigener, riskanter Aufwand. Ob das Ergebnis zusätzlich
-PDF/UA-1 erfüllt (Tagging aus Chromium, nach der Nachbearbeitung erhalten), ist
-unbelegt. Kandidat bis zum Nachweis der Abnahmekriterien.
+One engine, highest fidelity. Requires Chromium as a runtime dependency in the
+host. Chromium does not create PDF/A; the post-processing (XMP, OutputIntent,
+font embedding) is separate, risky effort. Whether the result also meets
+PDF/UA-1 (tagging from Chromium, preserved after the post-processing) is not
+proven. A candidate until the acceptance criteria are proven.
 
-==== Option 3: Apache FOP (XSL-FO) für PDF, separate XSLT-Transformation für HTML-Vorschau
+==== Option 3: Apache FOP (XSL-FO) for the PDF, separate XSLT transformation for the HTML preview
 
-Sehr ausgereift für PDF/A und Tagged PDF. Vorschau und PDF entstehen aus
-verschiedenen Transformationen, Abweichungen sind wahrscheinlich; passt nicht zu
-ADR-003.
+Very mature for PDF/A and tagged PDF. Preview and PDF are created by different
+transformations, differences are likely; does not fit ADR-003.
 
-*Rückfallebene* (Owner, 2026-11-21): Kunden akzeptieren Apache FOP mit
-XSLT-Transformation meist. Akzeptiert ein Kunde openhtmltopdf nicht, kommt Option 3
-wieder infrage. Für diese Bibliothek wählt der Owner sie vorerst nicht, sie ist ihm
-zu schwergewichtig. Ein Wechsel träfe den Port `Renderer` und das Vorlagenformat
-(ADR-003): Vorschau und PDF entstünden nicht mehr aus demselben HTML, QS-004 wäre
-neu nachzuweisen (R-003).
+*Fallback* (owner, 2026-11-21): Customers usually accept Apache FOP with an
+XSLT transformation. If a customer does not accept openhtmltopdf, option 3
+becomes an option again. For this library the owner does not choose it for
+now; it is too heavyweight for him. A switch would affect the port `Renderer`
+and the template format (ADR-003): preview and PDF would no longer be created
+from the same HTML, and QS-004 would have to be proven again (R-003).
 
-==== Option 4: Vorschau zeigt das erzeugte PDF (pdf.js)
+==== Option 4: The preview shows the generated PDF (pdf.js)
 
-Exakte Gleichheit, aber die Vorschau ist für Hilfstechnologien schlechter
-zugänglich, und jede Vorschau kostet eine vollständige PDF-Erzeugung.
+Exactly identical, but the preview is less accessible to assistive
+technologies, and every preview costs a complete PDF generation.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
-| Gleiches Aussehen | ? | +1 | -1 | +1
-| PDF/A und PDF/UA ohne kommerzielle Werkzeuge | +1 | ? | +1 | +1
-| Barrierefreie HTML-Vorschau | +1 | +1 | +1 | -1
-| Geringe Laufzeitabhängigkeiten | +1 | -1 | +1 | +1
-| Antwortzeit der Vorschau | +1 | 0 | 0 | -1
-s| Summe s| ? s| ? s| +2 s| +1
+| Criterion | Option 1 | Option 2 | Option 3 | Option 4
+| Identical look | ? | +1 | -1 | +1
+| PDF/A and PDF/UA without commercial tools | +1 | ? | +1 | +1
+| Accessible HTML preview | +1 | +1 | +1 | -1
+| Few runtime dependencies | +1 | -1 | +1 | +1
+| Response time of the preview | +1 | 0 | 0 | -1
+s| Sum s| ? s| ? s| +2 s| +1
 |===
 
-Option 4 scheidet unabhängig von der Summe aus, weil sie die Muss-Anforderung einer
-barrierefreien Vorschau verletzt. Option 3 hat die beste sichere Summe, verfehlt aber
-das wichtigste Ziel, gleiches Aussehen, und passt nicht zum Vorlagenformat aus ADR-003.
-Ob Option 1 sie übertrifft, entscheidet die Messung der Wiedergabetreue im Prototyp.
+Option 4 is ruled out regardless of its sum, because it violates the mandatory
+requirement of an accessible preview. Option 3 has the best certain sum, but it
+misses the most important goal, an identical look, and does not fit the
+template format from ADR-003. Whether option 1 beats it is decided by the
+fidelity measurement in the prototype.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Keine externen Prozesse; das PDF entsteht in der JVM des Hosts.
-* Paged.js-Erfahrung des Owners wird genutzt.
+* No external processes; the PDF is created in the host's JVM.
+* The owner's experience with Paged.js is used.
 
-==== Negativ
+==== Negative
 
-* Wiedergabetreue muss aktiv getestet werden (R-002).
-* Abhängigkeit von einem Community-Projekt (R-003); LGPL ist mit MIT als Abhängigkeit vereinbar, muss aber in der Lizenzdokumentation stehen.
-* Kunden können openhtmltopdf ablehnen. Dann wäre Option 3 die Rückfallebene, mit dem oben beschriebenen Preis.
+* Fidelity must be tested actively (R-002).
+* Dependency on a community project (R-003); LGPL is compatible with MIT as a dependency, but must be stated in the license documentation.
+* Customers can reject openhtmltopdf. Then option 3 would be the fallback, at the price described above.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Prototyp gemeinsam mit ADR-003: erledigt für Option 1, Ergebnis oben. Option 2 ist zurückgestellt (Entscheidung des Owners).
-* Die PDFBox-Nachbearbeitung der Fußzeile muss bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
-* Schriften: Maßgeblich ist die Schrift der zentralen DOCX-Vorgabe (QS-013). Beide Engines laden **dieselbe Datei** (openhtmltopdf eingebettet ins PDF, Paged.js per `@font-face` aus dem Backend). Woher die Datei kommt, regelt xref:adr-017-bereitstellung-der-schriften[ADR-017]: Lizenzpflichtige Schriften stellt der Host in einem konfigurierbaren Ordner bereit, sonst greift eine freie Ersatzschrift der Bibliothek. Der Spike prüft beide Wege getrennt (Q-PO-010): (1) *Referenzschriften vom Host:* Sie laden im sandboxed iframe unter der vorgesehenen CSP (ADR-014), openhtmltopdf bettet sie ins PDF ein, und ihre Lizenz ist für beide Nutzungen freigegeben, Einbettung ins PDF und Auslieferung als Webfont. (2) *Freie Ersatzschriften:* Vorschau und PDF werden gegen QS-004 und QS-013 gemessen. Ein erfolgreicher Weg 2 ersetzt den Nachweis für Weg 1 nicht.
+* Prototype together with ADR-003: done for option 1, result above. Option 2 is postponed (owner's decision).
+* The PDFBox post-processing of the footer must be checked with every update of openhtmltopdf (R-003).
+* Fonts: the font of the central DOCX specification is authoritative (QS-013). Both engines load **the same file** (openhtmltopdf embedded in the PDF, Paged.js via `@font-face` from the backend). xref:adr-017-bereitstellung-der-schriften[ADR-017] governs where the file comes from: the host provides fonts that require a license in a configurable folder; otherwise a free substitute font of the library applies. The spike checks both paths separately (Q-PO-010): (1) *Reference fonts from the host:* they load in the sandboxed iframe under the intended CSP (ADR-014), openhtmltopdf embeds them in the PDF, and their license permits both uses, embedding in the PDF and delivery as a web font. (2) *Free substitute fonts:* preview and PDF are measured against QS-004 and QS-013. A successful path 2 does not replace the proof for path 1.
 
 
-=== Ergebnis des Prototyps
+=== Result of the prototype
 
-Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat Option 1 an beiden
-Referenzschreiben geprüft. Stand der Abnahmekriterien:
+The throwaway prototype from #3 (`prototyp/README.adoc`) checked option 1 on
+both reference letters. Status of the acceptance criteria:
 
 [cols="2,1,4", options="header"]
 |===
-| Kriterium | Stand | Befund
-| PDF/A-2b (QS-001) | erfüllt | veraPDF ohne Verstöße, auch mit Ersatzschriften und für ein bösartiges Testschreiben.
-| PDF/UA-1 (QS-002) | teilweise | veraPDF ohne Verstöße. Manuelle Stichprobe an beiden Referenz-PDFs (Owner, 2026-11-23): NVDA mit Acrobat Reader ohne Befund; axesCheck meldet PDF/UA und WCAG als erfüllt, mit je einer Warnung ohne Details (Strukturbaum, WCAG 4.1), die noch nicht eingeordnet ist. Die inhaltliche Fußzeile wird erst durch einen Nachbearbeitungsschritt mit PDFBox lesbar (siehe unten).
-| Barrierefreie Vorschau (QS-003) | mit Grenzen | axe-core ohne Verstöße der Stufen serious und critical, keine Fokusfalle, Statusmeldungen über `aria-live`. VoiceOver liest das Schreiben vollständig, braucht am Ende der ersten Seite aber einen neuen Einstieg in den Frame. Bei 200 % Zoom scrollt die Vorschau statt umzubrechen. NVDA mit Chrome liest das Schreiben vollständig einschließlich der Alternativtexte; Reihenfolge und Wiederholungen sind mit NVDA nicht einzeln festgehalten.
-| Wiedergabetreue (QS-004) | erfüllt, Messung folgt | Das Chrome-Druck-PDF der Vorschau weicht höchstens 0,3 mm vom PDF ab, bei gleicher Seitenzahl und gleicher erster und letzter Zeile je Seite. In der Sichtprobe des Owners am Bildschirm (100 %, nebeneinander) ist kein Unterschied zu erkennen. Die genaue Messung der Bildschirmdarstellung wird ein automatischer Test in #7.
-| Stiltreue (QS-013) | angenommen | Das PDF weicht höchstens 0,1 mm vom Word-PDF ab. Eine Abnahme durch die zentrale Abteilung ist nicht möglich; das Projekt nimmt an, dass die Stiltreue passt (Owner, 2026-11-21).
+| Criterion | Status | Finding
+| PDF/A-2b (QS-001) | met | veraPDF without violations, also with substitute fonts and for a malicious test letter.
+| PDF/UA-1 (QS-002) | partially | veraPDF without violations. Manual spot check on both reference PDFs (owner, 2026-11-23): NVDA with Acrobat Reader without findings; axesCheck reports PDF/UA and WCAG as met, with one warning each without details (structure tree, WCAG 4.1), which is not yet classified. The content footer only becomes readable through a post-processing step with PDFBox (see below).
+| Accessible preview (QS-003) | with limits | axe-core without violations of the levels serious and critical, no focus trap, status messages via `aria-live`. VoiceOver reads the letter completely, but at the end of the first page it needs a new entry into the frame. At 200 % zoom the preview scrolls instead of reflowing. NVDA with Chrome reads the letter completely, including the alternative texts; order and repetitions are not recorded individually with NVDA.
+| Fidelity (QS-004) | met, measurement follows | The Chrome print PDF of the preview differs from the PDF by at most 0.3 mm, with the same number of pages and the same first and last line on each page. In the owner's visual check on screen (100 %, side by side) no difference can be seen. The exact measurement of the screen rendering will be an automated test in #7.
+| Style fidelity (QS-013) | assumed | The PDF differs from the Word PDF by at most 0.1 mm. An acceptance by the central department is not possible; the project assumes that the style fidelity is right (owner, 2026-11-21).
 |===
 
-*Fußzeile im PDF.* openhtmltopdf gibt laufende Elemente immer als Artefakt aus;
-eine Einstellung dafür gibt es nicht. Als Fließinhalt der ersten Seite schiebt es
-die Fußzeile auf die nächste Seite. Ein Nachbearbeitungsschritt mit PDFBox taggt
-deshalb die inhaltliche Fußzeile als Absätze am Ende des Strukturbaums. Bei jeder
-Erzeugung wird geprüft, dass genau die Fußzeilentexte aus dem HTML in dieser
-Reihenfolge dort stehen; sonst bricht die Erzeugung ab.
+*Footer in the PDF.* openhtmltopdf always outputs running elements as
+artifacts; there is no setting for this. As flowing content of the first page,
+it pushes the footer to the next page. A post-processing step with PDFBox
+therefore tags the content footer as paragraphs at the end of the structure
+tree. On every generation it is checked that exactly the footer texts from the
+HTML are there in this order; otherwise the generation aborts.
 
-*Entscheidungen des Owners* im https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[Review zu PR #47]:
+*Owner's decisions* in the https://github.com/dieterbaier/standardschreiben/pull/47#pullrequestreview-5997431593[review of PR #47]:
 
-* *Chromium (Option 2) wird vorerst nicht geprüft.* Ein anderer PDF-Renderer
-  behebt die Grenzen der Paged.js-Vorschau nicht. Die Abweichungen bleiben offen.
-  Option 2 kommt wieder infrage, wenn die PDF/UA-Stichprobe ein Problem zeigt,
-  das sich mit openhtmltopdf und PDFBox nicht zuverlässig lösen lässt.
-* *Die PDFBox-Nachbearbeitung ist akzeptiert*, solange sie und ihr Ausweichweg
-  dokumentiert sind. Der Nachweis bleibt bei jeder Erzeugung aktiv. Ausweichweg:
-  die Fußzeile als regulärer, getaggter Block im Brieflayout; eine geänderte
-  Platzierung braucht die Abnahme nach QS-013.
-* Die Vorschau darf bei 200 % Zoom scrollen statt umzubrechen. Den Aufwand für
-  VoiceOver am Seitenwechsel treibt das Projekt nicht weiter (Owner, 2026-11-20).
+* *Chromium (option 2) is not checked for now.* A different PDF renderer does
+  not remove the limits of the Paged.js preview. The deviations stay open.
+  Option 2 becomes an option again if the PDF/UA spot check shows a problem
+  that cannot be solved reliably with openhtmltopdf and PDFBox.
+* *The PDFBox post-processing is accepted* as long as it and its fallback are
+  documented. The proof stays active on every generation. Fallback: the footer
+  as a regular, tagged block in the letter layout; a changed placement needs
+  acceptance according to QS-013.
+* The preview may scroll instead of reflowing at 200 % zoom. The project does
+  not pursue the effort for VoiceOver at the page change any further (owner,
+  2026-11-20).
 
-*Schriften.* Weg 1: Arial und Arial Narrow aus dem Schriftordner laden im
-sandboxed iframe unter der CSP, und openhtmltopdf bettet sie ein. Zur Lizenz hat
-der Owner am 2026-11-21 entschieden: Die Bibliothek liefert keine lizenzpflichtigen
-Schriften aus. Stellt der Host sie bereit, bettet das PDF Teilmengen davon ein
-(PDF/A verlangt das), und die Vorschau erhält sie als Webfont. Das Projekt nimmt an,
-dass der Host beides darf; maßgeblich ist seine Lizenz. Weg 2: siehe
-xref:adr-017-bereitstellung-der-schriften[ADR-017].
+*Fonts.* Path 1: Arial and Arial Narrow from the font folder load in the
+sandboxed iframe under the CSP, and openhtmltopdf embeds them. On the license,
+the owner decided on 2026-11-21: the library does not ship fonts that require a
+license. If the host provides them, the PDF embeds subsets of them (PDF/A
+requires this), and the preview receives them as a web font. The project
+assumes that the host is allowed to do both; its license is authoritative.
+Path 2: see xref:adr-017-bereitstellung-der-schriften[ADR-017].
 
-*Weitere Befunde:* Vorschau und PDF entstehen aus demselben bereinigten HTML
-(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]); die Vorschau bekommt nur
-Zusätze im Kopf. Die Vorschau des fertigen PDFs (Option 4) wäre exakt gleich,
-bleibt aber aus den genannten Gründen ausgeschieden. Den Wartungsstand von
-openhtmltopdf (Annahme unten, R-003) hat der Prototyp nicht geprüft.
+*Further findings:* Preview and PDF are created from the same sanitized HTML
+(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]); the preview only gets
+additions in the head. The preview of the finished PDF (option 4) would be
+exactly identical, but stays ruled out for the reasons given. The prototype did
+not check the maintenance status of openhtmltopdf (assumption below, R-003).
 
-*Annahme* (Owner, 2026-11-21): Option 1 ist angenommen. QS-013 gilt als Annahme,
-die der erste echte Kundeneinsatz bestätigen muss; der ist erst mit einem
-produktionsreifen Stand möglich. Die Wiedergabetreue am Bildschirm ist per
-Sichtprobe bestätigt und wird in #7 automatisch gemessen. Die PDF/UA-Stichprobe
-und der Test mit NVDA sind durchgeführt (Owner, 2026-11-23); offen und beim Owner
-ist die Einordnung der zwei Warnungen aus axesCheck. Zeigt
-die Stichprobe ein Problem, das sich mit openhtmltopdf und PDFBox nicht zuverlässig
-lösen lässt, kommt Option 2 wieder infrage.
+*Acceptance* (owner, 2026-11-21): Option 1 is accepted. QS-013 counts as an
+assumption that the first real customer deployment must confirm; that is only
+possible with a production-ready state. Fidelity on screen is confirmed by a
+visual check and will be measured automatically in #7. The PDF/UA spot check
+and the test with NVDA have been carried out (owner, 2026-11-23); the
+classification of the two warnings from axesCheck is open and with the owner.
+If the spot check shows a problem that cannot be solved reliably with
+openhtmltopdf and PDFBox, option 2 becomes an option again.
 
 === Impact
 
@@ -269,27 +271,27 @@ include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-impact.adoc[
 include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-004-rendering-pipeline-fuer-vorschau-und-pdf-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* openhtmltopdf wird in einer aktiv gepflegten Community-Fork-Version weiterentwickelt. Geprüft am 2026-11-21: `io.github.openhtmltopdf`, Release 1.1.114 vom 2026-11-16, das Repository `openhtmltopdf/openhtmltopdf` ist nicht archiviert. Der Prototyp nutzt diese Version.
-* Die Layout-Anforderungen von Briefen sind einfach genug (kein komplexer Spaltensatz), dass beide Engines gleich umbrechen.
+* openhtmltopdf is developed further in an actively maintained community fork version. Checked on 2026-11-21: `io.github.openhtmltopdf`, release 1.1.114 of 2026-11-16; the repository `openhtmltopdf/openhtmltopdf` is not archived. The prototype uses this version.
+* The layout requirements of letters are simple enough (no complex multi-column layout) that both engines break lines and pages the same way.
 
 === Open Questions
 
-* Keine. Zum Drucken hat der Owner am 2026-11-16 entschieden (Q-PO-002): Die
-  Vorschau wird nicht gedruckt. „Drucken“ gibt es nur beim gespeicherten
-  Schreiben, und gedruckt wird dessen PDF über die Druckfunktion des Browsers.
+* None. On printing, the owner decided on 2026-11-16 (Q-PO-002): the preview
+  is not printed. “Drucken” exists only for the saved letter, and what is
+  printed is its PDF, through the browser's print function.
 
 === Review Notes
 
-* Der Owner hat die Entscheidung am 2026-11-21 angenommen, nach dem Prototyp und
-  der Sichtprobe zu QS-004.
-* Der Owner hat am 2026-11-21 auch die neun Relationen im Front Matter
-  angenommen: zu ADR-003, QS-001 bis QS-004, QS-012, QS-013, R-002 und R-003.
+* The owner accepted the decision on 2026-11-21, after the prototype and the
+  visual check for QS-004.
+* On 2026-11-21 the owner also accepted the nine relations in the front matter:
+  to ADR-003, QS-001 to QS-004, QS-012, QS-013, R-002 and R-003.

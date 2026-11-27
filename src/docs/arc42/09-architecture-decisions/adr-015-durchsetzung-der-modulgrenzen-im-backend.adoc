@@ -1,419 +1,418 @@
 ---
 id: ADR-015-durchsetzung-der-modulgrenzen-im-backend
 type: ADR
-title: 'Durchsetzung der Architekturgrenzen im Backend'
+title: 'Enforcing the architecture boundaries in the backend'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-16'
 reviewed: true
-summary: 'Die Grenzen der hexagonalen Architektur werden über eigene Gradle-Module erzwungen, damit falsche Abhängigkeiten schon beim Kompilieren scheitern; ArchUnit prüft zusätzlich die Paketregeln aus ADR-002.'
+summary: 'The boundaries of the hexagonal architecture are enforced through separate Gradle modules, so that wrong dependencies already fail at compile time; ArchUnit additionally checks the package rules from ADR-002.'
 derived_from:
 - type: external
-  description: 'Entscheidung des Owners im Review von PR #15 (Backend-Gerüst, Issue #12): Grenzen über eigene Module erzwingen, ArchUnit zusätzlich („fail fast“)'
+  description: 'Decision of the owner in the review of PR #15 (backend skeleton, issue #12): enforce boundaries through separate modules, ArchUnit in addition (“fail fast”)'
   uri: https://github.com/dieterbaier/standardschreiben/pull/15
 tags:
 - decision
-- architektur
+- architecture
 - build
 - hexagonal
 relations:
 - type: depends_on
   target: ADR-002-hexagonale-architektur-und-ports
   status: accepted
-  rationale: 'Die Module bilden die Ports und Adapter aus ADR-002 ab; ohne diesen Schnitt gäbe es keine Grenzen durchzusetzen.'
+  rationale: 'The modules map the ports and adapters from ADR-002; without this cut there would be no boundaries to enforce.'
   reviewed: true
 - type: refines
   target: ADR-009-build-monorepo-und-versionen
   status: accepted
-  rationale: 'ADR-009 legt den Modulschnitt fest; dieser ADR begründet, warum die Grenzen als Module und nicht als Paketkonvention umgesetzt sind.'
+  rationale: 'ADR-009 defines the module cut; this ADR justifies why the boundaries are implemented as modules and not as a package convention.'
   reviewed: true
 - type: addresses
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Über die Modulgrenzen sieht ein Host beim Kompilieren nur das Modul spi (ADR-016), auch über den Starter; Domänenmodell, Ports, Anwendungsfälle, Service und Adapter bleiben ihm verborgen.'
+  rationale: 'Through the module boundaries a host sees only the module spi (ADR-016) at compile time, also via the starter; domain model, ports, use cases, service and adapters stay hidden from it.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-015-durchsetzung-der-modulgrenzen-im-backend]]
-== ADR-015: Durchsetzung der Architekturgrenzen im Backend
+== ADR-015: Enforcing the architecture boundaries in the backend
 
 === Status
 
-Angenommen (accepted) am 2026-11-16.
+Accepted on 2026-11-16.
 
-Dieser ADR ist KI-gestützt entstanden. Der Owner hat ihn im Review von PR #18
-geprüft und angenommen.
+This ADR was created with AI assistance. The owner reviewed and accepted it in
+the review of PR #18.
 
-Ergänzt am 2026-11-16 um die Trennung von Domänenmodell und Domänenservices
-(<<adr-015-domaenenservices>>, Issue #25). Diese Ergänzung hat der Owner
-entschieden: Option 1 aus drei Varianten, beide Module unter `domain`.
+Extended on 2026-11-16 with the separation of domain model and domain services
+(<<adr-015-domaenenservices>>, issue #25). The owner decided this extension:
+option 1 of three variants, both modules under `domain`.
 
-Verfeinert am 2026-11-17 durch xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28).
-`usecases-out` ist seitdem ein internes Modul; der Host kompiliert nur gegen das
-Modul `spi`, auch über den Starter. Mit Issue #19 sind die Aussagen dieses ADR
-zur Host-Abhängigkeit auf `spi` umgestellt.
+Refined on 2026-11-17 by xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] (PR #28).
+Since then `usecases-out` is an internal module; the host compiles only against
+the module `spi`, also via the starter. With issue #19 the statements of this
+ADR on the host dependency have been switched to `spi`.
 
-Ergänzt am 2026-11-18 mit Issue #19 (<<adr-015-leere-selektoren>>): Eine
-ArchUnit-Regel prüft die Isolation der Adapter, und leere Selektoren schlagen
-fehl. Damit ArchUnit auch Pakete ohne weitere Klassen sieht, kompiliert
-`-Xpkginfo:always` jede `package-info`. Unabhängig davon ist jedes Paket mit
-JSpecify `@NullMarked` annotiert (<<adr-015-null-vertrag>>). Beides hat der
-Owner im Review von PR #33 entschieden. Die Ergänzung ist KI-gestützt formuliert;
-der Owner hat sie im Review von PR #33 angenommen.
+Extended on 2026-11-18 with issue #19 (<<adr-015-leere-selektoren>>): an
+ArchUnit rule checks the isolation of the adapters, and empty selectors fail.
+So that ArchUnit also sees packages without further classes,
+`-Xpkginfo:always` compiles every `package-info`. Independently of this, every
+package is annotated with JSpecify `@NullMarked` (<<adr-015-null-vertrag>>).
+The owner decided both in the review of PR #33. The extension was worded with
+AI assistance; the owner accepted it in the review of PR #33.
 
-=== Entscheidung
+=== Decision
 
-Wir erzwingen die Grenzen der hexagonalen Architektur
-(xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) über **eigene
-Gradle-Module** und nicht nur über eine Paketkonvention:
+We enforce the boundaries of the hexagonal architecture
+(xref:adr-002-hexagonale-architektur-und-ports[ADR-002]) through **separate
+Gradle modules** and not only through a package convention:
 
-* Jede Grenze, über die eine Abhängigkeit nur in eine Richtung laufen darf, ist
-  eine Modulgrenze: `domain-model`, `domain-service`, `usecases-in`,
-  `usecases-out`, `usecases-service`, `spi` und je Adapter ein Modul (Schnitt in
-  xref:adr-009-build-monorepo-und-versionen[ADR-009] und
+* Every boundary across which a dependency may run in one direction only is a
+  module boundary: `domain-model`, `domain-service`, `usecases-in`,
+  `usecases-out`, `usecases-service`, `spi` and one module per adapter (cut in
+  xref:adr-009-build-monorepo-und-versionen[ADR-009] and
   xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]).
-* Domänenmodell und Domänenservices sind getrennte Module unter `domain`. Nur
-  `usecases-service` bindet `domain-service` ein, als `implementation`. Ports
-  und Adapter sehen beim Kompilieren nur das Modell
+* Domain model and domain services are separate modules under `domain`. Only
+  `usecases-service` includes `domain-service`, as `implementation`. Ports and
+  adapters see only the model at compile time
   (<<adr-015-domaenenservices>>).
-* Die erlaubten Richtungen stehen als Projektabhängigkeiten in den
-  `build.gradle.kts`-Dateien. Ein eingehender Adapter sieht nur `usecases-in`,
-  ein ausgehender nur `usecases-out`. Eine falsche Abhängigkeit scheitert damit
-  beim Kompilieren („fail fast“) und nicht erst im Testlauf.
-* **ArchUnit bleibt zusätzlich bestehen** (Modul `architecture-tests`). Es prüft
-  auf Paketebene einen Teil derselben Regeln und dazu, was die
-  Modulabhängigkeiten nicht ausdrücken: Die Domäne und die Ports sind frei von
-  Spring, eingehende und ausgehende Ports kennen einander nicht, der Service
-  kennt keine Adapter, eingehende Adapter kennen nur eingehende Ports,
-  ausgehende Adapter nur ausgehende, kein Adapter hängt am Starter, und kein
-  Adapter benutzt einen anderen. Das Domänenmodell kennt keine Domänenservices,
-  und weder Ports noch Adapter kennen sie. Die Regeln zu `spi` stehen in
-  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. Keine Regel lässt
-  einen leeren Selektor zu (<<adr-015-leere-selektoren>>).
-* Gemeinsame Build-Regeln stehen im Convention-Plugin
-  `letterwright.java-module`, damit die Zahl der Module den Pflegeaufwand
-  nicht vervielfacht.
+* The allowed directions are project dependencies in the
+  `build.gradle.kts` files. An inbound adapter sees only `usecases-in`, an
+  outbound adapter only `usecases-out`. A wrong dependency therefore fails at
+  compile time (“fail fast”) and not only in the test run.
+* **ArchUnit remains in addition** (module `architecture-tests`). At package
+  level it checks part of the same rules and also what the module dependencies
+  do not express: the domain and the ports are free of Spring, inbound and
+  outbound ports do not know each other, the service knows no adapters,
+  inbound adapters know only inbound ports, outbound adapters only outbound
+  ones, no adapter depends on the starter, and no adapter uses another one.
+  The domain model knows no domain services, and neither ports nor adapters
+  know them. The rules on `spi` are in
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]. No rule allows an
+  empty selector (<<adr-015-leere-selektoren>>).
+* Shared build rules are in the convention plugin
+  `letterwright.java-module`, so that the number of modules does not multiply
+  the maintenance effort.
 
-Die Pugh-Matrix ungewichtet ergibt keinen klaren Sieger (siehe unten). Den
-Ausschlag geben die beiden Treiber, die der Owner höher gewichtet: früher
-Fehlernachweis und die schmale Abhängigkeit des Hosts.
+The unweighted Pugh matrix gives no clear winner (see below). The deciding
+factor is the two drivers that the owner weights higher: early error detection
+and the narrow dependency of the host.
 
-=== Kontext
+=== Context
 
-Das Backend-Gerüst (Issue #12, PR #15) hat die Anwendungsfälle in drei Module
-`usecases/in`, `usecases/out` und `usecases/service` geschnitten. ADR-002 und
-ADR-009 halten dieses Ergebnis fest, begründen aber nicht, warum Module statt
-einer Paketkonvention in einem Modul. Diese Begründung liefert dieser ADR.
+The backend skeleton (issue #12, PR #15) cut the use cases into three modules
+`usecases/in`, `usecases/out` and `usecases/service`. ADR-002 and ADR-009
+record this result, but do not justify why modules instead of a package
+convention in one module. This ADR provides that justification.
 
-Geprüfte Belege im Repository:
+Evidence checked in the repository:
 
-* `src/application/backend/**/build.gradle.kts`: `adapter-web` hängt nur an
-  `usecases-in`, `adapter-rendering` und `adapter-persistence-jdbc` nur an
-  `usecases-out`, `adapter-host` an `usecases-out` und `spi`;
-  `usecases-service` exportiert `usecases-in` per `api` und
-  nutzt `usecases-out` und `domain-service` per `implementation`;
-  `spring-boot-starter` exportiert nur `spi` per `api` und bindet Ports, Service
-  und Adapter als `implementation` ein (Nachtrag 2026-11-24: seit #78 auch
-  `api`; `adapter-api` hängt an `api` und `usecases-in`). `domain-service` sieht er beim
-  Kompilieren nicht, er bringt es nur transitiv zur Laufzeit mit.
-* `src/application/backend/architecture-tests/`: die ArchUnit-Regeln, jede mit
-  einer Fixture, die einen Verstoß nachstellt.
+* `src/application/backend/**/build.gradle.kts`: `adapter-web` depends only on
+  `usecases-in`, `adapter-rendering` and `adapter-persistence-jdbc` only on
+  `usecases-out`, `adapter-host` on `usecases-out` and `spi`;
+  `usecases-service` exports `usecases-in` via `api` and
+  uses `usecases-out` and `domain-service` via `implementation`;
+  `spring-boot-starter` exports only `spi` via `api` and includes ports, service
+  and adapters as `implementation` (addendum 2026-11-24: since #78 also
+  `api`; `adapter-api` depends on `api` and `usecases-in`). It does not see
+  `domain-service` at compile time; it only brings it along transitively at
+  runtime.
+* `src/application/backend/architecture-tests/`: the ArchUnit rules, each with
+  a fixture that reproduces a violation.
 
-Zwei Eigenschaften des Projekts machen die Frage schärfer als in einer
-gewöhnlichen Anwendung:
+Two properties of the project make the question sharper than in an ordinary
+application:
 
-* **Es ist eine Bibliothek** (xref:adr-001-einbettbare-bibliothek[ADR-001]).
-  Die Driven Ports sind öffentliche API, die der Host implementiert. Was in
-  welchem Artefakt liegt, ist damit Teil des Vertrags mit dem Host.
-* **Ports und ihre Implementierungen müssen `public` sein.** Driving Adapter
-  rufen Ports aus anderen Paketen auf, und die Autokonfiguration im Starter
-  muss die Service-Klassen instanziieren. Innerhalb eines Moduls kann der
-  Compiler daher nicht verhindern, dass ein Adapter direkt eine Service-Klasse
-  oder einen fremden Port benutzt.
+* **It is a library** (xref:adr-001-einbettbare-bibliothek[ADR-001]).
+  The driven ports are public API that the host implements. What lies in which
+  artifact is therefore part of the contract with the host.
+* **Ports and their implementations must be `public`.** Driving adapters
+  call ports from other packages, and the auto-configuration in the starter
+  must instantiate the service classes. Within one module the compiler
+  therefore cannot prevent an adapter from directly using a service class or
+  a foreign port.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* **Früher Fehlernachweis:** Eine falsche Abhängigkeit soll so früh wie möglich
-  scheitern, idealerweise schon in der IDE und beim Kompilieren.
-* **Schmale Abhängigkeit des Hosts:** Ein Host soll zum Kompilieren nur den
-  Vertrag brauchen, den er implementiert, nicht die Anwendungsfälle, den Service
-  und die Adapter. Zur Laufzeit bindet der Host über den Starter ohnehin alles
-  ein. Bei der ersten Entscheidung waren das die Ports und die Domäne; seit
-  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] ist es nur `spi`.
-  Nachtrag 2026-11-24: seit
+* **Early error detection:** A wrong dependency should fail as early as
+  possible, ideally already in the IDE and at compile time.
+* **Narrow dependency of the host:** To compile, a host should need only the
+  contract it implements, not the use cases, the service and the adapters. At
+  runtime the host includes everything via the starter anyway. At the time of
+  the first decision these were the ports and the domain; since
+  xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] it is only `spi`.
+  Addendum 2026-11-24: since
   xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] (#78) `spi`
-  und `api`.
-* **Isolierte Adapter:** Ein Adapter soll einen anderen nicht direkt benutzen
-  können, etwa der Web-Adapter nicht die Persistenz an den Anwendungsfällen
-  vorbei. Dieser Treiber kam erst beim Lesen der Literatur hinzu.
-* **Geringer Build-Aufwand:** Wenige Module, einfache Konfiguration.
-* **Grenzen später verschieben:** Wie leicht lässt sich der Schnitt ändern, wenn
-  sich Grenzen als falsch erweisen.
-* **Verträglichkeit mit Spring-Hosts:** Keine Zusatzhürden für Hosts, die auf
-  dem Klassenpfad laufen.
+  and `api`.
+* **Isolated adapters:** An adapter should not be able to use another one
+  directly, for example the web adapter should not use persistence while
+  bypassing the use cases. This driver was added only when reading the
+  literature.
+* **Low build effort:** Few modules, simple configuration.
+* **Moving boundaries later:** How easily the cut can be changed if boundaries
+  turn out to be wrong.
+* **Compatibility with Spring hosts:** No extra hurdles for hosts that run on
+  the classpath.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Ein Modul, Paketkonvention und ArchUnit
+==== Option 1: One module, package convention and ArchUnit
 
-Alle Kernklassen liegen in einem Modul, die Grenzen sind Pakete. ArchUnit prüft
-die Abhängigkeitsregeln nach dem Kompilieren im Testlauf.
+All core classes lie in one module; the boundaries are packages. ArchUnit
+checks the dependency rules after compilation in the test run.
 
-Einfachster Build, Grenzen lassen sich mit einem Refactoring verschieben. Ein
-Verstoß fällt aber erst im Test auf, und die IDE bietet die falsche Klasse
-weiter per Autovervollständigung an. Der Host bekommt ein einziges Artefakt
-mit allen Klassen. Beide Quellen halten Prüfungen nach dem Kompilieren allein
-für zu schwach: Hombergs nennt sie „not fail-safe“, weil schon ein umbenanntes
-Paket eine Regel leer laufen lässt. Brown nennt sie „fallible“ mit einem zu
-langen Feedback-Zyklus (siehe <<adr-015-literatur>>).
+Simplest build; boundaries can be moved with a refactoring. But a violation
+shows up only in the test, and the IDE keeps offering the wrong class through
+auto-completion. The host gets a single artifact with all classes. Both sources
+consider checks after compilation alone too weak: Hombergs calls them “not
+fail-safe”, because a single renamed package can make a rule run empty. Brown
+calls them “fallible” with a feedback loop that is too long (see
+<<adr-015-literatur>>).
 
-==== Option 2: Ein Modul, Sichtbarkeit (package-private) und ArchUnit
+==== Option 2: One module, visibility (package-private) and ArchUnit
 
-Wie Option 1, aber alles, was eine Grenze nicht überschreiten muss, ist
-package-private. Der Compiler setzt so einen Teil der Regeln durch.
+Like option 1, but everything that does not have to cross a boundary is
+package-private. The compiler thus enforces part of the rules.
 
-Das ist Browns bevorzugter Weg für einen Monolithen („package by component“):
-Je weniger Typen `public` sind, desto mehr Regeln setzt der Compiler durch.
-Innerhalb einer Komponente hilft das. An den Grenzen des Hexagons trägt es
-nicht: Ports und Service-Klassen müssen `public` sein (siehe Kontext), und
-genau dort verlaufen die wichtigen Regeln. Hombergs nennt zwei weitere
-Grenzen. Package-private reicht nicht über Unterpakete hinweg. Mit Spring
-funktioniert es nur, wenn die Klassen per Classpath-Scanning erzeugt werden.
-Der Host bekommt weiterhin ein einziges Artefakt.
+This is Brown's preferred way for a monolith (“package by component”): the
+fewer types are `public`, the more rules the compiler enforces. Within a
+component this helps. At the boundaries of the hexagon it does not hold:
+ports and service classes must be `public` (see Context), and that is exactly
+where the important rules run. Hombergs names two further limits.
+Package-private does not reach across subpackages. With Spring it only works
+if the classes are created by classpath scanning. The host still gets a single
+artifact.
 
-==== Option 3: Eigene Gradle-Module je Grenze und ArchUnit (gewählt)
+==== Option 3: Separate Gradle modules per boundary and ArchUnit (chosen)
 
-Die Grenzen sind Module, die erlaubten Richtungen Projektabhängigkeiten.
-ArchUnit prüft zusätzlich.
+The boundaries are modules, the allowed directions are project dependencies.
+ArchUnit checks in addition.
 
-Falsche Abhängigkeiten scheitern beim Kompilieren, und die IDE bietet sie gar
-nicht erst an. Ein Host hängt beim Kompilieren nur am Modul, das seinen Vertrag
-enthält; seit xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] ist das
-`spi`. Der Schnitt entspricht der
-feinsten Variante, die Hombergs beschreibt: eingehende und ausgehende Ports als
-getrennte Module, damit jeder Adapter schon an seiner Abhängigkeit als
-eingehend oder ausgehend erkennbar ist. Ein Modul je Adapter vermeidet zudem
-Browns „Périphérique anti-pattern“. Gemeint ist damit Infrastrukturcode in einem
-gemeinsamen Quellbaum, über den ein Web-Controller an der Domäne vorbei direkt
-ein Repository aufrufen kann.
+Wrong dependencies fail at compile time, and the IDE does not even offer them.
+At compile time a host depends only on the module that contains its contract;
+since xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016] that is
+`spi`. The cut corresponds to the
+finest variant that Hombergs describes: inbound and outbound ports as separate
+modules, so that every adapter can be recognized as inbound or outbound by its
+dependency alone. One module per adapter also avoids Brown's “Périphérique
+anti-pattern”. This means infrastructure code in a shared source tree, through
+which a web controller can call a repository directly, bypassing the domain.
 
-Kosten: mehr Build-Dateien, ein Convention-Plugin, und das Verschieben einer
-Grenze ist eine Änderung am Build und an den veröffentlichten Artefakten.
-Brown nennt einen eigenen Quellbaum je Komponente „very much an idealistic
-solution“ mit Kosten für Performance, Komplexität und Wartung.
+Costs: more build files, a convention plugin, and moving a boundary is a change
+to the build and to the published artifacts. Brown calls a separate source tree
+per component “very much an idealistic solution” with costs for performance,
+complexity and maintenance.
 
-==== Option 4: Java-Module (JPMS) mit `module-info.java`
+==== Option 4: Java modules (JPMS) with `module-info.java`
 
-Jedes Gradle-Modul bekommt zusätzlich einen Moduldeskriptor, der nur die
-Port-Pakete exportiert.
+Every Gradle module additionally gets a module descriptor that exports only the
+port packages.
 
-Stärkste Kapselung, auch innerhalb eines Artefakts: Brown beschreibt das als
-Unterscheidung zwischen Typen, die `public`, und Typen, die „published“ sind.
-Sie setzt aber dieselbe
-Aufteilung in Artefakte wie Option 3 voraus und kommt nur auf dem Modulpfad zur
-Wirkung. Spring-Boot-Hosts laufen üblicherweise auf dem Klassenpfad, wo die
-Deskriptoren ignoriert werden. Der Aufwand für Reflection-Freigaben (`opens`)
-in Tests und Autokonfiguration ist nicht erprobt.
+Strongest encapsulation, even within one artifact: Brown describes this as a
+distinction between types that are `public` and types that are “published”.
+But it requires the same
+split into artifacts as option 3 and takes effect only on the module path.
+Spring Boot hosts usually run on the classpath, where the descriptors are
+ignored. The effort for reflection access (`opens`) in tests and
+auto-configuration has not been tried out.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
-Die Matrix ist ungewichtet.
+`+1` means better support, `0` neutral, `-1` weaker support and `?` a rating
+that needs human review or a prototype. If a column contains a `?`, its sum is
+also `?`. The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
-| Früher Fehlernachweis | -1 | 0 | +1 | +1
-| Schmale Abhängigkeit des Hosts | -1 | -1 | +1 | +1
-| Isolierte Adapter | -1 | 0 | +1 | +1
-| Geringer Build-Aufwand | +1 | +1 | -1 | -1
-| Grenzen später verschieben | +1 | +1 | -1 | -1
-| Verträglichkeit mit Spring-Hosts | 0 | 0 | 0 | 0
-s| Summe s| -1 s| +1 s| +1 s| +1
+| Criterion | Option 1 | Option 2 | Option 3 | Option 4
+| Early error detection | -1 | 0 | +1 | +1
+| Narrow dependency of the host | -1 | -1 | +1 | +1
+| Isolated adapters | -1 | 0 | +1 | +1
+| Low build effort | +1 | +1 | -1 | -1
+| Moving boundaries later | +1 | +1 | -1 | -1
+| Compatibility with Spring hosts | 0 | 0 | 0 | 0
+s| Sum s| -1 s| +1 s| +1 s| +1
 |===
 
-Die `0` für Option 4 bei „Verträglichkeit mit Spring-Hosts“ ist eine
-Einschätzung des Owners ohne eigene Erfahrung mit JPMS, keine erprobte
-Bewertung (siehe Annahmen).
+The `0` for option 4 under “Compatibility with Spring hosts” is an estimate by
+the owner without own experience with JPMS, not a tested rating (see
+Assumptions).
 
-Ungewichtet liegen Option 2, Option 3 und Option 4 gleichauf. Ohne den
-nachträglich ergänzten Treiber „Isolierte Adapter“ läge Option 2 vorn.
-Option 2 verfehlt aber genau die beiden Treiber, die der Owner höher gewichtet:
-An den Grenzen des Hexagons setzt sie nichts durch, und der Host bekommt alle
-Klassen. Option 3 und Option 4 erfüllen beide. Die Matrix trennt sie nicht,
-weil Option 4 Option 3 voraussetzt und auf einer Drei-Punkte-Skala beim
-Build-Aufwand ebenfalls `-1` erhält. Option 4 kostet zusätzlich die
-Moduldeskriptoren und die Freigaben für Spring. Ihr Mehrwert, Kapselung
-innerhalb eines Artefakts, wirkt nur auf dem Modulpfad und damit nicht in den
-erwarteten Hosts. Deshalb fällt die Wahl auf Option 3.
+Unweighted, option 2, option 3 and option 4 are level. Without the driver
+“Isolated adapters”, which was added later, option 2 would be ahead.
+But option 2 misses exactly the two drivers that the owner weights higher:
+it enforces nothing at the boundaries of the hexagon, and the host gets all
+classes. Option 3 and option 4 meet both. The matrix does not separate them,
+because option 4 requires option 3 and, on a three-point scale, also gets `-1`
+for build effort. Option 4 additionally costs the module descriptors and the
+access grants for Spring. Its added value, encapsulation within one artifact,
+takes effect only on the module path and therefore not in the expected hosts.
+This is why option 3 is chosen.
 
 [[adr-015-domaenenservices]]
-=== Ergänzung: Domänenmodell und Domänenservices
+=== Extension: domain model and domain services
 
-Der Owner hat am 2026-11-16 auf eine Lücke im Schnitt hingewiesen. Beide
-Port-Module geben die Domäne per `api` weiter. Läge ein Domänenservice im selben
-Modul wie das Modell, sähen ihn die Ports und transitiv alle Adapter. Ein Adapter
-könnte ihn dann am Anwendungsfall vorbei aufrufen. Die Modulgrenzen verhinderten
-das nicht, und ArchUnit prüfte es nicht.
+On 2026-11-16 the owner pointed out a gap in the cut. Both port modules pass
+on the domain via `api`. If a domain service lay in the same module as the
+model, the ports and, transitively, all adapters would see it. An adapter could
+then call it while bypassing the use case. The module boundaries did not
+prevent this, and ArchUnit did not check it.
 
-Betrachtet wurden drei Varianten:
+Three variants were considered:
 
-. *Eigenes Modul für Domänenservices* (gewählt). Nur `usecases-service` bindet
-  es ein. Ports und Adapter sehen es beim Kompilieren nicht.
-. *Domänenservices im Modul `usecases-service`.* Sie wären ebenso unsichtbar,
-  aber Domänenlogik läge in der Anwendungsschicht.
-. *Domänenservices in der Domäne lassen und nur per ArchUnit absichern.* Das ist am
-  einfachsten, scheitert aber erst im Test und widerspricht damit dem früheren
-  Fehlernachweis dieses ADR.
+. *Separate module for domain services* (chosen). Only `usecases-service`
+  includes it. Ports and adapters do not see it at compile time.
+. *Domain services in the module `usecases-service`.* They would be just as
+  invisible, but domain logic would lie in the application layer.
+. *Leave domain services in the domain and secure them only via ArchUnit.* This
+  is the simplest, but fails only in the test and thus contradicts this ADR's
+  early error detection.
 
-Der Schnitt:
+The cut:
 
 [cols="1,2,2", options="header"]
 |===
-| Modul | Verzeichnis | Hängt an
-| `domain-model` | `domain/model` | nichts
+| Module | Directory | Depends on
+| `domain-model` | `domain/model` | nothing
 | `domain-service` | `domain/service` | `domain-model` (`api`)
 | `usecases-in`, `usecases-out` | `usecases/in`, `usecases/out` | `domain-model` (`api`)
-| `usecases-service` | `usecases/service` | `usecases-in` (`api`), `usecases-out` und `domain-service` (`implementation`)
+| `usecases-service` | `usecases/service` | `usecases-in` (`api`), `usecases-out` and `domain-service` (`implementation`)
 |===
 
-Ob ein Domänenservice sichtbar ist, legt damit der Build fest und nicht eine
-Konvention. Zwei ArchUnit-Regeln prüfen das zusätzlich auf Paketebene, jede mit
-Fixture: Das Modell (`domain.model`) kennt keine Domänenservices
-(`domain.service`), und Ports und Adapter kennen sie nicht. Der Starter bindet
-`usecases-service` als `implementation` ein. Beim Kompilieren sieht er die
-Domänenservices deshalb nicht, und auch ein Host über den Starter bekommt sie
-nur zur Laufzeit. Braucht die Autokonfiguration sie später als Beans, muss der
-Starter `domain-service` ausdrücklich einbinden.
+Whether a domain service is visible is thus defined by the build and not by a
+convention. Two ArchUnit rules additionally check this at package level, each
+with a fixture: the model (`domain.model`) knows no domain services
+(`domain.service`), and ports and adapters do not know them. The starter
+includes `usecases-service` as `implementation`. It therefore does not see the
+domain services at compile time, and a host using the starter also gets them
+only at runtime. If the auto-configuration later needs them as beans, the
+starter must include `domain-service` explicitly.
 
 [[adr-015-leere-selektoren]]
-=== Ergänzung: Isolation der Adapter und leere Selektoren
+=== Extension: isolation of the adapters and empty selectors
 
-Das Review von PR #18 hat zwei Lücken in der ArchUnit-Prüfung gefunden
-(Issue #19). Beide sind mit dieser Ergänzung geschlossen.
+The review of PR #18 found two gaps in the ArchUnit check (issue #19). Both are
+closed with this extension.
 
-*Isolation der Adapter.* Die Regel `adaptersAreIsolatedFromEachOther` schneidet
-`adapter.<richtung>.<adapter>` in Slices, und keine Slice darf von einer anderen
-abhängen. Sie deckt eingehende und ausgehende Adapter ab, auch `adapter-host`.
-Zwei Fixtures stellen den Verstoß nach: ein eingehender Adapter, der einen
-ausgehenden benutzt, und `adapter-host`, der einen anderen ausgehenden Adapter
-benutzt.
+*Isolation of the adapters.* The rule `adaptersAreIsolatedFromEachOther` cuts
+`adapter.<direction>.<adapter>` into slices, and no slice may depend on another.
+It covers inbound and outbound adapters, including `adapter-host`.
+Two fixtures reproduce the violation: an inbound adapter that uses an outbound
+one, and `adapter-host` using another outbound adapter.
 
-*Leere Selektoren.* Keine Regel setzt mehr `allowEmptyShould(true)`. Trifft ein
-Selektor in der Produktivprüfung keine Klasse, schlägt sie fehl.
+*Empty selectors.* No rule sets `allowEmptyShould(true)` any more. If a selector
+matches no class in the production check, the check fails.
 
-*Sichtbarkeit der Pakete.* Die Module des Gerüsts enthalten nur
-`package-info.java`. Ohne Annotation erzeugt der Compiler daraus normalerweise
-keine Klasse. Für ArchUnit waren die Module leer, und alle Produktivprüfungen
-wären rot gewesen. Das Convention-Plugin übergibt deshalb `-Xpkginfo:always`.
-Damit wird jede `package-info.java` zur Klasse, mit oder ohne Annotation.
+*Visibility of the packages.* The modules of the skeleton contain only
+`package-info.java`. Without an annotation the compiler normally generates no
+class from it. For ArchUnit the modules were empty, and all production checks
+would have been red. The convention plugin therefore passes `-Xpkginfo:always`.
+This turns every `package-info.java` into a class, with or without an
+annotation.
 
-Betrachtet wurden vier Varianten:
+Four variants were considered:
 
-. *`-Xpkginfo:always`* (gewählt). Die Sichtbarkeit für ArchUnit hängt an einer
-  Compileroption und nicht an einer Annotation. Der Null-Vertrag ist davon
-  getrennt entschieden (<<adr-015-null-vertrag>>).
-. *Nur JSpecify `@NullMarked`.* Die Annotation erzeugt ebenfalls
-  `package-info.class`. Die Sichtbarkeit für ArchUnit hinge dann aber an der
-  Null-Konvention: Ein Paket ohne `@NullMarked` fiele aus der Prüfung.
-. *#19 aufteilen* und das Verbot leerer Selektoren erst einführen, wenn echte
-  Klassen in den Modulen liegen (nach #30). Bis dahin bliebe die Lücke offen,
-  gerade während #5 die ersten Klassen anlegt.
-. *Leere Selektoren je Regel zulassen*, solange ihr Paket leer ist, mit einer
-  Liste im Test. Das kostet Pflege, und die Liste kann veralten.
+. *`-Xpkginfo:always`* (chosen). Visibility for ArchUnit depends on a compiler
+  option and not on an annotation. The null contract is decided separately
+  (<<adr-015-null-vertrag>>).
+. *Only JSpecify `@NullMarked`.* The annotation also generates
+  `package-info.class`. But visibility for ArchUnit would then depend on the
+  null convention: a package without `@NullMarked` would drop out of the check.
+. *Split #19* and introduce the ban on empty selectors only once real classes
+  are in the modules (after #30). Until then the gap would stay open, precisely
+  while #5 creates the first classes.
+. *Allow empty selectors per rule* as long as their package is empty, with a
+  list in the test. This costs maintenance, and the list can become outdated.
 
-*Was der Nachweis abdeckt.* Mit einem absichtlich falschen Basispaket schlagen
-alle Prüfungen in `HexagonalArchitectureTest` mit „failed to check any classes“
-fehl, mit `-Xpkginfo:always` allein ebenso wie mit `@NullMarked` allein. Belegt
-ist damit: Ein Selektor, der *gar nichts* mehr trifft, fällt auf. Nicht belegt
-ist, dass jedes einzelne Paket getroffen wird. Viele Regeln wählen mehrere
-Pakete auf einmal aus, etwa `domain..`, `adapter..` oder das Slice-Muster
-`adapter.(*).(*)..`. Fällt ein einzelnes Paket aus einem solchen Selektor, weil
-es umbenannt wurde, und treffen andere weiterhin, bleibt die Regel grün. Die
-Schwäche, die Hombergs nennt, ist damit verkleinert, aber nicht beseitigt.
+*What the evidence covers.* With a deliberately wrong base package, all checks
+in `HexagonalArchitectureTest` fail with “failed to check any classes”, with
+`-Xpkginfo:always` alone as well as with `@NullMarked` alone. This proves: a
+selector that matches *nothing at all* any more is noticed. It does not prove
+that every single package is matched. Many rules select several packages at
+once, for example `domain..`, `adapter..` or the slice pattern
+`adapter.(*).(*)..`. If a single package drops out of such a selector because
+it was renamed, and others still match, the rule stays green. The weakness
+that Hombergs names is thus reduced, but not removed.
 
 [[adr-015-null-vertrag]]
-=== Ergänzung: Null-Vertrag mit JSpecify
+=== Extension: null contract with JSpecify
 
-Jedes Paket ist in seiner `package-info.java` mit JSpecify `@NullMarked`
-annotiert. Typen sind damit standardmäßig nicht `null`, Ausnahmen tragen
-`@Nullable`. Der Owner hat das im Review von PR #33 als bewussten Vertrag
-entschieden, vor allem für `spi`: Der Host sieht dort, was er liefern muss und
-was er bekommt. Mit einer passenden Toolchain, etwa einem Nullness-Checker,
-kann er seine Implementierung dagegen prüfen. Spring Boot 4 verwendet JSpecify
-selbst.
+Every package is annotated with JSpecify `@NullMarked` in its
+`package-info.java`. Types are thus non-`null` by default; exceptions carry
+`@Nullable`. The owner decided this in the review of PR #33 as a deliberate
+contract, above all for `spi`: there the host sees what it must deliver and
+what it receives. With a suitable toolchain, for example a nullness checker,
+it can check its implementation against it. Spring Boot 4 uses JSpecify
+itself.
 
-Was das bedeutet und was nicht:
+What this means and what it does not:
 
-* `javac` prüft den Vertrag nicht. Die Annotationen sind Information für
-  Werkzeuge und Leser.
-* Unterpakete erben `@NullMarked` nicht. Jedes neue Paket braucht eine eigene
-  `package-info.java` mit `@NullMarked`. Das ist eine Konvention für neue
-  Pakete. Weder ArchUnit noch der Build prüfen sie; ArchUnit prüft nur, dass
-  die Selektoren Klassen treffen (<<adr-015-leere-selektoren>>).
-* Das Convention-Plugin bindet `org.jspecify:jspecify` per `api` ein, wie
-  JSpecify es für Bibliotheken empfiehlt. Die Version steht im
-  Versionskatalog, unabhängig von der Spring-Boot-BOM. JSpecify braucht Spring
-  nicht.
+* `javac` does not check the contract. The annotations are information for
+  tools and readers.
+* Subpackages do not inherit `@NullMarked`. Every new package needs its own
+  `package-info.java` with `@NullMarked`. This is a convention for new
+  packages. Neither ArchUnit nor the build checks it; ArchUnit only checks that
+  the selectors match classes (<<adr-015-leere-selektoren>>).
+* The convention plugin includes `org.jspecify:jspecify` via `api`, as
+  JSpecify recommends for libraries. The version is in the
+  version catalog, independent of the Spring Boot BOM. JSpecify does not need
+  Spring.
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Ein Domänenservice ist beim Kompilieren nur in `usecases-service` sichtbar.
-  Ein Port oder Adapter, der ihn importiert, kompiliert nicht.
+* A domain service is visible at compile time only in `usecases-service`.
+  A port or adapter that imports it does not compile.
 
-* Falsche Abhängigkeiten scheitern beim Kompilieren und werden in der IDE gar
-  nicht erst angeboten.
-* Ein Host sieht beim Kompilieren nur `spi`, auch wenn er den Starter einbindet
-  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]; Nachtrag 2026-11-24:
-  seit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] `spi` und
-  `api`). Domänenmodell,
-  Ports, Anwendungsfälle, Service und Adapter bringt der Starter nur zur
-  Laufzeit mit.
-* Für die Regeln, die beide abdecken, prüfen ArchUnit und Modulgrenzen auf zwei
-  Wegen; fällt einer weg, bleibt der andere. Hombergs empfiehlt diese
-  Kombination.
-* Jede neue Modulabhängigkeit steht im Build-Skript und ist damit eine bewusste,
-  im Review sichtbare Entscheidung.
-* Die ArchUnit-Fixtures im Paket `archfixture` belegen, dass jede Regel den
-  nachgestellten Verstoß erkennt. Ein Selektor, der im Produktionscode gar
-  nichts mehr trifft, lässt die Produktivprüfung fehlschlagen
+* Wrong dependencies fail at compile time and are not even offered in the
+  IDE.
+* At compile time a host sees only `spi`, even if it includes the starter
+  (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]; addendum 2026-11-24:
+  since xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] `spi` and
+  `api`). The starter brings domain model,
+  ports, use cases, service and adapters along only at
+  runtime.
+* For the rules that both cover, ArchUnit and module boundaries check in two
+  ways; if one fails, the other remains. Hombergs recommends this
+  combination.
+* Every new module dependency is in the build script and is thus a deliberate
+  decision that is visible in the review.
+* The ArchUnit fixtures in the package `archfixture` prove that every rule
+  detects the reproduced violation. A selector that matches nothing at all any
+  more in the production code makes the production check fail
   (<<adr-015-leere-selektoren>>).
-* Der Null-Vertrag gilt von Anfang an und ist für den Host in `spi` sichtbar
+* The null contract applies from the start and is visible to the host in `spi`
   (<<adr-015-null-vertrag>>).
 
-==== Negativ
+==== Negative
 
-* Mehr Gradle-Projekte und Build-Dateien; das Convention-Plugin ist Pflicht,
-  damit die Regeln nicht auseinanderlaufen.
-* Eine Grenze zu verschieben ändert den Build und die veröffentlichten Artefakte
-  (xref:adr-012-distribution-ueber-github-packages[ADR-012]) und ist damit für
-  Hosts sichtbar. Hombergs warnt, dass Build-Module „less supple to change over
-  time“ sind und ein falscher Schnitt deshalb eher bestehen bleibt.
-* Die Modulabhängigkeiten selbst sind Code, der falsch sein kann. Eine
-  zusätzliche Projektabhängigkeit hebt eine Grenze still auf. ArchUnit fängt
-  das nur für die Regeln ab, die es prüft. Seit #19 gehört die Isolation der
-  Adapter dazu.
-* Ein Selektor über mehrere Pakete bleibt grün, wenn nur eines davon wegfällt
-  und andere weiter treffen (<<adr-015-leere-selektoren>>).
-* Jedes Modul hängt an JSpecify, und ein Host sieht es über `spi`. Die
-  Bibliothek enthält nur Annotationen und hat keine weiteren Abhängigkeiten.
-* Ob ein neues Paket `@NullMarked` trägt, prüft kein Werkzeug. Das bleibt eine
-  Konvention, die im Review auffallen muss (<<adr-015-null-vertrag>>).
+* More Gradle projects and build files; the convention plugin is mandatory,
+  so that the rules do not drift apart.
+* Moving a boundary changes the build and the published artifacts
+  (xref:adr-012-distribution-ueber-github-packages[ADR-012]) and is therefore
+  visible to hosts. Hombergs warns that build modules are “less supple to
+  change over time” and that a wrong cut is therefore more likely to remain.
+* The module dependencies themselves are code that can be wrong. An additional
+  project dependency silently lifts a boundary. ArchUnit catches this only for
+  the rules it checks. Since #19 the isolation of the adapters is one of
+  them.
+* A selector over several packages stays green if only one of them drops out
+  and others still match (<<adr-015-leere-selektoren>>).
+* Every module depends on JSpecify, and a host sees it via `spi`. The
+  library contains only annotations and has no further dependencies.
+* No tool checks whether a new package carries `@NullMarked`. This remains a
+  convention that must be noticed in the review (<<adr-015-null-vertrag>>).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Issue #32: Der Nachweis am Host zeigt, dass `spi` JSpecify auf den
-  Compile-Classpath bringt, ohne Constraints aus der Spring-Boot-BOM
-  weiterzugeben.
-* JPMS (Option 4) neu bewerten, falls ein Host auf dem Modulpfad läuft oder
-  Kapselung innerhalb eines Artefakts nötig wird.
-* Innerhalb eines Moduls bleibt package-private die Voreinstellung für alles,
-  was keine Grenze überschreiten muss.
+* Issue #32: The evidence at the host shows that `spi` brings JSpecify onto the
+  compile classpath without passing on constraints from the Spring Boot BOM.
+* Re-evaluate JPMS (option 4) if a host runs on the module path or
+  encapsulation within one artifact becomes necessary.
+* Within a module, package-private remains the default for everything that
+  does not have to cross a boundary.
 
 === Impact
 
@@ -424,7 +423,7 @@ include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-impact.adoc[
 include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -432,93 +431,93 @@ endif::[]
 include::generated/adr-015-durchsetzung-der-modulgrenzen-im-backend-traceability.adoc[leveloffset=+2]
 
 [[adr-015-literatur]]
-=== Literatur
+=== Literature
 
-Beide Quellen sind am Originaltext geprüft. Zitate stehen im englischen
-Original.
+Both sources have been checked against the original text. Quotations are given
+in the English original.
 
-*Tom Hombergs: _Get Your Hands Dirty on Clean Architecture_, 2. Auflage. Packt,
-2023, ISBN 978-1-80512-837-3, Kapitel 12 „Enforcing Architecture Boundaries“.*
-Das Kapitel stellt drei Mittel nebeneinander, jeweils mit eigenem Abschnitt:
-„Visibility modifiers“, „Post-compile fitness function“ und „Build artifacts“.
+*Tom Hombergs: _Get Your Hands Dirty on Clean Architecture_, 2nd edition. Packt,
+2023, ISBN 978-1-80512-837-3, chapter 12 “Enforcing Architecture Boundaries”.*
+The chapter presents three means side by side, each with its own section:
+“Visibility modifiers”, “Post-compile fitness function” and “Build artifacts”.
 
-* Zu Build-Modulen: „Developers can no longer inadvertently create illegal
+* On build modules: “Developers can no longer inadvertently create illegal
   dependencies because the classes are not even available on the classpath and
-  they would run into compile errors.“ Als weitere Vorteile nennt er, dass
-  Build-Werkzeuge keine zyklischen Abhängigkeiten zulassen, dass Module isoliert
-  geändert werden können und dass eine neue Abhängigkeit „a conscious act
-  instead of an accident“ wird.
-* Zu den Kosten: Die Architektur „should be somewhat stable before splitting it
-  into different build modules“, und Build-Module „tend to be less supple to
-  change over time“. Je feiner der Schnitt, desto mehr Mapping zwischen den
-  Modulen.
-* Zu ArchUnit: Prüfungen nach dem Kompilieren „are not fail-safe“; ein Tippfehler
-  oder ein umbenanntes Paket kann eine Regel wirkungslos machen.
-* Fazit des Kapitels: „All three approaches can be combined to enforce
-  architecture boundaries“.
+  they would run into compile errors.” As further advantages he names that
+  build tools do not allow cyclic dependencies, that modules can be changed in
+  isolation, and that a new dependency becomes “a conscious act instead of an
+  accident”.
+* On the costs: the architecture “should be somewhat stable before splitting it
+  into different build modules”, and build modules “tend to be less supple to
+  change over time”. The finer the cut, the more mapping between the
+  modules.
+* On ArchUnit: checks after compilation “are not fail-safe”; a typo or a
+  renamed package can make a rule ineffective.
+* Conclusion of the chapter: “All three approaches can be combined to enforce
+  architecture boundaries”.
 
-*Simon Brown: „The Missing Chapter“. Kapitel 34 in Robert C. Martin: _Clean
+*Simon Brown: “The Missing Chapter”. Chapter 34 in Robert C. Martin: _Clean
 Architecture. A Craftsman's Guide to Software Structure and Design_. Prentice
-Hall, © 2018 Pearson Education, ISBN 978-0-13-449416-6, S. 303–321.*
+Hall, © 2018 Pearson Education, ISBN 978-0-13-449416-6, pp. 303–321.*
 
-* Zu Prüfungen nach dem Kompilieren (S. 313): „The problem with both approaches
-  is that they are fallible, and the feedback loop is longer than it should be.“
-  und „I'd personally like to use the compiler to enforce my architecture if at
-  all possible.“
-* Zur Sichtbarkeit (S. 318): Bei „package by component“ ist nur die
-  Komponentenschnittstelle `public`, „so we can rely on the compiler to enforce
-  this architectural principle.“ Für Ports and Adapters hält er fest, dass die
-  Port-Interfaces `public` sein müssen.
-* Zu getrennten Quellbäumen (S. 319–320): Abhängigkeiten lassen sich „at the
-  source code level“ entkoppeln, „by configuring separate modules or projects in
-  your build tool (e.g., Maven, Gradle, MSBuild)“, idealerweise mit einem
-  eigenen Quellbaum je Komponente. Er nennt das „very much an idealistic
-  solution“ wegen „real-world performance, complexity, and maintenance issues“.
-* Zu nur zwei Quellbäumen, Domäne und Infrastruktur (S. 320–321): das
-  „Périphérique anti-pattern of ports and adapters“. Infrastrukturcode kann dort
-  an der Domäne vorbei anderen Infrastrukturcode aufrufen.
-* Zu Modulsystemen (S. 319): Mit OSGi oder dem Java-9-Modulsystem lässt sich
-  zwischen „public“ und „published“ unterscheiden.
+* On checks after compilation (p. 313): “The problem with both approaches
+  is that they are fallible, and the feedback loop is longer than it should be.”
+  and “I'd personally like to use the compiler to enforce my architecture if at
+  all possible.”
+* On visibility (p. 318): with “package by component” only the component
+  interface is `public`, “so we can rely on the compiler to enforce this
+  architectural principle.” For ports and adapters he states that the port
+  interfaces must be `public`.
+* On separate source trees (pp. 319–320): dependencies can be decoupled “at the
+  source code level”, “by configuring separate modules or projects in
+  your build tool (e.g., Maven, Gradle, MSBuild)”, ideally with a separate
+  source tree per component. He calls this “very much an idealistic
+  solution” because of “real-world performance, complexity, and maintenance
+  issues”.
+* On only two source trees, domain and infrastructure (pp. 320–321): the
+  “Périphérique anti-pattern of ports and adapters”. There, infrastructure code
+  can call other infrastructure code while bypassing the domain.
+* On module systems (p. 319): with OSGi or the Java 9 module system one can
+  distinguish between “public” and “published”.
 
-Beide Autoren ziehen also den Compiler der Prüfung nach dem Kompilieren vor. Sie
-unterscheiden sich im Mittel. Brown setzt in einem Monolithen zuerst auf
-Sichtbarkeit innerhalb eines Quellbaums und hält eigene Module je Komponente für
-teuer. Hombergs empfiehlt Build-Module, sobald die Architektur stabil genug
-ist.
+Both authors therefore prefer the compiler to checks after compilation. They
+differ in the means. In a monolith, Brown relies first on visibility within one
+source tree and considers separate modules per component expensive. Hombergs
+recommends build modules as soon as the architecture is stable enough.
 
-=== Annahmen
+=== Assumptions
 
-* Die Hosts laufen auf dem Klassenpfad (Spring Boot im Standardbetrieb).
-* Der Modulschnitt aus ADR-009 ist für den MVP stabil genug, dass die Kosten
-  eines Verschiebens selten anfallen.
-* JPMS (Option 4) behindert Spring-Hosts auf dem Klassenpfad nicht. Das ist die
-  Einschätzung des Owners ohne eigene Erfahrung, nicht erprobt.
+* The hosts run on the classpath (Spring Boot in standard operation).
+* The module cut from ADR-009 is stable enough for the MVP that the costs of
+  moving it rarely arise.
+* JPMS (option 4) does not hinder Spring hosts on the classpath. This is the
+  owner's estimate without own experience, not tested.
 
 === Open Questions
 
-* Keine. Ob `usecases-out` getrennt vom Starter versioniert wird, hat der Owner
-  im Review von PR #18 beantwortet: vorerst nicht. Alle Module erscheinen mit
-  derselben Version.
+* None. Whether `usecases-out` is versioned separately from the starter was
+  answered by the owner in the review of PR #18: not for now. All modules are
+  released with the same version.
 
 === Review Notes
 
-* Der Owner hat im Review von PR #18 den Treiber „Isolierte Adapter“
-  bestätigt. Ungewichtet liegen damit Option 2, 3 und 4 gleichauf.
-* Der Owner hat die Gewichtung der Treiber bestätigt: früher Fehlernachweis und
-  schmale Host-Abhängigkeit vor Build-Aufwand und Verschiebbarkeit.
-* Präzisiert nach dem Review von PR #18: Die Isolation der Adapter beruht derzeit
-  allein auf den Gradle-Abhängigkeiten. Die Fixtures belegen nur, dass jede
-  Regel ihren Verstoß erkennt. Die schmale Host-Abhängigkeit gilt nur für den
-  Compile-Classpath eines Moduls, das ausschließlich SPIs implementiert.
-* Ergänzt am 2026-11-16 auf Entscheidung des Owners (Issue #25): Domänenmodell und
-  Domänenservices als getrennte Module unter `domain`. Der Owner hatte darauf
-  hingewiesen, dass ein Domänenservice im Modul der Domäne für Ports und Adapter
-  sichtbar wäre.
-* Ergänzt am 2026-11-18 mit Issue #19: Isolation der Adapter per ArchUnit,
-  leere Selektoren schlagen fehl, die Aussagen zur Host-Abhängigkeit sind auf
-  `spi` umgestellt, wie ADR-016 es vorsieht.
-* Review von PR #33 durch den Owner: JSpecify als bewussten Null-Vertrag
-  behalten, die Version unabhängig von Boot im Katalog führen. Zusätzlich
-  `-Xpkginfo:always`, damit die Sichtbarkeit für ArchUnit nicht an
-  `@NullMarked` hängt. Der Nachweis mit dem falschen Basispaket ist auf
-  vollständig leer laufende Selektoren eingegrenzt.
+* In the review of PR #18 the owner confirmed the driver “Isolated adapters”.
+  Unweighted, option 2, 3 and 4 are thus level.
+* The owner confirmed the weighting of the drivers: early error detection and
+  narrow host dependency before build effort and ability to move boundaries.
+* Made more precise after the review of PR #18: the isolation of the adapters
+  currently rests solely on the Gradle dependencies. The fixtures only prove
+  that every rule detects its violation. The narrow host dependency applies
+  only to the compile classpath of a module that implements SPIs exclusively.
+* Extended on 2026-11-16 by decision of the owner (issue #25): domain model and
+  domain services as separate modules under `domain`. The owner had pointed out
+  that a domain service in the domain's module would be visible to ports and
+  adapters.
+* Extended on 2026-11-18 with issue #19: isolation of the adapters via ArchUnit,
+  empty selectors fail, the statements on the host dependency are switched to
+  `spi`, as ADR-016 provides.
+* Review of PR #33 by the owner: keep JSpecify as a deliberate null contract,
+  keep its version in the catalog independent of Boot. In addition
+  `-Xpkginfo:always`, so that visibility for ArchUnit does not depend on
+  `@NullMarked`. The evidence with the wrong base package is limited to
+  selectors that run completely empty.

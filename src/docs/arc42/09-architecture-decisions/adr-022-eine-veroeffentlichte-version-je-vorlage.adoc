@@ -1,201 +1,198 @@
 ---
 id: ADR-022-eine-veroeffentlichte-version-je-vorlage
 type: ADR
-title: 'Eine veröffentlichte Version je Vorlage, geprüft mit Beispieldaten'
+title: 'One published version per template, checked with sample data'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-22'
 reviewed: true
-summary: 'Je Briefpapier und Standardschreiben gibt es höchstens eine veröffentlichte Version; neue Schreiben entstehen mit ihr. Eine neu veröffentlichte Version löst die bisherige ab (Zustand abgelöst). Veröffentlicht wird nur, wenn ein Probe-PDF mit den Beispieldaten der Version konform ist. Die Beispieldaten pflegt der Vorlagenverwalter an der Vorlagenversion; sie werden mit ihr unveränderlich.'
+summary: 'For each letterhead and each letter template there is at most one published version; new letters are created with it. A newly published version supersedes the previous one (state superseded). A version is published only if a proof PDF with the sample data of the version is conformant. The template manager maintains the sample data on the template version; they become immutable with it.'
 derived_from:
 - type: conversation
-  description: 'Entscheidungen des Owners am 2026-11-22 zu #55: je Vorlage nur eine veröffentlichte Version, neue Schreiben mit dieser Version, gespeicherte Schreiben bleiben unverändert; eigener Zustand „abgelöst“; Beispieldaten pflegt der Vorlagenverwalter an der Vorlagenversion; das Probe-PDF entsteht mit dem veröffentlichten Gegenstück.'
+  description: 'Decisions of the owner on 2026-11-22 on #55: only one published version per template, new letters with this version, stored letters remain unchanged; own state “superseded”; the template manager maintains sample data on the template version; the proof PDF is created with the published counterpart.'
 - type: external
-  description: 'Issue #55: Anwendungsfall Vorlagenversion veröffentlichen, mit der offenen Frage aus ADR-018'
+  description: 'Issue #55: use case publish template version, with the open question from ADR-018'
   uri: https://github.com/dieterbaier/standardschreiben/issues/55
 tags:
 - decision
-- vorlage
-- konformitaet
+- template
+- conformance
 relations:
 - type: refines
   target: ADR-007-versionierung-und-unveraenderlichkeit
   status: accepted
-  rationale: 'ADR-007 führt die Zustände Entwurf, veröffentlicht und zurückgezogen ein. Dieser ADR legt fest, dass höchstens eine Version veröffentlicht ist, und ergänzt den Zustand abgelöst.'
+  rationale: 'ADR-007 introduces the states draft, published and withdrawn. This ADR specifies that at most one version is published and adds the state superseded.'
   reviewed: true
 - type: refines
   target: ADR-005-pdfa-und-barrierefreiheit
   status: accepted
-  rationale: 'ADR-005 verlangt beim Veröffentlichen ein geprüftes Probe-PDF mit Beispieldaten. Dieser ADR legt fest, woher die Beispieldaten kommen und mit welchem Gegenstück das Probe-PDF entsteht.'
+  rationale: 'ADR-005 requires a checked proof PDF with sample data when publishing. This ADR specifies where the sample data come from and with which counterpart the proof PDF is created.'
   reviewed: true
 - type: refines
   target: ADR-018-ddd-rollen-und-selbstvalidierung-im-fachmodell
   status: accepted
-  rationale: 'Beantwortet die offene Frage aus ADR-018, ob neben der neuesten veröffentlichten Version weitere gültig sein dürfen: nein; das Aggregat der Vorlage setzt es durch.'
+  rationale: 'Answers the open question from ADR-018 whether further versions may be valid besides the latest published one: no; the aggregate of the template enforces it.'
   reviewed: true
 - type: addresses
   target: QS-001-pdfa-konformitaet
   status: accepted
-  rationale: 'Eine Vorlage, deren Probe-PDF nicht PDF/A-2b-konform ist, wird nicht veröffentlicht; der Fehler fällt vor dem ersten Speichern eines Schreibens auf.'
+  rationale: 'A template whose proof PDF is not PDF/A-2b conformant is not published; the error shows up before the first letter is saved.'
   reviewed: true
 - type: addresses
   target: QS-002-barrierefreies-pdf
   status: accepted
-  rationale: 'Ebenso für PDF/UA-1: Das Probe-PDF wird mit demselben Prüfer geprüft wie jedes gespeicherte Schreiben.'
+  rationale: 'Likewise for PDF/UA-1: the proof PDF is checked with the same checker as every stored letter.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[adr-022-eine-veroeffentlichte-version-je-vorlage]]
-== ADR-022: Eine veröffentlichte Version je Vorlage, geprüft mit Beispieldaten
+== ADR-022: One published version per template, checked with sample data
 
 === Status
 
-Angenommen (accepted) am 2026-11-22.
+Accepted on 2026-11-22.
 
-Der Owner hat am 2026-11-22 bei #55 die Richtung vorgegeben (siehe Abgeleitet
-aus). Der ADR ist KI-gestützt formuliert; der Owner hat ihn und seine fünf
-Relationen am selben Tag im Review von PR #68 angenommen, nachdem er den
-Prüfzeitpunkt für das Gegenstück entschieden hatte.
+The owner set the direction on 2026-11-22 in #55 (see Derived from). The ADR
+was drafted with AI support. The owner accepted it and its five relations on
+the same day in the review of PR #68, after he had decided the check time for
+the counterpart.
 
-=== Entscheidung
+=== Decision
 
-* **Höchstens eine veröffentlichte Version.** Je Briefpapier und je
-  Standardschreiben ist höchstens eine Version veröffentlicht. Neue Vorschauen und
-  damit neue Schreiben entstehen mit ihr. Gespeicherte Schreiben behalten ihre
-  Versionen (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
-* **Abgelöst.** Wird ein Entwurf veröffentlicht, wechselt die bisher
-  veröffentlichte Version in den neuen Zustand *abgelöst*. *Zurückgezogen* heißt
-  dagegen: Der Vorlagenverwalter hat die veröffentlichte Version ohne Nachfolger
-  zurückgenommen; danach gibt es keine veröffentlichte Version, und eine Vorschau
-  ist nicht möglich, bis ein Entwurf veröffentlicht ist. Abgelöste und
-  zurückgezogene Versionen bleiben unverändert erhalten.
-* **Das Aggregat setzt die Regel durch.** `publishDraft` löst die
-  bisherige Version im selben Zustandswechsel ab; `withdraw` nimmt die
-  veröffentlichte Version zurück. Beim Wiederherstellen lehnt das Modell mehr als
-  eine veröffentlichte Version ab
+* **At most one published version.** For each letterhead and each letter
+  template, at most one version is published. New previews, and therefore new
+  letters, are created with it. Stored letters keep their versions
+  (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
+* **Superseded.** When a draft is published, the version published so far
+  changes to the new state *superseded*. *Withdrawn*, by contrast, means: the
+  template manager has taken back the published version without a successor;
+  after that there is no published version, and a preview is not possible
+  until a draft is published. Superseded and withdrawn versions are kept
+  unchanged.
+* **The aggregate enforces the rule.** `publishDraft` supersedes the previous
+  version in the same state change; `withdraw` takes back the published
+  version. On restore, the model rejects more than one published version
   (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]).
-* **Beispieldaten an der Vorlagenversion.** Jede Version trägt neben ihrem Inhalt
-  Beispieldaten: Werte für ihre Platzhalter, wie sie der Host formatiert liefern
-  würde. Der Vorlagenverwalter pflegt sie im Entwurf zusammen mit dem Inhalt. Ein
-  neuer Entwurf übernimmt die Beispieldaten der vorigen Version. Mit dem
-  Veröffentlichen werden sie unveränderlich; so bleibt nachvollziehbar, womit eine
-  Version geprüft wurde. Die Bibliothek fragt dafür nicht den Host; eine weitere
-  Host-Schnittstelle widerspräche
+* **Sample data on the template version.** Besides its content, each version
+  carries sample data: values for its placeholders, formatted as the host would
+  deliver them. The template manager maintains them in the draft together with
+  the content. A new draft takes over the sample data of the previous version.
+  On publishing, they become immutable; this keeps it traceable what a version
+  was checked with. The library does not ask the host for this; a further host
+  interface would contradict
   xref:qs-007-integration-in-host-anwendung[QS-007].
-* **Probe-PDF mit dem veröffentlichten Gegenstück.** Vor dem Veröffentlichen
-  entsteht ein Probe-PDF und wird mit dem `ConformanceChecker` geprüft, wie vor
-  jedem Speichern
+* **Proof PDF with the published counterpart.** Before publishing, a proof PDF
+  is created and checked with the `ConformanceChecker`, as before every save
   (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005]):
-** Ein Standardschreiben wird mit der veröffentlichten Version seines Briefpapiers
-   gerendert. Die Daten sind die Beispieldaten beider Versionen; bei gleichem
-   Schlüssel gilt die des Standardschreibens. Hat das Briefpapier keine
-   veröffentlichte Version, wird nicht veröffentlicht.
-** Ein Briefpapier wird mit einem eingebauten Beispielinhalt des Renderers und
-   seinen eigenen Beispieldaten gerendert. Andere Standardschreiben, die das
-   Briefpapier nutzen, werden nicht mitgeprüft.
-* **Fail-closed.** Ist das Probe-PDF nicht konform, bleibt der Entwurf ein Entwurf,
-  und der Vorlagenverwalter erhält die Befunde. Lässt sich die Prüfung nicht
-  ausführen, wird ebenfalls nicht veröffentlicht.
-* **Berechtigung.** Veröffentlichen und Zurückziehen verlangen
-  `TemplateAction.PUBLISH`. Die Bibliothek fragt den Host, bevor sie die
-  Vorlage lädt.
-* **Gleichzeitige Änderungen.** Zwischen Laden und Speichern kann ein anderer
-  Vorlagenverwalter den Entwurf ändern oder dieselbe Vorlage veröffentlichen. Das
-  Repository ersetzt eine Vorlage deshalb nur, wenn sie seit dem Laden unverändert
-  ist; sonst wird nichts gespeichert, und der Benutzer lädt neu. So wird nie ein
-  Inhalt veröffentlicht, der nicht geprüft wurde.
-* **Für das Gegenstück zählt der Prüfzeitpunkt.** Das bedingte Ersetzen sichert
-  nur die Vorlage, die veröffentlicht wird, nicht ihr Briefpapier. Wird das
-  Briefpapier während der Prüfung eines Standardschreibens abgelöst oder
-  zurückgezogen, wird das Standardschreiben trotzdem veröffentlicht. Das Ergebnis
-  gleicht der erlaubten Reihenfolge „erst das Standardschreiben veröffentlichen,
-  dann das Briefpapier ändern“:
-** Nach einer Ablösung entstehen neue Schreiben mit dem neuen Briefpapier, mit
-   dem das Standardschreiben nicht geprüft wurde. Das gilt für jede spätere
-   Ablösung ebenso (siehe Konsequenzen). Die Prüfung vor jedem Speichern fängt
-   ein nicht konformes PDF ab.
-** Nach einem Rückzug entsteht mit dem Standardschreiben keine Vorschau, bis ein
-   Briefpapier veröffentlicht ist.
+** A letter template is rendered with the published version of its letterhead.
+   The data are the sample data of both versions; for the same key, the value
+   of the letter template applies. If the letterhead has no published version,
+   nothing is published.
+** A letterhead is rendered with a built-in sample content of the renderer and
+   its own sample data. Other letter templates that use the letterhead are not
+   checked along with it.
+* **Fail-closed.** If the proof PDF is not conformant, the draft stays a draft,
+  and the template manager receives the findings. If the check cannot be run,
+  nothing is published either.
+* **Permission.** Publishing and withdrawing require
+  `TemplateAction.PUBLISH`. The library asks the host before it loads the
+  template.
+* **Concurrent changes.** Between loading and saving, another template manager
+  can change the draft or publish the same template. The repository therefore
+  replaces a template only if it is unchanged since loading; otherwise nothing
+  is saved, and the user reloads. This way, content that was not checked is
+  never published.
+* **For the counterpart, the check time counts.** The conditional replacement
+  only secures the template that is being published, not its letterhead. If
+  the letterhead is superseded or withdrawn while a letter template is being
+  checked, the letter template is published anyway. The result equals the
+  permitted order “first publish the letter template, then change the
+  letterhead”:
+** After a supersession, new letters are created with the new letterhead, with
+   which the letter template was not checked. This applies equally to every
+   later supersession (see Consequences). The check before every save catches
+   a non-conformant PDF.
+** After a withdrawal, no preview is created with the letter template until a
+   letterhead is published.
 
-=== Kontext
+=== Context
 
-Das Fachmodell aus #51 ließ mehrere veröffentlichte Versionen je Vorlage zu;
-`neuesteVeroeffentlichteVersion()` nahm die mit der höchsten Nummer. ADR-018
-ließ offen, ob ältere veröffentlichte Versionen gültig bleiben. ADR-005 verlangt
-beim Veröffentlichen ein Probe-PDF mit Beispieldaten, sagt aber nicht, woher
-diese kommen. Vorlagen enthalten Platzhalter, die erst mit Werten zeigen, ob das
-Ergebnis konform ist, etwa ob ein langer Name das Anschriftfeld sprengt oder ein
-Bild ohne Alternativtext bleibt.
+The domain model from #51 allowed several published versions per template;
+`neuesteVeroeffentlichteVersion()` took the one with the highest number.
+ADR-018 left open whether older published versions remain valid. ADR-005
+requires a proof PDF with sample data when publishing, but does not say where
+the data come from. Templates contain placeholders that only show with values
+whether the result is conformant, for example whether a long name breaks the
+address field or an image remains without alternative text.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Eindeutig, mit welcher Version ein neues Schreiben entsteht.
-* Ein Fehler in einer gepflegten Vorlage fällt vor dem ersten Speichern auf.
-* Keine weitere Schnittstelle, die der Host implementieren muss (QS-007).
-* Nachvollziehbar, womit eine veröffentlichte Version geprüft wurde.
+* Unambiguous with which version a new letter is created.
+* An error in a maintained template shows up before the first save.
+* No further interface that the host must implement (QS-007).
+* Traceable what a published version was checked with.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Eine veröffentlichte Version, Beispieldaten an der Version (gewählt)
+==== Option 1: One published version, sample data on the version (chosen)
 
-Wie oben.
+As above.
 
-==== Option 2: Mehrere veröffentlichte Versionen, Beispieldaten aus den Platzhaltern
+==== Option 2: Several published versions, sample data from the placeholders
 
-Ältere Versionen bleiben veröffentlicht, bis sie zurückgezogen werden; neue
-Schreiben nehmen die neueste. Der Renderer füllt jeden Platzhalter mit einem
-Wert aus seinem Namen. Keine Pflege, aber unklar, wozu eine ältere veröffentlichte
-Version dient, und ein generierter Wert prüft weder Länge noch realistische
-Inhalte.
+Older versions stay published until they are withdrawn; new letters take the
+latest one. The renderer fills each placeholder with a value derived from its
+name. No maintenance, but it is unclear what an older published version is for,
+and a generated value checks neither length nor realistic content.
 
-==== Option 3: Eine veröffentlichte Version, Beispieldaten vom Host
+==== Option 3: One published version, sample data from the host
 
-Der Host liefert Beispieldaten je Standardschreiben über eine weitere
-SPI-Schnittstelle. Realistisch, aber eine vierte Schnittstelle widerspricht
-QS-007, und ein Briefpapier hat keinen Bezug, zu dem der Host Daten kennt.
+The host delivers sample data per letter template through a further SPI
+interface. Realistic, but a fourth interface contradicts QS-007, and a
+letterhead has no reference for which the host knows data.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral und `-1` für schwächere
-Unterstützung. Die Matrix ist ungewichtet.
+`+1` stands for better support, `0` for neutral and `-1` for weaker support.
+The matrix is unweighted.
 
 [.pugh-matrix]
 [cols="2,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3
-| Eindeutige Version für neue Schreiben | +1 | 0 | +1
-| Fehler fällt vor dem ersten Speichern auf | +1 | 0 | +1
-| Keine weitere Host-Schnittstelle | +1 | +1 | -1
-| Nachvollziehbar, womit geprüft wurde | +1 | 0 | -1
-| Kein Pflegeaufwand | -1 | +1 | 0
-s| Summe s| +3 s| +2 s| 0
+| Criterion | Option 1 | Option 2 | Option 3
+| Unambiguous version for new letters | +1 | 0 | +1
+| Error shows up before the first save | +1 | 0 | +1
+| No further host interface | +1 | +1 | -1
+| Traceable what was checked with | +1 | 0 | -1
+| No maintenance effort | -1 | +1 | 0
+s| Total s| +3 s| +2 s| 0
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Für Sachbearbeiter und Vorschau gibt es genau eine gültige Version je Vorlage.
-* Abgelöst und zurückgezogen sind unterscheidbar; die Historie zeigt, warum eine
-  Version nicht mehr verwendet wird.
-* Jede veröffentlichte Version ist mit ihren eigenen Beispieldaten geprüft.
+* For clerks and the preview there is exactly one valid version per template.
+* Superseded and withdrawn can be told apart; the history shows why a version
+  is no longer used.
+* Every published version is checked with its own sample data.
 
-==== Negativ
+==== Negative
 
-* Der Vorlagenverwalter pflegt Beispieldaten. Fehlen sie, zeigt das Probe-PDF die
-  Platzhalter als fehlend (QS-010) und prüft weniger.
-* Ein Briefpapier wird nur mit dem eingebauten Beispielinhalt geprüft; ein
-  Standardschreiben, das mit dem neuen Briefpapier nicht mehr konform ist, fällt
-  erst beim Speichern auf (fail-closed bleibt).
-* Der Port `TemplateRepository` braucht eine bedingte Ersetzung.
+* The template manager maintains sample data. If they are missing, the proof
+  PDF shows the placeholders as missing (QS-010) and checks less.
+* A letterhead is checked only with the built-in sample content; a letter
+  template that is no longer conformant with the new letterhead shows up only
+  on saving (fail-closed remains).
+* The port `TemplateRepository` needs a conditional replacement.
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* #6: Vorlagen mit Beispieldaten je Version speichern; die bedingte Ersetzung,
-  etwa mit einer Revisionsspalte.
-* #7: Der Renderer erzeugt das Probe-PDF eines Briefpapiers mit eingebautem
-  Beispielinhalt.
-* #8 und #9: Der Editor pflegt Beispieldaten zusammen mit dem Entwurf.
+* #6: Store templates with sample data per version; the conditional
+  replacement, for example with a revision column.
+* #7: The renderer creates the proof PDF of a letterhead with built-in sample
+  content.
+* #8 and #9: The editor maintains sample data together with the draft.
 
 === Impact
 
@@ -206,7 +203,7 @@ include::generated/adr-022-eine-veroeffentlichte-version-je-vorlage-impact.adoc[
 include::generated/adr-022-eine-veroeffentlichte-version-je-vorlage-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -215,16 +212,16 @@ include::generated/adr-022-eine-veroeffentlichte-version-je-vorlage-traceability
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Im Review von PR #68 fragte der Owner, welcher Zeitpunkt für das veröffentlichte
-Briefpapier zählt, wenn es sich während der Prüfung eines Standardschreibens
-ändert. Am 2026-11-22 entschied er: der Prüfzeitpunkt. Der Port prüft das
-Briefpapier beim Ersetzen nicht mit; Entscheidung „Für das Gegenstück zählt der
-Prüfzeitpunkt“ und das Szenario dazu in
+In the review of PR #68, the owner asked which point in time counts for the
+published letterhead if it changes while a letter template is being checked.
+On 2026-11-22 he decided: the check time. The port does not check the
+letterhead when replacing; see the decision “For the counterpart, the check
+time counts” and the scenario for it in
 `features/templates/publish-template-version.feature`.
 
-Danach hat der Owner den ADR und seine fünf Relationen am 2026-11-22 im Review
-von PR #68 angenommen.
+After that, the owner accepted the ADR and its five relations on 2026-11-22 in
+the review of PR #68.

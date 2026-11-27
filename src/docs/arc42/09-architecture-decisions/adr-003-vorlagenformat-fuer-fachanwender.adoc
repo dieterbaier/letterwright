@@ -1,209 +1,215 @@
 ---
 id: ADR-003-vorlagenformat-fuer-fachanwender
 type: ADR
-title: 'Vorlagenformat und Pflege durch Fachanwender'
+title: 'Template format and maintenance by business users'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Briefpapier und Standardschreiben werden in einem bausteinbasierten Editor gepflegt und intern als semantisches HTML mit Paged-Media-CSS gespeichert; DOCX bleibt Gestaltungsvorlage. Ein Prototyp muss das gegen DOCX-Vorlagen absichern.'
+summary: 'Letterheads and letter templates are maintained in a building-block-based editor and stored internally as semantic HTML with Paged Media CSS; DOCX stays the design specification. A prototype must verify this against DOCX templates.'
 derived_from:
 - type: external
-  description: 'Issue #1 Projektidee und Antworten des Owners im Issue'
+  description: 'Issue #1 project idea and the owner''s answers in the issue'
   uri: https://github.com/dieterbaier/standardschreiben/issues/1
 tags:
 - decision
-- vorlagen
+- templates
 - usability
-- barrierefreiheit
+- accessibility
 relations:
 - type: addresses
   target: QS-006-briefpapier-pflege-durch-fachanwender
   status: proposed
-  rationale: 'Das Vorlagenformat bestimmt, ob Fachanwender ohne Entwickler pflegen können.'
+  rationale: 'The template format determines whether business users can maintain templates without developers.'
   reviewed: false
 - type: addresses
   target: QS-002-barrierefreies-pdf
   status: proposed
-  rationale: 'Semantisches HTML liefert die Struktur für getaggte PDFs.'
+  rationale: 'Semantic HTML provides the structure for tagged PDFs.'
   reviewed: false
 - type: addresses
   target: QS-004-wiedergabetreue-vorschau-und-pdf
   status: proposed
-  rationale: 'Ein gemeinsames internes Format ist Voraussetzung für gleiche Darstellung.'
+  rationale: 'A shared internal format is a prerequisite for identical rendering.'
   reviewed: false
 - type: addresses
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: proposed
-  rationale: 'Benannte Stilvorgaben im Briefpapier bilden die zentrale DOCX-Vorgabe ab.'
+  rationale: 'Named style specifications in the letterhead reproduce the central DOCX specification.'
   reviewed: false
 - type: introduces_risk
   target: R-009-abweichung-von-der-zentralen-vorgabe
   status: proposed
-  rationale: 'Die Vorgabe wird manuell übertragen und kann veralten.'
+  rationale: 'The specification is transferred manually and can become outdated.'
   reviewed: false
 - type: introduces_risk
   target: R-001-akzeptanz-editor-statt-word
   status: proposed
-  rationale: 'Fachanwender arbeiten heute mit DOCX.'
+  rationale: 'Business users work with DOCX today.'
   reviewed: false
 - type: introduces_risk
   target: R-005-barrierefreiheit-haengt-von-vorlageninhalt-ab
   status: proposed
-  rationale: 'Fachanwender können unzugängliche Inhalte erstellen.'
+  rationale: 'Business users can create inaccessible content.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[adr-003-vorlagenformat-fuer-fachanwender]]
-== ADR-003: Vorlagenformat und Pflege durch Fachanwender
+== ADR-003: Template format and maintenance by business users
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieser ADR ist KI-gestützt entstanden. Er gilt erst als Architekturentscheidung,
-wenn der verantwortliche Owner ihn geprüft und akzeptiert hat.
+This ADR was created with AI assistance. It counts as an architecture decision
+only once the responsible owner has reviewed and accepted it.
 
-=== Entscheidung
+=== Decision
 
-Wir schlagen vor (vorbehaltlich eines Prototyps, siehe Folgearbeiten):
+We propose (subject to a prototype, see Follow-Up):
 
-* **Internes Vorlagenformat** für Briefpapier und Standardschreiben ist **semantisches
-  HTML mit CSS Paged Media** (`@page`, A4, DIN-5008-Maße, laufende Kopf- und Fußzeilen,
-  Seitenzähler).
-* **Pflege durch Fachanwender** erfolgt in einem **bausteinbasierten Editor** in der UI:
-** Briefpapier: Formular für Typ (privat, geschäftlich Form A oder B), Logo, Slogan,
-   Absender, Fußzeile, Informationsblock, Schriftart, Schriftgrößen und Abstände.
-   Positionen nach DIN 5008 sind fest vorgegeben, nicht frei verschiebbar.
-** **Stilvorgaben** des Briefpapiers (benannte Stile wie Fließtext, Betreff,
-   Absenderzeile mit Schriftart, Größe, Zeilenabstand, Abständen und Farbe) werden
-   einmalig aus der zentralen DOCX-Vorgabe übertragen und gelten für alle
-   Standardschreiben, die dieses Briefpapier nutzen. Fachanwender wählen im Text nur
-   benannte Stile, keine freien Formatierungen.
-** Standardschreiben: Richtext-Editor (z. B. auf Basis von ProseMirror/TipTap) mit
-   Einfügen von Platzhaltern, Wiederholungs- und Bedingungsblöcken als Bausteine.
-* **DOCX** bleibt die Gestaltungsvorgabe der Fachanwender. Ein **DOCX-Import** für
-  Textinhalte (nicht für das Layout) ist als spätere Erweiterung möglich.
+* The **internal template format** for letterheads and letter templates is
+  **semantic HTML with CSS Paged Media** (`@page`, A4, DIN 5008 dimensions,
+  running headers and footers, page counters).
+* **Maintenance by business users** takes place in a **building-block-based
+  editor** in the UI:
+** Letterhead: a form for type (private, business Form A or B), logo, slogan,
+   sender, footer, information block, font, font sizes and spacing.
+   Positions according to DIN 5008 are fixed and cannot be moved freely.
+** **Style specifications** of the letterhead (named styles such as body text,
+   subject, sender line with font, size, line spacing, spacing and colour) are
+   transferred once from the central DOCX specification and apply to all
+   letter templates that use this letterhead. In the text, business users only
+   choose named styles, no free formatting.
+** Letter template: a rich text editor (e.g. based on ProseMirror/TipTap)
+   that inserts placeholders, repetition blocks and condition blocks as
+   building blocks.
+* **DOCX** stays the design specification of the business users. A **DOCX
+  import** for text content (not for the layout) is possible as a later
+  extension.
 
-Option 4 (DOCX-Upload mit Umwandlung) lässt sich als Einstiegsweg mit Option 1
-kombinieren. Ob die Umwandlung ohne Nacharbeit trägt, ist offen und wird im
-Prototyp mitbewertet.
+Option 4 (DOCX upload with conversion) can be combined with option 1 as an
+entry path. Whether the conversion works without rework is open and is assessed
+in the prototype as well.
 
-=== Kontext
+=== Context
 
-Der Owner verlangt: Pflege durch Nicht-Techniker, Vorschau und endgültiges Dokument
-sehen gleich aus, keine kommerziellen Werkzeuge, PDF/A und Barrierefreiheit. Die
-Fachanwender arbeiten heute mit DOCX-Dateien, in denen auch die Gestaltungsvorgaben
-(Schrift, Größe, Abstände, Logo-Position) liegen. Ein Briefpapier ist ein Template,
-das ein Standardschreiben nutzt, und soll genauso pflegbar sein.
+The owner requires: maintenance by non-technical people, preview and final
+document look the same, no commercial tools, PDF/A and accessibility. Today the
+business users work with DOCX files, which also hold the design specifications
+(font, size, spacing, logo position). A letterhead is a template that a letter
+template uses, and it shall be just as maintainable.
 
-Ergänzung des Owners (2026-11-14): Die DOCX-Dateien kommen als Vorgabe von einer
-zentralen Abteilung. Ein Editor statt Word ist in Ordnung; die Bestandteile in den
-Editor zu übertragen ist kein Problem. Im Ergebnis müssen die Styles der Vorgabe
-stimmen (Schriftart, Schriftgrößen, Abstände, Positionen).
+Addition by the owner (2026-11-14): The DOCX files come as a specification from
+a central department. An editor instead of Word is fine; transferring the parts
+into the editor is no problem. In the result, the styles of the specification
+must be right (font, font sizes, spacing, positions).
 
-Diese Ziele stehen in Spannung: DOCX ist für Fachanwender am vertrautesten, aber die
-Umwandlung von DOCX nach PDF/A plus barrierefreiem HTML ist ohne kommerzielle Werkzeuge
-verlustbehaftet, und eine HTML-Vorschau eines DOCX entspricht nicht exakt dem PDF.
+These goals are in tension: DOCX is the most familiar to business users, but
+converting DOCX to PDF/A plus accessible HTML is lossy without commercial tools,
+and an HTML preview of a DOCX does not exactly match the PDF.
 
-=== Entscheidungstreiber
+=== Decision Drivers
 
-* Pflegbarkeit durch Fachanwender ohne Entwickler.
-* Gleiches Aussehen von Vorschau und PDF.
-* Barrierefreiheit (strukturierte Inhalte, getaggtes PDF).
-* Nur nicht kommerzielle Open-Source-Werkzeuge, MIT-kompatibel.
-* Nähe zur heutigen Arbeitsweise mit DOCX.
-* Verlässliches Ergebnis ohne unsichtbare Nacharbeit.
+* Maintainability by business users without developers.
+* Identical look of preview and PDF.
+* Accessibility (structured content, tagged PDF).
+* Only non-commercial open source tools, MIT-compatible.
+* Closeness to today's way of working with DOCX.
+* A reliable result without invisible rework.
 
-=== Betrachtete Optionen
+=== Considered Options
 
-==== Option 1: Bausteinbasierter Editor, intern HTML und Paged-Media-CSS
+==== Option 1: Building-block-based editor, internally HTML and Paged Media CSS
 
-Fachanwender pflegen strukturiert in der UI. Das interne Format ist dasselbe für
-Vorschau und PDF und trägt Semantik (Überschriften, Listen, Alternativtexte).
-Nachteil: neue Oberfläche statt Word; Gestaltungsfreiheit ist bewusst begrenzt.
+Business users maintain templates in a structured way in the UI. The internal
+format is the same for preview and PDF and carries semantics (headings, lists,
+alternative texts). Drawback: a new user interface instead of Word; design
+freedom is deliberately limited.
 
-==== Option 2: DOCX-Vorlagen mit Platzhaltern, Konvertierung zur Laufzeit
+==== Option 2: DOCX templates with placeholders, conversion at runtime
 
-Fachanwender bleiben in Word. Laufzeit: DOCX-Templating (z. B. poi-tl, docx-stamper)
-und Umwandlung nach PDF, praktisch nur mit LibreOffice headless in guter Qualität.
-Die HTML-Vorschau entsteht separat und weicht ab, oder die Vorschau zeigt das PDF.
-Schwere Laufzeitabhängigkeit (LibreOffice) im Host.
+Business users stay in Word. Runtime: DOCX templating (e.g. poi-tl,
+docx-stamper) and conversion to PDF, in good quality practically only with
+headless LibreOffice. The HTML preview is created separately and differs, or
+the preview shows the PDF. Heavy runtime dependency (LibreOffice) in the host.
 
-==== Option 3: XSL-FO-Vorlagen mit Apache FOP
+==== Option 3: XSL-FO templates with Apache FOP
 
-Ausgereifte PDF/A- und Tagged-PDF-Erzeugung. Für Fachanwender nicht pflegbar; die
-HTML-Vorschau bräuchte eine zweite Transformation.
+Mature PDF/A and tagged PDF generation. Not maintainable by business users; the
+HTML preview would need a second transformation.
 
-==== Option 4: DOCX-Upload mit automatischer Umwandlung in HTML-Vorlagen
+==== Option 4: DOCX upload with automatic conversion into HTML templates
 
-Fachanwender laden DOCX hoch, die Anwendung wandelt in das interne HTML-Format um
-(z. B. mit mammoth). Vertrauter Einstieg, aber Layout-Treue (Positionen, Abstände)
-geht verloren, und Nacharbeit wird unsichtbar.
+Business users upload DOCX; the application converts it into the internal HTML
+format (e.g. with mammoth). A familiar entry point, but layout fidelity
+(positions, spacing) is lost, and rework becomes invisible.
 
-=== Pugh-Matrix
+=== Pugh Matrix
 
-`+1` steht für bessere Unterstützung, `0` für neutral, `-1` für schwächere
-Unterstützung und `?` für eine Bewertung, die eine menschliche Prüfung oder
-einen Prototyp braucht. Enthält eine Spalte ein `?`, ist ihre Summe ebenfalls `?`.
+`+1` stands for better support, `0` for neutral, `-1` for weaker support and
+`?` for a rating that needs human review or a prototype. If a column contains a
+`?`, its sum is `?` as well.
 
 [.pugh-matrix]
 [cols="2,1,1,1,1", options="header"]
 |===
-| Kriterium | Option 1 | Option 2 | Option 3 | Option 4
-| Pflegbarkeit durch Fachanwender | +1 | +1 | -1 | ?
-| Gleiches Aussehen Vorschau und PDF | +1 | -1 | 0 | +1
-| Barrierefreiheit | +1 | ? | +1 | 0
-| Nur Open Source, MIT-kompatibel | +1 | 0 | +1 | +1
-| Nähe zur Arbeitsweise mit DOCX | -1 | +1 | -1 | +1
-| Verlässliches Ergebnis ohne Nacharbeit | +1 | 0 | +1 | -1
-s| Summe s| +4 s| ? s| +1 s| ?
+| Criterion | Option 1 | Option 2 | Option 3 | Option 4
+| Maintainability by business users | +1 | +1 | -1 | ?
+| Identical look of preview and PDF | +1 | -1 | 0 | +1
+| Accessibility | +1 | ? | +1 | 0
+| Only open source, MIT-compatible | +1 | 0 | +1 | +1
+| Closeness to the way of working with DOCX | -1 | +1 | -1 | +1
+| Reliable result without rework | +1 | 0 | +1 | -1
+s| Sum s| +4 s| ? s| +1 s| ?
 |===
 
-=== Konsequenzen
+=== Consequences
 
-==== Positiv
+==== Positive
 
-* Ein einziges internes Format für Vorschau und PDF.
-* Strukturierte Inhalte als Basis für Barrierefreiheit und DIN-5008-Maßhaltigkeit.
+* A single internal format for preview and PDF.
+* Structured content as the basis for accessibility and DIN 5008 dimensional
+  accuracy.
 
-==== Negativ
+==== Negative
 
-* Ein Editor muss gebaut werden; er ist ein wesentlicher Teil des MVP-Aufwands.
-* Fachanwender müssen sich auf eine neue Oberfläche einlassen (R-001); der Owner hält das für akzeptabel.
-* Änderungen der zentralen DOCX-Vorgabe müssen manuell nachgezogen werden (R-009).
+* An editor must be built; it is a substantial part of the MVP effort.
+* Business users must get used to a new user interface (R-001); the owner considers this acceptable.
+* Changes to the central DOCX specification must be carried over manually (R-009).
 
-==== Neutral oder Folgearbeiten
+==== Neutral or Follow-Up
 
-* Prototyp (Spike) mit realen DOCX-Vorlagen des Owners (werden nachgeliefert): Nachbau im Editor-Modell, Messung der Stiltreue (QS-013), Vergleich mit Option 2.
-* Das Ergebnis entscheidet zwischen Option 1 und Option 2; erst danach kann der ADR akzeptiert werden.
+* Prototype (spike) with real DOCX templates from the owner (to be supplied later): rebuild in the editor model, measurement of style fidelity (QS-013), comparison with option 2.
+* The result decides between option 1 and option 2; only then can the ADR be accepted.
 
 
-=== Ergebnis des Prototyps
+=== Result of the prototype
 
-Der Wegwerf-Prototyp aus #3 (`prototyp/README.adoc`) hat Option 1 am
-`Geschaeftsbrief.docx` geprüft, ein- und mehrseitig, DIN 5008 Form B.
+The throwaway prototype from #3 (`prototyp/README.adoc`) checked option 1
+against `Geschaeftsbrief.docx`, single-page and multi-page, DIN 5008 Form B.
 
-* *Nachbau im Vorlagenmodell:* Briefpapier und Standardschreiben als HTML mit
-  Paged-Media-CSS. Die Maße stammen aus der DOCX (Seitenränder, Rahmen,
-  Tabstopps, Formatvorlagen). Wo Word eigene Regeln anwendet, etwa beim
-  Zeilenabstand, sind sie an den Grundlinien des Word-PDFs abgeglichen.
-* *Abstand zum Word-PDF:* höchstens 0,1 mm, gleiche Zeilen- und
-  Seitenumbrüche. Einziger Unterschied: Word setzt in der einseitigen Vorgabe
-  eine leere zweite Seite, der Prototyp nicht.
-* *Semantik:* Der Betreff ist eine Überschrift und sieht aus wie in der Vorgabe
-  (Owner, 2026-11-20).
-* *Vorlageninhalte mit Befunden:* Die Pflege zeigt Befunde der Bereinigung an und
-  verlangt eine Wahl: Ablehnen, Trotzdem akzeptieren oder Bereinigen (Owner,
-  2026-11-20, xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). Umsetzung
-  in #8 und #9.
+* *Rebuild in the template model:* letterhead and letter template as HTML with
+  Paged Media CSS. The dimensions come from the DOCX (page margins, frames,
+  tab stops, paragraph styles). Where Word applies its own rules, for example
+  for line spacing, they are matched against the baselines of the Word PDF.
+* *Distance to the Word PDF:* at most 0.1 mm, same line and page breaks. The
+  only difference: in the single-page specification, Word sets an empty second
+  page, the prototype does not.
+* *Semantics:* The subject is a heading and looks as in the specification
+  (owner, 2026-11-20).
+* *Template content with findings:* Maintenance shows the findings of the
+  sanitization and requires a choice: Ablehnen, Trotzdem akzeptieren or
+  Bereinigen (owner,
+  2026-11-20, xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]).
+  Implemented in #8 and #9.
 
-Nicht geprüft:
+Not checked:
 
-* Die Stiltreue aus Sicht der zentralen Abteilung (QS-013). Sie entscheidet
-  über die Annahme dieses ADR.
-* Der Editor selbst und damit die Pflegbarkeit durch Fachanwender.
-* Option 4 (DOCX-Upload mit Umwandlung) und der Vergleich mit Option 2.
+* Style fidelity from the point of view of the central department (QS-013). It
+  decides on the acceptance of this ADR.
+* The editor itself and thus the maintainability by business users.
+* Option 4 (DOCX upload with conversion) and the comparison with option 2.
 * `Formular_intern.docx`.
 
 === Impact
@@ -215,23 +221,23 @@ include::generated/adr-003-vorlagenformat-fuer-fachanwender-impact.adoc[leveloff
 include::generated/adr-003-vorlagenformat-fuer-fachanwender-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
 // Generated traceability fragment. Relations are maintained only in YAML front matter.
 include::generated/adr-003-vorlagenformat-fuer-fachanwender-traceability.adoc[leveloffset=+2]
 
-=== Annahmen
+=== Assumptions
 
-* Die heutigen DOCX-Vorlagen nutzen kein Freiform-Layout, das über die DIN-5008-Bausteine hinausgeht.
-* Fachanwender akzeptieren eine geführte Pflege, wenn das Ergebnis exakt dem Druck entspricht.
+* Today's DOCX templates use no free-form layout that goes beyond the DIN 5008 building blocks.
+* Business users accept guided maintenance if the result matches the print exactly.
 
 === Open Questions
 
-* Beispielvorlagen für den Prototyp (Q-PO-004): beantwortet, in `src/examples/`.
-* Wie oft ändert die zentrale Abteilung ihre DOCX-Vorgabe, und wer zieht Änderungen nach? (Q-PO-009)
+* Sample templates for the prototype (Q-PO-004): answered, in `src/examples/`.
+* How often does the central department change its DOCX specification, and who carries over changes? (Q-PO-009)
 
 === Review Notes
 
-Kritischste Entscheidung des Projekts. Der Owner hat den Editor-Ansatz grundsätzlich bestätigt (Q-PO-005). Akzeptieren, sobald der Prototyp die Stiltreue (QS-013) an den nachgelieferten DOCX gezeigt hat.
+The most critical decision of the project. The owner confirmed the editor approach in principle (Q-PO-005). Accept as soon as the prototype has shown style fidelity (QS-013) on the DOCX files supplied later.
