@@ -3,13 +3,13 @@ package dieterbaier.letterwright.usecases.in;
 import dieterbaier.letterwright.domain.model.template.VersionReference;
 import dieterbaier.letterwright.validation.Validate;
 
-/** Was beim Zurückziehen einer Vorlagenversion herauskommt. Außer bei {@link Withdrawn} bleibt alles, wie es war. */
+/** The outcome of withdrawing a template version. Except for {@link Withdrawn}, everything stays as it was. */
 public sealed interface WithdrawalResult {
 
     record Withdrawn(VersionReference version) implements WithdrawalResult {
 
         public Withdrawn {
-            Validate.required(version, "Die zurückgezogene Version");
+            Validate.required(version, "The withdrawn version");
         }
     }
 
@@ -19,6 +19,6 @@ public sealed interface WithdrawalResult {
 
     record NothingPublished() implements WithdrawalResult {}
 
-    /** Die Vorlage hat sich seit dem Laden geändert, etwa durch einen anderen Vorlagenverwalter. */
+    /** The template has changed since it was loaded, for example by another template manager. */
     record Stale() implements WithdrawalResult {}
 }

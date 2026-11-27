@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.domain;
 
 import org.assertj.core.util.Lists;
 
-/** Fixture: absichtlicher Verstoß, eine Domänenklasse mit einer nicht zugelassenen Bibliothek. */
+/** Fixture: deliberate violation, a domain class with an unapproved library. */
 public class DomainWithForeignLibrary {
 
     public Object list() {

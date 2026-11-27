@@ -5,15 +5,15 @@ import java.util.UUID;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Identität eines gespeicherten Schreibens.
+ * Identity of a stored letter.
  *
- * <p>Der Konstruktor stellt eine bestehende Identität wieder her, {@link #generate()} vergibt eine neue.
+ * <p>The constructor restores an existing identity, {@link #generate()} assigns a new one.
  */
 @ValueObject
 public record LetterId(UUID value) {
 
     public LetterId {
-        Validate.required(value, "Der Wert der SchreibenId");
+        Validate.required(value, "The value of the LetterId");
     }
 
     public static LetterId generate() {

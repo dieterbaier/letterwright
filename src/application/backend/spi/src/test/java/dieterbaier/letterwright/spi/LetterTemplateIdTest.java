@@ -14,11 +14,11 @@ class LetterTemplateIdTest {
     @NullSource
     @ValueSource(strings = {"", " ", "\t"})
     void theNameRejectsMissingEmptyAndBlankValues(String value) {
-        rejects(() -> new LetterTemplateId(UUID.randomUUID(), value), "Der Name des Standardschreibens");
+        rejects(() -> new LetterTemplateId(UUID.randomUUID(), value), "The name of the letter template");
     }
 
     @Test
     void theIdIsRequired() {
-        rejects(() -> new LetterTemplateId(null, "Mahnung"), "Die ID des Standardschreibens");
+        rejects(() -> new LetterTemplateId(null, "Payment reminder"), "The ID of the letter template");
     }
 }

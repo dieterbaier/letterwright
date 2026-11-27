@@ -9,13 +9,13 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 /**
- * Vorlage für den Inhalt eines Schreibens mit Platzhaltern. Ihr ist genau ein Briefpapier zugewiesen. Aggregate Root
- * über ihre {@link TemplateVersion Versionen}, mit denselben Regeln wie das Briefpapier (siehe {@link VersionSequence}).
- * Das Briefpapier ist ein eigenes Aggregat und wird nur über seine ID referenziert.
+ * Template for the content of a letter with placeholders. It is assigned exactly one letterhead. Aggregate root over
+ * its {@link TemplateVersion versions}, with the same rules as the letterhead (see {@link VersionSequence}). The
+ * letterhead is an aggregate of its own and is referenced only by its ID.
  *
- * <p>Ein Standardschreiben gehört zu genau einem Bezugstyp, etwa {@code Kunde}. Zu einem fachlichen Bezug anderen Typs
- * entsteht kein Schreiben daraus, damit der Host keine Platzhalterdaten für eine unpassende Kombination liefern muss
- * (ADR-020).
+ * <p>A letter template belongs to exactly one reference type, such as {@code Customer}. No letter is created from it
+ * for a business reference of another type, so that the host never has to supply placeholder data for an unsuitable
+ * combination (ADR-020).
  */
 @AggregateRoot
 public final class LetterTemplate {
@@ -29,25 +29,25 @@ public final class LetterTemplate {
 
     private LetterTemplate(
             TemplateId id, String name, TemplateId letterhead, String referenceType, VersionSequence versions) {
-        this.id = Validate.required(id, "Die ID des Standardschreibens");
-        this.name = Validate.notBlank(name, "Der Name des Standardschreibens");
-        this.letterhead = Validate.required(letterhead, "Das Briefpapier des Standardschreibens");
-        this.referenceType = Validate.notBlank(referenceType, "Der Bezugstyp des Standardschreibens");
+        this.id = Validate.required(id, "The ID of the letter template");
+        this.name = Validate.notBlank(name, "The name of the letter template");
+        this.letterhead = Validate.required(letterhead, "The letterhead of the letter template");
+        this.referenceType = Validate.notBlank(referenceType, "The reference type of the letter template");
         this.versions = versions;
     }
 
-    /** Legt ein neues Standardschreiben mit der ersten Version als Entwurf an. */
+    /** Creates a new letter template with the first version as a draft. */
     public static LetterTemplate create(
             TemplateId id, String name, TemplateId letterhead, String referenceType, String content) {
         return new LetterTemplate(id, name, letterhead, referenceType, VersionSequence.first(
-                Validate.required(id, "Die ID des Standardschreibens"), content));
+                Validate.required(id, "The ID of the letter template"), content));
     }
 
-    /** Stellt ein gespeichertes Standardschreiben mit seinen Versionen wieder her und prüft deren Regeln. */
+    /** Restores a stored letter template with its versions and checks their rules. */
     public static LetterTemplate restore(
             TemplateId id, String name, TemplateId letterhead, String referenceType, List<TemplateVersion> versions) {
         return new LetterTemplate(id, name, letterhead, referenceType, VersionSequence.restore(
-                Validate.required(id, "Die ID des Standardschreibens"), versions));
+                Validate.required(id, "The ID of the letter template"), versions));
     }
 
     public TemplateId id() {
@@ -66,12 +66,12 @@ public final class LetterTemplate {
         return referenceType;
     }
 
-    /** Ob aus diesem Standardschreiben zu dem Bezug ein Schreiben entstehen darf: nur bei gleichem Bezugstyp. */
+    /** Whether this letter template may create a letter for the reference: only for the same reference type. */
     public boolean matches(BusinessReference reference) {
         return referenceType.equals(reference.type());
     }
 
-    /** Alle Versionen, aufsteigend nach Nummer. */
+    /** All versions, in ascending order of number. */
     public List<TemplateVersion> versions() {
         return versions.all();
     }
@@ -84,38 +84,38 @@ public final class LetterTemplate {
         return versions.draft();
     }
 
-    /** Die Version, mit der neue Schreiben entstehen; je Vorlage gibt es höchstens eine (ADR-022). */
+    /** The version new letters are created with; each template has at most one (ADR-022). */
     public Optional<TemplateVersion> publishedVersion() {
         return versions.published();
     }
 
-    /** Ersetzt den Inhalt des Entwurfs und behält seine Beispieldaten. Leer ist erlaubt, fehlend nicht. */
+    /** Replaces the content of the draft and keeps its sample data. Empty is allowed, missing is not. */
     public LetterTemplate changeDraft(String content) {
         return with(versions.changeDraft(content));
     }
 
-    /** Ersetzt Inhalt und Beispieldaten des Entwurfs. */
+    /** Replaces content and sample data of the draft. */
     public LetterTemplate changeDraft(String content, DataContext sampleData) {
         return with(versions.changeDraft(content, sampleData));
     }
 
     /**
-     * Veröffentlicht den Entwurf. Er braucht Inhalt; danach ist er unveränderlich. Die bisher veröffentlichte Version ist
-     * danach abgelöst (ADR-022).
+     * Publishes the draft. It needs content; afterwards it is immutable. The previously published version is then
+     * superseded (ADR-022).
      */
     public LetterTemplate publishDraft() {
         return with(versions.publishDraft());
     }
 
     /**
-     * Legt die nächste Version als Entwurf an und übernimmt die Beispieldaten der neuesten. Geht nur, solange es keinen
-     * Entwurf gibt.
+     * Creates the next version as a draft and takes over the sample data of the newest one. Only possible while there
+     * is no draft.
      */
     public LetterTemplate newDraft(String content) {
         return with(versions.newDraft(content));
     }
 
-    /** Nimmt die veröffentlichte Version ohne Nachfolger zurück; bis zur nächsten Veröffentlichung gibt es keine. */
+    /** Withdraws the published version without a successor; until the next publication there is none. */
     public LetterTemplate withdraw() {
         return with(versions.withdraw());
     }
@@ -124,7 +124,7 @@ public final class LetterTemplate {
         return new LetterTemplate(id, name, letterhead, referenceType, newVersions);
     }
 
-    /** Gleich sind zwei Instanzen mit derselben ID, auch in verschiedenen Ständen. */
+    /** Two instances with the same ID are equal, even in different states. */
     @Override
     public boolean equals(Object other) {
         return other instanceof LetterTemplate template && id.equals(template.id);
@@ -137,6 +137,6 @@ public final class LetterTemplate {
 
     @Override
     public String toString() {
-        return "Standardschreiben[id=" + id.value() + ", name=" + name + "]";
+        return "LetterTemplate[id=" + id.value() + ", name=" + name + "]";
     }
 }

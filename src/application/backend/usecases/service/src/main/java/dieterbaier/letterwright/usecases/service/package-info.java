@@ -1,5 +1,5 @@
 /**
- * Implementierung der Anwendungsfälle, siehe ADR-002.
+ * Implementation of the use cases, see ADR-002.
  */
 @NullMarked
 package dieterbaier.letterwright.usecases.service;

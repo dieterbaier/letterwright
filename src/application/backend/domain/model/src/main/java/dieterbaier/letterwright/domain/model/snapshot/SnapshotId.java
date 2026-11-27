@@ -5,15 +5,15 @@ import java.util.UUID;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Identität eines Snapshots.
+ * Identity of a snapshot.
  *
- * <p>Der Konstruktor stellt eine bestehende Identität wieder her, {@link #generate()} vergibt eine neue.
+ * <p>The constructor restores an existing identity, {@link #generate()} assigns a new one.
  */
 @ValueObject
 public record SnapshotId(UUID value) {
 
     public SnapshotId {
-        Validate.required(value, "Der Wert der SnapshotId");
+        Validate.required(value, "The value of the SnapshotId");
     }
 
     public static SnapshotId generate() {

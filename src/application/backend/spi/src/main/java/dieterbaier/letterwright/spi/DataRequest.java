@@ -1,16 +1,16 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Anfrage an den {@link PlaceholderDataProvider}: Welche Werte braucht dieses Standardschreiben für diesen fachlichen
- * Bezug?
+ * A request to the {@link PlaceholderDataProvider}: which values does this letter template need for this business
+ * reference?
  *
- * @param userId der angemeldete Benutzer, wie ihn die Spring Security des Hosts kennt
+ * @param userId the signed-in user as the host's Spring Security knows them
  */
 public record DataRequest(String userId, BusinessReference reference, LetterTemplateId letterTemplate) {
 
     public DataRequest {
-        Require.text(userId, "Die Benutzerkennung");
-        Require.value(reference, "Der fachliche Bezug");
-        Require.value(letterTemplate, "Das Standardschreiben");
+        Require.text(userId, "The user ID");
+        Require.value(reference, "The business reference");
+        Require.value(letterTemplate, "The letter template");
     }
 }

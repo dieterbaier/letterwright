@@ -5,24 +5,24 @@ import dieterbaier.letterwright.validation.Validate;
 import dieterbaier.letterwright.validation.ValidationException;
 import java.util.List;
 
-/** Was beim Veröffentlichen einer Vorlagenversion herauskommt. Außer bei {@link Published} bleibt alles, wie es war. */
+/** The outcome of publishing a template version. Except for {@link Published}, everything stays as it was. */
 public sealed interface PublicationResult {
 
-    /** Diese Version ist jetzt die veröffentlichte; neue Schreiben entstehen mit ihr. */
+    /** This version is now the published one; new letters are created with it. */
     record Published(VersionReference version) implements PublicationResult {
 
         public Published {
-            Validate.required(version, "Die veröffentlichte Version");
+            Validate.required(version, "The published version");
         }
     }
 
-    /** Das Probe-PDF ist nicht konform; der Entwurf bleibt ein Entwurf. Die Befunde sind für den Vorlagenverwalter. */
+    /** The proof PDF is not conformant; the draft stays a draft. The findings are meant for the template manager. */
     record NotConformant(List<String> findings) implements PublicationResult {
 
         public NotConformant {
-            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "Die Befunde der Konformitätsprüfung"));
+            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "The findings of the conformance check"));
             if (findings.isEmpty()) {
-                throw new ValidationException("Ein nicht konformes Probe-PDF braucht mindestens einen Befund");
+                throw new ValidationException("A non-conformant proof PDF needs at least one finding");
             }
         }
     }
@@ -33,12 +33,12 @@ public sealed interface PublicationResult {
 
     record NoDraft() implements PublicationResult {}
 
-    /** Der Entwurf ist leer oder enthält nur Leerraum. */
+    /** The draft is empty or contains only whitespace. */
     record DraftWithoutContent() implements PublicationResult {}
 
-    /** Ein Standardschreiben braucht für sein Probe-PDF die veröffentlichte Version seines Briefpapiers. */
+    /** A letter template needs the published version of its letterhead for its proof PDF. */
     record LetterheadNotPublished() implements PublicationResult {}
 
-    /** Die Vorlage hat sich seit dem Laden geändert, etwa durch einen anderen Vorlagenverwalter. Neu laden und prüfen. */
+    /** The template has changed since it was loaded, for example by another template manager. Reload and check. */
     record Stale() implements PublicationResult {}
 }

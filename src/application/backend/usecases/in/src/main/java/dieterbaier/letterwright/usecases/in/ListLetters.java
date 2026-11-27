@@ -5,8 +5,8 @@ import dieterbaier.letterwright.domain.model.BusinessReference;
 import dieterbaier.letterwright.domain.model.PageRequest;
 
 /**
- * Anwendungsfall „Schreiben auflisten“: die sichtbaren Schreiben zu einem fachlichen Bezug, seitenweise. Was der
- * Benutzer nicht sehen darf, zählt weder in die Seite noch in die Gesamtzahl (QS-009).
+ * Use case "list letters": the visible letters for a business reference, page by page. What the user may not see
+ * counts neither towards the page nor towards the total (QS-009).
  */
 public interface ListLetters {
 

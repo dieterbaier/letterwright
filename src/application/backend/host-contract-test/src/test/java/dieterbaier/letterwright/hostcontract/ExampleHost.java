@@ -14,8 +14,8 @@ import dieterbaier.letterwright.spi.CallbackResult;
 import java.util.Map;
 
 /**
- * Ein Host, der nur den Starter einbindet und alle drei SPI-Schnittstellen implementiert, dazu den optionalen Rückruf
- * nach dem Speichern. Dass diese Klasse kompiliert, ist der positive Teil des Nachweises.
+ * A host that includes only the starter and implements all three SPI interfaces, plus the optional letter save
+ * callback. That this class compiles is the positive part of the proof.
  */
 final class ExampleHost implements PlaceholderDataProvider, AuthorizationCheck, DeletionPolicy, LetterSaveCallback {
 
@@ -30,7 +30,7 @@ final class ExampleHost implements PlaceholderDataProvider, AuthorizationCheck, 
             case AuthorizationRequest.ForTemplates templates -> false;
             case AuthorizationRequest.ForLetter letter -> letter.userId().equals("erika");
             case AuthorizationRequest.ForCreation create -> create.userId().equals("erika")
-                    && create.letterTemplate().name().equals("Mahnung");
+                    && create.letterTemplate().name().equals("Payment reminder");
         };
     }
 
@@ -39,11 +39,11 @@ final class ExampleHost implements PlaceholderDataProvider, AuthorizationCheck, 
         return DeletionDecision.logical();
     }
 
-    /** Ein Host, der zu jedem Kunden höchstens ein Schreiben zulässt, etwa weil die Aufgabe damit erledigt ist. */
+    /** A host that allows at most one letter per customer, for example because that completes the task. */
     @Override
     public CallbackResult created(SavedLetter letter) {
         return letter.reference().id().equals("4711")
-                ? CallbackResult.rejected("Die Aufgabe zum Kunden 4711 ist bereits erledigt")
+                ? CallbackResult.rejected("The task for customer 4711 is already done")
                 : CallbackResult.accepted();
     }
 }

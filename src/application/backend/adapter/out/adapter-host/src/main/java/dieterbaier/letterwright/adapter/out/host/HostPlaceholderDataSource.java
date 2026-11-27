@@ -9,8 +9,8 @@ import dieterbaier.letterwright.usecases.out.PlaceholderDataSource;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Fragt den {@link PlaceholderDataProvider} des Hosts und übernimmt seine Werte ins Domänenmodell. Der Host liegt
- * außerhalb der Vertrauensgrenze: Hält er den Vertrag des SPI nicht ein, meldet der Adapter das als
+ * Asks the host's {@link PlaceholderDataProvider} and takes its values over into the domain model. The host lies
+ * outside the trust boundary: if it does not keep the SPI's contract, the adapter reports this as
  * {@link HostContractViolated}.
  */
 public final class HostPlaceholderDataSource implements PlaceholderDataSource {
@@ -27,8 +27,8 @@ public final class HostPlaceholderDataSource implements PlaceholderDataSource {
         dieterbaier.letterwright.spi.@Nullable DataContext answer =
                 provider.dataContext(Mapping.dataRequest(user, reference, letterTemplate));
         if (answer == null) {
-            throw new HostContractViolated("Der PlatzhalterdatenAnbieter des Hosts hat null statt eines Datenkontexts"
-                    + " geliefert");
+            throw new HostContractViolated("The PlaceholderDataProvider of the host returned null instead of a"
+                    + " DataContext");
         }
         return Mapping.toDomain(answer);
     }

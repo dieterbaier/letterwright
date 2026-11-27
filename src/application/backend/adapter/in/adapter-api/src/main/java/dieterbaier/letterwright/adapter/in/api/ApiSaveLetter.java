@@ -10,13 +10,13 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Speichert über den Anwendungsfall {@code SaveLetter} in der Transaktion des Hosts (ADR-023).
+ * Saves via the use case {@code SaveLetter} in the host's transaction (ADR-023).
  *
- * <p>Die Transaktion steuert der Adapter selbst mit {@code REQUIRED}, statt über {@code @Transactional}: Dann hängt die
- * Grenze nicht davon ab, dass der Aufruf durch einen Proxy läuft, und sie lässt sich ohne Spring-Kontext prüfen. Ein
- * Ergebnis kehrt regulär zurück und markiert die Transaktion deshalb nie zum Zurückrollen; nur eine Ausnahme tut das.
- * Auch die Eingaben werden erst innerhalb der Grenze zu Domänentypen: Eine ungültige Eingabe markiert die Transaktion
- * des Hosts wie jede andere Ausnahme, damit ein Host, der sie fängt, nicht halb committen kann.
+ * <p>The adapter controls the transaction itself with {@code REQUIRED} instead of via {@code @Transactional}: that way
+ * the boundary does not depend on the call going through a proxy, and it can be tested without a Spring context. A
+ * result returns normally and therefore never marks the transaction for rollback; only an exception does. The inputs,
+ * too, become domain types only inside the boundary: an invalid input marks the host's transaction like any other
+ * exception, so that a host that catches it cannot commit halfway.
  */
 public final class ApiSaveLetter implements SaveLetter {
 

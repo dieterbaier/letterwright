@@ -1,4 +1,4 @@
-// erwartet: [NullAway] incompatible types: List<@Nullable String>
+// expected: [NullAway] incompatible types: List<@Nullable String>
 package proof;
 
 import java.util.List;

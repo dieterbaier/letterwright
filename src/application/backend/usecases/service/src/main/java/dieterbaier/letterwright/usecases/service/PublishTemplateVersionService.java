@@ -78,7 +78,7 @@ public final class PublishTemplateVersionService implements PublishTemplateVersi
                 () -> templates.replace(loaded, loaded.publishDraft()));
     }
 
-    /** Kann der Prüfer nicht prüfen, wirft er; dann wird ebenfalls nichts ersetzt (fail-closed, ADR-005). */
+    /** If the checker cannot check, it throws; then nothing is replaced either (fail-closed, ADR-005). */
     private PublicationResult ifConformant(
             byte[] proof, TemplateVersion draft, Supplier<ReplaceOutcome> replace) {
         if (checker.check(proof) instanceof Conformance.NotConformant notConformant) {

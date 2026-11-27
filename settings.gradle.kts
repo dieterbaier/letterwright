@@ -1,4 +1,4 @@
-// Gradle-Wurzel des Monorepos. Die Backend-Module liegen unter src/application/backend (ADR-009).
+// Gradle root of the monorepo. The backend modules live under src/application/backend (ADR-009).
 pluginManagement {
     includeBuild("gradle/build-logic")
 }
@@ -12,9 +12,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "letterwright"
 
-// Projektname (zugleich Artefakt-ID) -> Verzeichnis. Die Projekte sind flach benannt,
-// damit die Gruppenordner (adapter/in, adapter/out, usecases) keine eigenen Gradle-Projekte werden.
-val backendModule = mapOf(
+// Project name (also the artifact ID) -> directory. The projects are named flat,
+// so that the group folders (adapter/in, adapter/out, usecases) do not become Gradle projects of their own.
+val backendModules = mapOf(
     "validation" to "validation",
     "domain-model" to "domain/model",
     "domain-service" to "domain/service",
@@ -33,7 +33,7 @@ val backendModule = mapOf(
     "host-contract-test" to "host-contract-test",
 )
 
-backendModule.forEach { (modul, verzeichnis) ->
-    include(modul)
-    project(":$modul").projectDir = file("src/application/backend/$verzeichnis")
+backendModules.forEach { (module, directory) ->
+    include(module)
+    project(":$module").projectDir = file("src/application/backend/$directory")
 }

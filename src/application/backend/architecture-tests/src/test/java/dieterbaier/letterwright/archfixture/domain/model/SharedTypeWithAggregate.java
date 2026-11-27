@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.domain.model;
 
 import dieterbaier.letterwright.archfixture.domain.model.cyclea.AggregateA;
 
-/** Fixture: absichtlicher Verstoß, ein geteilter Werttyp im Wurzelpaket kennt ein Aggregat. */
+/** Fixture: deliberate violation, a shared value type in the root package knows an aggregate. */
 public class SharedTypeWithAggregate {
 
     public AggregateA aggregate() {

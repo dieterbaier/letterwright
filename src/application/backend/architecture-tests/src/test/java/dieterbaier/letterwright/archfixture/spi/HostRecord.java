@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.spi;
 
-/** Fixture: ein eigener Datentyp des SPI. */
+/** Fixture: a data type of the SPI's own. */
 public record HostRecord(String reference, String value) {
 }

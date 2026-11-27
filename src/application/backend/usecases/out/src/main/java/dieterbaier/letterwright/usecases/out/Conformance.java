@@ -4,7 +4,7 @@ import dieterbaier.letterwright.validation.Validate;
 import dieterbaier.letterwright.validation.ValidationException;
 import java.util.List;
 
-/** Ergebnis einer Konformitätsprüfung. */
+/** The result of a conformance check. */
 public sealed interface Conformance {
 
     static Conformance conformant() {
@@ -17,13 +17,13 @@ public sealed interface Conformance {
 
     record Conformant() implements Conformance {}
 
-    /** Mindestens ein Befund, damit der Benutzer erfährt, was nicht stimmt. */
+    /** At least one finding, so that the user learns what is wrong. */
     record NotConformant(List<String> findings) implements Conformance {
 
         public NotConformant {
-            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "Die Befunde der Konformitätsprüfung"));
+            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "The findings of the conformance check"));
             if (findings.isEmpty()) {
-                throw new ValidationException("Ein nicht konformes PDF braucht mindestens einen Befund");
+                throw new ValidationException("A non-conformant PDF needs at least one finding");
             }
         }
     }

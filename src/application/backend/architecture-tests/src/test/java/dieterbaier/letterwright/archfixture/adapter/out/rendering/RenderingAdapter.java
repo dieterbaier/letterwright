@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.adapter.out.rendering;
 
-/** Fixture: ein regelkonformer ausgehender Adapter. */
+/** Fixture: a compliant outbound adapter. */
 public class RenderingAdapter {
 }

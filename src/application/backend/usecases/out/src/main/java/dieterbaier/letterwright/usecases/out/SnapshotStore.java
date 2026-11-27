@@ -5,8 +5,7 @@ import dieterbaier.letterwright.domain.model.snapshot.SnapshotId;
 import java.util.Optional;
 
 /**
- * Hält Snapshots bis zu ihrem Ablauf. Ob ein Snapshot dem Anfragenden gehört, prüft der Anwendungsfall, nicht die
- * Ablage.
+ * Keeps snapshots until they expire. The use case, not the store, checks whether a snapshot belongs to the requester.
  */
 public interface SnapshotStore {
 
@@ -15,9 +14,9 @@ public interface SnapshotStore {
     Optional<Snapshot> load(SnapshotId id);
 
     /**
-     * Löscht den Snapshot, aber nur, wenn er beim Löschen noch offen ist; beides in einem Schritt. Einen verbrauchten
-     * lässt sie stehen, auch wenn eine gleichzeitige Anfrage ihn gerade erst verbraucht hat: Eine Wiederholung des
-     * Speicherns braucht ihn noch (ADR-021).
+     * Deletes the snapshot, but only if it is still open at the time of deletion; both in one step. It leaves a consumed
+     * one in place, even if a concurrent request has only just consumed it: a retry of the save still needs it
+     * (ADR-021).
      */
     void deleteIfOpen(SnapshotId id);
 }

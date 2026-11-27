@@ -21,18 +21,18 @@ import org.junit.jupiter.api.Test;
 class SaveResultTest {
 
     private final Letter letter = Letter.restore(LetterId.generate(), SnapshotId.generate(),
-            new BusinessReference("Kunde", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
+            new BusinessReference("Customer", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
             new VersionReference(TemplateId.generate(), VersionNumber.FIRST), new DocumentReference("store/1"),
             Checksum.of(new byte[] {1}), Instant.parse("2026-11-24T10:00:00Z"), new LetterState.Visible());
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         assertThat(Stream.of(new SaveResult.Saved(letter),
                 new SaveResult.AlreadySaved(letter), new SaveResult.SnapshotUnknown(),
                 new SaveResult.SnapshotExpired(), new SaveResult.NotAllowed(),
-                new SaveResult.DataContextChanged(), new SaveResult.NotConformant(List.of("Befund")),
-                new SaveResult.RejectedByHost("Aufgabe ist bereits erledigt"))
+                new SaveResult.DataContextChanged(), new SaveResult.NotConformant(List.of("Finding")),
+                new SaveResult.RejectedByHost("Task is already done"))
                 .map(SaveResultTest::status))
                 .containsExactly(201, 200, 404, 410, 403, 409, 422, 400);
     }
@@ -54,12 +54,12 @@ class SaveResultTest {
     void requiredAttributes() {
         assertThat(new SaveResult.Saved(letter).letter()).isEqualTo(letter);
         assertThat(new SaveResult.AlreadySaved(letter).letter()).isEqualTo(letter);
-        assertThat(new SaveResult.NotConformant(List.of("Befund")).findings()).containsExactly("Befund");
+        assertThat(new SaveResult.NotConformant(List.of("Finding")).findings()).containsExactly("Finding");
         assertThatThrownBy(() -> new SaveResult.Saved(null)).hasMessageContaining("saved");
         assertThatThrownBy(() -> new SaveResult.AlreadySaved(null)).hasMessageContaining("already");
-        assertThatThrownBy(() -> new SaveResult.NotConformant(null)).hasMessageContaining("Befunde");
-        assertThat(new SaveResult.RejectedByHost("Aufgabe ist bereits erledigt").reason())
-                .isEqualTo("Aufgabe ist bereits erledigt");
-        assertThatThrownBy(() -> new SaveResult.RejectedByHost(" ")).hasMessageContaining("Grund");
+        assertThatThrownBy(() -> new SaveResult.NotConformant(null)).hasMessageContaining("findings");
+        assertThat(new SaveResult.RejectedByHost("Task is already done").reason())
+                .isEqualTo("Task is already done");
+        assertThatThrownBy(() -> new SaveResult.RejectedByHost(" ")).hasMessageContaining("reason");
     }
 }

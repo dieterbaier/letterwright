@@ -2,4 +2,4 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Java-API für den Host: Anwendungsfälle, die der Host in seiner eigenen Transaktion aufruft, mit eigenen Datentypen, reines Java ohne Abhängigkeit zur Bibliothek (ADR-023, Muster aus ADR-016)."
+description = "Java API for the host: use cases the host calls in its own transaction, with their own data types, plain Java without a dependency on the library (ADR-023, pattern from ADR-016)."

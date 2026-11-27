@@ -5,13 +5,13 @@ import dieterbaier.letterwright.domain.model.DataContext;
 import dieterbaier.letterwright.domain.model.BusinessReference;
 import dieterbaier.letterwright.domain.model.template.LetterTemplate;
 
-/** Liefert den Datenkontext des Hosts in Domänenbegriffen. Implementiert von {@code adapter-host} (ADR-016). */
+/** Provides the host's data context in domain terms. Implemented by {@code adapter-host} (ADR-016). */
 public interface PlaceholderDataSource {
 
     /**
-     * Liest die bereits formatierten Werte für ein Standardschreiben und einen fachlichen Bezug.
+     * Reads the already formatted values for a letter template and a business reference.
      *
-     * @throws IllegalStateException wenn der Host keinen gültigen Datenkontext liefert
+     * @throws IllegalStateException if the host does not provide a valid data context
      */
     DataContext readDataContext(UserId user, BusinessReference reference, LetterTemplate letterTemplate);
 }

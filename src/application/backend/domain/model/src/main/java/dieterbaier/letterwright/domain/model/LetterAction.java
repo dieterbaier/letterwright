@@ -3,8 +3,8 @@ package dieterbaier.letterwright.domain.model;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Eine Handlung an den gespeicherten Schreiben zu einem {@link BusinessReference}. Das Erzeugen gehört nicht dazu, weil
- * der Host dafür auch das Standardschreiben kennen muss (ADR-020).
+ * An action on the stored letters of a {@link BusinessReference}. Creating is not one of them because the host also
+ * needs to know the letter template for it (ADR-020).
  */
 @ValueObject
 public enum LetterAction {
@@ -13,6 +13,6 @@ public enum LetterAction {
 
     DOWNLOAD,
 
-    /** Wie gelöscht wird, entscheidet die Löschrichtlinie des Hosts. */
+    /** How deletion happens is decided by the host's deletion policy. */
     DELETE
 }

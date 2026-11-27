@@ -10,17 +10,17 @@ import dieterbaier.letterwright.usecases.out.Permissions;
 import dieterbaier.letterwright.usecases.out.LetterRepository;
 
 /**
- * Fragt den Host vor dem Repository: Ohne Berechtigung wird nichts gelesen und nichts gezählt. Der Host erteilt sie je
- * Bezug; logisch gelöschte Schreiben filtert das Repository vor dem Paginieren (QS-009).
+ * Asks the host before the repository: without permission, nothing is read and nothing is counted. The host grants
+ * permission per reference; the repository filters out logically deleted letters before paginating (QS-009).
  */
 public final class ListLettersService implements ListLetters {
 
     private final Permissions permissions;
-    private final LetterRepository letter;
+    private final LetterRepository letters;
 
-    public ListLettersService(Permissions permissions, LetterRepository letter) {
+    public ListLettersService(Permissions permissions, LetterRepository letters) {
         this.permissions = permissions;
-        this.letter = letter;
+        this.letters = letters;
     }
 
     @Override
@@ -28,6 +28,6 @@ public final class ListLettersService implements ListLetters {
         if (!permissions.may(user, LetterAction.VIEW, reference)) {
             return new ListResult.NotAllowed();
         }
-        return new ListResult.Found(letter.visibleFor(reference, page));
+        return new ListResult.Found(letters.visibleFor(reference, page));
     }
 }

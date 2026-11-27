@@ -4,13 +4,13 @@ import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Kennung des angemeldeten Benutzers, wie sie die Host-Anwendung liefert. Die Bibliothek verwaltet keine Benutzer, sie
- * vergleicht nur Kennungen.
+ * ID of the signed-in user as supplied by the host application. The library does not manage users; it only compares
+ * IDs.
  */
 @ValueObject
 public record UserId(String value) {
 
     public UserId {
-        Validate.notBlank(value, "Die Benutzerkennung");
+        Validate.notBlank(value, "The user ID");
     }
 }

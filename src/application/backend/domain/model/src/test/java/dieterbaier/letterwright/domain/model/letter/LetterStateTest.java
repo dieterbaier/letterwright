@@ -13,7 +13,7 @@ class LetterStateTest {
         Instant at = Instant.parse("2026-11-22T11:00:00Z");
 
         assertThat(new LetterState.LogicallyDeleted(at).at()).isEqualTo(at);
-        rejects(() -> new LetterState.LogicallyDeleted(null), "Zeitpunkt des Löschens");
+        rejects(() -> new LetterState.LogicallyDeleted(null), "time of deletion");
     }
 
     @Test

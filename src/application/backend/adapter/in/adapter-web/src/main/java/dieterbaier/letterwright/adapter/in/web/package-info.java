@@ -1,5 +1,5 @@
 /**
- * REST-Adapter für die React-Komponenten, siehe ADR-002.
+ * REST adapter for the React components, see ADR-002.
  */
 @NullMarked
 package dieterbaier.letterwright.adapter.in.web;

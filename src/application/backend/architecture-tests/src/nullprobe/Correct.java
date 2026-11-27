@@ -1,4 +1,4 @@
-// erwartet: kompiliert
+// expected: compiles
 package proof;
 
 import org.jspecify.annotations.NullMarked;

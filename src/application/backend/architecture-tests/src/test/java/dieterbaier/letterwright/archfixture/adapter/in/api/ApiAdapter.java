@@ -4,7 +4,7 @@ import dieterbaier.letterwright.archfixture.api.ApiRecord;
 import dieterbaier.letterwright.archfixture.api.ApiInterface;
 import dieterbaier.letterwright.archfixture.usecases.in.InboundPort;
 
-/** Fixture: regelkonform, adapter-api implementiert die API und ruft einen eingehenden Port. */
+/** Fixture: compliant, adapter-api implements the API and calls an inbound port. */
 public class ApiAdapter implements ApiInterface {
 
     private InboundPort useCase;

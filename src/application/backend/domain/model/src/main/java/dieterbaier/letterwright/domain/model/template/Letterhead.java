@@ -8,12 +8,11 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 /**
- * Vorlage für das Seitenlayout eines Schreibens. Aggregate Root über seine {@link TemplateVersion Versionen}: Jede
- * Änderung an einer Version geht über das Briefpapier, das die Regeln über alle Versionen hinweg sichert (siehe
- * {@link VersionSequence}).
+ * Template for the page layout of a letter. Aggregate root over its {@link TemplateVersion versions}: every change to a
+ * version goes through the letterhead, which secures the rules across all versions (see {@link VersionSequence}).
  *
- * <p>Der Inhalt, auch die Stilvorgaben, steht in den Versionen; wie die Pflege die Stilvorgaben strukturiert, legt #8
- * fest. Jeder Übergang liefert eine neue Instanz.
+ * <p>The content, including the style rules, is in the versions; how editing structures the style rules is decided by
+ * #8. Every transition returns a new instance.
  */
 @AggregateRoot
 public final class Letterhead {
@@ -25,28 +24,28 @@ public final class Letterhead {
     private final VersionSequence versions;
 
     private Letterhead(TemplateId id, String name, LetterheadType type, VersionSequence versions) {
-        this.id = Validate.required(id, "Die ID des Briefpapiers");
-        this.name = Validate.notBlank(name, "Der Name des Briefpapiers");
-        this.type = Validate.required(type, "Der Typ des Briefpapiers");
+        this.id = Validate.required(id, "The ID of the letterhead");
+        this.name = Validate.notBlank(name, "The name of the letterhead");
+        this.type = Validate.required(type, "The type of the letterhead");
         this.versions = versions;
     }
 
-    /** Legt ein neues Briefpapier mit der ersten Version als Entwurf an. */
+    /** Creates a new letterhead with the first version as a draft. */
     public static Letterhead create(TemplateId id, String name, LetterheadType type, String content) {
-        return new Letterhead(id, name, type, VersionSequence.first(Validate.required(id, "Die ID des Briefpapiers"),
+        return new Letterhead(id, name, type, VersionSequence.first(Validate.required(id, "The ID of the letterhead"),
                 content));
     }
 
-    /** Legt ein neues Briefpapier mit dem Standardtyp (geschäftlich Form B) an. */
+    /** Creates a new letterhead with the default type (business form B). */
     public static Letterhead createWithDefaultType(TemplateId id, String name, String content) {
         return create(id, name, LetterheadType.STANDARD, content);
     }
 
-    /** Stellt ein gespeichertes Briefpapier mit seinen Versionen wieder her und prüft deren Regeln. */
+    /** Restores a stored letterhead with its versions and checks their rules. */
     public static Letterhead restore(
             TemplateId id, String name, LetterheadType type, List<TemplateVersion> versions) {
         return new Letterhead(id, name, type, VersionSequence.restore(
-                Validate.required(id, "Die ID des Briefpapiers"), versions));
+                Validate.required(id, "The ID of the letterhead"), versions));
     }
 
     public TemplateId id() {
@@ -61,7 +60,7 @@ public final class Letterhead {
         return type;
     }
 
-    /** Alle Versionen, aufsteigend nach Nummer. */
+    /** All versions, in ascending order of number. */
     public List<TemplateVersion> versions() {
         return versions.all();
     }
@@ -74,38 +73,38 @@ public final class Letterhead {
         return versions.draft();
     }
 
-    /** Die Version, mit der neue Schreiben entstehen; je Vorlage gibt es höchstens eine (ADR-022). */
+    /** The version new letters are created with; each template has at most one (ADR-022). */
     public Optional<TemplateVersion> publishedVersion() {
         return versions.published();
     }
 
-    /** Ersetzt den Inhalt des Entwurfs und behält seine Beispieldaten. Leer ist erlaubt, fehlend nicht. */
+    /** Replaces the content of the draft and keeps its sample data. Empty is allowed, missing is not. */
     public Letterhead changeDraft(String content) {
         return with(versions.changeDraft(content));
     }
 
-    /** Ersetzt Inhalt und Beispieldaten des Entwurfs. */
+    /** Replaces content and sample data of the draft. */
     public Letterhead changeDraft(String content, DataContext sampleData) {
         return with(versions.changeDraft(content, sampleData));
     }
 
     /**
-     * Veröffentlicht den Entwurf. Er braucht Inhalt; danach ist er unveränderlich. Die bisher veröffentlichte Version ist
-     * danach abgelöst (ADR-022).
+     * Publishes the draft. It needs content; afterwards it is immutable. The previously published version is then
+     * superseded (ADR-022).
      */
     public Letterhead publishDraft() {
         return with(versions.publishDraft());
     }
 
     /**
-     * Legt die nächste Version als Entwurf an und übernimmt die Beispieldaten der neuesten. Geht nur, solange es keinen
-     * Entwurf gibt.
+     * Creates the next version as a draft and takes over the sample data of the newest one. Only possible while there
+     * is no draft.
      */
     public Letterhead newDraft(String content) {
         return with(versions.newDraft(content));
     }
 
-    /** Nimmt die veröffentlichte Version ohne Nachfolger zurück; bis zur nächsten Veröffentlichung gibt es keine. */
+    /** Withdraws the published version without a successor; until the next publication there is none. */
     public Letterhead withdraw() {
         return with(versions.withdraw());
     }
@@ -114,7 +113,7 @@ public final class Letterhead {
         return new Letterhead(id, name, type, newVersions);
     }
 
-    /** Gleich sind zwei Instanzen mit derselben ID, auch in verschiedenen Ständen. */
+    /** Two instances with the same ID are equal, even in different states. */
     @Override
     public boolean equals(Object other) {
         return other instanceof Letterhead template && id.equals(template.id);
@@ -127,6 +126,6 @@ public final class Letterhead {
 
     @Override
     public String toString() {
-        return "Briefpapier[id=" + id.value() + ", name=" + name + "]";
+        return "Letterhead[id=" + id.value() + ", name=" + name + "]";
     }
 }

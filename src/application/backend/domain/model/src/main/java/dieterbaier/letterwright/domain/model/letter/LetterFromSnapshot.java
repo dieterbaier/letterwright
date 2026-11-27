@@ -7,20 +7,20 @@ import dieterbaier.letterwright.validation.ValidationException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Ein neues Schreiben und der Snapshot, den es verbraucht hat. Beide werden zusammen gespeichert: Nur wenn der
- * gespeicherte Snapshot dabei noch offen ist, gilt das Schreiben (ADR-021).
+ * A new letter and the snapshot it consumed. Both are saved together: the letter only counts if the stored snapshot
+ * is still open at that moment (ADR-021).
  */
 @ValueObject
 public record LetterFromSnapshot(Letter letter, Snapshot consumedSnapshot) {
 
     public LetterFromSnapshot {
-        Validate.required(letter, "Das Schreiben");
-        Validate.required(consumedSnapshot, "Der verbrauchte Snapshot");
+        Validate.required(letter, "The letter");
+        Validate.required(consumedSnapshot, "The consumed snapshot");
         if (!(consumedSnapshot.state() instanceof SnapshotState.Consumed)) {
-            throw new ValidationException("Der Snapshot " + consumedSnapshot.id().value() + " ist nicht verbraucht");
+            throw new ValidationException("The snapshot " + consumedSnapshot.id().value() + " is not consumed");
         }
         if (!letter.snapshot().equals(consumedSnapshot.id())) {
-            throw new ValidationException("Das Schreiben " + letter.id().value() + " entstand nicht aus Snapshot "
+            throw new ValidationException("The letter " + letter.id().value() + " was not created from snapshot "
                     + consumedSnapshot.id().value());
         }
     }

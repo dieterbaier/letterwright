@@ -1,34 +1,34 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Wie der Host auf ein neu angelegtes Schreiben antwortet, siehe {@link LetterSaveCallback}. Erzeugt wird ein Ergebnis
- * mit {@link #accepted()} oder {@link #rejected(String)}.
+ * How the host answers a newly created letter, see {@link LetterSaveCallback}. A result is created with
+ * {@link #accepted()} or {@link #rejected(String)}.
  */
 public sealed interface CallbackResult {
 
-    /** Der Host ist einverstanden; Schreiben und Daten des Hosts werden gemeinsam committet. */
+    /** The host agrees; the letter and the host's data are committed together. */
     static CallbackResult accepted() {
         return new Accepted();
     }
 
     /**
-     * Der Host lehnt das Speichern ab; die gemeinsame Transaktion wird zurückgerollt.
+     * The host rejects the save; the shared transaction is rolled back.
      *
-     * @param reason warum nicht; die Bibliothek zeigt ihn dem Benutzer an. Nicht leer und nicht nur aus Leerraum
+     * @param reason why not; the library shows it to the user. Not empty and not only whitespace
      */
     static CallbackResult rejected(String reason) {
         return new Rejected(reason);
     }
 
-    /** Siehe {@link #accepted()}. */
+    /** See {@link #accepted()}. */
     record Accepted() implements CallbackResult {
     }
 
-    /** Siehe {@link #rejected(String)}. */
+    /** See {@link #rejected(String)}. */
     record Rejected(String reason) implements CallbackResult {
 
         public Rejected {
-            Require.text(reason, "Der Grund der Ablehnung");
+            Require.text(reason, "The reason for the rejection");
         }
     }
 }

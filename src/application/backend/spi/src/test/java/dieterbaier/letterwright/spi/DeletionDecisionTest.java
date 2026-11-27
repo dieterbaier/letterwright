@@ -14,13 +14,13 @@ class DeletionDecisionTest {
     @NullSource
     @ValueSource(strings = {"", " "})
     void aDeletionBlockNeedsAReason(String reason) {
-        rejects(() -> DeletionDecision.blocked(reason), "Der Grund der Löschsperre");
+        rejects(() -> DeletionDecision.blocked(reason), "The reason for the deletion block");
     }
 
     @Test
     void deletionDecisionsAreValues() {
         assertThat(DeletionDecision.hard()).isEqualTo(new DeletionDecision.Hard());
         assertThat(DeletionDecision.logical()).isEqualTo(new DeletionDecision.Logical());
-        assertThat(DeletionDecision.blocked("Frist")).isEqualTo(new DeletionDecision.Blocked("Frist"));
+        assertThat(DeletionDecision.blocked("Retention period")).isEqualTo(new DeletionDecision.Blocked("Retention period"));
     }
 }

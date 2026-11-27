@@ -4,9 +4,9 @@ import dieterbaier.letterwright.domain.model.UserId;
 import dieterbaier.letterwright.domain.model.template.TemplateId;
 
 /**
- * Anwendungsfall „Vorlagenversion veröffentlichen“: Der Entwurf eines Briefpapiers oder Standardschreibens wird zur
- * einzigen veröffentlichten Version, wenn sein Probe-PDF mit den Beispieldaten konform ist (ADR-005, ADR-022). Die bisher
- * veröffentlichte Version ist danach abgelöst.
+ * Use case "publish template version": the draft of a letterhead or letter template becomes the only published version
+ * if its proof PDF with the sample data is conformant (ADR-005, ADR-022). The previously published version is then
+ * superseded.
  */
 public interface PublishTemplateVersion {
 

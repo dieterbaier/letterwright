@@ -12,28 +12,28 @@ import dieterbaier.letterwright.domain.model.template.TemplateId;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
-/** Legt Schreiben samt PDF in den Attrappen ab, als wären sie früher gespeichert worden. */
+/** Stores letters with their PDF in the fakes, as if they had been saved earlier. */
 final class SavedLetters {
 
-    private final Fakes.LetterStore letter;
+    private final Fakes.LetterStore letters;
     private final Fakes.Documents documents;
     private final VersionReference letterhead = new VersionReference(TemplateId.generate(), VersionNumber.FIRST);
     private final VersionReference reminder = new VersionReference(TemplateId.generate(), VersionNumber.FIRST);
 
-    SavedLetters(Fakes.LetterStore letter, Fakes.Documents documents) {
-        this.letter = letter;
+    SavedLetters(Fakes.LetterStore letters, Fakes.Documents documents) {
+        this.letters = letters;
         this.documents = documents;
     }
 
     Letter save(BusinessReference reference, Instant created) {
         byte[] pdf = ("%PDF " + reference.id() + " " + created).getBytes(StandardCharsets.UTF_8);
-        return letter.store(Letter.restore(LetterId.generate(), SnapshotId.generate(), reference, letterhead,
+        return letters.store(Letter.restore(LetterId.generate(), SnapshotId.generate(), reference, letterhead,
                 reminder, documents.put(pdf), Checksum.of(pdf), created, new LetterState.Visible()));
     }
 
     Letter deleteLogically(Letter existing, Instant at) {
         Letter deleted = existing.logicallyDeleted(at);
-        letter.replace(deleted);
+        letters.replace(deleted);
         return deleted;
     }
 }

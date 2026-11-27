@@ -20,9 +20,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Belegt mit absichtlich falschen Fixture-Klassen, dass jede Regel Verstöße erkennt.
+ * Proves with deliberately wrong fixture classes that every rule detects violations.
  *
- * <p>Ohne diesen Nachweis könnte eine falsch formulierte Regel dauerhaft grün sein.
+ * <p>Without this proof a wrongly phrased rule could stay green forever.
  */
 class ArchitectureRulesDetectViolationsTest {
 

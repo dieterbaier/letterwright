@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-/** Die Regeln über alle Versionen einer Vorlage, geprüft am Briefpapier. Das Standardschreiben teilt sie. */
+/** The rules across all versions of a template, checked on the letterhead. The letter template shares them. */
 class LetterheadTest {
 
     private final TemplateId id = TemplateId.generate();
-    private final Letterhead generate = Letterhead.createWithDefaultType(id, "Geschäftsbrief", "<p>Hallo</p>");
+    private final Letterhead fresh = Letterhead.createWithDefaultType(id, "Business letter", "<p>Hello</p>");
 
     private static TemplateVersion version(TemplateId template, int number, TemplateVersionState state) {
         return TemplateVersion.restore(template, new VersionNumber(number), state, "<p>" + number + "</p>",
@@ -23,60 +23,60 @@ class LetterheadTest {
 
     @Test
     void aNewLetterheadHasTheFirstVersionAsDraft() {
-        assertThat(generate.type()).isEqualTo(LetterheadType.BUSINESS_FORM_B);
-        assertThat(generate.versions()).singleElement().satisfies(version -> {
+        assertThat(fresh.type()).isEqualTo(LetterheadType.BUSINESS_FORM_B);
+        assertThat(fresh.versions()).singleElement().satisfies(version -> {
             assertThat(version.number()).isEqualTo(VersionNumber.FIRST);
             assertThat(version.state()).isEqualTo(TemplateVersionState.DRAFT);
-            assertThat(version.content()).isEqualTo("<p>Hallo</p>");
+            assertThat(version.content()).isEqualTo("<p>Hello</p>");
             assertThat(version.reference()).isEqualTo(new VersionReference(id, VersionNumber.FIRST));
         });
-        assertThat(generate.draft()).isPresent();
-        assertThat(generate.publishedVersion()).isEmpty();
-        assertThat(generate.draft()).get().extracting(TemplateVersion::sampleData)
-                .as("noch ohne Beispieldaten").isEqualTo(DataContext.from(Map.of()));
+        assertThat(fresh.draft()).isPresent();
+        assertThat(fresh.publishedVersion()).isEmpty();
+        assertThat(fresh.draft()).get().extracting(TemplateVersion::sampleData)
+                .as("no sample data yet").isEqualTo(DataContext.from(Map.of()));
     }
 
     @Test
     void aDraftIsChangeableAndMayBeEmpty() {
-        Letterhead changed = generate.changeDraft("");
+        Letterhead changed = fresh.changeDraft("");
 
         assertThat(changed.draft()).get().extracting(TemplateVersion::content).isEqualTo("");
-        assertThat(generate.draft()).get().extracting(TemplateVersion::content)
-                .as("die Ausgangsinstanz bleibt unverändert").isEqualTo("<p>Hallo</p>");
+        assertThat(fresh.draft()).get().extracting(TemplateVersion::content)
+                .as("the original instance stays unchanged").isEqualTo("<p>Hello</p>");
     }
 
     @Test
     void theDraftCarriesItsSampleDataAndANewDraftTakesThemOver() {
-        DataContext sampleData = DataContext.from(Map.of("empfaenger", "Erika Mustermann"));
+        DataContext sampleData = DataContext.from(Map.of("recipient", "Erika Mustermann"));
 
-        Letterhead withData = generate.changeDraft("<p>Hallo</p>", sampleData);
-        Letterhead contentOnly = withData.changeDraft("<p>Guten Tag</p>");
-        Letterhead next = contentOnly.publishDraft().newDraft("<p>neu</p>");
+        Letterhead withData = fresh.changeDraft("<p>Hello</p>", sampleData);
+        Letterhead contentOnly = withData.changeDraft("<p>Good day</p>");
+        Letterhead next = contentOnly.publishDraft().newDraft("<p>new</p>");
 
         assertThat(contentOnly.draft()).get().extracting(TemplateVersion::sampleData).isEqualTo(sampleData);
         assertThat(next.draft()).get().extracting(TemplateVersion::sampleData).isEqualTo(sampleData);
-        rejects(() -> generate.changeDraft("<p>Hallo</p>", null), "Beispieldaten der Version");
+        rejects(() -> fresh.changeDraft("<p>Hello</p>", null), "sample data of the version");
     }
 
     @Test
     void aMissingContentIsRejected() {
-        rejects(() -> Letterhead.createWithDefaultType(id, "Geschäftsbrief", null), "Inhalt der Version");
-        rejects(() -> generate.changeDraft(null), "Inhalt der Version");
-        rejects(() -> generate.publishDraft().newDraft(null), "Inhalt der Version");
+        rejects(() -> Letterhead.createWithDefaultType(id, "Business letter", null), "content of the version");
+        rejects(() -> fresh.changeDraft(null), "content of the version");
+        rejects(() -> fresh.publishDraft().newDraft(null), "content of the version");
     }
 
     @Test
     void anEmptyDraftCannotBePublished() {
-        Letterhead empty = generate.changeDraft("  ");
+        Letterhead empty = fresh.changeDraft("  ");
 
         assertThatThrownBy(empty::publishDraft)
                 .isInstanceOf(IllegalStateTransition.class)
-                .hasMessageContaining("ohne Inhalt");
+                .hasMessageContaining("without content");
     }
 
     @Test
     void lifecycleDraftPublishedWithdrawn() {
-        Letterhead published = generate.publishDraft();
+        Letterhead published = fresh.publishDraft();
         Letterhead withdrawn = published.withdraw();
 
         assertThat(published.draft()).isEmpty();
@@ -89,19 +89,19 @@ class LetterheadTest {
 
     @Test
     void aNewlyPublishedVersionSupersedesThePreviousOne() {
-        Letterhead withV2 = generate.publishDraft().newDraft("<p>2</p>").publishDraft();
+        Letterhead withV2 = fresh.publishDraft().newDraft("<p>2</p>").publishDraft();
 
         assertThat(withV2.versions()).extracting(TemplateVersion::state)
                 .containsExactly(TemplateVersionState.SUPERSEDED, TemplateVersionState.PUBLISHED);
         assertThat(withV2.publishedVersion()).get()
                 .extracting(TemplateVersion::number).isEqualTo(new VersionNumber(2));
         assertThat(withV2.version(VersionNumber.FIRST)).get().extracting(TemplateVersion::content)
-                .as("die abgelöste Version bleibt unverändert").isEqualTo("<p>Hallo</p>");
+                .as("the superseded version stays unchanged").isEqualTo("<p>Hello</p>");
     }
 
     @Test
     void afterWithdrawalTheNextPublicationSupersedesNothing() {
-        Letterhead withV2 = generate.publishDraft().withdraw().newDraft("<p>2</p>")
+        Letterhead withV2 = fresh.publishDraft().withdraw().newDraft("<p>2</p>")
                 .publishDraft();
 
         assertThat(withV2.versions()).extracting(TemplateVersion::state)
@@ -110,18 +110,18 @@ class LetterheadTest {
 
     @Test
     void aPublishedVersionIsImmutable() {
-        Letterhead published = generate.publishDraft();
+        Letterhead published = fresh.publishDraft();
 
-        assertThatThrownBy(() -> published.changeDraft("<p>anders</p>"))
+        assertThatThrownBy(() -> published.changeDraft("<p>different</p>"))
                 .isInstanceOf(IllegalStateTransition.class)
-                .hasMessageContaining("Ändern braucht einen Entwurf")
+                .hasMessageContaining("Changing requires a draft")
                 .hasMessageContaining("PUBLISHED");
         assertThatThrownBy(published::publishDraft).isInstanceOf(IllegalStateTransition.class);
     }
 
     @Test
     void aChangeAfterPublishingIsTheNextDraft() {
-        Letterhead withV2 = generate.publishDraft().newDraft("<p>neu</p>");
+        Letterhead withV2 = fresh.publishDraft().newDraft("<p>new</p>");
 
         assertThat(withV2.versions()).extracting(TemplateVersion::number)
                 .containsExactly(VersionNumber.FIRST, new VersionNumber(2));
@@ -132,30 +132,30 @@ class LetterheadTest {
 
     @Test
     void thereIsAtMostOneDraft() {
-        assertThatThrownBy(() -> generate.newDraft("<p>zweiter</p>"))
+        assertThatThrownBy(() -> fresh.newDraft("<p>second</p>"))
                 .isInstanceOf(IllegalStateTransition.class)
-                .hasMessageContaining("höchstens einen");
+                .hasMessageContaining("at most one");
     }
 
     @Test
     void newNumbersFollowTheHighestEvenAfterWithdrawal() {
-        Letterhead withV2 = generate.publishDraft().withdraw().newDraft("<p>2</p>");
+        Letterhead withV2 = fresh.publishDraft().withdraw().newDraft("<p>2</p>");
 
         assertThat(withV2.draft()).get().extracting(TemplateVersion::number).isEqualTo(new VersionNumber(2));
     }
 
     @Test
     void withdrawNeedsAPublishedVersion() {
-        assertThatThrownBy(generate::withdraw)
+        assertThatThrownBy(fresh::withdraw)
                 .isInstanceOf(IllegalStateTransition.class)
-                .hasMessageContaining("braucht eine veröffentlichte Version");
-        Letterhead withdrawn = generate.publishDraft().withdraw();
+                .hasMessageContaining("requires a published version");
+        Letterhead withdrawn = fresh.publishDraft().withdraw();
         assertThatThrownBy(withdrawn::withdraw).isInstanceOf(IllegalStateTransition.class);
     }
 
     @Test
     void restoreSortsByNumber() {
-        Letterhead loaded = Letterhead.restore(id, "Geschäftsbrief", LetterheadType.PRIVATE, List.of(
+        Letterhead loaded = Letterhead.restore(id, "Business letter", LetterheadType.PRIVATE, List.of(
                 version(id, 2, TemplateVersionState.DRAFT),
                 version(id, 1, TemplateVersionState.PUBLISHED)));
 
@@ -168,20 +168,20 @@ class LetterheadTest {
         TemplateId foreign = TemplateId.generate();
         LetterheadType type = LetterheadType.PRIVATE;
 
-        rejects(() -> Letterhead.restore(id, "B", type, List.of()), "mindestens eine Version");
-        rejects(() -> Letterhead.restore(id, "B", type, null), "Die Versionen");
+        rejects(() -> Letterhead.restore(id, "B", type, List.of()), "at least one version");
+        rejects(() -> Letterhead.restore(id, "B", type, null), "The versions");
         rejects(() -> Letterhead.restore(id, "B", type,
-                Arrays.asList(version(id, 1, TemplateVersionState.DRAFT), null)), "Die Versionen[1]");
+                Arrays.asList(version(id, 1, TemplateVersionState.DRAFT), null)), "The versions[1]");
         rejects(() -> Letterhead.restore(id, "B", type,
-                List.of(version(foreign, 1, TemplateVersionState.DRAFT))), "gehört zur Vorlage");
+                List.of(version(foreign, 1, TemplateVersionState.DRAFT))), "belongs to template");
         rejects(() -> Letterhead.restore(id, "B", type,
-                List.of(version(id, 2, TemplateVersionState.DRAFT))), "erwartet 1, gefunden 2");
+                List.of(version(id, 2, TemplateVersionState.DRAFT))), "expected 1, found 2");
         rejects(() -> Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.WITHDRAWN), version(id, 1, TemplateVersionState.WITHDRAWN))),
-                "erwartet 2, gefunden 1");
+                "expected 2, found 1");
         rejects(() -> Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.DRAFT), version(id, 2, TemplateVersionState.PUBLISHED))),
-                "nicht die neueste");
+                "not the newest");
     }
 
     @Test
@@ -190,15 +190,15 @@ class LetterheadTest {
 
         rejects(() -> Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.PUBLISHED), version(id, 2, TemplateVersionState.PUBLISHED))),
-                "Version 1 ist veröffentlicht");
+                "Version 1 is published");
         rejects(() -> Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.PUBLISHED), version(id, 2, TemplateVersionState.WITHDRAWN))),
-                "höchstens eine veröffentlicht");
+                "at most one version per template is published");
         rejects(() -> Letterhead.restore(id, "B", type, List.of(version(id, 1, TemplateVersionState.SUPERSEDED))),
-                "keine neuere Version ist freigegeben");
+                "no newer version is released");
         rejects(() -> Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.SUPERSEDED), version(id, 2, TemplateVersionState.DRAFT))),
-                "Version 1 ist abgelöst");
+                "Version 1 is superseded");
 
         Letterhead loaded = Letterhead.restore(id, "B", type, List.of(
                 version(id, 1, TemplateVersionState.WITHDRAWN), version(id, 2, TemplateVersionState.SUPERSEDED),
@@ -209,23 +209,23 @@ class LetterheadTest {
 
     @Test
     void requiredAttributesOfTheLetterhead() {
-        rejects(() -> Letterhead.create(null, "B", LetterheadType.PRIVATE, ""), "ID des Briefpapiers");
-        rejects(() -> Letterhead.create(id, null, LetterheadType.PRIVATE, ""), "Name des Briefpapiers");
-        rejects(() -> Letterhead.create(id, " ", LetterheadType.PRIVATE, ""), "Name des Briefpapiers");
-        rejects(() -> Letterhead.create(id, "B", null, ""), "Typ des Briefpapiers");
+        rejects(() -> Letterhead.create(null, "B", LetterheadType.PRIVATE, ""), "ID of the letterhead");
+        rejects(() -> Letterhead.create(id, null, LetterheadType.PRIVATE, ""), "name of the letterhead");
+        rejects(() -> Letterhead.create(id, " ", LetterheadType.PRIVATE, ""), "name of the letterhead");
+        rejects(() -> Letterhead.create(id, "B", null, ""), "type of the letterhead");
         rejects(() -> Letterhead.restore(null, "B", LetterheadType.PRIVATE, List.of()),
-                "ID des Briefpapiers");
+                "ID of the letterhead");
     }
 
     @Test
     void equalityOfAggregatesByIdentity() {
-        Letterhead otherState = generate.changeDraft("<p>anders</p>").publishDraft();
-        Letterhead sameContentOtherId = Letterhead.createWithDefaultType(TemplateId.generate(), "Geschäftsbrief",
-                "<p>Hallo</p>");
+        Letterhead otherState = fresh.changeDraft("<p>different</p>").publishDraft();
+        Letterhead sameContentOtherId = Letterhead.createWithDefaultType(TemplateId.generate(), "Business letter",
+                "<p>Hello</p>");
 
-        assertThat(otherState).isEqualTo(generate).hasSameHashCodeAs(generate);
-        assertThat(sameContentOtherId).isNotEqualTo(generate);
-        assertThat(generate).isNotEqualTo("Geschäftsbrief");
-        assertThat(generate.toString()).contains(id.value().toString(), "Geschäftsbrief");
+        assertThat(otherState).isEqualTo(fresh).hasSameHashCodeAs(fresh);
+        assertThat(sameContentOtherId).isNotEqualTo(fresh);
+        assertThat(fresh).isNotEqualTo("Business letter");
+        assertThat(fresh.toString()).contains(id.value().toString(), "Business letter");
     }
 }

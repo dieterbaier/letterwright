@@ -1,4 +1,4 @@
-// erwartet: [NullAway] returning @Nullable expression
+// expected: [NullAway] returning @Nullable expression
 package proof;
 
 import org.jspecify.annotations.NullMarked;

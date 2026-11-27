@@ -4,31 +4,30 @@ import dieterbaier.letterwright.domain.model.snapshot.SnapshotId;
 import dieterbaier.letterwright.validation.Validate;
 import java.time.Instant;
 
-/** Was beim Erzeugen einer Vorschau herauskommt. Nur {@link Created} enthält eine Vorschau. */
+/** The outcome of creating a preview. Only {@link Created} contains a preview. */
 public sealed interface PreviewResult {
 
     /**
-     * Die Vorschau als HTML, noch nicht paginiert. Mit der Snapshot-ID wird das Schreiben später gespeichert, bis zum
-     * Ablauf.
+     * The preview as HTML, not yet paginated. The snapshot ID is used to save the letter later, until the expiry.
      */
     record Created(SnapshotId snapshot, String html, Instant expiry) implements PreviewResult {
 
         public Created {
-            Validate.required(snapshot, "Der Snapshot der Vorschau");
-            Validate.required(html, "Das HTML der Vorschau");
-            Validate.required(expiry, "Der Ablauf der Vorschau");
+            Validate.required(snapshot, "The snapshot of the preview");
+            Validate.required(html, "The HTML of the preview");
+            Validate.required(expiry, "The expiry of the preview");
         }
     }
 
-    /** Ein Standardschreiben mit dieser ID gibt es nicht. */
+    /** There is no letter template with this ID. */
     record LetterTemplateUnknown() implements PreviewResult {}
 
-    /** Das Standardschreiben gehört zu einem anderen Bezugstyp (ADR-020). Der Host wurde nicht gefragt. */
+    /** The letter template belongs to another reference type (ADR-020). The host was not asked. */
     record ReferenceMismatch() implements PreviewResult {}
 
-    /** Standardschreiben oder Briefpapier haben keine veröffentlichte Version. */
+    /** The letter template or the letterhead has no published version. */
     record NoPublishedVersion() implements PreviewResult {}
 
-    /** Der Host erlaubt dem Benutzer nicht, aus dem Standardschreiben zu dem Bezug ein Schreiben zu erzeugen. */
+    /** The host does not allow the user to create a letter from the letter template for the reference. */
     record NotAllowed() implements PreviewResult {}
 }

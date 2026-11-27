@@ -22,11 +22,11 @@ class HostDeletionRulesTest {
         List<DeletionRequest> requests = new ArrayList<>();
         var rules = new HostDeletionRules(request -> {
             requests.add(request);
-            return dieterbaier.letterwright.spi.DeletionDecision.blocked("Aufbewahrungsfrist bis 2036");
+            return dieterbaier.letterwright.spi.DeletionDecision.blocked("Retention period until 2036");
         });
 
         assertThat(rules.decide(ERIKA, LETTER))
-                .isEqualTo(DeletionDecision.blocked("Aufbewahrungsfrist bis 2036"));
+                .isEqualTo(DeletionDecision.blocked("Retention period until 2036"));
         assertThat(requests)
                 .containsExactly(new DeletionRequest(ERIKA_IN_SPI, LETTER.id().value(), CUSTOMER_IN_SPI, CREATED));
     }

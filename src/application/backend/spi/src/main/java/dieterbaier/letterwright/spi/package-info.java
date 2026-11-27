@@ -1,19 +1,19 @@
 /**
- * SPI zur Host-Anwendung: Schnittstellen, die der Host implementiert, und die Datentypen, die über
- * sie fließen, siehe ADR-016. Hängt an keinem anderen Modul der Bibliothek und nicht an Spring.
+ * SPI towards the host application: interfaces the host implements and the data types that flow through them, see
+ * ADR-016. Depends on no other module of the library and not on Spring.
  *
- * <p>Der Host implementiert drei Schnittstellen: {@link dieterbaier.letterwright.spi.PlaceholderDataProvider},
- * {@link dieterbaier.letterwright.spi.AuthorizationCheck} (optional, der Starter bringt eine Default-Implementierung
- * mit) und {@link dieterbaier.letterwright.spi.DeletionPolicy}. Optional kommt der Rückruf
- * {@link dieterbaier.letterwright.spi.LetterSaveCallback} hinzu (ADR-023); er zählt nicht zu diesen drei.
+ * <p>The host implements three interfaces: {@link dieterbaier.letterwright.spi.PlaceholderDataProvider},
+ * {@link dieterbaier.letterwright.spi.AuthorizationCheck} (optional, the starter ships a default implementation) and
+ * {@link dieterbaier.letterwright.spi.DeletionPolicy}. Optionally, the callback
+ * {@link dieterbaier.letterwright.spi.LetterSaveCallback} is added (ADR-023); it does not count among these three.
  *
- * <p>Für alle Typen dieses Pakets gilt:
+ * <p>For all types of this package:
  * <ul>
- *   <li>Kein Parameter und kein Rückgabewert ist {@code null}. Das Paket ist {@code @NullMarked} (JSpecify); wo ein Wert
- *       fehlen darf, sagt es der Typ. Liefert eine Implementierung des Hosts {@code null}, bricht die Bibliothek mit
- *       einer Vertragsverletzung ab.</li>
- *   <li>Alle Datentypen sind unveränderlich und prüfen sich beim Erzeugen. Ein fehlender oder ungültiger Wert ergibt
- *       eine {@link IllegalArgumentException} mit dem Namen des Attributs.</li>
+ *   <li>No parameter and no return value is {@code null}. The package is {@code @NullMarked} (JSpecify); where a value
+ *       may be absent, the type says so. If an implementation of the host returns {@code null}, the library aborts
+ *       with a host contract violation.</li>
+ *   <li>All data types are immutable and validate themselves on creation. A missing or invalid value results in an
+ *       {@link IllegalArgumentException} naming the attribute.</li>
  * </ul>
  */
 @NullMarked

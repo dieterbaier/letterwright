@@ -1,14 +1,14 @@
 package dieterbaier.letterwright.spi;
 
-/** Eine Handlung an Briefpapier und Standardschreiben. Sie hat keinen fachlichen Bezug. */
+/** An action on letterheads and letter templates. It has no business reference. */
 public enum TemplateAction {
 
-    /** Briefpapier und Standardschreiben anlegen, Entwürfe ändern und neue Entwürfe anlegen. */
+    /** Create letterheads and letter templates, change drafts and create new drafts. */
     EDIT,
 
     /**
-     * Entwürfe veröffentlichen und veröffentlichte Versionen zurückziehen. Getrennt vom Bearbeiten, damit der Host ein
-     * Vier-Augen-Prinzip abbilden kann.
+     * Publish drafts and withdraw published versions. Separate from editing so that the host can enforce a
+     * four-eyes principle.
      */
     PUBLISH
 }

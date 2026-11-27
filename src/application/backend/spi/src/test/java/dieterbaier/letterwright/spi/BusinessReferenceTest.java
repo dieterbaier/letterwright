@@ -12,7 +12,7 @@ class BusinessReferenceTest {
     @NullSource
     @ValueSource(strings = {"", " ", "\t"})
     void typeAndIdRejectMissingEmptyAndBlankValues(String value) {
-        rejects(() -> new BusinessReference(value, "4711"), "Der Typ des fachlichen Bezugs");
-        rejects(() -> new BusinessReference("Kunde", value), "Die ID des fachlichen Bezugs");
+        rejects(() -> new BusinessReference(value, "4711"), "The type of the business reference");
+        rejects(() -> new BusinessReference("Customer", value), "The ID of the business reference");
     }
 }

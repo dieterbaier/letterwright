@@ -31,17 +31,18 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Brücke zu {@code features/eingebaute-berechtigungspruefung.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die Tests laufen durch die Autokonfiguration und fragen über den Port, wie es der Kern tut.
+ * Bridge to {@code features/built-in-authorization-check.feature}: one test per scenario, named after the
+ * scenario title. The tests run through the auto-configuration and ask through the port, as the core does.
  */
 class BuiltInAuthorizationCheckTest {
 
     private static final UserId ERIKA = new UserId("erika");
-    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Customer", "4711");
     private static final LetterTemplate REMINDER =
-            LetterTemplate.create(TemplateId.generate(), "Mahnung", TemplateId.generate(), "Kunde", "<p>Mahnung</p>");
+            LetterTemplate.create(TemplateId.generate(), "Payment reminder", TemplateId.generate(), "Customer",
+                    "<p>Payment reminder</p>");
 
-    // Grundlage: Die Host-Anwendung stellt keine eigene Berechtigungsprüfung bereit.
+    // Background: the host application provides no authorization check of its own.
     private final ApplicationContextRunner withoutCustomCheck = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(LetterwrightAutoConfiguration.class))
             .withUserConfiguration(RequiredSpi.class);
@@ -53,34 +54,34 @@ class BuiltInAuthorizationCheckTest {
 
     @Test
     void withTheRoleOfTheActionItIsAllowed() {
-        // Given: Erika ist angemeldet und hat die Rolle ROLE_LETTERWRIGHT_LETTERS_CREATE
+        // Given: Erika is logged in and has the role ROLE_LETTERWRIGHT_LETTERS_CREATE
         login("erika", "ROLE_LETTERWRIGHT_LETTERS_CREATE");
 
-        // When / Then: Erzeugen zum Kunden 4711 ist erlaubt
+        // When / Then: creating for customer 4711 is allowed
         withoutCustomCheck.run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class)))
                 .isTrue());
     }
 
     @Test
     void withTheRoleOfAnotherActionItIsNotAllowed() {
-        // Given: Erika ist angemeldet und hat nur die Rolle ROLE_LETTERWRIGHT_LETTERS_VIEW
+        // Given: Erika is logged in and has only the role ROLE_LETTERWRIGHT_LETTERS_VIEW
         login("erika", "ROLE_LETTERWRIGHT_LETTERS_VIEW");
 
-        // When / Then: Erzeugen ist nicht erlaubt
+        // When / Then: creating is not allowed
         withoutCustomCheck.run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class)))
                 .isFalse());
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = {"niemand ist angemeldet", "Erika greift nur anonym zu"})
+    @ValueSource(strings = {"nobody is logged in", "Erika accesses only anonymously"})
     void withoutAuthenticationNothingIsAllowed(String access) {
-        // Given: Der Host hat ROLE_ANONYMOUS fürs Erzeugen konfiguriert, und es gibt nur den Zugriff aus dem Beispiel
+        // Given: the host has configured ROLE_ANONYMOUS for creating, and there is only the access from the example
         if (access.startsWith("Erika")) {
             SecurityContextHolder.getContext().setAuthentication(new AnonymousAuthenticationToken("key",
                     "erika", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")));
         }
 
-        // When / Then: Erzeugen ist nicht erlaubt
+        // When / Then: creating is not allowed
         withoutCustomCheck
                 .withPropertyValues("letterwright.authorization.roles.letters.CREATE=ROLE_ANONYMOUS")
                 .run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class))).isFalse());
@@ -88,42 +89,42 @@ class BuiltInAuthorizationCheckTest {
 
     @Test
     void theHostDecidesWhatCountsAsAnonymousAccess() {
-        // Given: Der Host stuft mit einem eigenen AuthenticationTrustResolver jede Anmeldung als anonym ein,
-        // Erika ist angemeldet und hat die Rolle ROLE_LETTERWRIGHT_LETTERS_CREATE
+        // Given: the host classifies every login as anonymous with its own AuthenticationTrustResolver,
+        // Erika is logged in and has the role ROLE_LETTERWRIGHT_LETTERS_CREATE
         login("erika", "ROLE_LETTERWRIGHT_LETTERS_CREATE");
 
-        // When / Then: Erzeugen ist nicht erlaubt; ohne diesen Resolver wäre es erlaubt (erstes Szenario)
+        // When / Then: creating is not allowed; without this resolver it would be allowed (first scenario)
         withoutCustomCheck.withUserConfiguration(EverythingIsAnonymous.class)
                 .run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class))).isFalse());
     }
 
     @Test
     void nothingIsAllowedForAUserOtherThanTheLoggedInOne() {
-        // Given: Max ist angemeldet und hat die Rolle ROLE_LETTERWRIGHT_LETTERS_CREATE
+        // Given: Max is logged in and has the role ROLE_LETTERWRIGHT_LETTERS_CREATE
         login("max", "ROLE_LETTERWRIGHT_LETTERS_CREATE");
 
-        // When / Then: die Frage für Erika wird abgelehnt
+        // When / Then: the question for Erika is rejected
         withoutCustomCheck.run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class)))
                 .isFalse());
     }
 
     @Test
     void aConfiguredRoleReplacesThePredefinedOne() {
-        // Given: Der Host hat ROLE_SACHBEARBEITUNG fürs Erzeugen konfiguriert,
-        // Erika hat nur die vorgegebene Rolle
+        // Given: the host has configured ROLE_CASEWORK for creating,
+        // Erika has only the predefined role
         login("erika", "ROLE_LETTERWRIGHT_LETTERS_CREATE");
 
-        // When / Then: Erzeugen ist nicht erlaubt
+        // When / Then: creating is not allowed
         withoutCustomCheck
-                .withPropertyValues("letterwright.authorization.roles.letters.CREATE=ROLE_SACHBEARBEITUNG")
+                .withPropertyValues("letterwright.authorization.roles.letters.CREATE=ROLE_CASEWORK")
                 .run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class))).isFalse());
     }
 
     @Test
     void aCustomAuthorizationCheckOfTheHostReplacesTheBuiltInOne() {
-        // Given: Der Host stellt eine eigene Prüfung bereit, die alles erlaubt; niemand ist angemeldet
+        // Given: the host provides a check of its own that allows everything; nobody is logged in
 
-        // When / Then: Erzeugen ist erlaubt, weil die eigene Prüfung entscheidet
+        // When / Then: creating is allowed because the custom check decides
         withoutCustomCheck.withUserConfiguration(AllowsEverything.class)
                 .run(context -> assertThat(erikaMayCreate(context.getBean(Permissions.class))).isTrue());
     }
@@ -133,7 +134,7 @@ class BuiltInAuthorizationCheckTest {
     }
 
     private static void login(String name, String role) {
-        SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(name, "geheim", role));
+        SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(name, "secret", role));
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -146,7 +147,7 @@ class BuiltInAuthorizationCheckTest {
 
         @Bean
         DeletionPolicy deletionPolicy() {
-            return request -> DeletionDecision.blocked("Aufbewahrungsfrist");
+            return request -> DeletionDecision.blocked("Retention period");
         }
     }
 

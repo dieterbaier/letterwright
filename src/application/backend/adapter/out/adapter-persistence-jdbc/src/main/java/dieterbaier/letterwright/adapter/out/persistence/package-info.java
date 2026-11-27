@@ -1,5 +1,5 @@
 /**
- * Persistenz-Adapter auf Basis von Spring JDBC und Liquibase, siehe ADR-006.
+ * Persistence adapter based on Spring JDBC and Liquibase, see ADR-006.
  */
 @NullMarked
 package dieterbaier.letterwright.adapter.out.persistence;

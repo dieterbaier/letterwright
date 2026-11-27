@@ -14,13 +14,13 @@ class CallbackResultTest {
     @NullSource
     @ValueSource(strings = {"", " "})
     void aRejectionNeedsAReason(String reason) {
-        rejects(() -> CallbackResult.rejected(reason), "Der Grund der Ablehnung");
+        rejects(() -> CallbackResult.rejected(reason), "The reason for the rejection");
     }
 
     @Test
     void callbackResultsAreValues() {
         assertThat(CallbackResult.accepted()).isEqualTo(new CallbackResult.Accepted());
-        assertThat(CallbackResult.rejected("Aufgabe ist bereits erledigt"))
-                .isEqualTo(new CallbackResult.Rejected("Aufgabe ist bereits erledigt"));
+        assertThat(CallbackResult.rejected("Task is already done"))
+                .isEqualTo(new CallbackResult.Rejected("Task is already done"));
     }
 }

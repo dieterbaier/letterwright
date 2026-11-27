@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 class DataContextTest {
 
     private static final Map<String, Object> CUSTOMER = Map.of(
-            "empfaenger", Map.of("name", "Erika Mustermann", "ort", "Köln"),
-            "items", List.of("Beitrag 2026", "Mahngebühr"));
+            "recipient", Map.of("name", "Erika Mustermann", "city", "Cologne"),
+            "items", List.of("Fee 2026", "Reminder fee"));
 
     @Test
     void sameContentYieldsSameChecksumRegardlessOfKeyOrder() {
@@ -37,26 +37,26 @@ class DataContextTest {
         Checksum before = DataContext.from(CUSTOMER).checksum();
 
         Map<String, Object> other = new HashMap<>(CUSTOMER);
-        other.put("empfaenger", Map.of("name", "Erika Mustermann", "ort", "Bonn"));
+        other.put("recipient", Map.of("name", "Erika Mustermann", "city", "Bonn"));
 
         assertThat(DataContext.from(other).checksum()).isNotEqualTo(before);
     }
 
     @Test
     void theOrderInListsMatters() {
-        DataContext from = DataContext.from(Map.of("items", List.of("a", "b")));
+        DataContext ab = DataContext.from(Map.of("items", List.of("a", "b")));
         DataContext ba = DataContext.from(Map.of("items", List.of("b", "a")));
 
-        assertThat(from.checksum()).isNotEqualTo(ba.checksum());
-        assertThat(from).isNotEqualTo(ba);
+        assertThat(ab.checksum()).isNotEqualTo(ba.checksum());
+        assertThat(ab).isNotEqualTo(ba);
     }
 
     @Test
     void theEncodingIsUnambiguousEvenWhenTextsLookLikeStructure() {
-        // Ohne Längen und Typkennungen ergäben diese Paare dieselbe Bytefolge.
+        // Without lengths and type tags these pairs would yield the same byte sequence.
         assertThat(DataContext.from(Map.of("a", "bc")).checksum())
-                .isNotEqualTo(DataContext.from(Map.of("from", "c")).checksum());
-        assertThat(DataContext.from(Map.of("x", List.of("from"))).checksum())
+                .isNotEqualTo(DataContext.from(Map.of("ab", "c")).checksum());
+        assertThat(DataContext.from(Map.of("x", List.of("ab"))).checksum())
                 .isNotEqualTo(DataContext.from(Map.of("x", List.of("a", "b"))).checksum());
         assertThat(DataContext.from(Map.of("x", "")).checksum())
                 .isNotEqualTo(DataContext.from(Map.of("x", List.of())).checksum())
@@ -65,28 +65,28 @@ class DataContextTest {
 
     @Test
     void theChecksumIsStable() {
-        // Festgeschrieben, damit eine Änderung der Kodierung auffällt: Snapshots, die vor der Änderung angelegt
-        // wurden, würden sonst beim Speichern als geändert gelten. Der Wert ist unabhängig von dieser Implementierung
-        // nachgerechnet (Python, hashlib): M,2 | T,"name" T,"Erika" | T,"posten" L,1 T,"a"; Längen als int32 big-endian.
+        // Pinned so that a change of the encoding is noticed: snapshots created before the change would otherwise count
+        // as changed on saving. The value was recomputed independently of this implementation (Python, hashlib):
+        // M,2 | T,"items" L,1 T,"a" | T,"name" T,"Erika"; lengths as int32 big-endian.
         assertThat(DataContext.from(Map.of("name", "Erika", "items", List.of("a"))).checksum().hex())
-                .isEqualTo("8b42f1fd375ad7eb974dddf7c451c706141bf7f5b3f84254b5ea0f1de7de7f69");
+                .isEqualTo("9f283f547742e425341d6f0a592f249b049c0c65a567f337c47be24851e76fd8");
     }
 
     @Test
     void isDeeplyImmutableAndIndependentOfTheSource() {
         List<Object> items = new ArrayList<>(List.of("a"));
-        Map<String, Object> source = new HashMap<>(Map.of("items", items, "unter", new HashMap<>(Map.of("k", "v"))));
+        Map<String, Object> source = new HashMap<>(Map.of("items", items, "sub", new HashMap<>(Map.of("k", "v"))));
         DataContext context = DataContext.from(source);
 
         items.add("b");
-        source.put("generate", "x");
+        source.put("new", "x");
 
-        assertThat(context.values()).containsOnlyKeys("items", "unter");
+        assertThat(context.values()).containsOnlyKeys("items", "sub");
         assertThat(context.values().get("items")).isEqualTo(List.of("a"));
-        assertThatThrownBy(() -> context.values().put("generate", "x")).isInstanceOf(UnsupportedOperationException.class);
+        assertThatThrownBy(() -> context.values().put("new", "x")).isInstanceOf(UnsupportedOperationException.class);
         assertThatThrownBy(() -> ((List<?>) context.values().get("items")).clear())
                 .isInstanceOf(UnsupportedOperationException.class);
-        assertThatThrownBy(() -> ((Map<?, ?>) context.values().get("unter")).clear())
+        assertThatThrownBy(() -> ((Map<?, ?>) context.values().get("sub")).clear())
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -101,9 +101,9 @@ class DataContextTest {
 
     @Test
     void rejectsOtherTypesAndNamesThePath() {
-        rejects(() -> DataContext.from(Map.of("betrag", Map.of("netto", 12))), "betrag.netto");
-        rejects(() -> DataContext.from(Map.of("betrag", Map.of("netto", 12))), "java.lang.Integer");
-        rejects(() -> DataContext.from(Map.of("items", List.of("a", List.of(1)))), "posten[1][0]");
+        rejects(() -> DataContext.from(Map.of("amount", Map.of("net", 12))), "amount.net");
+        rejects(() -> DataContext.from(Map.of("amount", Map.of("net", 12))), "java.lang.Integer");
+        rejects(() -> DataContext.from(Map.of("items", List.of("a", List.of(1)))), "items[1][0]");
     }
 
     @Test
@@ -111,54 +111,54 @@ class DataContextTest {
         Map<String, Object> source = new HashMap<>();
         source.put("name", null);
 
-        rejects(() -> DataContext.from(null), "Werte des Datenkontexts");
+        rejects(() -> DataContext.from(null), "values of the data context");
         rejects(() -> DataContext.from(source), "name");
-        rejects(() -> DataContext.from(Map.of("items", Arrays.asList("a", null))), "posten[1]");
+        rejects(() -> DataContext.from(Map.of("items", Arrays.asList("a", null))), "items[1]");
     }
 
     @Test
     void rejectsKeysThatAreNotText() {
-        rejects(() -> DataContext.from(Map.of("unter", Map.of(1, "x"))), "unter");
+        rejects(() -> DataContext.from(Map.of("sub", Map.of(1, "x"))), "sub");
     }
 
     @Test
     void rejectsLoneSurrogatesInValuesAndNamesThePath() {
-        // Ohne diese Prüfung kodierte UTF-8 das Surrogat als '?', und beide Kontexte hätten dieselbe Prüfsumme.
+        // Without this check UTF-8 would encode the surrogate as '?', and both contexts would have the same checksum.
         rejects(() -> DataContext.from(Map.of("x", "\uD800")), "x");
-        rejects(() -> DataContext.from(Map.of("items", List.of("a\uDC00b"))), "posten[0]");
+        rejects(() -> DataContext.from(Map.of("items", List.of("a\uDC00b"))), "items[0]");
     }
 
     @Test
     void rejectsLoneSurrogatesInKeys() {
-        rejects(() -> DataContext.from(Map.of("unter", Map.of("k\uD800", "x"))), "Schlüssel unter.k");
+        rejects(() -> DataContext.from(Map.of("sub", Map.of("k\uD800", "x"))), "Key sub.k");
     }
 
     @Test
     void validSurrogatePairsAreAllowedAndDistinguishable() {
-        DataContext emoji = DataContext.from(Map.of("gruss", "Hallo \uD83D\uDE00"));
-        DataContext questionMark = DataContext.from(Map.of("gruss", "Hallo ?"));
+        DataContext emoji = DataContext.from(Map.of("greeting", "Hello \uD83D\uDE00"));
+        DataContext questionMark = DataContext.from(Map.of("greeting", "Hello ?"));
 
-        assertThat(emoji.values()).containsEntry("gruss", "Hallo 😀");
+        assertThat(emoji.values()).containsEntry("greeting", "Hello 😀");
         assertThat(emoji.checksum()).isNotEqualTo(questionMark.checksum());
     }
 
     @Test
     void extendedByAnotherWhoseValuesTakePrecedence() {
-        DataContext letterhead = DataContext.from(Map.of("absender", "Muster GmbH", "betreff", "Allgemein"));
-        DataContext letterTemplate = DataContext.from(Map.of("betreff", "Mahnung", "betrag", "12,00 €"));
+        DataContext letterhead = DataContext.from(Map.of("sender", "Muster GmbH", "subject", "General"));
+        DataContext letterTemplate = DataContext.from(Map.of("subject", "Payment reminder", "amount", "12,00 €"));
 
         DataContext together = letterhead.extendedBy(letterTemplate);
 
         assertThat(together).isEqualTo(DataContext.from(
-                Map.of("absender", "Muster GmbH", "betreff", "Mahnung", "betrag", "12,00 €")));
+                Map.of("sender", "Muster GmbH", "subject", "Payment reminder", "amount", "12,00 €")));
         assertThat(together.values()).isUnmodifiable();
         assertThat(together.checksum()).isEqualTo(DataContext.from(together.values()).checksum());
-        rejects(() -> letterhead.extendedBy(null), "vorrangige Datenkontext");
+        rejects(() -> letterhead.extendedBy(null), "preferred data context");
     }
 
     @Test
     void toStringShowsNoValues() {
-        assertThat(DataContext.from(CUSTOMER).toString()).doesNotContain("Erika").contains("pruefsumme=");
+        assertThat(DataContext.from(CUSTOMER).toString()).doesNotContain("Erika").contains("checksum=");
     }
 
     @Test

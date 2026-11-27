@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.api;
 
 import dieterbaier.letterwright.archfixture.domain.model.ModelWithDomainService;
 
-/** Fixture: absichtlicher Verstoß, die API gibt einen Typ des Domänenmodells heraus. */
+/** Fixture: deliberate violation, the API exposes a type of the domain model. */
 public interface ApiWithDomain {
 
     ModelWithDomainService model();

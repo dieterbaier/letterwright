@@ -12,15 +12,15 @@ class DeletionDecisionTest {
 
     @Test
     void aBlockCarriesItsReason() {
-        assertThat(DeletionDecision.blocked("Aufbewahrungsfrist bis 2036"))
-                .isEqualTo(new DeletionDecision.Blocked("Aufbewahrungsfrist bis 2036"));
+        assertThat(DeletionDecision.blocked("Retention period until 2036"))
+                .isEqualTo(new DeletionDecision.Blocked("Retention period until 2036"));
     }
 
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", " "})
     void aBlockWithoutReasonIsNotAllowed(String reason) {
-        rejects(() -> DeletionDecision.blocked(reason), "Grund der Löschsperre");
+        rejects(() -> DeletionDecision.blocked(reason), "reason for the deletion block");
     }
 
     @Test

@@ -3,25 +3,25 @@ package dieterbaier.letterwright.usecases.out;
 import dieterbaier.letterwright.domain.model.letter.Letter;
 import dieterbaier.letterwright.validation.Validate;
 
-/** Sicherer Ausgang von {@link LetterRepository#save}. Ein ungewisser Ausgang ist eine Ausnahme. */
+/** A certain outcome of {@link LetterRepository#save}. An uncertain outcome is an exception. */
 public sealed interface SaveOutcome {
 
     record Saved() implements SaveOutcome {}
 
-    /** Gespeichert wurde nichts; den Snapshot gibt es nicht mehr, etwa weil eine neue Vorschau ihn ersetzt hat. */
+    /** Nothing was saved; the snapshot no longer exists, for example because a new preview replaced it. */
     record SnapshotNoLongerExists() implements SaveOutcome {}
 
     /**
-     * Gespeichert wurde nichts; aus dem Snapshot ist schon dieses Schreiben entstanden. Es kann inzwischen logisch
-     * gelöscht sein.
+     * Nothing was saved; this letter has already been created from the snapshot. It may since have been logically
+     * deleted.
      */
     record SnapshotAlreadyConsumed(Letter existing) implements SaveOutcome {
 
         public SnapshotAlreadyConsumed {
-            Validate.required(existing, "Das vorhandene Schreiben");
+            Validate.required(existing, "The existing letter");
         }
     }
 
-    /** Gespeichert wurde nichts; aus dem Snapshot ist schon ein Schreiben entstanden, und es ist hart gelöscht. */
+    /** Nothing was saved; a letter has already been created from the snapshot, and it is hard deleted. */
     record LetterRemoved() implements SaveOutcome {}
 }

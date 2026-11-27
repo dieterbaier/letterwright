@@ -39,16 +39,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-/** Zugleich Brücke zum Szenario „Ohne Rückruf des Hosts nimmt die Bibliothek jedes neue Schreiben an“ in rueckruf-nach-dem-speichern.feature. */
+/** Also the bridge to the scenario "Without a callback of the host the library accepts every new letter" in letter-save-callback.feature. */
 class LetterwrightAutoConfigurationTest {
 
     private static final dieterbaier.letterwright.spi.BusinessReference CUSTOMER =
-            new dieterbaier.letterwright.spi.BusinessReference("Kunde", "4711");
-    private static final LetterTemplateId REMINDER = new LetterTemplateId(UUID.randomUUID(), "Mahnung");
+            new dieterbaier.letterwright.spi.BusinessReference("Customer", "4711");
+    private static final LetterTemplateId REMINDER = new LetterTemplateId(UUID.randomUUID(), "Payment reminder");
 
     private static final UserId ERIKA = new UserId("erika");
     private static final Letter LETTER = Letter.restore(LetterId.generate(), SnapshotId.generate(),
-            new BusinessReference("Kunde", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
+            new BusinessReference("Customer", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
             new VersionReference(TemplateId.generate(), VersionNumber.FIRST), new DocumentReference("store/1"),
             Checksum.of(new byte[] {1}), Instant.parse("2026-11-25T10:00:00Z"), new LetterState.Visible());
 
@@ -73,7 +73,7 @@ class LetterwrightAutoConfigurationTest {
             assertThat(running).doesNotHaveBean(RoleAuthorizationCheck.class);
             assertThat(running.getBean(Permissions.class)
                     .may(new UserId("erika"), dieterbaier.letterwright.domain.model.LetterAction
-                            .DELETE, new BusinessReference("Kunde", "4711")))
+                            .DELETE, new BusinessReference("Customer", "4711")))
                     .isTrue();
         });
     }
@@ -95,13 +95,13 @@ class LetterwrightAutoConfigurationTest {
     @Test
     void theRolesAreConfigurable() {
         context.withUserConfiguration(RequiredSpi.class)
-                .withPropertyValues("letterwright.authorization.roles.letters.CREATE=ROLE_SACHBEARBEITUNG",
-                        "letterwright.authorization.roles.templates.EDIT=ROLE_REDAKTION")
+                .withPropertyValues("letterwright.authorization.roles.letters.CREATE=ROLE_CASEWORK",
+                        "letterwright.authorization.roles.templates.EDIT=ROLE_EDITORIAL")
                 .run(running -> {
                     AuthorizationProperties properties = running.getBean(AuthorizationProperties.class);
-                    assertThat(properties.role(AuthorizationRequest.forCreation("erika", CUSTOMER, REMINDER))).isEqualTo("ROLE_SACHBEARBEITUNG");
+                    assertThat(properties.role(AuthorizationRequest.forCreation("erika", CUSTOMER, REMINDER))).isEqualTo("ROLE_CASEWORK");
                     assertThat(properties.role(AuthorizationRequest.forLetter("erika", LetterAction.DELETE, CUSTOMER))).isEqualTo("ROLE_LETTERWRIGHT_LETTERS_DELETE");
-                    assertThat(properties.role(AuthorizationRequest.forTemplates("erika", TemplateAction.EDIT))).isEqualTo("ROLE_REDAKTION");
+                    assertThat(properties.role(AuthorizationRequest.forTemplates("erika", TemplateAction.EDIT))).isEqualTo("ROLE_EDITORIAL");
                     assertThat(properties.role(AuthorizationRequest.forTemplates("erika", TemplateAction.PUBLISH)))
                             .isEqualTo("ROLE_LETTERWRIGHT_TEMPLATES_PUBLISH");
                 });
@@ -119,7 +119,7 @@ class LetterwrightAutoConfigurationTest {
         context.withUserConfiguration(RequiredSpi.class, RejectingCallback.class).run(running -> assertThat(
                 running.getBean(SaveCallback.class).created(ERIKA, LETTER))
                 .isEqualTo(dieterbaier.letterwright.domain.model.letter.CallbackResult.rejected(
-                        "Aufgabe ist erledigt")));
+                        "Task is done")));
     }
 
     @Test
@@ -160,7 +160,7 @@ class LetterwrightAutoConfigurationTest {
 
         @Bean
         LetterSaveCallback letterSaveCallback() {
-            return letter -> CallbackResult.rejected("Aufgabe ist erledigt");
+            return letter -> CallbackResult.rejected("Task is done");
         }
     }
 
@@ -178,7 +178,7 @@ class LetterwrightAutoConfigurationTest {
 
         @Bean
         DeletionPolicy deletionPolicy() {
-            return request -> DeletionDecision.blocked("Aufbewahrungsfrist");
+            return request -> DeletionDecision.blocked("Retention period");
         }
     }
 
@@ -192,7 +192,7 @@ class LetterwrightAutoConfigurationTest {
 
         @Bean
         DeletionPolicy deletionPolicy() {
-            return request -> DeletionDecision.blocked("Aufbewahrungsfrist");
+            return request -> DeletionDecision.blocked("Retention period");
         }
     }
 

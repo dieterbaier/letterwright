@@ -1,6 +1,6 @@
 package dieterbaier.letterwright.archfixture.api;
 
-/** Fixture: eine regelkonforme API-Schnittstelle mit eigenem Datentyp. */
+/** Fixture: a compliant API interface with its own data type. */
 public interface ApiInterface {
 
     ApiRecord save(String user);

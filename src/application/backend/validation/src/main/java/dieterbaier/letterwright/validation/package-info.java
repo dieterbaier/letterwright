@@ -1,10 +1,10 @@
 /**
- * Allgemeine Prüfungen, mit denen selbstvalidierende Typen ihre Attribute im Konstruktor prüfen. Welche Regel für ein
- * Attribut gilt, entscheidet der Typ selbst; fachliche Regeln wie Zustandsübergänge gehören nicht hierher.
+ * General checks with which self-validating types check their attributes in the constructor. Which rule applies to an
+ * attribute is decided by the type itself; business rules such as state transitions do not belong here.
  *
- * <p>Fehlervertrag: Jede verletzte Prüfung wirft einen {@link dieterbaier.letterwright.validation.ValidationException}
- * mit der Bezeichnung des Attributs, nie eine {@link NullPointerException}. Frei von Frameworks und ohne Abhängigkeit zu
- * anderen Modulen. Das SPI nutzt dieses Modul nicht (ADR-016).
+ * <p>Error contract: every violated check throws a {@link dieterbaier.letterwright.validation.ValidationException}
+ * with the label of the attribute, never a {@link NullPointerException}. Free of frameworks and without dependencies on
+ * other modules. The SPI does not use this module (ADR-016).
  */
 @NullMarked
 package dieterbaier.letterwright.validation;

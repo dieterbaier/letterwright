@@ -1,6 +1,6 @@
 package dieterbaier.letterwright.archfixture.shared;
 
-/** Fixture: Klasse in einem Paket, das keine Regel namentlich nennt. */
+/** Fixture: class in a package that no rule names explicitly. */
 public final class SharedHelper {
 
     private SharedHelper() {

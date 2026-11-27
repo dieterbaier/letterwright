@@ -1,13 +1,13 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Entscheidet, ob ein Benutzer eine Aktion ausführen darf. Rollen und Sichtbarkeit bestimmt der Host.
+ * Decides whether a user may perform an action. The host determines roles and visibility.
  *
- * <p>Der Starter bringt eine Default-Implementierung auf Spring Security mit, die jede Aktion auf eine konfigurierbare
- * Rolle abbildet. Stellt der Host eine eigene Bean dieser Schnittstelle bereit, tritt sie zurück.
+ * <p>The starter ships a default implementation based on Spring Security that maps each action to a configurable role.
+ * It backs off when the host provides its own bean of this interface.
  */
 public interface AuthorizationCheck {
 
-    /** {@code true}, wenn der Benutzer die Aktion ausführen darf. */
+    /** {@code true} if the user may perform the action. */
     boolean isAllowed(AuthorizationRequest request);
 }

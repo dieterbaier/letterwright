@@ -13,7 +13,7 @@ class WithdrawalResultTest {
 
     private static final VersionReference VERSION = new VersionReference(TemplateId.generate(), VersionNumber.FIRST);
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         assertThat(Stream.of(new WithdrawalResult.Withdrawn(VERSION), new WithdrawalResult.NotAllowed(),
@@ -32,6 +32,6 @@ class WithdrawalResultTest {
     void withdrawnNamesTheVersion() {
         assertThat(new WithdrawalResult.Withdrawn(VERSION).version()).isEqualTo(VERSION);
         assertThatThrownBy(() -> new WithdrawalResult.Withdrawn(null))
-                .hasMessageContaining("zurückgezogene Version");
+                .hasMessageContaining("withdrawn version");
     }
 }

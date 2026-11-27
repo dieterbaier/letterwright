@@ -2,7 +2,7 @@ package dieterbaier.letterwright.domain.model.template;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 
-/** Art des Briefpapiers. Bei geschäftlichen Briefen legt DIN 5008 die Form fest (Höhe des Anschriftfelds). */
+/** Kind of letterhead. For business letters DIN 5008 defines the form (height of the address field). */
 @ValueObject
 public enum LetterheadType {
 
@@ -12,6 +12,6 @@ public enum LetterheadType {
 
     BUSINESS_FORM_B;
 
-    /** Ohne ausdrückliche Wahl gilt geschäftlich Form B. */
+    /** Without an explicit choice, business form B applies. */
     public static final LetterheadType STANDARD = BUSINESS_FORM_B;
 }

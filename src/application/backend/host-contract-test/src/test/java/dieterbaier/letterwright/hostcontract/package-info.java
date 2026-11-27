@@ -1,4 +1,4 @@
-/** Nachweis, dass ein Host nur gegen das SPI kompiliert (ADR-016). */
+/** Proof that a host compiles only against the SPI and the Java API (ADR-016, ADR-023). */
 @NullMarked
 package dieterbaier.letterwright.hostcontract;
 

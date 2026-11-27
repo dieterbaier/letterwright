@@ -3,16 +3,16 @@ package dieterbaier.letterwright.domain.model;
 import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
-/** Welche Seite einer Übersicht angefragt ist. Die erste Seite hat die Nummer 0. */
+/** Which page of a list is requested. The first page has number 0. */
 @ValueObject
 public record PageRequest(int number, int size) {
 
     public PageRequest {
-        Validate.atLeast(number, 0, "Die Seitennummer");
-        Validate.atLeast(size, 1, "Die Seitengröße");
+        Validate.atLeast(number, 0, "The page number");
+        Validate.atLeast(size, 1, "The page size");
     }
 
-    /** Wie viele Einträge vor dieser Seite liegen. */
+    /** How many entries precede this page. */
     public long offset() {
         return (long) number * size;
     }

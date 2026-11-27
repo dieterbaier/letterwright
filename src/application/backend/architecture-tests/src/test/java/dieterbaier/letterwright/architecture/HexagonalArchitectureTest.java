@@ -6,7 +6,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/** Prüft den Produktionscode aller Backend-Module gegen die Regeln aus ADR-002. */
+/** Checks the production code of all backend modules against the rules from ADR-002. */
 class HexagonalArchitectureTest {
 
     private static final String BASE = "dieterbaier.letterwright";

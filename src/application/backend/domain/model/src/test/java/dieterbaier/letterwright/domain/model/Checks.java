@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dieterbaier.letterwright.validation.ValidationException;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
-/** Gemeinsame Zusicherung für den Fehlervertrag des Modells. */
+/** Shared assertion for the error contract of the model. */
 public final class Checks {
 
     private Checks() {
     }
 
-    /** Der Aufruf scheitert mit einem Validierungsfehler, der das Attribut nennt, nicht mit einer NPE. */
+    /** The invocation fails with a validation error that names the attribute, not with an NPE. */
     public static void rejects(ThrowingCallable invocation, String attribute) {
         assertThatThrownBy(invocation).isInstanceOf(ValidationException.class).hasMessageContaining(attribute);
     }

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class DownloadResultTest {
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         assertThat(Stream.of(new DownloadResult.Delivered(LETTER, PDF.clone()), new DownloadResult.Unknown())
@@ -33,7 +33,7 @@ class DownloadResultTest {
 
     @Test
     void requiredAttributes() {
-        assertThatThrownBy(() -> new DownloadResult.Delivered(null, PDF)).hasMessageContaining("Letter");
+        assertThatThrownBy(() -> new DownloadResult.Delivered(null, PDF)).hasMessageContaining("letter");
         assertThatThrownBy(() -> new DownloadResult.Delivered(LETTER, null)).hasMessageContaining("PDF");
     }
 }

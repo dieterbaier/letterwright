@@ -6,7 +6,7 @@ import dieterbaier.letterwright.domain.model.LetterAction;
 import dieterbaier.letterwright.domain.model.TemplateAction;
 import dieterbaier.letterwright.domain.model.template.LetterTemplate;
 
-/** Fragt den Host, ob ein Benutzer eine Aktion ausführen darf. Implementiert von {@code adapter-host} (ADR-016). */
+/** Asks the host whether a user may perform an action. Implemented by {@code adapter-host} (ADR-016). */
 public interface Permissions {
 
     boolean may(UserId user, TemplateAction action);

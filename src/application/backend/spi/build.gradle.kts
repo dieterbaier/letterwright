@@ -2,4 +2,4 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "SPI zur Host-Anwendung: Schnittstellen und eigene Datentypen, reines Java ohne Abhängigkeit zur Bibliothek. Einziges Modul, gegen das der Host kompiliert (ADR-016)."
+description = "SPI to the host application: interfaces and their own data types, plain Java without a dependency on the library. The only module the host compiles against (ADR-016)."

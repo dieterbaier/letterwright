@@ -2,18 +2,18 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Nachweis für ADR-016: Ein Host, der nur den Starter einbindet, implementiert das SPI und sieht beim Kompilieren nichts anderes von der Bibliothek. Nur Tests, wird nicht veröffentlicht."
+description = "Proof for ADR-016: a host that includes only the starter implements the SPI and sees nothing else of the library when compiling. Tests only, not published."
 
 dependencies {
-    // Genau so bindet ein Host die Bibliothek ein.
+    // This is exactly how a host includes the library.
     testImplementation(project(":spring-boot-starter"))
 }
 
 tasks.named<Test>("test") {
-    // Der Klassenpfad, mit dem der Host kompiliert; der Test kompiliert damit Beispielquellen.
-    val klassenpfad: FileCollection = files(configurations.named("testCompileClasspath"))
-    inputs.files(klassenpfad).withPropertyName("hostKlassenpfad")
+    // The classpath the host compiles with; the test compiles example sources with it.
+    val classpath: FileCollection = files(configurations.named("testCompileClasspath"))
+    inputs.files(classpath).withPropertyName("hostClasspath")
     jvmArgumentProviders.add(CommandLineArgumentProvider {
-        listOf("-Dhost.classpath=" + klassenpfad.asPath)
+        listOf("-Dhost.classpath=" + classpath.asPath)
     })
 }

@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Implementierung der Anwendungsfälle: implementiert die eingehenden Ports und nutzt die ausgehenden (ADR-002)."
+description = "Implementation of the use cases: implements the inbound ports and uses the outbound ones (ADR-002)."
 
 dependencies {
     api(project(":usecases-in"))

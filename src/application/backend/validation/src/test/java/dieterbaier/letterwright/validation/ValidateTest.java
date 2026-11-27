@@ -13,14 +13,14 @@ class ValidateTest {
 
     @Test
     void requiredReturnsThePresentValue() {
-        assertThat(Validate.required("x", "Wert")).isEqualTo("x");
+        assertThat(Validate.required("x", "Value")).isEqualTo("x");
     }
 
     @Test
     void requiredReportsAMissingValueWithLabel() {
-        assertThatThrownBy(() -> Validate.required(null, "Die Kennung"))
+        assertThatThrownBy(() -> Validate.required(null, "The ID"))
                 .isInstanceOf(ValidationException.class)
-                .hasMessage("Die Kennung fehlt");
+                .hasMessage("The ID is missing");
     }
 
     @Test
@@ -30,48 +30,48 @@ class ValidateTest {
 
     @Test
     void notEmptyRejectsEmptyAndMissingTexts() {
-        assertThatThrownBy(() -> Validate.notEmpty("", "Der Text"))
-                .isInstanceOf(ValidationException.class).hasMessageContaining("Der Text darf nicht leer sein");
-        assertThatThrownBy(() -> Validate.notEmpty(null, "Der Text"))
-                .isInstanceOf(ValidationException.class).hasMessage("Der Text fehlt");
+        assertThatThrownBy(() -> Validate.notEmpty("", "The text"))
+                .isInstanceOf(ValidationException.class).hasMessageContaining("The text must not be empty");
+        assertThatThrownBy(() -> Validate.notEmpty(null, "The text"))
+                .isInstanceOf(ValidationException.class).hasMessage("The text is missing");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\t\n"})
     void notBlankRejectsEmptyAndWhitespace(String text) {
-        assertThatThrownBy(() -> Validate.notBlank(text, "Der Name"))
-                .isInstanceOf(ValidationException.class).hasMessageContaining("Der Name");
+        assertThatThrownBy(() -> Validate.notBlank(text, "The name"))
+                .isInstanceOf(ValidationException.class).hasMessageContaining("The name");
     }
 
     @Test
     void notBlankReturnsTheTextAndReportsMissingTexts() {
         assertThat(Validate.notBlank(" a ", "Name")).isEqualTo(" a ");
-        assertThatThrownBy(() -> Validate.notBlank(null, "Der Name"))
-                .isInstanceOf(ValidationException.class).hasMessage("Der Name fehlt");
+        assertThatThrownBy(() -> Validate.notBlank(null, "The name"))
+                .isInstanceOf(ValidationException.class).hasMessage("The name is missing");
     }
 
     @Test
     void atLeastChecksTheLowerBoundInclusively() {
-        assertThat(Validate.atLeast(1, 1, "Nummer")).isEqualTo(1);
-        assertThatThrownBy(() -> Validate.atLeast(0, 1, "Die Nummer"))
+        assertThat(Validate.atLeast(1, 1, "Number")).isEqualTo(1);
+        assertThatThrownBy(() -> Validate.atLeast(0, 1, "The number"))
                 .isInstanceOf(ValidationException.class)
-                .hasMessage("Die Nummer muss mindestens 1 sein, war 0");
+                .hasMessage("The number must be at least 1, was 0");
     }
 
     @Test
     void requiredWithoutGapsNamesThePositionOfTheMissingElement() {
-        assertThat(Validate.requiredWithoutGaps(List.of("a"), "Liste")).containsExactly("a");
-        assertThatThrownBy(() -> Validate.requiredWithoutGaps(Arrays.asList("a", null), "Die Versionen"))
-                .isInstanceOf(ValidationException.class).hasMessage("Die Versionen[1] fehlt");
-        assertThatThrownBy(() -> Validate.requiredWithoutGaps(null, "Die Versionen"))
-                .isInstanceOf(ValidationException.class).hasMessage("Die Versionen fehlt");
+        assertThat(Validate.requiredWithoutGaps(List.of("a"), "List")).containsExactly("a");
+        assertThatThrownBy(() -> Validate.requiredWithoutGaps(Arrays.asList("a", null), "Versions"))
+                .isInstanceOf(ValidationException.class).hasMessage("Versions[1] is missing");
+        assertThatThrownBy(() -> Validate.requiredWithoutGaps(null, "Versions"))
+                .isInstanceOf(ValidationException.class).hasMessage("Versions is missing");
     }
 
     @Test
     void validationExceptionIsAnIllegalArgumentExceptionAndKeepsTheCause() {
-        Exception cause = new IllegalStateException("innen");
+        Exception cause = new IllegalStateException("inner");
 
-        assertThat(new ValidationException("außen", cause))
+        assertThat(new ValidationException("outer", cause))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasCause(cause);
     }

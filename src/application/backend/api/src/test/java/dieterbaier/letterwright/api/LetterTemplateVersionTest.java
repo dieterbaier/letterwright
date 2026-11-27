@@ -19,12 +19,12 @@ class LetterTemplateVersionTest {
 
     @Test
     void rejectsAMissingId() {
-        rejects(() -> new LetterTemplateVersion(null, 1), "Die ID des Standardschreibens");
+        rejects(() -> new LetterTemplateVersion(null, 1), "The ID of the letter template");
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1, Integer.MIN_VALUE})
     void rejectsANumberBelowOne(int number) {
-        rejects(() -> new LetterTemplateVersion(reminder, number), "Die Versionsnummer");
+        rejects(() -> new LetterTemplateVersion(reminder, number), "The version number");
     }
 }

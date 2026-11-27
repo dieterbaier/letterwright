@@ -1,18 +1,18 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Eine Handlung an den gespeicherten Schreiben zu einem {@link BusinessReference}. Das Erzeugen eines Schreibens ist
- * keine {@code LetterAction}: Es braucht zusätzlich das Standardschreiben, siehe
+ * An action on the saved letters for a {@link BusinessReference}. Creating a letter is not a {@code LetterAction}: it
+ * also needs the letter template, see
  * {@link AuthorizationRequest#forCreation(String, BusinessReference, LetterTemplateId)}.
  */
 public enum LetterAction {
 
-    /** Die Schreiben in der Übersicht sehen. */
+    /** See the letters in the list. */
     VIEW,
 
-    /** Ein Schreiben herunterladen. */
+    /** Download a letter. */
     DOWNLOAD,
 
-    /** Ein Schreiben löschen. Wie, entscheidet die {@link DeletionPolicy}. */
+    /** Delete a letter. The {@link DeletionPolicy} decides how. */
     DELETE
 }

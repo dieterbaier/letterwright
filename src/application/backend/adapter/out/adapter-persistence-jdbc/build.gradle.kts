@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Ausgehender Adapter: Persistenz mit Spring JDBC und Liquibase (ADR-006). Kennt nur die ausgehenden Ports."
+description = "Outbound adapter: persistence with Spring JDBC and Liquibase (ADR-006). Knows only the outbound ports."
 
 dependencies {
     implementation(project(":usecases-out"))

@@ -3,8 +3,8 @@ package dieterbaier.letterwright.adapter.out.host;
 import java.io.Serial;
 
 /**
- * Eine SPI-Implementierung des Hosts hat ihren Vertrag verletzt, etwa {@code null} oder ungültige Werte geliefert. Das
- * ist ein Fehler im Host, nicht in der Eingabe des Benutzers.
+ * An SPI implementation of the host has violated its contract, for example by returning {@code null} or invalid
+ * values. This is an error in the host, not in the user's input.
  */
 public final class HostContractViolated extends IllegalStateException {
 

@@ -18,17 +18,17 @@ import java.util.TreeMap;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert, bereits formatiert (ADR-008).
+ * The values the host supplies for a letter template and a business reference, already formatted (ADR-008).
  *
- * <p>Erlaubt sind nur Texte, Listen und Maps mit Text-Schlüsseln, beliebig verschachtelt. So verlangt es die
- * abgesicherte Platzhaltersprache. Der Datenkontext ist tief unveränderlich; die Maps sind nach Schlüssel sortiert.
+ * <p>Only texts, lists and maps with text keys are allowed, nested to any depth, as the sandboxed placeholder language
+ * requires. The data context is deeply immutable; the maps are sorted by key.
  *
- * <p>Die {@link #checksum() Prüfsumme} hängt nur vom Inhalt ab, nicht von der Reihenfolge, in der der Host die
- * Schlüssel einer Map liefert. Die Reihenfolge von Listen zählt. Mit ihr erkennt das Speichern, ob sich der
- * Datenkontext seit der Vorschau geändert hat (ADR-007).
+ * <p>The {@link #checksum() checksum} depends only on the content, not on the order in which the host supplies the
+ * keys of a map. The order of lists counts. Saving uses it to detect whether the data context has changed since the
+ * preview (ADR-007).
  *
- * <p>Texte und Schlüssel müssen gültiges Unicode sein. Ein einzelnes Surrogat ließe sich nicht eindeutig als UTF-8
- * kodieren; zwei verschiedene Datenkontexte bekämen sonst dieselbe Prüfsumme.
+ * <p>Texts and keys must be valid Unicode. A lone surrogate could not be encoded unambiguously as UTF-8; two different
+ * data contexts would otherwise get the same checksum.
  */
 @ValueObject
 public final class DataContext {
@@ -45,9 +45,9 @@ public final class DataContext {
         this.checksum = computeChecksum(values);
     }
 
-    /** Übernimmt eine tiefe, unveränderliche Kopie der Werte. */
+    /** Takes a deep, immutable copy of the values. */
     public static DataContext from(Map<String, ?> values) {
-        return new DataContext(copyMap(Validate.required(values, "Die Werte des Datenkontexts"), ""));
+        return new DataContext(copyMap(Validate.required(values, "The values of the data context"), ""));
     }
 
     public Map<String, Object> values() {
@@ -55,17 +55,17 @@ public final class DataContext {
     }
 
     /**
-     * Die Werte beider Datenkontexte; bei gleichem Schlüssel auf oberster Ebene gilt der Wert aus {@code preferred}.
-     * So entstehen die Daten für das Probe-PDF eines Standardschreibens aus den Beispieldaten seines Briefpapiers und
-     * seinen eigenen (ADR-022).
+     * The values of both data contexts; for the same top-level key the value from {@code preferred} wins. This is how
+     * the data for the proof PDF of a letter template is built from the sample data of its letterhead and its own
+     * (ADR-022).
      */
     public DataContext extendedBy(DataContext preferred) {
         Map<String, Object> together = new TreeMap<>(values);
-        together.putAll(Validate.required(preferred, "Der vorrangige Datenkontext").values);
+        together.putAll(Validate.required(preferred, "The preferred data context").values);
         return new DataContext(Collections.unmodifiableMap(together));
     }
 
-    /** SHA-256 über eine eindeutige, kanonische Kodierung der Werte. */
+    /** SHA-256 over an unambiguous, canonical encoding of the values. */
     public Checksum checksum() {
         return checksum;
     }
@@ -82,18 +82,18 @@ public final class DataContext {
 
     @Override
     public String toString() {
-        // Bewusst ohne Werte: Sie können personenbezogen sein und gehören nicht in Logs.
-        return "Datenkontext[pruefsumme=" + checksum.hex() + "]";
+        // Deliberately without values: they may be personal data and do not belong in logs.
+        return "DataContext[checksum=" + checksum.hex() + "]";
     }
 
     private static Map<String, Object> copyMap(Map<?, ?> source, String path) {
         TreeMap<String, Object> copy = new TreeMap<>();
         for (Map.Entry<?, ?> entry : source.entrySet()) {
             if (!(entry.getKey() instanceof String key)) {
-                throw new ValidationException("Schlüssel unter '" + path + "' ist kein Text: " + entry.getKey());
+                throw new ValidationException("Key at '" + path + "' is not text: " + entry.getKey());
             }
             String subpath = path.isEmpty() ? key : path + "." + key;
-            checkUnicode(key, "Schlüssel " + subpath);
+            checkUnicode(key, "Key " + subpath);
             copy.put(key, copyValue(entry.getValue(), subpath));
         }
         return Collections.unmodifiableMap(copy);
@@ -101,7 +101,7 @@ public final class DataContext {
 
     private static Object copyValue(Object value, String path) {
         return switch (value) {
-            case String text -> checkUnicode(text, "Wert unter '" + path + "'");
+            case String text -> checkUnicode(text, "Value at '" + path + "'");
             case Map<?, ?> map -> copyMap(map, path);
             case List<?> list -> {
                 List<Object> copy = new ArrayList<>(list.size());
@@ -111,8 +111,8 @@ public final class DataContext {
                 yield Collections.unmodifiableList(copy);
             }
             case null -> throw new ValidationException(
-                    "Wert unter '" + path + "' fehlt; ein fehlender Wert wird weggelassen, nicht als null geliefert");
-            default -> throw new ValidationException("Wert unter '" + path + "' ist weder Text, Liste noch Map: "
+                    "Value at '" + path + "' is missing; a missing value is omitted, not supplied as null");
+            default -> throw new ValidationException("Value at '" + path + "' is neither text, list nor map: "
                     + value.getClass().getName());
         };
     }
@@ -124,7 +124,7 @@ public final class DataContext {
         try {
             strict.encode(CharBuffer.wrap(text));
         } catch (CharacterCodingException e) {
-            throw new ValidationException(label + " ist kein gültiges Unicode (einzelnes Surrogat)", e);
+            throw new ValidationException(label + " is not valid Unicode (lone surrogate)", e);
         }
         return text;
     }
@@ -135,8 +135,8 @@ public final class DataContext {
         return new Checksum(HexFormat.of().formatHex(sha256.digest()));
     }
 
-    // Jeder Wert beginnt mit einer Typkennung und seiner Länge. Damit ist die Kodierung eindeutig: Kein anderer
-    // Datenkontext ergibt dieselbe Bytefolge, auch nicht durch Texte, die wie Trenner aussehen.
+    // Every value starts with a type tag and its length. This makes the encoding unambiguous: no other data context
+    // yields the same byte sequence, not even through texts that look like separators.
     private static void encode(Object value, MessageDigest target) {
         switch (value) {
             case String text -> {
@@ -149,14 +149,14 @@ public final class DataContext {
                 list.forEach(element -> encode(element, target));
             }
             case Map<?, ?> map -> {
-                // Die Maps sind TreeMaps (siehe kopiereMap), die Reihenfolge ist also nach Schlüssel sortiert.
+                // The maps are TreeMaps (see copyMap), so the order is sorted by key.
                 head(target, MAP, map.size());
                 map.forEach((key, element) -> {
                     encode(key, target);
                     encode(element, target);
                 });
             }
-            default -> throw new IllegalStateException("Nicht kodierbar: " + value.getClass().getName());
+            default -> throw new IllegalStateException("Not encodable: " + value.getClass().getName());
         }
     }
 

@@ -1,10 +1,10 @@
 package dieterbaier.letterwright.usecases.out;
 
-/** Was das {@link TemplateRepository} beim bedingten Ersetzen einer Vorlage meldet (ADR-022). */
+/** What the {@link TemplateRepository} reports on the conditional replacement of a template (ADR-022). */
 public sealed interface ReplaceOutcome {
 
     record Replaced() implements ReplaceOutcome {}
 
-    /** Ersetzt wurde nichts; die gespeicherte Vorlage hat sich seit dem Laden geändert oder ist nicht mehr vorhanden. */
+    /** Nothing was replaced; the stored template has changed since it was loaded or no longer exists. */
     record Stale() implements ReplaceOutcome {}
 }

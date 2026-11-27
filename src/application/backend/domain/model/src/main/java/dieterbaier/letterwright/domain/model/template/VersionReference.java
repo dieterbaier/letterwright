@@ -4,14 +4,14 @@ import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Verweist von außen auf genau eine Version eines Briefpapiers oder Standardschreibens. Snapshot und Schreiben halten
- * nur diesen Verweis, nie die Version selbst; sie gehört zum Aggregat ihrer Vorlage.
+ * Refers from outside to exactly one version of a letterhead or letter template. Snapshot and letter hold only this
+ * reference, never the version itself; it belongs to the aggregate of its template.
  */
 @ValueObject
 public record VersionReference(TemplateId template, VersionNumber number) {
 
     public VersionReference {
-        Validate.required(template, "Die Vorlage des Versionsverweises");
-        Validate.required(number, "Die Nummer des Versionsverweises");
+        Validate.required(template, "The template of the VersionReference");
+        Validate.required(number, "The number of the VersionReference");
     }
 }

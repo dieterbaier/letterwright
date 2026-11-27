@@ -8,8 +8,8 @@ import dieterbaier.letterwright.usecases.out.DeletionRules;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Fragt die {@link DeletionPolicy} des Hosts. Der Host liegt außerhalb der Vertrauensgrenze: Hält er den Null-Vertrag
- * des SPI nicht ein, meldet der Adapter das als {@link HostContractViolated}.
+ * Asks the host's {@link DeletionPolicy}. The host lies outside the trust boundary: if it does not keep the SPI's null
+ * contract, the adapter reports this as {@link HostContractViolated}.
  */
 public final class HostDeletionRules implements DeletionRules {
 
@@ -24,7 +24,7 @@ public final class HostDeletionRules implements DeletionRules {
         dieterbaier.letterwright.spi.@Nullable DeletionDecision answer =
                 policy.decide(Mapping.deletionRequest(user, letter));
         if (answer == null) {
-            throw new HostContractViolated("Die Loeschrichtlinie des Hosts hat null statt einer Entscheidung geliefert");
+            throw new HostContractViolated("The DeletionPolicy of the host returned null instead of a decision");
         }
         return Mapping.toDomain(answer);
     }

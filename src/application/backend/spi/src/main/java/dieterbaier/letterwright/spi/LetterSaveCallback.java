@@ -1,41 +1,41 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Optionaler Rückruf, wenn ein Benutzer über die Oberfläche der Bibliothek ein Schreiben speichert (ADR-023). Der Host
- * ändert darin eigene Daten im selben Commit wie das Schreiben, oder er lehnt das Speichern mit einem Grund ab. Der Host
- * implementiert diese Schnittstelle als Bean, wenn er sie braucht; ohne Bean verhält sich die Bibliothek wie ohne
- * Rückruf. Es gibt höchstens einen Rückruf. Stellt der Host mehrere Beans bereit, wählt Spring nach seinen üblichen
- * Regeln eine aus, etwa die mit {@code @Primary}; nur sie wird gerufen. Bleibt die Auswahl mehrdeutig, startet die
- * Anwendung nicht.
+ * Optional callback when a user saves a letter through the library's user interface (ADR-023). In it, the host changes
+ * its own data in the same commit as the letter, or it rejects the save with a reason. The host implements this
+ * interface as a bean if it needs it; without a bean, the library behaves as if there were no callback. There is at
+ * most one callback. If the host provides several beans, Spring picks one by its usual rules, for example the one
+ * annotated with {@code @Primary}; only that one is called. If the choice remains ambiguous, the application does not
+ * start.
  *
- * <p><b>Wann:</b> Die Bibliothek ruft {@link #created} in derselben Transaktion wie das Speichern auf, nach ihren
- * eigenen Datenbankänderungen und vor dem Commit. Einen Aufruf nach dem Commit gibt es nicht. Die Datenbankaktionen des
- * Hosts nehmen an dieser Transaktion teil, wenn er denselben Transaktionsmanager wie die Bibliothek benutzt.
+ * <p><b>When:</b> The library calls {@link #created} synchronously, in the same transaction as the save, after its
+ * own database changes and before the commit. There is no call after the commit. The host's database operations take
+ * part in this transaction if the host uses the same transaction manager as the library.
  *
- * <p><b>Nur bei einer Neuanlage:</b> Der Rückruf läuft nur, wenn der aktuelle Aufruf das Schreiben anlegt. Speichert
- * der Benutzer dieselbe Vorschau erneut, etwa nach einer verlorenen Antwort, entsteht kein neues Schreiben und es gibt
- * keinen Rückruf. Mehr sichert der Vertrag nicht zu: Ein vorhandenes Schreiben kann über die Java-API ohne Rückruf
- * entstanden sein. Über die Java-API gibt es nie einen Rückruf; dort wertet der Host das Ergebnis selbst aus.
+ * <p><b>Only on creation:</b> The callback runs only if the current call creates the letter. If the user saves the
+ * same preview again, for example after a lost response, no new letter is created and there is no callback. The
+ * contract guarantees nothing more: an existing letter may have been created through the Java API without a callback.
+ * The Java API never triggers a callback; there, the host evaluates the result itself.
  *
- * <p><b>Ablehnen:</b> {@link CallbackResult#rejected(String)} rollt die gemeinsame Transaktion zurück. Danach ist
- * nichts gespeichert, weder das Schreiben noch die Daten des Hosts, und der Benutzer sieht den Grund. Die Vorschau
- * bleibt gültig, bis sie abläuft; der Benutzer kann erneut speichern.
+ * <p><b>Rejecting:</b> {@link CallbackResult#rejected(String)} rolls back the shared transaction. Afterwards nothing
+ * is saved, neither the letter nor the host's data, and the user sees the reason. The preview remains valid until it
+ * expires; the user can save again.
  *
- * <p><b>Ausnahmen:</b> Jede Ausnahme ist ein technischer Fehler und rollt die gemeinsame Transaktion ebenfalls zurück.
- * Die Bibliothek wiederholt nicht; eine Wiederholung ist ein neuer Speicherversuch des Benutzers.
+ * <p><b>Exceptions:</b> Every exception is a technical error and likewise rolls back the shared transaction. The
+ * library does not retry; a retry is a new save attempt by the user.
  *
- * <p><b>Wirkungen außerhalb der Datenbank</b>, etwa der Abschluss eines Tasks in einer entfernten Engine, gehören nicht
- * in den Rückruf. Der Host schreibt dafür einen Auftrag in seine Outbox in derselben Transaktion und führt ihn nach dem
- * Commit wiederholbar und idempotent selbst aus.
+ * <p><b>Effects outside the database</b>, for example completing a task in a remote engine, do not belong in the
+ * callback. For those, the host writes a job to its outbox in the same transaction and executes it itself after the
+ * commit, retryably and idempotently.
  */
 public interface LetterSaveCallback {
 
     /**
-     * Ein Benutzer hat über die Oberfläche ein Schreiben angelegt; die Transaktion ist noch nicht committet.
+     * A user has created a letter through the user interface; the transaction is not yet committed.
      *
-     * @param letter die stabilen Identifikatoren des neuen Schreibens; über die ID verknüpft der Host seine Daten
-     * @return {@link CallbackResult#accepted()}, damit das Schreiben committet wird, oder
-     *     {@link CallbackResult#rejected(String)} mit einem Grund für den Benutzer
+     * @param letter the stable identifiers of the new letter; the host links its data via the ID
+     * @return {@link CallbackResult#accepted()} so that the letter is committed, or
+     *     {@link CallbackResult#rejected(String)} with a reason for the user, which rolls back the transaction
      */
     CallbackResult created(SavedLetter letter);
 }

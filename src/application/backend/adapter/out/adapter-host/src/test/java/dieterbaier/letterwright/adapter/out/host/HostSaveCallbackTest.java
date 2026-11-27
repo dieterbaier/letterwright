@@ -35,9 +35,9 @@ class HostSaveCallbackTest {
     @Test
     void theHostsRejectionComesWithItsReason() {
         var callback = HostSaveCallback.forReference(
-                letter -> dieterbaier.letterwright.spi.CallbackResult.rejected("Aufgabe ist erledigt"));
+                letter -> dieterbaier.letterwright.spi.CallbackResult.rejected("Task is done"));
 
-        assertThat(callback.created(ERIKA, LETTER)).isEqualTo(CallbackResult.rejected("Aufgabe ist erledigt"));
+        assertThat(callback.created(ERIKA, LETTER)).isEqualTo(CallbackResult.rejected("Task is done"));
     }
 
     @Test
@@ -51,7 +51,7 @@ class HostSaveCallbackTest {
 
     @Test
     void anExceptionOfTheHostStaysUnchanged() {
-        var error = new IllegalStateException("Aufgabenverwaltung nicht erreichbar");
+        var error = new IllegalStateException("Task management unreachable");
         var callback = HostSaveCallback.forReference(letter -> {
             throw error;
         });

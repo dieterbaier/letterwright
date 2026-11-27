@@ -10,20 +10,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class DataRequestTest {
 
-    private static final BusinessReference CUSTOMER = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER = new BusinessReference("Customer", "4711");
     private static final LetterTemplateId REMINDER =
-            new LetterTemplateId(UUID.randomUUID(), "Mahnung");
+            new LetterTemplateId(UUID.randomUUID(), "Payment reminder");
 
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", " ", "\t"})
     void theUserIdRejectsMissingEmptyAndBlankValues(String value) {
-        rejects(() -> new DataRequest(value, CUSTOMER, REMINDER), "Die Benutzerkennung");
+        rejects(() -> new DataRequest(value, CUSTOMER, REMINDER), "The user ID");
     }
 
     @Test
     void referenceAndLetterTemplateAreRequired() {
-        rejects(() -> new DataRequest("erika", null, REMINDER), "Der fachliche Bezug");
-        rejects(() -> new DataRequest("erika", CUSTOMER, null), "Das Standardschreiben");
+        rejects(() -> new DataRequest("erika", null, REMINDER), "The business reference");
+        rejects(() -> new DataRequest("erika", CUSTOMER, null), "The letter template");
     }
 }

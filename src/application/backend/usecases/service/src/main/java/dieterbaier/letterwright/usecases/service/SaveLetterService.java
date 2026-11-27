@@ -32,12 +32,12 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * Prüft Snapshot und Berechtigung, bevor es den Zustand des Snapshots auswertet: Ein Unberechtigter erfährt so nicht,
- * ob schon gespeichert wurde. Aus einem offenen Snapshot liest es den Datenkontext erneut, erzeugt das PDF und speichert
- * nur ein konformes (fail-closed). Ein PDF entfernt es nur, wenn sicher ist, dass kein Schreiben darauf verweist.
+ * Checks snapshot and permission before evaluating the snapshot's state, so that an unauthorized user does not learn
+ * whether it was already saved. From an open snapshot it reads the data context again, generates the PDF and saves only
+ * a conformant one (fail-closed). It removes a PDF only when it is certain that no letter refers to it.
  *
- * <p>Ein neu angelegtes Schreiben meldet es vor dem Commit dem {@link SaveCallback} des Hosts (ADR-023). Welcher
- * Rückruf gilt, entscheidet die Verdrahtung: Über die Java-API gibt es keinen.
+ * <p>It reports a newly created letter to the host's {@link SaveCallback} before the commit (ADR-023). The wiring
+ * decides which callback applies: via the Java API there is none.
  */
 public final class SaveLetterService implements SaveLetter {
 
@@ -48,13 +48,13 @@ public final class SaveLetterService implements SaveLetter {
     private final Renderer renderer;
     private final ConformanceChecker checker;
     private final DocumentStore documents;
-    private final LetterRepository letter;
+    private final LetterRepository letters;
     private final SaveCallback callback;
     private final Clock clock;
 
     public SaveLetterService(SnapshotStore snapshots, TemplateRepository templates, Permissions permissions,
             PlaceholderDataSource data, Renderer renderer, ConformanceChecker checker, DocumentStore documents,
-            LetterRepository letter, SaveCallback callback, Clock clock) {
+            LetterRepository letters, SaveCallback callback, Clock clock) {
         this.snapshots = snapshots;
         this.templates = templates;
         this.permissions = permissions;
@@ -62,7 +62,7 @@ public final class SaveLetterService implements SaveLetter {
         this.renderer = renderer;
         this.checker = checker;
         this.documents = documents;
-        this.letter = letter;
+        this.letters = letters;
         this.callback = callback;
         this.clock = clock;
     }
@@ -84,8 +84,8 @@ public final class SaveLetterService implements SaveLetter {
             return new SaveResult.NotAllowed();
         }
         return switch (snapshot.state()) {
-            // Ist das Schreiben inzwischen gelöscht, gibt es für den Benutzer nichts mehr zu finden.
-            case SnapshotState.Consumed consumed -> letter.forSnapshot(id)
+            // If the letter has since been deleted, there is nothing left for the user to find.
+            case SnapshotState.Consumed consumed -> letters.forSnapshot(id)
                     .filter(Letter::isVisible)
                     .<SaveResult>map(existing -> new SaveResult.AlreadySaved(existing))
                     .orElseGet(SaveResult.SnapshotUnknown::new);
@@ -108,25 +108,25 @@ public final class SaveLetterService implements SaveLetter {
 
     private SaveResult save(UserId user, Snapshot snapshot, byte[] pdf, Instant now) {
         DocumentReference document = documents.put(pdf);
-        LetterFromSnapshot generate =
+        LetterFromSnapshot creation =
                 Letter.fromSnapshot(LetterId.generate(), snapshot, document, Checksum.of(pdf), now);
-        // Wirft speichere, ist der Ausgang ungewiss; das PDF bleibt, weil ein Schreiben darauf verweisen kann.
-        return switch (letter.save(generate)) {
-            case SaveOutcome.Saved saved -> afterCreation(user, generate.letter());
+        // If save throws, the outcome is uncertain; the PDF stays because a letter may refer to it.
+        return switch (letters.save(creation)) {
+            case SaveOutcome.Saved saved -> afterCreation(user, creation.letter());
             case SaveOutcome.SnapshotNoLongerExists removed -> {
-                // Eine neue Vorschau hat den Snapshot inzwischen ersetzt; gespeichert wurde sicher nichts.
+                // A new preview has replaced the snapshot in the meantime; nothing was saved for certain.
                 documents.remove(document);
                 yield new SaveResult.SnapshotUnknown();
             }
             case SaveOutcome.SnapshotAlreadyConsumed already -> {
-                // Eine gleichzeitige Anfrage war schneller; ihr PDF gilt, auf dieses verweist sicher nichts.
+                // A concurrent request was faster; its PDF counts, nothing refers to this one for certain.
                 documents.remove(document);
                 yield already.existing().isVisible()
                         ? new SaveResult.AlreadySaved(already.existing())
                         : new SaveResult.SnapshotUnknown();
             }
             case SaveOutcome.LetterRemoved removed -> {
-                // Das Schreiben der schnelleren Anfrage ist schon gelöscht; auf dieses PDF verweist sicher nichts.
+                // The letter of the faster request is already deleted; nothing refers to this PDF for certain.
                 documents.remove(document);
                 yield new SaveResult.SnapshotUnknown();
             }
@@ -134,8 +134,8 @@ public final class SaveLetterService implements SaveLetter {
     }
 
     /**
-     * Nur hier entsteht ein neues Schreiben, deshalb läuft der Rückruf nur hier. Lehnt der Host ab, bleibt das PDF
-     * liegen: Das Schreiben ist schon geschrieben, und ob der Rollback es zurücknimmt, entscheidet die äußere Grenze.
+     * Only here is a new letter created, so the callback runs only here. If the host rejects it, the PDF stays: the
+     * letter is already written, and the outer boundary decides whether the rollback undoes it.
      */
     private SaveResult afterCreation(UserId user, Letter newOne) {
         return switch (callback.created(user, newOne)) {
@@ -150,8 +150,8 @@ public final class SaveLetterService implements SaveLetter {
                 .orElseThrow(() -> missing(reference));
     }
 
-    /** Versionen sind unveränderlich und werden nie gelöscht (ADR-007); fehlt eine, ist der Bestand defekt. */
+    /** Versions are immutable and never deleted (ADR-007); if one is missing, the stored data is corrupt. */
     private static IllegalStateException missing(VersionReference reference) {
-        return new IllegalStateException("Vorlagenversion " + reference + " aus einem Snapshot fehlt");
+        return new IllegalStateException("Template version " + reference + " from a snapshot is missing");
     }
 }

@@ -11,17 +11,17 @@ class ConformanceTest {
 
     @Test
     void aNonConformantPdfHasItsFindings() {
-        var findings = new ArrayList<>(List.of("PDF/UA-1: Bild ohne Alternativtext"));
+        var findings = new ArrayList<>(List.of("PDF/UA-1: Image without alternative text"));
         var notConformant = (Conformance.NotConformant) Conformance.notConformant(findings);
         findings.clear();
 
-        assertThat(notConformant.findings()).containsExactly("PDF/UA-1: Bild ohne Alternativtext");
+        assertThat(notConformant.findings()).containsExactly("PDF/UA-1: Image without alternative text");
         assertThat(Conformance.conformant()).isInstanceOf(Conformance.Conformant.class);
     }
 
     @Test
     void aNonConformantPdfNeedsAtLeastOneFinding() {
-        assertThatThrownBy(() -> Conformance.notConformant(List.of())).hasMessageContaining("mindestens einen Befund");
-        assertThatThrownBy(() -> Conformance.notConformant(null)).hasMessageContaining("Befunde");
+        assertThatThrownBy(() -> Conformance.notConformant(List.of())).hasMessageContaining("at least one finding");
+        assertThatThrownBy(() -> Conformance.notConformant(null)).hasMessageContaining("findings");
     }
 }

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 class DeletionResultTest {
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
-        assertThat(Stream.of(new DeletionResult.Deleted(), new DeletionResult.Blocked("Frist"),
+        assertThat(Stream.of(new DeletionResult.Deleted(), new DeletionResult.Blocked("Retention period"),
                 new DeletionResult.Unknown())
                 .map(result -> switch (result) {
                     case DeletionResult.Deleted deleted -> 204;
@@ -22,7 +22,7 @@ class DeletionResultTest {
 
     @Test
     void aBlockNamesItsReason() {
-        assertThat(new DeletionResult.Blocked("Frist").reason()).isEqualTo("Frist");
-        assertThatThrownBy(() -> new DeletionResult.Blocked(" ")).hasMessageContaining("Grund");
+        assertThat(new DeletionResult.Blocked("Retention period").reason()).isEqualTo("Retention period");
+        assertThatThrownBy(() -> new DeletionResult.Blocked(" ")).hasMessageContaining("reason");
     }
 }

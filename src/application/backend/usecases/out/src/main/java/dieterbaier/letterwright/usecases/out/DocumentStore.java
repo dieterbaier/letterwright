@@ -2,18 +2,18 @@ package dieterbaier.letterwright.usecases.out;
 
 import dieterbaier.letterwright.domain.model.letter.DocumentReference;
 
-/** Legt das PDF eines Schreibens ab. Was ein Dokumentverweis bedeutet, weiß nur die Ablage. */
+/** Stores the PDF of a letter. Only the store knows what a document reference means. */
 public interface DocumentStore {
 
     DocumentReference put(byte[] pdf);
 
     /**
-     * Die Bytes, wie sie abgelegt wurden.
+     * The bytes as they were stored.
      *
-     * @throws IllegalStateException wenn es zum Verweis kein PDF gibt
+     * @throws IllegalStateException if there is no PDF for the reference
      */
     byte[] read(DocumentReference document);
 
-    /** Für ein PDF, auf das kein Schreiben (mehr) verweist: nie gespeichert oder hart gelöscht. */
+    /** For a PDF that no letter refers to (any more): never saved or hard deleted. */
     void remove(DocumentReference document);
 }

@@ -10,19 +10,19 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Die Versionen einer Vorlage und die Regeln über sie hinweg. Briefpapier und Standardschreiben teilen sich diese
- * Regeln; nach außen sichtbar sind sie über die beiden Aggregate.
+ * The versions of a template and the rules across them. Letterhead and letter template share these rules; they are
+ * visible to the outside through the two aggregates.
  *
- * <p>Invarianten:
+ * <p>Invariants:
  * <ul>
- *   <li>Mindestens eine Version; alle gehören zur selben Vorlage.</li>
- *   <li>Die Nummern laufen lückenlos von 1 an, jede gibt es genau einmal.</li>
- *   <li>Höchstens ein Entwurf, und wenn, dann ist er die neueste Version.</li>
- *   <li>Höchstens eine veröffentlichte Version, und wenn, dann ist sie die neueste freigegebene (ADR-022).</li>
- *   <li>Eine abgelöste Version hat eine neuere freigegebene Version.</li>
+ *   <li>At least one version; all belong to the same template.</li>
+ *   <li>The numbers run from 1 without gaps; each exists exactly once.</li>
+ *   <li>At most one draft, and if there is one, it is the newest version.</li>
+ *   <li>At most one published version, and if there is one, it is the newest released one (ADR-022).</li>
+ *   <li>A superseded version has a newer released version.</li>
  * </ul>
  *
- * <p>Freigegeben heißt: kein Entwurf mehr, also veröffentlicht, abgelöst oder zurückgezogen.
+ * <p>Released means: no longer a draft, i.e. published, superseded or withdrawn.
  */
 final class VersionSequence {
 
@@ -40,9 +40,9 @@ final class VersionSequence {
     }
 
     static VersionSequence restore(TemplateId template, List<TemplateVersion> versions) {
-        Validate.requiredWithoutGaps(versions, "Die Versionen");
+        Validate.requiredWithoutGaps(versions, "The versions");
         if (versions.isEmpty()) {
-            throw new ValidationException("Eine Vorlage hat mindestens eine Version");
+            throw new ValidationException("A template has at least one version");
         }
         List<TemplateVersion> sorted = new ArrayList<>(versions);
         sorted.sort(Comparator.comparing(TemplateVersion::number));
@@ -52,25 +52,25 @@ final class VersionSequence {
         for (int position = 0; position < sorted.size(); position++) {
             TemplateVersion version = sorted.get(position);
             if (!version.template().equals(template)) {
-                throw new ValidationException("Version " + version.number().value() + " gehört zur Vorlage "
-                        + version.template().value() + ", nicht zu " + template.value());
+                throw new ValidationException("Version " + version.number().value() + " belongs to template "
+                        + version.template().value() + ", not to " + template.value());
             }
             if (!version.number().equals(expected)) {
-                throw new ValidationException("Die Versionsnummern laufen nicht lückenlos von 1 an: erwartet "
-                        + expected.value() + ", gefunden " + version.number().value());
+                throw new ValidationException("The version numbers do not run from 1 without gaps: expected "
+                        + expected.value() + ", found " + version.number().value());
             }
             boolean isNewest = position == sorted.size() - 1;
             if (version.state() == TemplateVersionState.DRAFT && !isNewest) {
                 throw new ValidationException("Version " + version.number().value()
-                        + " ist ein Entwurf, aber nicht die neueste Version");
+                        + " is a draft but not the newest version");
             }
             if (version.state() == TemplateVersionState.PUBLISHED && position != newestReleased) {
-                throw new ValidationException("Version " + version.number().value() + " ist veröffentlicht, aber nicht "
-                        + "die neueste freigegebene Version; je Vorlage ist höchstens eine veröffentlicht");
+                throw new ValidationException("Version " + version.number().value() + " is published but not "
+                        + "the newest released version; at most one version per template is published");
             }
             if (version.state() == TemplateVersionState.SUPERSEDED && position == newestReleased) {
                 throw new ValidationException("Version " + version.number().value()
-                        + " ist abgelöst, aber keine neuere Version ist freigegeben");
+                        + " is superseded, but no newer version is released");
             }
             expected = expected.next();
         }
@@ -97,19 +97,19 @@ final class VersionSequence {
     }
 
     VersionSequence changeDraft(String content) {
-        TemplateVersion draft = requireDraft("Ändern");
+        TemplateVersion draft = requireDraft("Changing");
         return replace(draft.withContent(content, draft.sampleData()));
     }
 
     VersionSequence changeDraft(String content, DataContext sampleData) {
-        return replace(requireDraft("Ändern").withContent(content, sampleData));
+        return replace(requireDraft("Changing").withContent(content, sampleData));
     }
 
     VersionSequence publishDraft() {
-        TemplateVersion draft = requireDraft("Veröffentlichen");
+        TemplateVersion draft = requireDraft("Publishing");
         if (!draft.isPublishable()) {
             throw new IllegalStateTransition(template,
-                    "Ein Entwurf ohne Inhalt kann nicht veröffentlicht werden");
+                    "A draft without content cannot be published");
         }
         VersionSequence superseded = published()
                 .map(previous -> replace(previous.inState(TemplateVersionState.SUPERSEDED)))
@@ -120,28 +120,28 @@ final class VersionSequence {
     VersionSequence newDraft(String content) {
         draft().ifPresent(present -> {
             throw new IllegalStateTransition(template, "Version " + present.number().value()
-                    + " ist schon ein Entwurf; es gibt höchstens einen");
+                    + " is already a draft; there is at most one");
         });
         TemplateVersion newest = versions.getLast();
-        List<TemplateVersion> generate = new ArrayList<>(versions);
-        generate.add(TemplateVersion.draft(template, newest.number().next(), content, newest.sampleData()));
-        return new VersionSequence(template, generate);
+        List<TemplateVersion> extended = new ArrayList<>(versions);
+        extended.add(TemplateVersion.draft(template, newest.number().next(), content, newest.sampleData()));
+        return new VersionSequence(template, extended);
     }
 
     VersionSequence withdraw() {
         TemplateVersion published = published().orElseThrow(() -> new IllegalStateTransition(
-                template, "Zurückziehen braucht eine veröffentlichte Version; es gibt keine"));
+                template, "Withdrawing requires a published version; there is none"));
         return replace(published.inState(TemplateVersionState.WITHDRAWN));
     }
 
-    private TemplateVersion requireDraft(String case_) {
+    private TemplateVersion requireDraft(String operation) {
         return draft().orElseThrow(() -> new IllegalStateTransition(template,
-                case_ + " braucht einen Entwurf; die neueste Version ist " + versions.getLast().state()));
+                operation + " requires a draft; the newest version is " + versions.getLast().state()));
     }
 
     private VersionSequence replace(TemplateVersion changed) {
-        List<TemplateVersion> generate = new ArrayList<>(versions);
-        generate.replaceAll(version -> version.equals(changed) ? changed : version);
-        return new VersionSequence(template, generate);
+        List<TemplateVersion> replaced = new ArrayList<>(versions);
+        replaced.replaceAll(version -> version.equals(changed) ? changed : version);
+        return new VersionSequence(template, replaced);
     }
 }

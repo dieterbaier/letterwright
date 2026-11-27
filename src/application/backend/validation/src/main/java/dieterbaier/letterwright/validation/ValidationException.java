@@ -2,7 +2,7 @@ package dieterbaier.letterwright.validation;
 
 import java.io.Serial;
 
-/** Ein Wert erfüllt eine Prüfung nicht. Die Meldung nennt das Attribut und die verletzte Regel. */
+/** A value fails a check. The message names the attribute and the violated rule. */
 public final class ValidationException extends IllegalArgumentException {
 
     @Serial

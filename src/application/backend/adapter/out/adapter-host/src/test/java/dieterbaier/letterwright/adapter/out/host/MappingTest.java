@@ -29,7 +29,7 @@ class MappingTest {
     void theBusinessReferenceMapsLosslesslyInBothDirections() {
         dieterbaier.letterwright.spi.BusinessReference inSpi = Mapping.toSpi(CUSTOMER);
 
-        assertThat(inSpi).isEqualTo(new dieterbaier.letterwright.spi.BusinessReference("Kunde", "4711"));
+        assertThat(inSpi).isEqualTo(new dieterbaier.letterwright.spi.BusinessReference("Customer", "4711"));
         assertThat(Mapping.toDomain(inSpi)).isEqualTo(CUSTOMER);
     }
 
@@ -46,7 +46,7 @@ class MappingTest {
     }
 
     static final List<DeletionDecision> DELETION_DECISIONS = List.of(DeletionDecision.hard(),
-            DeletionDecision.logical(), DeletionDecision.blocked("Aufbewahrungsfrist bis 2036"));
+            DeletionDecision.logical(), DeletionDecision.blocked("Retention period until 2036"));
 
     @ParameterizedTest
     @FieldSource("DELETION_DECISIONS")
@@ -61,14 +61,14 @@ class MappingTest {
     void everyCallbackResultOfTheHostMapsToTheSameNamedOne() {
         assertThat(Mapping.toDomain(dieterbaier.letterwright.spi.CallbackResult.accepted()))
                 .isEqualTo(CallbackResult.accepted());
-        assertThat(Mapping.toDomain(dieterbaier.letterwright.spi.CallbackResult.rejected("Erledigt")))
-                .isEqualTo(CallbackResult.rejected("Erledigt"));
+        assertThat(Mapping.toDomain(dieterbaier.letterwright.spi.CallbackResult.rejected("Done")))
+                .isEqualTo(CallbackResult.rejected("Done"));
     }
 
     @Test
     void theReasonForTheBlockIsKept() {
-        assertThat(Mapping.toSpi(DeletionDecision.blocked("Frist")))
-                .isEqualTo(dieterbaier.letterwright.spi.DeletionDecision.blocked("Frist"));
+        assertThat(Mapping.toSpi(DeletionDecision.blocked("Retention period")))
+                .isEqualTo(dieterbaier.letterwright.spi.DeletionDecision.blocked("Retention period"));
     }
 
     @Test
@@ -83,7 +83,7 @@ class MappingTest {
 
     @Test
     void theDataContextMapsLosslesslyInBothDirections() {
-        Map<String, Object> values = Map.of("name", "Erika", "items", List.of(Map.of("betrag", "12,00 €")));
+        Map<String, Object> values = Map.of("name", "Erika", "items", List.of(Map.of("amount", "12,00 €")));
         DataContext inTheDomain = DataContext.from(values);
 
         dieterbaier.letterwright.spi.DataContext inSpi = Mapping.toSpi(inTheDomain);
@@ -94,11 +94,12 @@ class MappingTest {
 
     @Test
     void anInvalidDataContextOfTheHostIsAContractViolation() {
-        var invalid = new dieterbaier.letterwright.spi.DataContext(Map.of("betrag", 12));
+        var invalid = new dieterbaier.letterwright.spi.DataContext(Map.of("amount", 12));
 
         assertThatThrownBy(() -> Mapping.toDomain(invalid))
                 .isInstanceOf(HostContractViolated.class)
-                .hasMessageContaining("PlaceholderDataProvider")
+                .hasMessageContaining("The PlaceholderDataProvider of the host delivered an invalid DataContext: ")
+                .hasMessageContaining("amount")
                 .hasCauseInstanceOf(ValidationException.class);
     }
 
@@ -109,7 +110,7 @@ class MappingTest {
         assertThat(request.userId()).isEqualTo("erika");
         assertThat(request.reference()).isEqualTo(Mapping.toSpi(CUSTOMER));
         assertThat(request.letterTemplate().id()).isEqualTo(REMINDER.id().value());
-        assertThat(request.letterTemplate().name()).isEqualTo("Mahnung");
+        assertThat(request.letterTemplate().name()).isEqualTo("Payment reminder");
     }
 
     @Test

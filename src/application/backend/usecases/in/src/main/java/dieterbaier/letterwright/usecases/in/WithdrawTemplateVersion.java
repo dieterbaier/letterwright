@@ -4,9 +4,9 @@ import dieterbaier.letterwright.domain.model.UserId;
 import dieterbaier.letterwright.domain.model.template.TemplateId;
 
 /**
- * Anwendungsfall „Vorlagenversion zurückziehen“: Die veröffentlichte Version eines Briefpapiers oder Standardschreibens
- * wird ohne Nachfolger zurückgenommen. Bis zur nächsten Veröffentlichung entsteht mit der Vorlage kein neues Schreiben;
- * gespeicherte Schreiben bleiben unverändert (ADR-007, ADR-022).
+ * Use case "withdraw template version": the published version of a letterhead or letter template is withdrawn without a
+ * successor. Until the next publication, no new letter is created with the template; saved letters stay unchanged
+ * (ADR-007, ADR-022).
  */
 public interface WithdrawTemplateVersion {
 

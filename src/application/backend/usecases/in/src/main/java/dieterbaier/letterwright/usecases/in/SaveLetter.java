@@ -4,9 +4,9 @@ import dieterbaier.letterwright.domain.model.UserId;
 import dieterbaier.letterwright.domain.model.snapshot.SnapshotId;
 
 /**
- * Anwendungsfall „Schreiben speichern“: Aus dem Snapshot einer Vorschau entsteht das PDF, das der Benutzer gesehen hat,
- * und wird nur gespeichert, wenn es konform ist (ADR-005, ADR-007). Derselbe Snapshot ergibt höchstens ein Schreiben;
- * ein neues entsteht nur aus einer neuen Vorschau (ADR-021).
+ * Use case "save letter": the snapshot of a preview produces the PDF the user has seen, which is saved only if it is
+ * conformant (ADR-005, ADR-007). The same snapshot yields at most one letter; a new one comes only from a new preview
+ * (ADR-021).
  */
 public interface SaveLetter {
 

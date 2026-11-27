@@ -16,23 +16,23 @@ class PublicationResultTest {
 
     private static final VersionReference VERSION = new VersionReference(TemplateId.generate(), VersionNumber.FIRST);
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         assertThat(Stream.of(new PublicationResult.Published(VERSION),
-                new PublicationResult.NotConformant(List.of("Befund")),
+                new PublicationResult.NotConformant(List.of("Finding")),
                 new PublicationResult.NotAllowed(), new PublicationResult.TemplateUnknown(),
                 new PublicationResult.NoDraft(), new PublicationResult.DraftWithoutContent(),
                 new PublicationResult.LetterheadNotPublished(),
                 new PublicationResult.Stale())
                 .map(result -> switch (result) {
-                    case PublicationResult.Published published -> "veröffentlicht";
-                    case PublicationResult.NotConformant notConformant -> "nicht konform";
-                    case PublicationResult.NotAllowed notAllowed -> "nicht erlaubt";
+                    case PublicationResult.Published published -> "published";
+                    case PublicationResult.NotConformant notConformant -> "not conformant";
+                    case PublicationResult.NotAllowed notAllowed -> "not allowed";
                     case PublicationResult.TemplateUnknown unknown -> "unknown";
-                    case PublicationResult.NoDraft noDraft -> "kein Entwurf";
-                    case PublicationResult.DraftWithoutContent withoutContent -> "ohne Inhalt";
-                    case PublicationResult.LetterheadNotPublished letterhead -> "Briefpapier fehlt";
+                    case PublicationResult.NoDraft noDraft -> "no draft";
+                    case PublicationResult.DraftWithoutContent withoutContent -> "without content";
+                    case PublicationResult.LetterheadNotPublished letterhead -> "letterhead missing";
                     case PublicationResult.Stale stale -> "stale";
                 })).doesNotHaveDuplicates().hasSize(8);
     }
@@ -41,19 +41,19 @@ class PublicationResultTest {
     void publishedNamesTheVersion() {
         assertThat(new PublicationResult.Published(VERSION).version()).isEqualTo(VERSION);
         assertThatThrownBy(() -> new PublicationResult.Published(null))
-                .hasMessageContaining("veröffentlichte Version");
+                .hasMessageContaining("published version");
     }
 
     @Test
     void notConformantNeedsAtLeastOneFindingAndCopiesTheList() {
-        List<String> findings = new ArrayList<>(List.of("Bild ohne Alternativtext"));
+        List<String> findings = new ArrayList<>(List.of("Image without alternative text"));
         var notConformant = new PublicationResult.NotConformant(findings);
-        findings.add("später");
+        findings.add("later");
 
-        assertThat(notConformant.findings()).containsExactly("Bild ohne Alternativtext");
+        assertThat(notConformant.findings()).containsExactly("Image without alternative text");
         assertThatThrownBy(() -> new PublicationResult.NotConformant(List.of()))
-                .hasMessageContaining("mindestens einen Befund");
+                .hasMessageContaining("at least one finding");
         assertThatThrownBy(() -> new PublicationResult.NotConformant(Arrays.asList("a", null)))
-                .hasMessageContaining("Befunde");
+                .hasMessageContaining("findings");
     }
 }

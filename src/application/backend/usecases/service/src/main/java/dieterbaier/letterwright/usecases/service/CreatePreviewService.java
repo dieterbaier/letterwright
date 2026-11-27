@@ -18,9 +18,9 @@ import java.time.Clock;
 import java.util.Optional;
 
 /**
- * Prüft erst, ob es das Standardschreiben gibt und ob sein Bezugstyp passt, und fragt dann den Host nach der
- * Berechtigung. Erst mit ihr prüft sie die veröffentlichten Versionen, damit ein Unberechtigter deren Stand nicht
- * erfährt, und fragt den Datenkontext an (ADR-020).
+ * First checks whether the letter template exists and whether its reference type matches, then asks the host for
+ * permission. Only with permission does it check the published versions, so that an unauthorized user does not learn
+ * their state, and request the data context (ADR-020).
  */
 public final class CreatePreviewService implements CreatePreview {
 

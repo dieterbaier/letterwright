@@ -16,33 +16,33 @@ import dieterbaier.letterwright.spi.LetterTemplateId;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
-/** Gemeinsame Testdaten der Adaptertests. */
+/** Shared test data of the adapter tests. */
 final class TestData {
 
     static final UserId ERIKA = new UserId("erika");
-    static final BusinessReference CUSTOMER = new BusinessReference("Kunde", "4711");
+    static final BusinessReference CUSTOMER = new BusinessReference("Customer", "4711");
     static final Instant CREATED = Instant.parse("2026-11-21T10:00:00Z");
     static final LetterTemplate REMINDER =
-            LetterTemplate.create(TemplateId.generate(), "Mahnung", TemplateId.generate(), "Kunde", "Sehr geehrte {{name}}");
+            LetterTemplate.create(TemplateId.generate(), "Payment reminder", TemplateId.generate(), "Customer", "Dear {{name}}");
     static final Letter LETTER = Letter.restore(LetterId.generate(), SnapshotId.generate(), CUSTOMER,
             new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
             new VersionReference(REMINDER.id(), VersionNumber.FIRST), new DocumentReference("store/1.pdf"),
             Checksum.of("pdf".getBytes(StandardCharsets.UTF_8)), CREATED, new LetterState.Visible());
 
     /**
-     * So sehen Benutzer, Bezug und Mahnung im SPI aus. Von Hand aufgebaut und nicht über {@link Mapping}, damit ein
-     * Fehler in der Abbildung in den Adaptertests sichtbar wird.
+     * This is how user, reference and payment reminder look in the SPI. Built by hand and not via {@link Mapping}, so
+     * that an error in the mapping becomes visible in the adapter tests.
      */
     static final String ERIKA_IN_SPI = "erika";
     static final dieterbaier.letterwright.spi.BusinessReference CUSTOMER_IN_SPI =
-            new dieterbaier.letterwright.spi.BusinessReference("Kunde", "4711");
+            new dieterbaier.letterwright.spi.BusinessReference("Customer", "4711");
     static final LetterTemplateId REMINDER_IN_SPI =
-            new LetterTemplateId(REMINDER.id().value(), "Mahnung");
+            new LetterTemplateId(REMINDER.id().value(), "Payment reminder");
 
     private TestData() {
     }
 
-    /** Ein Host, der sich nicht an den Null-Vertrag hält. */
+    /** A host that does not keep the null contract. */
     @SuppressWarnings({"NullAway", "unchecked"})
     static <T> T nullFromHost() {
         return (T) null;

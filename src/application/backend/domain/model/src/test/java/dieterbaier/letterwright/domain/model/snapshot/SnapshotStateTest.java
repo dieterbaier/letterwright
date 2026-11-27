@@ -22,6 +22,6 @@ class SnapshotStateTest {
 
     @Test
     void anOpenSnapshotHoldsADataContext() {
-        rejects(() -> new SnapshotState.Open(null), "Datenkontext des Snapshots");
+        rejects(() -> new SnapshotState.Open(null), "data context of the snapshot");
     }
 }

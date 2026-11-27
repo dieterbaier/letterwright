@@ -5,8 +5,8 @@ import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Ein Snapshot ist offen, bis aus ihm ein Schreiben entsteht; danach ist er verbraucht (ADR-021). Nur ein offener
- * Snapshot hält den Datenkontext: Ist das Schreiben gespeichert, braucht ihn niemand mehr.
+ * A snapshot is open until a letter is created from it; after that it is consumed (ADR-021). Only an open snapshot
+ * holds the data context: once the letter is saved, nobody needs it any more.
  */
 @ValueObject
 public sealed interface SnapshotState {
@@ -14,18 +14,18 @@ public sealed interface SnapshotState {
     record Open(DataContext dataContext) implements SnapshotState {
 
         public Open {
-            Validate.required(dataContext, "Der Datenkontext des Snapshots");
+            Validate.required(dataContext, "The data context of the snapshot");
         }
 
-        /** Ob der neu gelesene Datenkontext dieselbe Prüfsumme hat wie der der Vorschau. */
+        /** Whether the newly read data context has the same checksum as the one of the preview. */
         public boolean isUnchanged(DataContext reread) {
             return dataContext.checksum().equals(reread.checksum());
         }
     }
 
     /**
-     * Aus dem Snapshot ist ein Schreiben entstanden. Er bleibt bis zu seinem Ablauf, damit eine Wiederholung Besitzer und
-     * Berechtigung prüfen und das Schreiben finden kann.
+     * A letter was created from the snapshot. It remains until its expiry so that a retry can check owner and
+     * permission and find the letter.
      */
     record Consumed() implements SnapshotState {}
 }

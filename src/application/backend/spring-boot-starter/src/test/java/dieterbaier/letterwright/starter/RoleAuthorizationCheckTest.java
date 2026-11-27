@@ -18,9 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 class RoleAuthorizationCheckTest {
 
-    private static final BusinessReference CUSTOMER = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER = new BusinessReference("Customer", "4711");
     private static final AuthorizationRequest CREATE =
-            AuthorizationRequest.forCreation("erika", CUSTOMER, new LetterTemplateId(UUID.randomUUID(), "Mahnung"));
+            AuthorizationRequest.forCreation("erika", CUSTOMER, new LetterTemplateId(UUID.randomUUID(), "Payment reminder"));
 
     private final RoleAuthorizationCheck check = new RoleAuthorizationCheck(
             new AuthorizationProperties(Map.of(), Map.of()), new AuthenticationTrustResolverImpl());
@@ -86,13 +86,13 @@ class RoleAuthorizationCheckTest {
     @Test
     void aConfiguredRoleReplacesTheDefault() {
         var configured = new RoleAuthorizationCheck(
-                new AuthorizationProperties(Map.of(), Map.of(LetterRole.CREATE, "ROLE_SACHBEARBEITUNG")),
+                new AuthorizationProperties(Map.of(), Map.of(LetterRole.CREATE, "ROLE_CASEWORK")),
                 new AuthenticationTrustResolverImpl());
         login("erika", true, "ROLE_LETTERWRIGHT_LETTERS_CREATE");
 
         assertThat(configured.isAllowed(CREATE)).isFalse();
 
-        login("erika", true, "ROLE_SACHBEARBEITUNG");
+        login("erika", true, "ROLE_CASEWORK");
 
         assertThat(configured.isAllowed(CREATE)).isTrue();
     }
@@ -108,7 +108,7 @@ class RoleAuthorizationCheckTest {
     }
 
     private static void login(String name, boolean loggedIn, String role) {
-        var authentication = new TestingAuthenticationToken(name, "geheim", role);
+        var authentication = new TestingAuthenticationToken(name, "secret", role);
         authentication.setAuthenticated(loggedIn);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

@@ -4,8 +4,8 @@ import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Wie die Host-Anwendung auf ein neu angelegtes Schreiben antwortet, wenn sie den optionalen Rückruf nach dem Speichern
- * bereitstellt (ADR-023). Ohne Rückruf gilt jedes Schreiben als angenommen.
+ * How the host application responds to a newly created letter if it provides the optional letter save callback
+ * (ADR-023). Without a callback every letter counts as accepted.
  */
 @ValueObject
 public sealed interface CallbackResult {
@@ -14,7 +14,7 @@ public sealed interface CallbackResult {
         return new Accepted();
     }
 
-    /** Der Host lehnt ab; der Grund wird dem Benutzer angezeigt. */
+    /** The host rejects; the reason is shown to the user. */
     static CallbackResult rejected(String reason) {
         return new Rejected(reason);
     }
@@ -27,7 +27,7 @@ public sealed interface CallbackResult {
     record Rejected(String reason) implements CallbackResult {
 
         public Rejected {
-            Validate.notBlank(reason, "Der Grund der Ablehnung");
+            Validate.notBlank(reason, "The reason for the rejection");
         }
     }
 }

@@ -2,16 +2,16 @@ package dieterbaier.letterwright.domain.model;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 
-/** Eine Handlung an Briefpapier und Standardschreiben, ohne fachlichen Bezug. */
+/** An action on letterheads and letter templates, without a business reference. */
 @ValueObject
 public enum TemplateAction {
 
-    /** Umfasst Anlegen, Entwürfe ändern und neue Entwürfe anlegen. */
+    /** Covers creating, changing drafts and creating new drafts. */
     EDIT,
 
     /**
-     * Umfasst auch das Zurückziehen veröffentlichter Versionen. Getrennt vom Bearbeiten, damit der Host ein Vier-Augen-Prinzip
-     * abbilden kann: Was veröffentlicht ist, geht in alle neuen Schreiben ein.
+     * Also covers withdrawing published versions. Separate from editing so that the host can enforce a four-eyes
+     * principle: what is published goes into every new letter.
      */
     PUBLISH
 }

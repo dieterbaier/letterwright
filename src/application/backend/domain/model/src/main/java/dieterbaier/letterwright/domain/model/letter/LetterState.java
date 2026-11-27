@@ -5,9 +5,9 @@ import java.time.Instant;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Ein Schreiben ist sichtbar, bis es logisch gelöscht wird. Ein logisch gelöschtes Schreiben behält sein PDF, erscheint
- * aber in keiner Übersicht und lässt sich weder herunterladen noch erneut löschen; für den Benutzer gibt es es nicht
- * mehr. Ein hart gelöschtes Schreiben hat keinen Zustand, es ist entfernt.
+ * A letter is visible until it is logically deleted. A logically deleted letter keeps its PDF but appears in no list
+ * and can neither be downloaded nor deleted again; for the user it no longer exists. A hard deleted letter has no
+ * state; it is removed.
  */
 @ValueObject
 public sealed interface LetterState {
@@ -17,7 +17,7 @@ public sealed interface LetterState {
     record LogicallyDeleted(Instant at) implements LetterState {
 
         public LogicallyDeleted {
-            Validate.required(at, "Der Zeitpunkt des Löschens");
+            Validate.required(at, "The time of deletion");
         }
     }
 }

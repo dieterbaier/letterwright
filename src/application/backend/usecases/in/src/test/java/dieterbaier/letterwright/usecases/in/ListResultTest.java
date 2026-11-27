@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class ListResultTest {
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         var page = new Page<>(List.of(TestLetters.LETTER), 1, new PageRequest(0, 20));
@@ -25,6 +25,6 @@ class ListResultTest {
 
     @Test
     void foundNeedsAPage() {
-        assertThatThrownBy(() -> new ListResult.Found(null)).hasMessageContaining("Page");
+        assertThatThrownBy(() -> new ListResult.Found(null)).hasMessageContaining("page");
     }
 }
