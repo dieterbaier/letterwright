@@ -80,7 +80,10 @@ Bezugstyp passt, bleibt für ihn dagegen unterscheidbar; dieser ADR schützt nur
 den Veröffentlichungsstatus. Beim Speichern wird die Berechtigung erneut mit
 `ForCreation` gefragt.
 * **Default-Berechtigungsprüfung.** Der Starter bildet `ForCreation` weiter auf die
-  Rolle `ROLE_LETTERWRIGHT_LETTERS_CREATE` ab; die Konfiguration bleibt unverändert.
+  Rolle zum Erzeugen von Schreiben ab; diese Entscheidung ändert die
+  Konfiguration nicht. Zum Zeitpunkt der Entscheidung hieß die Rolle
+  `ROLE_SSW_SCHREIBEN_ERZEUGEN`, seit ADR-024 (#84)
+  `ROLE_LETTERWRIGHT_LETTERS_CREATE`.
   Das Standardschreiben wertet er nicht aus.
 
 === Kontext

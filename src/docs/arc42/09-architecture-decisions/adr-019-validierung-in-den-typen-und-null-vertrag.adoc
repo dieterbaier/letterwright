@@ -173,9 +173,12 @@ nur ein Versprechen.
   und Gradle mitzuprüfen sind.
 * Die SPI-Änderung bricht jeden Host, der gegen die alte `Aktion` kompiliert hat.
   Vor dem ersten Release betrifft das nur die Tests der Bibliothek.
-* Die Rollen-Properties des Starters heißen jetzt
-  `letterwright.authorization.roles.templates.<AKTION>` und
-  `….roles.letters.<AKTION>`. Die Default-Authorities behalten ihre Namen.
+* Die Rollen-Properties des Starters hießen mit dieser Entscheidung
+  `standardschreiben.berechtigung.rollen.vorlagen.<AKTION>` und
+  `….rollen.schreiben.<AKTION>`; die Default-Authorities behielten ihre Namen
+  (`ROLE_SSW_*`). Das ist der Stand dieser Entscheidung. Seit ADR-024 (#84)
+  heißen Properties und Default-Authorities anders; den aktuellen Stand nennt
+  der Abschnitt „Sicherheit“ der <<crosscutting-concepts>>.
 
 ==== Neutral oder Folgearbeiten
 
