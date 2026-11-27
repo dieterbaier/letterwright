@@ -10,14 +10,14 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "standardschreiben"
+rootProject.name = "letterwright"
 
 // Projektname (zugleich Artefakt-ID) -> Verzeichnis. Die Projekte sind flach benannt,
 // damit die Gruppenordner (adapter/in, adapter/out, usecases) keine eigenen Gradle-Projekte werden.
 val backendModule = mapOf(
-    "validierung" to "validierung",
-    "domaene-modell" to "domaene/modell",
-    "domaene-service" to "domaene/service",
+    "validation" to "validation",
+    "domain-model" to "domain/model",
+    "domain-service" to "domain/service",
     "usecases-in" to "usecases/in",
     "usecases-out" to "usecases/out",
     "usecases-service" to "usecases/service",
@@ -26,11 +26,11 @@ val backendModule = mapOf(
     "adapter-web" to "adapter/in/adapter-web",
     "adapter-api" to "adapter/in/adapter-api",
     "adapter-rendering" to "adapter/out/adapter-rendering",
-    "adapter-persistenz-jdbc" to "adapter/out/adapter-persistenz-jdbc",
+    "adapter-persistence-jdbc" to "adapter/out/adapter-persistence-jdbc",
     "adapter-host" to "adapter/out/adapter-host",
     "spring-boot-starter" to "spring-boot-starter",
-    "architekturtests" to "architekturtests",
-    "host-vertragstest" to "host-vertragstest",
+    "architecture-tests" to "architecture-tests",
+    "host-contract-test" to "host-contract-test",
 )
 
 backendModule.forEach { (modul, verzeichnis) ->

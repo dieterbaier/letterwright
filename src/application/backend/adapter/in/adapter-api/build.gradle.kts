@@ -1,5 +1,5 @@
 plugins {
-    id("standardschreiben.java-modul")
+    id("letterwright.java-module")
 }
 
 description = "Eingehender Adapter für die Java-API: implementiert api, ruft die Anwendungsfälle in der Transaktion des Hosts und bildet zwischen API-Typen und Domänenmodell ab (ADR-023)."
