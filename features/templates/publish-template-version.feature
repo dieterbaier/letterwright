@@ -1,98 +1,96 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# VorlagenveroeffentlichungTest im Modul usecases-service, ein Test je Szenario,
-# benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
-Funktionalität: Vorlagenversion veröffentlichen
-  Ein Vorlagenverwalter veröffentlicht den Entwurf eines Briefpapiers oder
-  Standardschreibens. Je Vorlage gibt es höchstens eine veröffentlichte Version;
-  neue Schreiben entstehen mit ihr, gespeicherte behalten ihre Versionen
-  (ADR-007, ADR-022). Vorher entsteht ein Probe-PDF mit den Beispieldaten der
-  Version und wird wie jedes gespeicherte Schreiben geprüft (ADR-005). Besteht es
-  die Prüfung nicht, bleibt der Entwurf ein Entwurf.
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# PublishTemplateVersionServiceTest in the module usecases-service, one test per
+# scenario, named after the scenario title. There the ports are replaced by fakes.
+Feature: Publish template version
+  A template manager publishes the draft of a letterhead or letter template. Per
+  template there is at most one published version; new letters are created with
+  it, saved letters keep their versions (ADR-007, ADR-022). Beforehand, a proof
+  PDF is created with the sample data of the version and checked like every saved
+  letter (ADR-005). If it does not pass the check, the draft stays a draft.
 
-  Grundlage:
-    Angenommen das Briefpapier "Standard" hat die veröffentlichte Version 1 mit den Beispieldaten "absender" = "Muster GmbH" und "betreff" = "Allgemein"
-    Und das Standardschreiben "Mahnung" nutzt dieses Briefpapier
-    Und seine Version 1 ist veröffentlicht, und sein Entwurf 2 hat die Beispieldaten "name" = "Erika Mustermann GmbH" und "betreff" = "Mahnung"
-    Und Vera darf Vorlagen veröffentlichen
+  Background:
+    Given the letterhead "Standard" has the published version 1 with the sample data "sender" = "Muster GmbH" and "subject" = "General"
+    And the letter template "Payment reminder" uses this letterhead
+    And its version 1 is published, and its draft 2 has the sample data "name" = "Erika Mustermann GmbH" and "subject" = "Payment reminder"
+    And Vera may publish templates
 
-  Szenario: Ein konformer Entwurf wird veröffentlicht und löst die bisherige Version ab
-    Wenn Vera die Mahnung veröffentlicht
-    Dann ist Version 2 der Mahnung veröffentlicht
-    Und Version 1 ist abgelöst und unverändert
+  Scenario: A conformant draft is published and supersedes the previous version
+    When Vera publishes the payment reminder
+    Then version 2 of the payment reminder is published
+    And version 1 is superseded and unchanged
 
-  Szenario: Das Probe-PDF entsteht mit dem veröffentlichten Briefpapier und den Beispieldaten beider Versionen
-    Wenn Vera die Mahnung veröffentlicht
-    Dann entsteht das Probe-PDF aus Briefpapier Version 1 und Mahnung Version 2
-    Und mit den Beispieldaten "absender" = "Muster GmbH", "betreff" = "Mahnung" und "name" = "Erika Mustermann GmbH"
-    Und genau dieses Probe-PDF wurde geprüft
+  Scenario: The proof PDF is created with the published letterhead and the sample data of both versions
+    When Vera publishes the payment reminder
+    Then the proof PDF is created from letterhead version 1 and payment reminder version 2
+    And with the sample data "sender" = "Muster GmbH", "subject" = "Payment reminder" and "name" = "Erika Mustermann GmbH"
+    And exactly this proof PDF was checked
 
-  Szenario: Ein Briefpapier wird mit dem eingebauten Beispielinhalt geprüft und veröffentlicht
-    Angenommen das Briefpapier hat einen Entwurf 2
-    Wenn Vera das Briefpapier veröffentlicht
-    Dann entsteht das Probe-PDF aus dem Entwurf und dem eingebauten Beispielinhalt
-    Und mit den Beispieldaten des Briefpapiers
-    Und Version 2 des Briefpapiers ist veröffentlicht, Version 1 abgelöst
+  Scenario: A letterhead is checked with the built-in sample content and published
+    Given the letterhead has a draft 2
+    When Vera publishes the letterhead
+    Then the proof PDF is created from the draft and the built-in sample content
+    And with the sample data of the letterhead
+    And version 2 of the letterhead is published, version 1 superseded
 
-  Szenario: Besteht das Probe-PDF die Prüfung nicht, bleibt die Version ein Entwurf
-    Angenommen die Prüfung findet "Bild ohne Alternativtext"
-    Wenn Vera die Mahnung veröffentlicht
-    Dann ist die Mahnung nicht konform mit dem Befund "Bild ohne Alternativtext"
-    Und die Mahnung ist unverändert
+  Scenario: If the proof PDF fails the check, the version stays a draft
+    Given the check finds "Image without alternative text"
+    When Vera publishes the payment reminder
+    Then the payment reminder is not conformant with the finding "Image without alternative text"
+    And the payment reminder is unchanged
 
-  Szenario: Lässt sich die Prüfung nicht ausführen, wird nicht veröffentlicht
-    Angenommen die Prüfung ist nicht ausführbar
-    Wenn Vera die Mahnung veröffentlicht
-    Dann scheitert das Veröffentlichen mit einem technischen Fehler
-    Und die Mahnung ist unverändert
+  Scenario: If the check cannot run, nothing is published
+    Given the check cannot be run
+    When Vera publishes the payment reminder
+    Then the publishing fails with a technical error
+    And the payment reminder is unchanged
 
-  Szenario: Ohne Berechtigung wird nichts geprüft und nichts veröffentlicht
-    Wenn Max die Mahnung veröffentlicht
-    Dann ist das Veröffentlichen nicht erlaubt
-    Und es entstand kein Probe-PDF
-    Und die Mahnung ist unverändert
+  Scenario: Without permission, nothing is checked and nothing published
+    When Max publishes the payment reminder
+    Then the publishing is not allowed
+    And no proof PDF was created
+    And the payment reminder is unchanged
 
-  Szenario: Ohne Entwurf gibt es nichts zu veröffentlichen
-    Angenommen die Mahnung hat keinen Entwurf
-    Wenn Vera die Mahnung veröffentlicht
-    Dann hat die Mahnung keinen Entwurf
+  Scenario: Without draft, there is nothing to publish
+    Given the payment reminder has no draft
+    When Vera publishes the payment reminder
+    Then the payment reminder has no draft
 
-  Szenario: Ein Entwurf ohne Inhalt wird nicht veröffentlicht
-    Angenommen der Entwurf der Mahnung enthält nur Leerraum
-    Wenn Vera die Mahnung veröffentlicht
-    Dann hat der Entwurf keinen Inhalt
-    Und es entstand kein Probe-PDF
+  Scenario: A draft without content is not published
+    Given the draft of the payment reminder contains only whitespace
+    When Vera publishes the payment reminder
+    Then the draft has no content
+    And no proof PDF was created
 
-  Szenario: Ohne veröffentlichtes Briefpapier wird das Standardschreiben nicht veröffentlicht
-    Angenommen das Briefpapier ist zurückgezogen
-    Wenn Vera die Mahnung veröffentlicht
-    Dann ist das Briefpapier nicht veröffentlicht
-    Und es entstand kein Probe-PDF
+  Scenario: Without published letterhead, the letter template is not published
+    Given the letterhead is withdrawn
+    When Vera publishes the payment reminder
+    Then the letterhead is not published
+    And no proof PDF was created
 
-  Szenario: Eine unbekannte Vorlage wird gemeldet
-    Wenn Vera eine Vorlage mit unbekannter ID veröffentlicht
-    Dann ist die Vorlage unbekannt
+  Scenario: An unknown template is reported
+    When Vera publishes a template with an unknown ID
+    Then the template is unknown
 
-  Szenario: Hat ein anderer die Vorlage inzwischen geändert, wird nichts veröffentlicht
-    Angenommen ein anderer Vorlagenverwalter ändert den Entwurf, während Vera veröffentlicht
-    Wenn Vera die Mahnung veröffentlicht
-    Dann ist der Stand veraltet
-    Und der geänderte, ungeprüfte Entwurf bleibt ein Entwurf
+  Scenario: If someone else changed the template meanwhile, nothing is published
+    Given another template manager changes the draft while Vera publishes
+    When Vera publishes the payment reminder
+    Then the state is stale
+    And the changed, unchecked draft stays a draft
 
-  Szenariogrundriss: Wird das Briefpapier während der Prüfung geändert, zählt der Prüfzeitpunkt
-    Angenommen ein anderer Vorlagenverwalter hat das Briefpapier <aenderung>, während die Mahnung geprüft wird
-    Wenn Vera die Mahnung veröffentlicht
-    Dann wurde das Probe-PDF mit Briefpapier Version 1 geprüft
-    Und Version 2 der Mahnung ist veröffentlicht
-    Und das Briefpapier ist <danach>
+  Scenario Outline: If the letterhead changes during the check, the check time counts
+    Given another template manager has <change> the letterhead while the payment reminder is being checked
+    When Vera publishes the payment reminder
+    Then the proof PDF was checked with letterhead version 1
+    And version 2 of the payment reminder is published
+    And the letterhead is <afterwards>
 
-    Beispiele:
-      | aenderung                | danach                       |
-      | durch Version 2 abgelöst | in Version 2 veröffentlicht  |
-      | zurückgezogen            | ohne veröffentlichte Version |
+    Examples:
+      | change                    | afterwards                   |
+      | superseded with version 2 | published in version 2       |
+      | withdrawn                 | without a published version  |
 
-  Szenario: Eine veröffentlichte Version bleibt unverändert, eine Änderung beginnt einen neuen Entwurf
-    Angenommen Vera hat die Mahnung veröffentlicht
-    Wenn die veröffentlichte Version geändert werden soll
-    Dann wird das abgelehnt
-    Und ein neuer Entwurf 3 übernimmt die Beispieldaten von Version 2
+  Scenario: A published version stays unchanged, a change starts a new draft
+    Given Vera has published the payment reminder
+    When the published version is to be changed
+    Then this is rejected
+    And a new draft 3 takes over the sample data of version 2

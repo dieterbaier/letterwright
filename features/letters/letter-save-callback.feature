@@ -1,49 +1,48 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests: ein Test
-# je Szenario, benannt nach dem Szenariotitel. Die ersten vier Szenarien prüft
-# SchreibenspeicherungTest im Modul usecases-service gegen Attrappen der Ports,
-# das letzte StandardschreibenAutoKonfigurationTest im Modul spring-boot-starter.
-# Es prüft nur die Verdrahtung ohne Rückruf des Hosts; dass ein angenommenes
-# Schreiben gespeichert ist, zeigt das erste Szenario. Durchgängig über die
-# Oberfläche speichert erst der REST-Endpunkt in #10.
-# Dass der Snapshot nach einer Ablehnung offen bleibt, leistet der Rollback an der
-# äußeren Grenze; das prüft der REST-Endpunkt in #10.
-Funktionalität: Rückruf nach dem Speichern
-  Speichert ein Sachbearbeiter über die Oberfläche der Bibliothek, kann die
-  Host-Anwendung im selben Commit eigene Daten ändern oder das Speichern mit einem
-  Grund ablehnen (ADR-023). Dafür stellt sie optional den Rückruf NachDemSpeichern
-  bereit. Er läuft nach den Datenbankänderungen der Bibliothek und vor dem Commit,
-  und nur, wenn der aktuelle Aufruf das Schreiben anlegt. Über die Java-API gibt
-  es keinen Rückruf.
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests: one test
+# per scenario, named after the scenario title. The first four scenarios are
+# checked by SaveLetterServiceTest in the module usecases-service against fakes of
+# the ports, the last one by LetterwrightAutoConfigurationTest in the module
+# spring-boot-starter. It checks only the wiring without a callback of the host;
+# that an accepted letter is saved is shown by the first scenario. Saving end to
+# end through the user interface comes only with the REST endpoint in #10.
+# That the snapshot stays open after a rejection is achieved by the rollback at the
+# outer boundary; the REST endpoint in #10 checks this.
+Feature: Letter save callback
+  When a clerk saves through the user interface of the library, the host
+  application can change its own data in the same commit or reject the saving
+  with a reason (ADR-023). For this it optionally provides the callback
+  LetterSaveCallback. It runs after the database changes of the library and before
+  the commit, and only if the current invocation creates the letter. There is no
+  callback via the Java API.
 
-  Grundlage:
-    Angenommen Erika hat vor 10 Minuten eine Vorschau der "Mahnung" zum Kunden 4711 erzeugt
-    Und Erika darf zum Kunden 4711 aus der "Mahnung" ein Schreiben erzeugen
-    Und der Host liefert zum Kunden 4711 weiter denselben Datenkontext
+  Background:
+    Given Erika created a preview of the "Payment reminder" for customer 4711 10 minutes ago
+    And Erika may create a letter from the "Payment reminder" for customer 4711
+    And the host still delivers the same data context for customer 4711
 
-  Szenario: Legt das Speichern ein Schreiben an, erhält der Host einen Rückruf
-    Wenn Erika die Vorschau speichert
-    Dann ist ein Schreiben gespeichert
-    Und der Host erhielt genau einen Rückruf mit diesem Schreiben und Erika
+  Scenario: If saving creates a letter, the host receives a callback
+    When Erika saves the preview
+    Then a letter is saved
+    And the host received exactly one callback with this letter and Erika
 
-  Szenario: Eine Wiederholung löst keinen weiteren Rückruf aus
-    Angenommen Erika hat die Vorschau bereits gespeichert
-    Wenn Erika die Vorschau erneut speichert
-    Dann erhält sie das bereits gespeicherte Schreiben
-    Und der Host erhielt keinen weiteren Rückruf
+  Scenario: A repetition triggers no further callback
+    Given Erika has already saved the preview
+    When Erika saves the preview again
+    Then she receives the already saved letter
+    And the host received no further callback
 
-  Szenario: Der Host lehnt das neue Schreiben mit einem Grund ab
-    Angenommen der Host lehnt jedes neue Schreiben ab mit dem Grund "Die Aufgabe ist bereits erledigt"
-    Wenn Erika die Vorschau speichert
-    Dann ist das Speichern vom Host abgelehnt mit dem Grund "Die Aufgabe ist bereits erledigt"
+  Scenario: The host rejects the new letter with a reason
+    Given the host rejects every new letter with the reason "The task is already done"
+    When Erika saves the preview
+    Then the saving is rejected by the host with the reason "The task is already done"
 
-  Szenario: Ein Fehler im Rückruf ist ein technischer Fehler
-    Angenommen der Rückruf des Hosts scheitert mit einem Fehler
-    Wenn Erika die Vorschau speichert
-    Dann schlägt das Speichern mit diesem Fehler fehl
-    Und die Bibliothek hat den Rückruf nicht wiederholt
+  Scenario: An error in the callback is a technical error
+    Given the host's callback fails with an error
+    When Erika saves the preview
+    Then the saving fails with this error
+    And the library did not repeat the callback
 
-  Szenario: Ohne Rückruf des Hosts nimmt die Bibliothek jedes neue Schreiben an
-    Angenommen die Host-Anwendung stellt keinen Rückruf bereit
-    Wenn die Bibliothek nach dem Anlegen eines Schreibens den Rückruf befragt
-    Dann ist das neue Schreiben angenommen
+  Scenario: Without a callback of the host, the library accepts every new letter
+    Given the host application provides no callback
+    When the library consults the callback after creating a letter
+    Then the new letter is accepted

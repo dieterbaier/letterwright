@@ -1,39 +1,38 @@
-# language: de
-# Status: proposed (KI-gestützt, wartet auf Review). Brücke zu den Tests:
-# SchreibenabrufTest im Modul usecases-service, ein Test je Szenario,
-# benannt nach dem Szenariotitel. Die Ports sind dort durch Attrappen ersetzt.
-Funktionalität: Schreiben herunterladen
-  Ein Sachbearbeiter lädt das PDF eines gespeicherten Schreibens herunter. Er
-  bekommt genau das PDF, das beim Speichern geprüft wurde (ADR-007, QS-008). Ein
-  Schreiben, das er nicht herunterladen darf, gibt es für ihn nicht (QS-009).
+# Status: proposed (AI-assisted, awaiting review). Bridge to the tests:
+# DownloadLetterServiceTest in the module usecases-service, one test per scenario,
+# named after the scenario title. There the ports are replaced by fakes.
+Feature: Download letter
+  A clerk downloads the PDF of a saved letter. They get exactly the PDF that was
+  checked when saving (ADR-007, QS-008). A letter they may not download does not
+  exist for them (QS-009).
 
-  Grundlage:
-    Angenommen zum Kunden 4711 ist ein Schreiben gespeichert
-    Und Erika darf die Schreiben zum Kunden 4711 herunterladen
+  Background:
+    Given a letter is saved for customer 4711
+    And Erika may download the letters for customer 4711
 
-  Szenario: Der Download liefert das unveränderte PDF
-    Wenn Erika das Schreiben herunterlädt
-    Dann erhält sie das PDF mit der Prüfsumme vom Speichern
+  Scenario: The download delivers the unchanged PDF
+    When Erika downloads the letter
+    Then she receives the PDF with the checksum from saving
 
-  Szenario: Ein nicht erlaubtes Schreiben verhält sich wie ein nicht vorhandenes
-    Angenommen Max darf die Schreiben zum Kunden 4711 nicht herunterladen
-    Wenn Max das Schreiben herunterlädt
-    Dann ist das Schreiben unbekannt
-    Und es wurde kein PDF gelesen
+  Scenario: A letter that is not allowed behaves like a missing one
+    Given Max may not download the letters for customer 4711
+    When Max downloads the letter
+    Then the letter is unknown
+    And no PDF was read
 
-  Szenario: Ein unbekanntes Schreiben gibt es nicht
-    Wenn Erika ein Schreiben mit unbekannter ID herunterlädt
-    Dann ist das Schreiben unbekannt
-    Und der Host wurde nicht gefragt
+  Scenario: An unknown letter does not exist
+    When Erika downloads a letter with an unknown ID
+    Then the letter is unknown
+    And the host was not asked
 
-  Szenario: Ein logisch gelöschtes Schreiben gibt es nicht
-    Angenommen das Schreiben ist logisch gelöscht
-    Wenn Erika das Schreiben herunterlädt
-    Dann ist das Schreiben unbekannt
-    Und der Host wurde nicht gefragt
-    Und es wurde kein PDF gelesen
+  Scenario: A logically deleted letter does not exist
+    Given the letter is logically deleted
+    When Erika downloads the letter
+    Then the letter is unknown
+    And the host was not asked
+    And no PDF was read
 
-  Szenario: Ein verändertes PDF wird nicht ausgeliefert
-    Angenommen die Dokumentablage liefert andere Bytes als beim Speichern
-    Wenn Erika das Schreiben herunterlädt
-    Dann schlägt der Download mit einem Fehler fehl
+  Scenario: A changed PDF is not delivered
+    Given the document store delivers other bytes than when saving
+    When Erika downloads the letter
+    Then the download fails with an error
