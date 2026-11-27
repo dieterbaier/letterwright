@@ -5,7 +5,7 @@ templates: templates for letterheads and letters that business users maintain
 themselves, an accessible preview with current domain data, and stored PDF/A
 documents for download. Background: issue #1.
 
-**Architecture documentation:** https://dieterbaier.github.io/standardschreiben/
+**Architecture documentation:** https://dieterbaier.github.io/letterwright/
 
 ## Language
 

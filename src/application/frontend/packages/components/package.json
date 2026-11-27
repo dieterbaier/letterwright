@@ -6,7 +6,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dieterbaier/standardschreiben.git",
+    "url": "git+https://github.com/dieterbaier/letterwright.git",
     "directory": "src/application/frontend/packages/components"
   },
   "files": [

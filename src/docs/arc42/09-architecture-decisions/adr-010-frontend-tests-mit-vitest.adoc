@@ -10,7 +10,7 @@ summary: 'The React components are tested with Vitest and React Testing Library,
 derived_from:
 - type: external
   description: 'Issue #1 project idea and the owner''s answers in the issue'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+  uri: https://github.com/dieterbaier/letterwright/issues/1
 tags:
 - decision
 - frontend
@@ -129,4 +129,4 @@ include::generated/adr-010-frontend-tests-mit-vitest-traceability.adoc[leveloffs
 
 The owner confirmed the justification and accepted the ADR on 2026-11-18
 (issue #37). He accepted the outgoing relations in the
-https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[review of PR #38].
+https://github.com/dieterbaier/letterwright/pull/38#pullrequestreview-5962686450[review of PR #38].

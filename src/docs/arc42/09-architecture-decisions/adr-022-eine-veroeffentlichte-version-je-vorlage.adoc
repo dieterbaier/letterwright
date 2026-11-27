@@ -12,7 +12,7 @@ derived_from:
   description: 'Decisions of the owner on 2026-11-22 on #55: only one published version per template, new letters with this version, stored letters remain unchanged; own state “superseded”; the template manager maintains sample data on the template version; the proof PDF is created with the published counterpart.'
 - type: external
   description: 'Issue #55: use case publish template version, with the open question from ADR-018'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/55
+  uri: https://github.com/dieterbaier/letterwright/issues/55
 tags:
 - decision
 - template

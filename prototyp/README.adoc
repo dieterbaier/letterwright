@@ -1,6 +1,6 @@
 = Prototyp: Vorlagenformat und Rendering
 
-Wegwerf-Prototyp für https://github.com/dieterbaier/standardschreiben/issues/3[#3]. Er
+Wegwerf-Prototyp für https://github.com/dieterbaier/letterwright/issues/3[#3]. Er
 prüft ADR-003, ADR-004, ADR-005 und ADR-014 an der DOCX-Vorgabe unter `src/examples/`.
 Der Code wird nicht ins MVP übernommen und liegt deshalb außerhalb des Gradle- und
 npm-Builds. Der Wurzel-Build bindet nur die Module unter `src/application/backend` ein.

@@ -12,7 +12,7 @@ derived_from:
   description: 'TODOs and conversation with the owner on 2026-11-22 after PR #59 (#30): “The types should validate. Use cases don’t need to.”'
 - type: external
   description: 'Issue #61: Types validate, use cases do not'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/61
+  uri: https://github.com/dieterbaier/letterwright/issues/61
 tags:
 - decision
 - domain

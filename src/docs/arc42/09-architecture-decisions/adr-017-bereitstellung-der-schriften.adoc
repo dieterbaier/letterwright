@@ -13,7 +13,7 @@ derived_from:
   anchor: q-po-010
 - type: external
   description: 'Issue #39: Fonts: provided by the host, and free substitute fonts'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/39
+  uri: https://github.com/dieterbaier/letterwright/issues/39
 tags:
 - decision
 - rendering

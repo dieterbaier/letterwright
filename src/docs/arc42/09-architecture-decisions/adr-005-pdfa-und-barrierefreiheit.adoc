@@ -10,7 +10,7 @@ summary: 'Saved letters are PDF/A-2b and PDF/UA-1, the preview meets WCAG 2.1 AA
 derived_from:
 - type: external
   description: 'Issue #1 project idea and the owner''s answers in the issue'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/1
+  uri: https://github.com/dieterbaier/letterwright/issues/1
 tags:
 - decision
 - pdfa

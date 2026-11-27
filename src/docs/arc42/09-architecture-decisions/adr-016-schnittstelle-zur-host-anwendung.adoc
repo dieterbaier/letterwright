@@ -12,7 +12,7 @@ derived_from:
   description: 'Proposal of the owner on 2026-11-17 before the start of issue #19: separate SPI module, shielded from the use case interfaces, without a dependency on the domain model, with its own data types and mapping'
 - type: external
   description: 'Issue #27: Separate SPI module with its own data types for the host application'
-  uri: https://github.com/dieterbaier/standardschreiben/issues/27
+  uri: https://github.com/dieterbaier/letterwright/issues/27
 tags:
 - decision
 - architecture
