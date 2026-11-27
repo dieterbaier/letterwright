@@ -1,4 +1,4 @@
-# General Semantic Contracts (standardschreiben)
+# General Semantic Contracts (letterwright)
 
 Dieses Projekt übernimmt die allgemeinen semantischen Verträge des
 architecture-knowledge-toolkit unverändert und kopiert sie nicht.

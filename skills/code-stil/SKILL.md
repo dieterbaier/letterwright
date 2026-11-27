@@ -1,6 +1,6 @@
 ---
 name: code-stil
-description: "Write and review Java code in standardschreiben in the project's code style: validation only in the types, illegal states made unrepresentable with sealed types, no null outside what the type allows, static factory methods, one test class per production class with its own contract, and Javadoc only for the why or the SPI contract. Use when writing, changing or reviewing backend code or tests, when tempted to add a parameter check, a boolean flag or a nullable field, or when writing Javadoc."
+description: "Write and review Java code in letterwright in the project's code style: validation only in the types, illegal states made unrepresentable with sealed types, no null outside what the type allows, static factory methods, one test class per production class with its own contract, and Javadoc only for the why or the SPI contract. Use when writing, changing or reviewing backend code or tests, when tempted to add a parameter check, a boolean flag or a nullable field, or when writing Javadoc."
 ---
 
 # Code-Stil

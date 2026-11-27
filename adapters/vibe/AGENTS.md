@@ -1,7 +1,7 @@
 <!-- GENERATED FILE: edit the canonical skills or scripts/build-agent-adapters.js, then regenerate. -->
 # Vibe Adapter
 
-This is a thin Vibe-specific wrapper for the standardschreiben repository.
+This is a thin Vibe-specific wrapper for the letterwright repository.
 Keep project semantics in repository-root `general-semantic-contracts.md`
 and canonical `skills/**/SKILL.md` files. Architecture and
 software-development-lifecycle work not covered by a local skill is delegated to
@@ -19,7 +19,7 @@ repository:
 
 ## Local Skills
 
-Paths are relative to the standardschreiben repository root.
+Paths are relative to the letterwright repository root.
 
 - `code-stil`: `skills/code-stil/SKILL.md`
 
