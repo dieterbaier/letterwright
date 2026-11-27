@@ -1,7 +1,7 @@
 = Projekttagebuch 2026-11-27
 
 Thema `domaene-und-host`, Nebenstrang Sprache. Rekonstruiert aus
-`git log 70743d1..4756dc1` auf `main`, den PRs #83, #86 und #87 mit ihren
+`git log 70743d1..d21a3ef` auf `main`, den PRs #83, #86, #87 und #88 mit ihren
 Kommentaren und den Issues #84 und #85.
 
 == Was geschah
@@ -23,6 +23,12 @@ Kommentaren und den Issues #84 und #85.
   Auswahl der Dokumentvorlage in den Systemkontext.
 * `AGENTS.md`: Die Übergangsregel ist entfallen, neue Architekturdoku entsteht
   nur noch auf Englisch.
+* **Repository umbenannt** in `dieterbaier/letterwright` (PR #88): Agenten-Anleitung,
+  Adapter, `code-stil`, Worktree-Pfad `../worktree/letterwright/`, README,
+  `package.json` und die Links in der Doku nennen den neuen Namen. Die
+  Architekturdoku liegt jetzt unter https://dieterbaier.github.io/letterwright/.
+  Historische Namen, der Fachbegriff „Standardschreiben“, IDs und Anker sowie der
+  lokale Ordner bleiben.
 
 == Entscheidungen des Owners
 
@@ -31,6 +37,8 @@ Kommentaren und den Issues #84 und #85.
   document (`Letter`). Ohne deutsche Entsprechungen.
 * Der Host wählt für seinen fachlichen Dokumenttyp die Dokumentvorlage und gibt
   sie letterwright direkt vor (doc-03000, „Selecting the Document Template“).
+* Das Repository heißt `letterwright`; intern, auch in den Clock-Skills, wird
+  nur noch der neue Name verwendet.
 * Die allgemeinen Begriffe sind eine bewusste Indirektion. Sie bleiben auf
   Glossar und Systemkontext beschränkt. Eine Umbenennung im Code bräuchte ein
   eigenes ADR, erst wenn letterwright andere Dokumentarten unterstützt.
@@ -44,6 +52,8 @@ Kommentaren und den Issues #84 und #85.
 * **Eine Entscheidung im PR-Kommentar ist noch nicht dokumentiert.** Die
   Vorlagenauswahl stand zuerst nur im Kommentar. Das zweite Review hat sie in die
   Doku geholt, wo sie auffindbar bleibt.
+* **GitHub Pages hat keine Weiterleitung.** Nach dem Umbenennen leiten
+  Repository-, Issue- und PR-Links weiter, die alte Pages-URL liefert 404.
 * **Ein Worktree mit Submodul lässt sich von `gh pr merge` nicht entfernen.**
   `git worktree remove` verweigert es, nach Prüfung auf Sauberkeit hilft
   `--force`.
@@ -53,7 +63,6 @@ Kommentaren und den Issues #84 und #85.
 * Nächster Schritt im Thema: ADR zur Ablage beim Host (#60), danach Persistenz
   (#6), dann der Rest von #10.
 * #6 nennt noch das Tabellenpräfix `ssw_`.
-* Umbenennen des GitHub-Repositorys in `letterwright`: entscheidet der Owner.
 
 == Gelesen
 
@@ -64,5 +73,7 @@ Kommentaren und den Issues #84 und #85.
   `diary/2026-11-26.adoc`.
 * GitHub: PR #86 und #87 mit Beschreibung, Kommentaren, Inline-Kommentaren und
   Checks; Issues #84, #85, #60 und #6; offene Issues; heute gemergte PRs.
+* GitHub: PR #88 mit Checks, Pages-Lauf auf `main` (`d21a3ef`), Antwort der
+  alten und neuen Pages-URL.
 * Repository: Branch-Abgleich am Ende (`SWEEP: CLEAR`), `git worktree list`,
-  Journal-Bindung.
+  Journal-Bindung; Verweise auf den alten Namen per `git grep`.

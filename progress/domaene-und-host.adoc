@@ -91,8 +91,6 @@ bleiben Ausnahmen. Die Testkonvention steht in Kapitel 4 und im Skill
 * Dateiname: zurückgestellt, drei Varianten in Q-ARCH-004.
 * #6 nennt als Default-Tabellenpräfix noch `ssw_`; nach dem Umbenennen in
   `letterwright` beim Start von #6 festlegen.
-* GitHub-Repository heißt noch `standardschreiben`; Umbenennen entscheidet der
-  Owner.
 
 == Checks
 
