@@ -17,8 +17,8 @@ metadata_version: '1.0'
 = Introduction and Goals
 
 letterwright is an embeddable library for Spring Boot/React applications.
-It shows users letter templates on a defined letterhead, filled with current
-domain data, as an accessible preview. On request it saves them as an
+It shows users a letter generated from a letter template on a defined
+letterhead with current domain data as an accessible preview. On request it saves them as an
 accessible PDF/A document for download.
 
 include::generated/doc-01000-introduction-and-goals-includes.adoc[]

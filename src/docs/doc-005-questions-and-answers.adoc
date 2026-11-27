@@ -339,9 +339,9 @@ depend on the snapshot ID but on a **domain key**:
 
 Behind this is a scenario that refines or extends the original
 requirement: In the course of a business process of the host application, tasks
-arise in which letter templates are generated. Process and task are
+arise in which letters are generated. Process and task are
 uniquely identifiable, for example as
-`prozessname.instanzid.aufgabenName.aufgabenInstanz`. Every process instance belongs
+`processName.instanceId.taskName.taskInstance`. Every process instance belongs
 to a concrete case, in Camunda for example the business key.
 
 Follow-up questions before the rule is recorded as an ADR:
@@ -363,17 +363,17 @@ key.
   (business key) and the existing business reference (type and ID, glossary)
   relate to each other? Is the case the reference by which the list filters (Q-PO-003)?
 . *One key, one letter:* Does a task always create exactly one letter,
-  or can several letter templates belong to one task, for example to
+  or can one task generate several letters, for example for
   different recipients?
 +
-Answer (Owner, 2026-11-16): If several letter templates arise from one task,
+Answer (Owner, 2026-11-16): If several letters arise from one task,
 this can still count as one case. A case is to be understood similarly to
 a human task in BPMN: Someone has the task of creating a
-letter template. If a user is working on this task, no
-other user can create it and thus this letter template. The task
-stays blocked until it is released again. If the letter template has already been
+letter. If a user is working on this task, no
+other user can create it and thus this letter. The task
+stays blocked until it is released again. If the letter has already been
 created, another user cannot create it again. They are shown the
-stored letter template.
+stored letter.
 . *Deletion:* After a letter has been deleted through the `DeletionPolicy`,
   may a new one be created under the same key?
 +
@@ -416,10 +416,10 @@ Still open before the rule is recorded as an ADR:
 
 * *Refresh and expiry (question 1):* Does the proposal hold that “Aktualisieren”,
   expiry and changed data replace the snapshot under the same key?
-* *One key, several letters:* If several letter templates belong to one task,
+* *One key, several letters:* If one task generates several letters,
   each needs its own key; otherwise the second call delivers the first
   letter. Proposal: The host specifies a separate domain key per
-  letter template, for example the task instance with a suffix. Several keys can
+  letter, for example the task instance with a suffix. Several keys can
   belong to the same case.
 * *Terms (question 3):* So far the case was the business key of the process instance.
   The answer to question 4 describes it like a human task. What is the case, and
