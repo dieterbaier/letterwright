@@ -1,46 +1,46 @@
-= Frontend von Standardschreiben
+= Frontend of letterwright
 
-npm-Workspace mit dem Paket der React-Komponenten (ADR-001, ADR-009).
+npm workspace with the package of React components (ADR-001, ADR-009).
 
-== Pakete
+== Packages
 
-`packages/komponenten`:: `@dieterbaier/standardschreiben`, die React-Komponenten zum
-Einbetten in eine Host-Anwendung. React ist Peer-Abhängigkeit. Das Stylesheet
-importiert der Host getrennt: `@dieterbaier/standardschreiben/styles.css`.
+`packages/components`:: `@dieterbaier/letterwright`, the React components for
+embedding in a host application. React is a peer dependency. The host imports the
+stylesheet separately: `@dieterbaier/letterwright/styles.css`.
 
-== Befehle
+== Commands
 
-Im Verzeichnis `src/application/frontend/`, mit Node.js 22.22.2 oder neuer auf der
-22er-Linie, 24.15 oder neuer auf der 24er-Linie oder ab 26. Diese Bereiche
-verlangen jsdom und Vitest. `.npmrc` setzt `engine-strict`, damit `npm ci` mit
-einer anderen Version sofort abbricht.
+In the directory `src/application/frontend/`, with Node.js 22.22.2 or newer on the
+22 line, 24.15 or newer on the 24 line, or 26 and later. jsdom and Vitest require
+these ranges. `.npmrc` sets `engine-strict`, so `npm ci` stops right away with
+another version.
 
 [source,sh]
 ----
-npm ci          # Abhängigkeiten nach package-lock.json installieren
-npm run lint    # ESLint und Typprüfung
-npm run build   # Bibliothek und Typdeklarationen nach dist/
-npm test        # Vitest mit Abdeckungs-Gate
+npm ci          # install dependencies from package-lock.json
+npm run lint    # ESLint and type check
+npm run build   # library and type declarations to dist/
+npm test        # Vitest with coverage gate
 ----
 
 == Styling (ADR-013)
 
-* UnoCSS mit dem Klassenpräfix `ssw-`. Klassen ohne Präfix erzeugen kein CSS.
-* Kein globales Reset (keine Preflights).
-* Alle Styles liegen in der CSS-Ebene `standardschreiben`. Host-Styles außerhalb
-  dieser Ebene haben Vorrang, ohne `!important`.
+* UnoCSS with the class prefix `lw-`. Classes without the prefix generate no CSS.
+* No global reset (no preflights).
+* All styles live in the CSS layer `letterwright`. Host styles outside this layer
+  take precedence without `!important`.
 
-`src/test/styling.test.ts` prüft diese drei Regeln gegen die UnoCSS-Konfiguration.
+`src/test/styling.test.ts` checks these three rules against the UnoCSS configuration.
 
-== Testkonventionen (ADR-010, ADR-011)
+== Test conventions (ADR-010, ADR-011)
 
-* Tests liegen neben dem Code als `*.test.ts` oder `*.test.tsx` und laufen mit
-  Vitest, React Testing Library und jsdom.
-* Abdeckung mit dem V8-Provider: mindestens 80 % Zeilen und Zweige. Darunter
-  schlägt `npm test` fehl. Testhilfen unter `src/test/` zählen nicht mit.
-* Jeder Komponententest prüft das gerenderte Markup mit
-  `pruefeBarrierefreiheit(container)` aus `src/test/axe.ts`. Verstöße der Stufen
-  „serious“ und „critical“ lassen den Test scheitern.
-* Farbkontraste kann axe in jsdom nicht auswerten. Sie brauchen eine Prüfung im
-  echten Browser. Der Hinweis „HTMLCanvasElement's getContext()“ in der
-  Testausgabe stammt daher und ist kein Fehler.
+* Tests live next to the code as `*.test.ts` or `*.test.tsx` and run with Vitest,
+  React Testing Library and jsdom.
+* Coverage with the V8 provider: at least 80 % of lines and branches. Below that,
+  `npm test` fails. Test helpers under `src/test/` do not count.
+* Every component test checks the rendered markup with
+  `checkAccessibility(container)` from `src/test/axe.ts`. Violations of impact
+  "serious" and "critical" fail the test.
+* axe cannot evaluate colour contrast in jsdom. It needs a check in a real
+  browser. The notice "HTMLCanvasElement's getContext()" in the test output comes
+  from that and is not an error.
