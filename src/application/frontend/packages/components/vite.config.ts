@@ -9,11 +9,11 @@ export default defineConfig({
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.ts'),
       formats: ['es'],
-      fileName: 'standardschreiben',
-      cssFileName: 'standardschreiben',
+      fileName: 'letterwright',
+      cssFileName: 'letterwright',
     },
     rolldownOptions: {
-      // React stellt der Host bereit (Peer-Abhängigkeit).
+      // The host provides React (peer dependency).
       external: ['react', 'react-dom', 'react/jsx-runtime'],
     },
   },
@@ -23,10 +23,10 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      // Testhilfen gehören nicht zum ausgelieferten Paket.
+      // Test helpers are not part of the shipped package.
       exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
       reporter: ['text', 'html'],
-      // ADR-011: mindestens 80 % Zeilen- und Zweigabdeckung je Paket.
+      // ADR-011: at least 80 % line and branch coverage per package.
       thresholds: {
         lines: 80,
         branches: 80,

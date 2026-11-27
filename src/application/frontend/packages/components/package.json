@@ -1,13 +1,13 @@
 {
-  "name": "@dieterbaier/standardschreiben",
+  "name": "@dieterbaier/letterwright",
   "version": "0.0.0",
-  "description": "React-Komponenten für Standardschreiben zum Einbetten in eine Host-Anwendung",
+  "description": "React components of letterwright for embedding in a host application",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dieterbaier/standardschreiben.git",
-    "directory": "src/application/frontend/packages/komponenten"
+    "directory": "src/application/frontend/packages/components"
   },
   "files": [
     "dist"
@@ -15,9 +15,9 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/standardschreiben.js"
+      "import": "./dist/letterwright.js"
     },
-    "./styles.css": "./dist/standardschreiben.css"
+    "./styles.css": "./dist/letterwright.css"
   },
   "sideEffects": [
     "**/*.css"
