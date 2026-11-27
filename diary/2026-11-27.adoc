@@ -1,0 +1,68 @@
+= Projekttagebuch 2026-11-27
+
+Thema `domaene-und-host`, Nebenstrang Sprache. Rekonstruiert aus
+`git log 70743d1..4756dc1` auf `main`, den PRs #83, #86 und #87 mit ihren
+Kommentaren und den Issues #84 und #85.
+
+== Was geschah
+
+* **ADR-024 gemergt** (PR #83): Code, Features und Architekturdoku englisch,
+  Glossar zweisprachig, Projektname `letterwright`.
+* **Code umgestellt** (PR #86, #84): Bezeichner, Pakete
+  (`dieterbaier.letterwright`), Frontend-Paket, Gherkin-Features, README,
+  Kommentare und Meldungen englisch, Glossar zweisprachig. Nach dem Review der
+  Rückruf-Fabrik heißt sie `withCallback`.
+* **Architekturdoku übersetzt** (PR #87, #85): alle 75 AsciiDoc-Dateien unter
+  `src/docs/`. Ein Skript verglich jede Datei mit dem deutschen Stand `2b000c2`
+  (IDs, Issue-Nummern, Daten, Messwerte, Anker, Querverweise, Relationen,
+  Tabellenzeilen): keine Abweichung. Bewusste Abweichungen und Fehler im
+  deutschen Stand stehen in der PR-Beschreibung.
+* **Zwei Review-Runden zu PR #87:** Wo „Standardschreiben“ das erzeugte Schreiben
+  meinte (QS-001, Q-ARCH-004, Einleitung, Anforderungsübersicht), steht jetzt
+  „letter“. Danach kamen die Dokumentbegriffe ins Glossar und die Regel zur
+  Auswahl der Dokumentvorlage in den Systemkontext.
+* `AGENTS.md`: Die Übergangsregel ist entfallen, neue Architekturdoku entsteht
+  nur noch auf Englisch.
+
+== Entscheidungen des Owners
+
+* Vier allgemeine Dokumentbegriffe: document type (gehört dem Host), document
+  template (`LetterTemplate`), layout template (`Letterhead`), generated
+  document (`Letter`). Ohne deutsche Entsprechungen.
+* Der Host wählt für seinen fachlichen Dokumenttyp die Dokumentvorlage und gibt
+  sie letterwright direkt vor (doc-03000, „Selecting the Document Template“).
+* Die allgemeinen Begriffe sind eine bewusste Indirektion. Sie bleiben auf
+  Glossar und Systemkontext beschränkt. Eine Umbenennung im Code bräuchte ein
+  eigenes ADR, erst wenn letterwright andere Dokumentarten unterstützt.
+
+== Gelernt
+
+* **Eine wörtliche Übersetzung macht eine unscharfe Stelle sichtbar.**
+  „Standardschreiben“ stand im Deutschen auch für das erzeugte Schreiben. Mit
+  „letter template“ las es sich eindeutig als Vorlage, erst dadurch fiel es im
+  Review auf.
+* **Eine Entscheidung im PR-Kommentar ist noch nicht dokumentiert.** Die
+  Vorlagenauswahl stand zuerst nur im Kommentar. Das zweite Review hat sie in die
+  Doku geholt, wo sie auffindbar bleibt.
+* **Ein Worktree mit Submodul lässt sich von `gh pr merge` nicht entfernen.**
+  `git worktree remove` verweigert es, nach Prüfung auf Sauberkeit hilft
+  `--force`.
+
+== Offen
+
+* Nächster Schritt im Thema: ADR zur Ablage beim Host (#60), danach Persistenz
+  (#6), dann der Rest von #10.
+* #6 nennt noch das Tabellenpräfix `ssw_`.
+* Umbenennen des GitHub-Repositorys in `letterwright`: entscheidet der Owner.
+
+== Gelesen
+
+* Toolkit-Skills: `implement-issue-workflow`, `commit-message`,
+  `post-merge-sync`, `code-stil`, `clock-out`, `clock-in` (Branch-Abgleich).
+* Projekt: `AGENTS.md`, alle Dateien unter `src/docs/` (Übersetzung und
+  Vergleich mit `2b000c2`), `README.md`, `progress/domaene-und-host.adoc`,
+  `diary/2026-11-26.adoc`.
+* GitHub: PR #86 und #87 mit Beschreibung, Kommentaren, Inline-Kommentaren und
+  Checks; Issues #84, #85, #60 und #6; offene Issues; heute gemergte PRs.
+* Repository: Branch-Abgleich am Ende (`SWEEP: CLEAR`), `git worktree list`,
+  Journal-Bindung.

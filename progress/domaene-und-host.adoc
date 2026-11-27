@@ -8,12 +8,11 @@ Vorschau (#52), Speichern (#53), Auflisten, Herunterladen und Löschen (#54),
 Vorlagenversion veröffentlichen und zurückziehen (#55). Das Speichern in einer
 Transaktion des Hosts ist entschieden (ADR-023) und unter #77 umgesetzt, soweit
 es ohne Persistenz und REST geht: die Java-API (PR #81, #78) und der Rückruf
-`NachDemSpeichern` (PR #82, #79). #78 bleibt offen, bis #10 die Bean für die
-Java-API liefert. Offen sind außerdem der ADR zur Ablage im DMS des Hosts (#60) und
-der schmale BOM-Export (#32).
-Seit ADR-024 (PR #83, angenommen, noch nicht gemergt) werden Code und Doku
-englisch, und das Projekt heißt `letterwright`. Bevor #10 weitergeht, stellt #84
-den Code um; danach übersetzt #85 die Architekturdoku.
+`LetterSaveCallback` (PR #82, #79). #78 bleibt offen, bis #10 die Bean für die
+Java-API liefert. Die Sprachumstellung nach ADR-024 ist abgeschlossen: Code und
+Paket heißen `letterwright` und sind englisch (PR #86, #84), die Architekturdoku
+ist englisch (PR #87, #85). Offen sind der ADR zur Ablage im DMS des Hosts (#60)
+und der schmale BOM-Export (#32).
 
 == The plan
 
@@ -25,9 +24,11 @@ Testkonvention (#65) kam dazwischen, bevor mehr Code entstand.
 Nach dem Vertrag der Bezugs-ID (#69) kam das Speichern in der Transaktion des
 Hosts: erst die Entscheidung (ADR-023), dann die Umsetzung, zuerst die Java-API
 (#78), weil sie die Exporte des Starters festlegt, dann der Rückruf (#79).
-Vor dem Rest von #10 kommt die Sprachumstellung nach ADR-024 (#84), weil jeder
-weitere öffentliche Typ sie teurer macht. Die Übersetzung der Doku (#85) folgt,
-damit sie gleich die englischen Namen nennt.
+Vor dem Rest von #10 kam die Sprachumstellung nach ADR-024 (#84), weil jeder
+weitere öffentliche Typ sie teurer macht, danach die Übersetzung der Doku (#85).
+Als Nächstes kommt #60, weil die Entscheidung zur Ablage beim Host den Umfang
+von #6 bestimmt. #6 liefert die Persistenz, die #10 für Bean, Commit und
+Rollback der Java-API braucht.
 
 [options="checklist"]
 * [x] Fachmodell mit DDD-Rollen und Selbstvalidierung (PR #57, ADR-018): #51
@@ -41,11 +42,11 @@ damit sie gleich die englischen Namen nennt.
 * [x] Vertrag der ID von `FachlicherBezug` in Javadoc und Glossar (PR #73): #69
 * [x] Speichern in einer Transaktion des Hosts (PR #74, ADR-023): Q-ARCH-004
 * [ ] Java-API nach ADR-023: Module `api` und `adapter-api` gemergt (PR #81); #78 bleibt offen, bis #10 die Bean liefert (unter #77)
-* [x] Rückruf `NachDemSpeichern` nach ADR-023 (PR #82): #79 (unter #77)
-* [ ] Sprache von Code und Doku (ADR-024): PR #83 angenommen, Merge nach erneuter Durchsicht des Owners
-* [ ] Code auf Englisch umstellen und in `letterwright` umbenennen, einschließlich der Bezeichner in #10: #84, vor dem Rest von #10
-* [ ] Architekturdoku übersetzen, eigener Doku-PR mit Vergleich zum deutschen Stand: #85, nach #84
-* [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60
+* [x] Rückruf `LetterSaveCallback` nach ADR-023 (PR #82): #79 (unter #77)
+* [x] Sprache von Code und Doku (PR #83, ADR-024)
+* [x] Code auf Englisch umstellen und in `letterwright` umbenennen (PR #86): #84
+* [x] Architekturdoku übersetzen, mit Dokumentbegriffen und Auswahl der Dokumentvorlage durch den Host (PR #87): #85
+* [ ] ADR zur Ablage der Schreiben im DMS des Hosts: #60, vor #6, weil es festlegt, ob `DocumentStore` in der Datenbank der Bibliothek bleibt
 * [ ] Spring-Boot-BOM schmal exportieren: #32
 
 == Where we are
@@ -62,11 +63,12 @@ Ausgängen von `Speicherausgang` (ADR-021), Filtern vor dem Paginieren (QS-009),
 Beispieldaten je Vorlagenversion und bedingtes Ersetzen von Vorlagen (ADR-022).
 #7: `erzeugeProbePdf` mit eingebautem Beispielinhalt.
 
-Die Namen unten sind noch die deutschen; #84 benennt sie nach der Tabelle in
-ADR-024 um (etwa `NachDemSpeichern` zu `LetterSaveCallback`).
+Die Dokumentbegriffe (document type, document template, layout template,
+generated document) stehen nur im Glossar und in der Regel zur Auswahl der
+Dokumentvorlage im Systemkontext. Code und Features benutzen sie nicht.
 
-Nach ADR-023 gibt es die Java-API `api.SchreibenSpeichern` (Modul `api`,
-umgesetzt in `adapter-api`) und den optionalen Rückruf `spi.NachDemSpeichern`, den
+Nach ADR-023 gibt es die Java-API `api.SaveLetter` (Modul `api`,
+umgesetzt in `adapter-api`) und den optionalen Rückruf `spi.LetterSaveCallback`, den
 der Anwendungsfall nur bei einer Neuanlage ruft. Der Starter verdrahtet den
 Rückruf, aber noch keine Bean für die Java-API. Was die äußeren Grenzen leisten
 müssen, steht als Akzeptanzkriterien in #10: Bean der Java-API mit eigener
@@ -87,6 +89,10 @@ bleiben Ausnahmen. Die Testkonvention steht in Kapitel 4 und im Skill
 * #9: Wie die Bezugstypen eines Hosts zur Auswahl kommen, ohne neue
   verpflichtende Host-Schnittstelle (QS-007).
 * Dateiname: zurückgestellt, drei Varianten in Q-ARCH-004.
+* #6 nennt als Default-Tabellenpräfix noch `ssw_`; nach dem Umbenennen in
+  `letterwright` beim Start von #6 festlegen.
+* GitHub-Repository heißt noch `standardschreiben`; Umbenennen entscheidet der
+  Owner.
 
 == Checks
 
