@@ -13,7 +13,7 @@ class ChecksumTest {
 
     @Test
     void computesSha256AsLowercaseHex() {
-        // Bekannter Testvektor: SHA-256("abc")
+        // Known test vector: SHA-256("abc")
         assertThat(Checksum.of("abc".getBytes(StandardCharsets.US_ASCII)).hex())
                 .isEqualTo("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     }
@@ -27,11 +27,11 @@ class ChecksumTest {
         "za7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
     })
     void rejectsMissingAndOtherFormats(String hex) {
-        rejects(() -> new Checksum(hex), "Prüfsumme");
+        rejects(() -> new Checksum(hex), "checksum");
     }
 
     @Test
     void requiresContentToCompute() {
-        rejects(() -> Checksum.of(null), "Inhalt");
+        rejects(() -> Checksum.of(null), "content");
     }
 }

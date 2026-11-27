@@ -29,9 +29,9 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Brücke zu {@code features/letter/letter-of-die-api-speichern.feature}: ein Test je Szenario, benannt nach
- * dem Szenariotitel. Der Anwendungsfall ist eine Attrappe, die Transaktionen verwaltet die {@link FakeTransactionManager}.
- * Erwartete Werte baut der Test selbst auf, nicht mit der {@link Mapping}.
+ * Bridge to {@code features/letters/save-letter-via-api.feature}: one test per scenario, named after the scenario
+ * title. The use case is a fake; the {@link FakeTransactionManager} manages the transactions. The test builds expected
+ * values itself, not with {@link Mapping}.
  */
 class ApiSaveLetterTest {
 
@@ -40,11 +40,11 @@ class ApiSaveLetterTest {
     private static final UUID LETTERHEAD = UUID.fromString("00000000-0000-0000-0000-000000000003");
     private static final Instant CREATED = Instant.parse("2026-11-24T10:00:00Z");
 
-    // Grundlage: Erika hat eine Vorschau der Mahnung in Version 2 zum Kunden 4711 erzeugt.
+    // Background: Erika has created a preview of the payment reminder in version 2 for customer 4711.
     private final UUID previewOfErika = UUID.randomUUID();
     private final Letter fromThePreview = Letter.restore(new LetterId(LETTER),
             new SnapshotId(previewOfErika),
-            new dieterbaier.letterwright.domain.model.BusinessReference("Kunde", "4711"),
+            new dieterbaier.letterwright.domain.model.BusinessReference("Customer", "4711"),
             new VersionReference(new TemplateId(LETTERHEAD), VersionNumber.FIRST),
             new VersionReference(new TemplateId(REMINDER), new VersionNumber(2)), new DocumentReference("store/1"),
             Checksum.of(new byte[] {1}), CREATED, new LetterState.Visible());
@@ -60,7 +60,7 @@ class ApiSaveLetterTest {
     }
 
     private static final SavedLetter EXPECTED = new SavedLetter(LETTER,
-            new BusinessReference("Kunde", "4711"), new LetterTemplateVersion(REMINDER, 2), "erika", CREATED);
+            new BusinessReference("Customer", "4711"), new LetterTemplateVersion(REMINDER, 2), "erika", CREATED);
 
     @Test
     void theHostReceivesTheIdentifiersOfTheSavedLetter() {
@@ -94,7 +94,7 @@ class ApiSaveLetterTest {
             case "SnapshotExpired" -> new SaveResult.SnapshotExpired();
             case "NotAllowed" -> new SaveResult.NotAllowed();
             case "DataContextChanged" -> new SaveResult.DataContextChanged();
-            default -> new SaveResult.NotConformant(List.of("PDF/UA-1: Bild ohne Alternativtext"));
+            default -> new SaveResult.NotConformant(List.of("PDF/UA-1: Image without alternative text"));
         });
     }
 
@@ -102,8 +102,8 @@ class ApiSaveLetterTest {
     void savingJoinsTheHostsTransaction() {
         host.executeWithoutResult(status -> api.save("erika", previewOfErika));
 
-        assertThat(transactions.ranAtInvocation).as("in der Transaktion des Hosts").isTrue();
-        assertThat(transactions.openedAtInvocation).as("keine weitere Transaktion").isEqualTo(1);
+        assertThat(transactions.ranAtInvocation).as("in the host's transaction").isTrue();
+        assertThat(transactions.openedAtInvocation).as("no further transaction").isEqualTo(1);
         assertThat(transactions.opened).isEqualTo(1);
         assertThat(transactions.committed).isEqualTo(1);
     }
@@ -125,7 +125,7 @@ class ApiSaveLetterTest {
         var result = host.execute(status -> api.save("erika", previewOfErika));
 
         assertThat(result).isEqualTo(new SaveResult.NotAllowed());
-        assertThat(transactions.rollbackOnly).as("nicht rollback-only").isFalse();
+        assertThat(transactions.rollbackOnly).as("not rollback-only").isFalse();
         assertThat(transactions.committed).isEqualTo(1);
         assertThat(transactions.rolledBack).isZero();
     }
@@ -133,11 +133,11 @@ class ApiSaveLetterTest {
     @Test
     void aTechnicalErrorRollsBackTheHostsTransaction() {
         useCase.result = () -> {
-            throw new IllegalStateException("veraPDF nicht erreichbar");
+            throw new IllegalStateException("veraPDF unreachable");
         };
         List<RuntimeException> errorAtHost = new ArrayList<>();
 
-        // Der Host fängt den Fehler und versucht trotzdem zu committen.
+        // The host catches the error and tries to commit anyway.
         assertThatThrownBy(() -> host.executeWithoutResult(status -> {
             try {
                 api.save("erika", previewOfErika);
@@ -147,7 +147,7 @@ class ApiSaveLetterTest {
         })).isInstanceOf(UnexpectedRollbackException.class);
 
         assertThat(errorAtHost).singleElement().extracting(Throwable::getMessage)
-                .isEqualTo("veraPDF nicht erreichbar");
+                .isEqualTo("veraPDF unreachable");
         assertThat(transactions.rollbackOnly).isTrue();
         assertThat(transactions.committed).isZero();
         assertThat(transactions.rolledBack).isEqualTo(1);
@@ -171,7 +171,7 @@ class ApiSaveLetterTest {
     void anInvalidUserIdRollsBackTheHostsTransaction() {
         List<RuntimeException> errorAtHost = new ArrayList<>();
 
-        // Der Host fängt den Fehler und versucht trotzdem zu committen.
+        // The host catches the error and tries to commit anyway.
         assertThatThrownBy(() -> host.executeWithoutResult(status -> {
             try {
                 api.save(" ", previewOfErika);
@@ -181,21 +181,21 @@ class ApiSaveLetterTest {
         })).isInstanceOf(UnexpectedRollbackException.class);
 
         assertThat(errorAtHost).singleElement().extracting(Throwable::getMessage).asString()
-                .contains("Benutzerkennung");
+                .contains("The user ID");
         assertThat(useCase.invocations).isEmpty();
         assertThat(transactions.rollbackOnly).isTrue();
         assertThat(transactions.committed).isZero();
         assertThat(transactions.rolledBack).isEqualTo(1);
     }
 
-    /** Kein Szenario: Die Java-API ist ohne Rückruf verdrahtet (ADR-023). Kommt die Ablehnung doch, rollt sie zurück. */
+    /** Not a scenario: the Java API is wired without a callback (ADR-023). If the rejection occurs anyway, it rolls back. */
     @Test
     void aRejectionByTheCallbackIsAWiringError() {
         useCase.result = () -> new dieterbaier.letterwright.usecases.in.SaveResult
-                .RejectedByHost("Die Aufgabe ist bereits erledigt");
+                .RejectedByHost("The task is already done");
 
         assertThatThrownBy(() -> host.executeWithoutResult(status -> api.save("erika", previewOfErika)))
-                .isInstanceOf(IllegalStateException.class).hasMessageContaining("keinen Rückruf");
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("no callback");
         assertThat(transactions.committed).isZero();
         assertThat(transactions.rolledBack).isEqualTo(1);
     }
@@ -211,21 +211,21 @@ class ApiSaveLetterTest {
             case "DataContextChanged" -> new dieterbaier.letterwright.usecases.in.SaveResult
                     .DataContextChanged();
             case "NotConformant" -> new dieterbaier.letterwright.usecases.in.SaveResult.NotConformant(
-                    List.of("PDF/UA-1: Bild ohne Alternativtext"));
+                    List.of("PDF/UA-1: Image without alternative text"));
             default -> throw new IllegalArgumentException(rejection);
         };
     }
 
     private record Invocation(UserId user, SnapshotId snapshot) {}
 
-    /** Attrappe des eingehenden Ports; merkt sich die Aufrufe und ob dabei eine Transaktion lief. */
+    /** Fake of the inbound port; records the calls and whether a transaction was running at the time. */
     private static final class UseCase
             implements dieterbaier.letterwright.usecases.in.SaveLetter {
 
         private final FakeTransactionManager transactions;
         final List<Invocation> invocations = new ArrayList<>();
         Supplier<dieterbaier.letterwright.usecases.in.SaveResult> result = () -> {
-            throw new IllegalStateException("kein Ergebnis vorbereitet");
+            throw new IllegalStateException("no result prepared");
         };
 
         UseCase(FakeTransactionManager transactions) {

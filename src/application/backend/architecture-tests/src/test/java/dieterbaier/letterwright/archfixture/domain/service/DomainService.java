@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.domain.service;
 
-/** Fixture: ein regelkonformer Domänenservice. */
+/** Fixture: a compliant domain service. */
 public class DomainService {
 }

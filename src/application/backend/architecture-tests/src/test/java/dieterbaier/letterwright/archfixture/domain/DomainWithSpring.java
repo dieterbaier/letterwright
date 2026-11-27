@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.domain;
 
 import org.springframework.stereotype.Component;
 
-/** Fixture: absichtlicher Verstoß, eine Domänenklasse mit Spring-Abhängigkeit. */
+/** Fixture: deliberate violation, a domain class with a Spring dependency. */
 @Component
 public class DomainWithSpring {
 }

@@ -12,15 +12,15 @@ class CallbackResultTest {
 
     @Test
     void aRejectionCarriesItsReason() {
-        assertThat(CallbackResult.rejected("Aufgabe ist bereits erledigt"))
-                .isEqualTo(new CallbackResult.Rejected("Aufgabe ist bereits erledigt"));
+        assertThat(CallbackResult.rejected("Task is already done"))
+                .isEqualTo(new CallbackResult.Rejected("Task is already done"));
     }
 
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", " "})
     void aRejectionWithoutReasonIsNotAllowed(String reason) {
-        rejects(() -> CallbackResult.rejected(reason), "Grund der Ablehnung");
+        rejects(() -> CallbackResult.rejected(reason), "reason for the rejection");
     }
 
     @Test

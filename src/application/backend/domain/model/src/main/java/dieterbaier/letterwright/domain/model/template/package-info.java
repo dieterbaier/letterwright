@@ -1,6 +1,6 @@
 /**
- * Die Aggregate Briefpapier und Standardschreiben mit ihren Vorlagenversionen. Beide folgen denselben
- * Versionsregeln; die Versionsfolge, die sie durchsetzt, ist paketintern.
+ * The letterhead and letter template aggregates with their template versions. Both follow the same version rules; the
+ * version sequence that enforces them is package-private.
  */
 @NullMarked
 package dieterbaier.letterwright.domain.model.template;

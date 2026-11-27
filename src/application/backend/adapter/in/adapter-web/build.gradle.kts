@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Eingehender Adapter: REST-Endpunkte (ADR-002). Kennt nur die eingehenden Ports."
+description = "Inbound adapter: REST endpoints (ADR-002). Knows only the inbound ports."
 
 dependencies {
     implementation(project(":usecases-in"))

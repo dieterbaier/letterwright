@@ -1,7 +1,7 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Anfrage an die {@link AuthorizationCheck}. Es gibt genau drei Arten, und ein Host unterscheidet sie mit
+ * A request to the {@link AuthorizationCheck}. There are exactly three kinds, and a host distinguishes them with
  * {@code switch}:
  *
  * <pre>{@code
@@ -12,62 +12,62 @@ package dieterbaier.letterwright.spi;
  * };
  * }</pre>
  *
- * <p>Zum Erzeugen eines Schreibens kennt der Host das Standardschreiben. So kann er je Einstiegspunkt festlegen, welche
- * Standardschreiben zu welchem Bezug zulässig sind. Dass der Bezugstyp zum Standardschreiben passt, hat die Bibliothek
- * vorher schon geprüft.
+ * <p>When a letter is created, the host knows the letter template. This lets it decide per entry point which letter
+ * templates are allowed for which reference. The library has already checked beforehand that the reference type
+ * matches the letter template.
  */
 public sealed interface AuthorizationRequest {
 
-    /** Der angemeldete Benutzer, wie ihn die Spring Security des Hosts kennt. */
+    /** The signed-in user as the host's Spring Security knows them. */
     String userId();
 
-    /** Darf der Benutzer diese Handlung an Briefpapier und Standardschreiben ausführen? */
+    /** May the user perform this action on letterheads and letter templates? */
     static AuthorizationRequest forTemplates(String userId, TemplateAction action) {
         return new ForTemplates(userId, action);
     }
 
-    /** Darf der Benutzer diese Handlung an den gespeicherten Schreiben zu diesem fachlichen Bezug ausführen? */
+    /** May the user perform this action on the saved letters for this business reference? */
     static AuthorizationRequest forLetter(String userId, LetterAction action, BusinessReference reference) {
         return new ForLetter(userId, action, reference);
     }
 
     /**
-     * Darf der Benutzer aus diesem Standardschreiben zu diesem fachlichen Bezug ein Schreiben erzeugen? Gefragt wird beim
-     * Erzeugen der Vorschau und erneut beim Speichern.
+     * May the user create a letter from this letter template for this business reference? The library asks when the
+     * preview is created and again when the letter is saved.
      */
     static AuthorizationRequest forCreation(
             String userId, BusinessReference reference, LetterTemplateId letterTemplate) {
         return new ForCreation(userId, reference, letterTemplate);
     }
 
-    /** Siehe {@link #forTemplates(String, TemplateAction)}. */
+    /** See {@link #forTemplates(String, TemplateAction)}. */
     record ForTemplates(String userId, TemplateAction action) implements AuthorizationRequest {
 
         public ForTemplates {
-            Require.text(userId, "Die Benutzerkennung");
-            Require.value(action, "Die Aktion");
+            Require.text(userId, "The user ID");
+            Require.value(action, "The action");
         }
     }
 
-    /** Siehe {@link #forLetter(String, LetterAction, BusinessReference)}. */
+    /** See {@link #forLetter(String, LetterAction, BusinessReference)}. */
     record ForLetter(String userId, LetterAction action, BusinessReference reference)
             implements AuthorizationRequest {
 
         public ForLetter {
-            Require.text(userId, "Die Benutzerkennung");
-            Require.value(action, "Die Aktion");
-            Require.value(reference, "Der fachliche Bezug");
+            Require.text(userId, "The user ID");
+            Require.value(action, "The action");
+            Require.value(reference, "The business reference");
         }
     }
 
-    /** Siehe {@link #forCreation(String, BusinessReference, LetterTemplateId)}. */
+    /** See {@link #forCreation(String, BusinessReference, LetterTemplateId)}. */
     record ForCreation(String userId, BusinessReference reference, LetterTemplateId letterTemplate)
             implements AuthorizationRequest {
 
         public ForCreation {
-            Require.text(userId, "Die Benutzerkennung");
-            Require.value(reference, "Der fachliche Bezug");
-            Require.value(letterTemplate, "Das Standardschreiben");
+            Require.text(userId, "The user ID");
+            Require.value(reference, "The business reference");
+            Require.value(letterTemplate, "The letter template");
         }
     }
 }

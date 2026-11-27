@@ -14,7 +14,7 @@ class UserIdTest {
     @NullSource
     @ValueSource(strings = {"", " ", "\t"})
     void rejectsMissingEmptyAndBlankValues(String value) {
-        rejects(() -> new UserId(value), "Benutzerkennung");
+        rejects(() -> new UserId(value), "user ID");
     }
 
     @Test

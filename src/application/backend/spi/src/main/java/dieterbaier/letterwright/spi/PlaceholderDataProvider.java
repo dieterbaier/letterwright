@@ -1,13 +1,13 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Liefert die Werte für die Platzhalter eines Standardschreibens. Der Host implementiert diese Schnittstelle als Bean.
+ * Delivers the values for the placeholders of a letter template. The host implements this interface as a bean.
  *
- * <p>Die Bibliothek ruft sie beim Erzeugen der Vorschau und erneut beim Speichern auf. Ändern sich die Werte dazwischen,
- * verlangt sie eine neue Vorschau (ADR-007). Gleiche Daten sollten deshalb zu gleichen Werten führen.
+ * <p>The library calls it when the preview is created and again when the letter is saved. If the values change in
+ * between, it demands a new preview (ADR-007). The same data should therefore lead to the same values.
  */
 public interface PlaceholderDataProvider {
 
-    /** Die bereits formatierten Werte. Gibt es keine Werte, ein leerer Datenkontext. */
+    /** The already formatted values. If there are no values, an empty data context. */
     DataContext dataContext(DataRequest request);
 }

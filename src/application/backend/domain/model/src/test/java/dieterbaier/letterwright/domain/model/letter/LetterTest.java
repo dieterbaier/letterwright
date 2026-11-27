@@ -40,7 +40,7 @@ class LetterTest {
         assertThat(letter.document()).isEqualTo(document);
         assertThat(letter.pdfChecksum()).isEqualTo(pdf);
         assertThat(letter.created()).isEqualTo(saved);
-        assertThat(letter.isVisible()).as("ein neues Schreiben ist sichtbar").isTrue();
+        assertThat(letter.isVisible()).as("a new letter is visible").isTrue();
         assertThat(created.consumedSnapshot()).isEqualTo(snapshot);
         assertThat(created.consumedSnapshot().state()).isInstanceOf(SnapshotState.Consumed.class);
     }
@@ -52,7 +52,7 @@ class LetterTest {
 
         assertThatIllegalStateException()
                 .isThrownBy(() -> Letter.fromSnapshot(LetterId.generate(), consumed, document, pdf, NOW))
-                .withMessageContaining("schon ein Schreiben");
+                .withMessageContaining("already created");
     }
 
     @Test
@@ -66,23 +66,23 @@ class LetterTest {
     void requiredAttributes() {
         LetterId id = LetterId.generate();
 
-        rejects(() -> Letter.fromSnapshot(id, null, document, pdf, NOW), "Snapshot");
-        rejects(() -> Letter.fromSnapshot(id, snapshot, document, pdf, null), "Zeitpunkt");
-        rejects(() -> Letter.fromSnapshot(null, snapshot, document, pdf, NOW), "ID des Schreibens");
-        rejects(() -> Letter.fromSnapshot(id, snapshot, null, pdf, NOW), "Dokumentverweis des Schreibens");
-        rejects(() -> Letter.fromSnapshot(id, snapshot, document, null, NOW), "Prüfsumme des PDFs");
+        rejects(() -> Letter.fromSnapshot(id, null, document, pdf, NOW), "snapshot");
+        rejects(() -> Letter.fromSnapshot(id, snapshot, document, pdf, null), "time");
+        rejects(() -> Letter.fromSnapshot(null, snapshot, document, pdf, NOW), "ID of the letter");
+        rejects(() -> Letter.fromSnapshot(id, snapshot, null, pdf, NOW), "document reference of the letter");
+        rejects(() -> Letter.fromSnapshot(id, snapshot, document, null, NOW), "checksum of the PDF");
         rejects(() -> Letter.restore(id, null, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3, document,
-                pdf, NOW, VISIBLE), "Snapshot des Schreibens");
+                pdf, NOW, VISIBLE), "snapshot of the letter");
         rejects(() -> Letter.restore(id, snapshot.id(), null, LETTERHEAD_V1, LETTER_TEMPLATE_V3,
-                document, pdf, NOW, VISIBLE), "fachliche Bezug des Schreibens");
+                document, pdf, NOW, VISIBLE), "business reference of the letter");
         rejects(() -> Letter.restore(id, snapshot.id(), CUSTOMER, null, LETTER_TEMPLATE_V3, document, pdf,
-                NOW, VISIBLE), "Letterhead-Version");
+                NOW, VISIBLE), "letterhead version");
         rejects(() -> Letter.restore(id, snapshot.id(), CUSTOMER, LETTERHEAD_V1, null, document, pdf, NOW,
-                VISIBLE), "LetterTemplate-Version");
+                VISIBLE), "letter template version");
         rejects(() -> Letter.restore(id, snapshot.id(), CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3,
-                document, pdf, null, VISIBLE), "Erstellungszeitpunkt");
+                document, pdf, null, VISIBLE), "creation time");
         rejects(() -> Letter.restore(id, snapshot.id(), CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3,
-                document, pdf, NOW, null), "Zustand des Schreibens");
+                document, pdf, NOW, null), "state of the letter");
     }
 
     @Test
@@ -112,7 +112,7 @@ class LetterTest {
         assertThat(result.document()).isEqualTo(document);
         assertThat(result.pdfChecksum()).isEqualTo(pdf);
         assertThat(result.created()).isEqualTo(NOW);
-        assertThat(letter.isVisible()).as("das Original bleibt unverändert").isTrue();
+        assertThat(letter.isVisible()).as("the original stays unchanged").isTrue();
     }
 
     @Test
@@ -121,8 +121,8 @@ class LetterTest {
                 .logicallyDeleted(NOW);
 
         assertThatIllegalStateException().isThrownBy(() -> deleted.logicallyDeleted(NOW))
-                .withMessageContaining("schon logisch gelöscht");
+                .withMessageContaining("already logically deleted");
         rejects(() -> Letter.fromSnapshot(LetterId.generate(), TestData.snapshot(), document, pdf, NOW).letter()
-                .logicallyDeleted(null), "Zeitpunkt");
+                .logicallyDeleted(null), "time");
     }
 }

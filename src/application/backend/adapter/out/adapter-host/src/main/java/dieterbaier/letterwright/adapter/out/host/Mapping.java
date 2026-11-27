@@ -17,8 +17,8 @@ import dieterbaier.letterwright.spi.LetterTemplateVersion;
 import dieterbaier.letterwright.validation.ValidationException;
 
 /**
- * Bildet zwischen den Typen des SPI und denen des Domänenmodells ab, in beide Richtungen (ADR-016). Die Typen tragen
- * dieselben Fachbegriffe; die SPI-Typen sind hier voll qualifiziert, die Domänentypen importiert.
+ * Maps between the types of the SPI and those of the domain model, in both directions (ADR-016). The types carry the
+ * same domain terms; the SPI types are fully qualified here, the domain types are imported.
  */
 final class Mapping {
 
@@ -71,16 +71,16 @@ final class Mapping {
     }
 
     /**
-     * Übernimmt die Werte des Hosts ins Domänenmodell, das sie prüft.
+     * Takes the host's values over into the domain model, which checks them.
      *
-     * @throws HostVertragVerletzt wenn die Werte die Regeln des Datenkontexts verletzen
+     * @throws HostContractViolated if the values violate the rules of the data context
      */
     static DataContext toDomain(dieterbaier.letterwright.spi.DataContext dataContext) {
         try {
             return DataContext.from(dataContext.values());
         } catch (ValidationException error) {
-            throw new HostContractViolated("Der PlatzhalterdatenAnbieter des Hosts hat einen ungültigen Datenkontext"
-                    + " geliefert: " + error.getMessage(), error);
+            throw new HostContractViolated("The PlaceholderDataProvider of the host delivered an invalid"
+                    + " DataContext: " + error.getMessage(), error);
         }
     }
 
@@ -102,8 +102,8 @@ final class Mapping {
     }
 
     /**
-     * Das Schreiben selbst führt keine Benutzerkennung. Der Rückruf läuft nur bei einer Neuanlage, und angelegt wird nur
-     * aus einem eigenen Snapshot des Benutzers; der aufrufende Benutzer hat das Schreiben also erzeugt.
+     * The letter itself does not carry a user ID. The callback runs only on creation, and a letter is created only from
+     * the user's own snapshot; the calling user has therefore created the letter.
      */
     static SavedLetter savedLetter(UserId user, Letter letter) {
         return new SavedLetter(letter.id().value(), toSpi(letter.reference()),

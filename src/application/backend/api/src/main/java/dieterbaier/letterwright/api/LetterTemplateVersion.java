@@ -3,18 +3,18 @@ package dieterbaier.letterwright.api;
 import java.util.UUID;
 
 /**
- * Die Version des Standardschreibens, aus der das Schreiben entstand. Versionen sind unveränderlich; die ID bleibt über
- * alle Versionen eines Standardschreibens gleich.
+ * The version of the letter template the letter was created from. Versions are immutable; the ID stays the same across
+ * all versions of a letter template.
  *
- * @param id die ID des Standardschreibens
- * @param number die laufende Nummer der Version, beginnend bei 1
+ * @param id the ID of the letter template
+ * @param number the sequential number of the version, starting at 1
  */
 public record LetterTemplateVersion(UUID id, int number) {
 
     public LetterTemplateVersion {
-        Require.value(id, "Die ID des Standardschreibens");
+        Require.value(id, "The ID of the letter template");
         if (number < 1) {
-            throw new IllegalArgumentException("Die Versionsnummer muss mindestens 1 sein, ist aber " + number);
+            throw new IllegalArgumentException("The version number must be at least 1, but is " + number);
         }
     }
 }

@@ -1,8 +1,8 @@
 package dieterbaier.letterwright.usecases.out;
 
 /**
- * Prüft ein PDF auf PDF/A-2b und PDF/UA-1 (ADR-005). Implementiert von {@code adapter-rendering}. Kann der Prüfer nicht
- * prüfen, wirft er eine Ausnahme; das zählt nie als konform.
+ * Checks a PDF for PDF/A-2b and PDF/UA-1 (ADR-005). Implemented by {@code adapter-rendering}. If the checker cannot
+ * check, it throws an exception; that never counts as conformant.
  */
 public interface ConformanceChecker {
 

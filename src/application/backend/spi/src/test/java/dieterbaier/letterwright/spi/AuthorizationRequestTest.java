@@ -11,30 +11,30 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class AuthorizationRequestTest {
 
-    private static final BusinessReference CUSTOMER = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER = new BusinessReference("Customer", "4711");
     private static final LetterTemplateId REMINDER =
-            new LetterTemplateId(UUID.randomUUID(), "Mahnung");
+            new LetterTemplateId(UUID.randomUUID(), "Payment reminder");
 
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", " ", "\t"})
     void theUserIdRejectsMissingEmptyAndBlankValues(String value) {
-        rejects(() -> AuthorizationRequest.forLetter(value, LetterAction.VIEW, CUSTOMER), "Die Benutzerkennung");
-        rejects(() -> AuthorizationRequest.forCreation(value, CUSTOMER, REMINDER), "Die Benutzerkennung");
-        rejects(() -> AuthorizationRequest.forTemplates(value, TemplateAction.EDIT), "Die Benutzerkennung");
+        rejects(() -> AuthorizationRequest.forLetter(value, LetterAction.VIEW, CUSTOMER), "The user ID");
+        rejects(() -> AuthorizationRequest.forCreation(value, CUSTOMER, REMINDER), "The user ID");
+        rejects(() -> AuthorizationRequest.forTemplates(value, TemplateAction.EDIT), "The user ID");
     }
 
     @Test
     void theActionIsRequired() {
-        rejects(() -> AuthorizationRequest.forLetter("erika", null, CUSTOMER), "Die Aktion");
-        rejects(() -> AuthorizationRequest.forTemplates("erika", null), "Die Aktion");
+        rejects(() -> AuthorizationRequest.forLetter("erika", null, CUSTOMER), "The action");
+        rejects(() -> AuthorizationRequest.forTemplates("erika", null), "The action");
     }
 
     @Test
     void aRequestForALetterNeedsAReference() {
-        rejects(() -> AuthorizationRequest.forLetter("erika", LetterAction.VIEW, null), "Der fachliche Bezug");
-        rejects(() -> AuthorizationRequest.forCreation("erika", null, REMINDER), "Der fachliche Bezug");
-        rejects(() -> AuthorizationRequest.forCreation("erika", CUSTOMER, null), "Das Standardschreiben");
+        rejects(() -> AuthorizationRequest.forLetter("erika", LetterAction.VIEW, null), "The business reference");
+        rejects(() -> AuthorizationRequest.forCreation("erika", null, REMINDER), "The business reference");
+        rejects(() -> AuthorizationRequest.forCreation("erika", CUSTOMER, null), "The letter template");
     }
 
     @Test

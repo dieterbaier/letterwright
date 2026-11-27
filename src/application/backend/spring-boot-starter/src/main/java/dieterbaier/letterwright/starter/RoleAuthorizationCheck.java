@@ -8,15 +8,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Default-{@link AuthorizationCheck} auf Spring Security: Erlaubt ist eine Aktion, wenn der angemeldete Benutzer der
- * angefragte ist und die Authority der Aktion hat (siehe {@link AuthorizationProperties}).
+ * Default {@link AuthorizationCheck} on Spring Security: an action is allowed if the logged-in user is the requested
+ * one and has the authority of the action (see {@link AuthorizationProperties}).
  *
- * <p>Ein anonymer Zugriff gilt nicht als Anmeldung, auch wenn Spring Security ihn als authentifiziert führt und seine
- * Authority auf eine Aktion abgebildet ist. Was anonym ist, entscheidet der {@link AuthenticationTrustResolver} des
- * Hosts, sofern er einen als Bean bereitstellt.
+ * <p>An anonymous access does not count as a login, even if Spring Security treats it as authenticated and its
+ * authority is mapped to an action. What is anonymous is decided by the host's {@link AuthenticationTrustResolver},
+ * if it provides one as a bean.
  *
- * <p>Den fachlichen Bezug wertet sie nicht aus. Wer Schreiben nach Bezug sichtbar machen will, etwa nur die eigenen
- * Kunden, stellt eine eigene Bean bereit; dann tritt diese zurück.
+ * <p>It does not evaluate the business reference. Whoever wants to make letters visible by reference, for example
+ * only one's own customers, provides a bean of their own; then this one steps back.
  */
 final class RoleAuthorizationCheck implements AuthorizationCheck {
 

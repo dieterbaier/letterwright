@@ -1,4 +1,4 @@
-// erwartet: RequireExplicitNullMarking
+// expected: RequireExplicitNullMarking
 package proof;
 
 class Unmarked {

@@ -34,17 +34,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Brücke zu {@code features/letter/letter-speichern.feature} und den ersten vier Szenarien von
- * {@code features/letter/callback-nach-dem-speichern.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die Vorschau entsteht mit dem echten Anwendungsfall, damit Snapshot und Speichern zusammenpassen; die
- * ausgehenden Ports sind {@link Fakes}.
+ * Bridge to {@code features/letters/save-letter.feature} and the first four scenarios of
+ * {@code features/letters/letter-save-callback.feature}: one test per scenario, named after the scenario title. The
+ * preview is created with the real use case so that snapshot and save fit together; the outbound ports are
+ * {@link Fakes}.
  */
 class SaveLetterServiceTest {
 
     private static final Instant PREVIEW = Instant.parse("2026-11-22T10:00:00Z");
     private static final UserId ERIKA = new UserId("erika");
     private static final UserId MAX = new UserId("max");
-    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Customer", "4711");
 
     private final Fakes.Templates templates = new Fakes.Templates();
     private final Fakes.Host host = new Fakes.Host();
@@ -52,19 +52,19 @@ class SaveLetterServiceTest {
     private final Fakes.Renderer renderer = new Fakes.Renderer();
     private final Fakes.Checker checker = new Fakes.Checker();
     private final Fakes.Documents documents = new Fakes.Documents();
-    private final Fakes.LetterStore letter = new Fakes.LetterStore(snapshots);
+    private final Fakes.LetterStore letters = new Fakes.LetterStore(snapshots);
     private final Fakes.Callback callback = new Fakes.Callback();
     private final Fakes.StoppedClock clock = new Fakes.StoppedClock(PREVIEW);
     private final CreatePreviewService preview = new CreatePreviewService(templates, host, host, renderer, snapshots, clock);
     private final SaveLetterService saving = new SaveLetterService(snapshots, templates, host, host, renderer,
-            checker, documents, letter, callback, clock);
+            checker, documents, letters, callback, clock);
 
     private final Letterhead letterhead = templates.store(
             Letterhead.createWithDefaultType(TemplateId.generate(), "Standard", "<header/>").publishDraft());
-    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Mahnung",
-            letterhead.id(), "Kunde", "<p>{{name}}</p>").publishDraft());
+    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Payment reminder",
+            letterhead.id(), "Customer", "<p>{{name}}</p>").publishDraft());
 
-    // Grundlage: Erika hat vor 10 Minuten eine Vorschau erzeugt, darf erzeugen, der Host liefert dieselben Daten.
+    // Background: Erika created a preview 10 minutes ago, may create, and the host provides the same data.
     private final SnapshotId previewOfErika = createPreview(ERIKA);
 
     {
@@ -77,10 +77,10 @@ class SaveLetterServiceTest {
     void anUnchangedPreviewSavesTheCheckedPdf() {
         var result = saving.save(ERIKA, previewOfErika);
 
-        Letter saved = letter.saved.get(previewOfErika);
+        Letter saved = letters.saved.get(previewOfErika);
         assertThat(result).isEqualTo(new SaveResult.Saved(saved));
         Snapshot snapshot = snapshots.load(previewOfErika).orElseThrow();
-        assertThat(snapshot.state()).as("Datenkontext freigegeben").isEqualTo(new SnapshotState.Consumed());
+        assertThat(snapshot.state()).as("data context released").isEqualTo(new SnapshotState.Consumed());
         assertThat(saved.letterhead()).isEqualTo(snapshot.letterhead());
         assertThat(saved.letterTemplate()).isEqualTo(snapshot.letterTemplate());
         assertThat(saved.reference()).isEqualTo(CUSTOMER_4711);
@@ -104,23 +104,23 @@ class SaveLetterServiceTest {
 
     @Test
     void aNonConformantPdfIsNotSaved() {
-        checker.result = pdf -> Conformance.notConformant(List.of("PDF/UA-1: Bild ohne Alternativtext"));
+        checker.result = pdf -> Conformance.notConformant(List.of("PDF/UA-1: Image without alternative text"));
 
         var result = saving.save(ERIKA, previewOfErika);
 
         assertThat(result)
-                .isEqualTo(new SaveResult.NotConformant(List.of("PDF/UA-1: Bild ohne Alternativtext")));
+                .isEqualTo(new SaveResult.NotConformant(List.of("PDF/UA-1: Image without alternative text")));
         nothingSavedOrStored();
     }
 
     @Test
     void anUncheckablePdfIsNotSaved() {
         checker.result = pdf -> {
-            throw new IllegalStateException("veraPDF nicht erreichbar");
+            throw new IllegalStateException("veraPDF not reachable");
         };
 
         assertThatThrownBy(() -> saving.save(ERIKA, previewOfErika))
-                .hasMessageContaining("veraPDF nicht erreichbar");
+                .hasMessageContaining("veraPDF not reachable");
         nothingSavedOrStored();
     }
 
@@ -144,7 +144,7 @@ class SaveLetterServiceTest {
         var result = saving.save(ERIKA, updated.snapshot());
 
         assertThat(result).isInstanceOf(SaveResult.Saved.class);
-        Letter saved = letter.saved.get(updated.snapshot());
+        Letter saved = letters.saved.get(updated.snapshot());
         assertThat(new String(documents.stored.get(saved.document()), StandardCharsets.UTF_8))
                 .contains("Erika Musterfrau AG");
     }
@@ -180,7 +180,7 @@ class SaveLetterServiceTest {
 
         var again = saving.save(ERIKA, previewOfErika);
 
-        // Then: dasselbe Schreiben, ohne Datenkontext und ohne neues PDF
+        // Then: the same letter, without data context and without a new PDF
         assertThat(again).isEqualTo(new SaveResult.AlreadySaved(first.letter()));
         assertThat(host.dataContextRequested).isZero();
         assertThat(renderer.pdfs).isEqualTo(1);
@@ -189,31 +189,31 @@ class SaveLetterServiceTest {
 
     @Test
     void ifTheOutcomeOfSavingIsUncertainThePdfIsKept() {
-        // Given: Die Persistenz speichert, aber die Bestätigung geht verloren
-        letter.after = Optional.of(new IllegalStateException("Verbindung abgebrochen"));
+        // Given: the persistence saves, but the acknowledgement is lost
+        letters.after = Optional.of(new IllegalStateException("Connection lost"));
 
-        // When: Erika speichert; das Speichern schlägt mit einem Fehler fehl
+        // When: Erika saves; the save fails with an error
         assertThatThrownBy(() -> saving.save(ERIKA, previewOfErika))
-                .hasMessageContaining("Verbindung abgebrochen");
+                .hasMessageContaining("Connection lost");
 
-        // Then: Das PDF ist noch abgelegt; eine Wiederholung liefert das Schreiben mit genau diesem PDF
-        letter.after = Optional.empty();
+        // Then: the PDF is still stored; a retry returns the letter with exactly this PDF
+        letters.after = Optional.empty();
         var again = (SaveResult.AlreadySaved) saving.save(ERIKA, previewOfErika);
-        Letter saved = letter.saved.get(previewOfErika);
+        Letter saved = letters.saved.get(previewOfErika);
         assertThat(again.letter()).isEqualTo(saved);
         assertThat(documents.stored).containsOnlyKeys(saved.document());
     }
 
     @Test
     void ifErikaSavesWhileUpdatingThePreviewARepetitionFindsTheLetter() {
-        // Given: Das Aktualisieren hat den offenen Snapshot gelesen; vor dem Löschen speichert eine andere Anfrage
+        // Given: the update has read the open snapshot; before the deletion, another request saves
         SaveResult[] concurrent = new SaveResult[1];
         snapshots.beforeDeletion = () -> concurrent[0] = saving.save(ERIKA, previewOfErika);
 
-        // When: Das Aktualisieren will den bisherigen Snapshot löschen
+        // When: the update wants to delete the previous snapshot
         preview.update(ERIKA, CUSTOMER_4711, reminder.id(), previewOfErika);
 
-        // Then: Der verbrauchte Snapshot bleibt; eine Wiederholung des Speicherns findet das Schreiben
+        // Then: the consumed snapshot stays; a retry of the save finds the letter
         var saved = (SaveResult.Saved) concurrent[0];
         assertThat(snapshots.deleted).isEmpty();
         assertThat(saving.save(ERIKA, previewOfErika))
@@ -222,29 +222,29 @@ class SaveLetterServiceTest {
 
     @Test
     void ifAConcurrentPreviewReplacesTheSnapshotNothingIsSaved() {
-        // Given: Während Erika speichert, ersetzt sie die Vorschau in einem anderen Tab
-        letter.before = () -> preview.update(ERIKA, CUSTOMER_4711, reminder.id(), previewOfErika);
+        // Given: while Erika saves, she replaces the preview in another tab
+        letters.before = () -> preview.update(ERIKA, CUSTOMER_4711, reminder.id(), previewOfErika);
 
         var result = saving.save(ERIKA, previewOfErika);
 
-        // Then: kein Schreiben, kein verwaistes PDF; gespeichert wird aus der neuen Vorschau
+        // Then: no letter, no orphaned PDF; saving happens from the new preview
         assertThat(result).isInstanceOf(SaveResult.SnapshotUnknown.class);
-        assertThat(letter.saved).isEmpty();
+        assertThat(letters.saved).isEmpty();
         assertThat(documents.stored).isEmpty();
     }
 
     @Test
     void concurrentSavingOfTheSamePreviewYieldsOneLetter() {
-        // Given: Eine zweite Anfrage verbraucht den Snapshot, während diese ihr PDF erzeugt
+        // Given: a second request consumes the snapshot while this one generates its PDF
         LetterFromSnapshot ofTheSecondRequest = Letter.fromSnapshot(LetterId.generate(),
-                snapshots.load(previewOfErika).orElseThrow(), new DocumentReference("store/zweite"),
+                snapshots.load(previewOfErika).orElseThrow(), new DocumentReference("store/second"),
                 Checksum.of(new byte[] {1}), clock.now);
-        letter.before = () -> letter.adopt(ofTheSecondRequest);
+        letters.before = () -> letters.adopt(ofTheSecondRequest);
 
         var result = saving.save(ERIKA, previewOfErika);
 
         assertThat(result).isEqualTo(new SaveResult.AlreadySaved(ofTheSecondRequest.letter()));
-        assertThat(letter.saved).containsOnly(Map.entry(previewOfErika, ofTheSecondRequest.letter()));
+        assertThat(letters.saved).containsOnly(Map.entry(previewOfErika, ofTheSecondRequest.letter()));
         assertThat(documents.stored).isEmpty();
     }
 
@@ -256,7 +256,7 @@ class SaveLetterServiceTest {
         var second = saving.save(ERIKA, newPreview);
 
         assertThat(second).isInstanceOf(SaveResult.Saved.class).isNotEqualTo(first);
-        assertThat(letter.saved).hasSize(2);
+        assertThat(letters.saved).hasSize(2);
     }
 
     @Test
@@ -267,7 +267,7 @@ class SaveLetterServiceTest {
         assertThat(saving.save(ERIKA, previewOfErika)).isInstanceOf(SaveResult.NotAllowed.class);
     }
 
-    @ParameterizedTest(name = "{0} gelöscht")
+    @ParameterizedTest(name = "{0} deleted")
     @ValueSource(strings = {"hard", "logical"})
     void ifTheLetterIsDeletedARepeatedSaveFindsNothing(String kind) {
         var saved = (SaveResult.Saved) saving.save(ERIKA, previewOfErika);
@@ -276,38 +276,38 @@ class SaveLetterServiceTest {
         var again = saving.save(ERIKA, previewOfErika);
 
         assertThat(again).isInstanceOf(SaveResult.SnapshotUnknown.class);
-        assertThat(renderer.pdfs).as("kein weiteres PDF").isEqualTo(1);
+        assertThat(renderer.pdfs).as("no further PDF").isEqualTo(1);
     }
 
-    @ParameterizedTest(name = "{0} gelöscht")
+    @ParameterizedTest(name = "{0} deleted")
     @ValueSource(strings = {"hard", "logical"})
     void ifTheLetterOfAConcurrentRequestIsDeletedNothingIsSaved(String kind) {
-        // Given: Eine zweite Anfrage speichert dieselbe Vorschau, ihr Schreiben wird gelöscht, bevor diese speichert
+        // Given: a second request saves the same preview, and its letter is deleted before this one saves
         byte[] pdfOfTheSecond = {1};
         LetterFromSnapshot ofTheSecondRequest = Letter.fromSnapshot(LetterId.generate(),
                 snapshots.load(previewOfErika).orElseThrow(), documents.put(pdfOfTheSecond),
                 Checksum.of(pdfOfTheSecond), clock.now);
-        letter.before = () -> {
-            letter.adopt(ofTheSecondRequest);
+        letters.before = () -> {
+            letters.adopt(ofTheSecondRequest);
             delete(ofTheSecondRequest.letter().id(), kind);
         };
 
         var result = saving.save(ERIKA, previewOfErika);
 
-        // Then: kein Schreiben, und das eigene PDF ist wieder entfernt
+        // Then: no letter, and its own PDF is removed again
         assertThat(result).isInstanceOf(SaveResult.SnapshotUnknown.class);
-        assertThat(letter.saved.values()).noneMatch(Letter::isVisible);
-        assertThat(documents.stored.keySet()).as("nur noch das PDF eines logisch gelöschten Schreibens")
+        assertThat(letters.saved.values()).noneMatch(Letter::isVisible);
+        assertThat(documents.stored.keySet()).as("only the PDF of a logically deleted letter remains")
                 .isSubsetOf(ofTheSecondRequest.letter().document());
     }
 
-    // Rückruf nach dem Speichern (rueckruf-nach-dem-speichern.feature)
+    // Letter save callback (letter-save-callback.feature)
 
     @Test
     void ifSavingCreatesALetterTheHostReceivesACallback() {
         var result = saving.save(ERIKA, previewOfErika);
 
-        Letter saved = letter.saved.get(previewOfErika);
+        Letter saved = letters.saved.get(previewOfErika);
         assertThat(result).isEqualTo(new SaveResult.Saved(saved));
         assertThat(callback.invocations).containsExactly(new Fakes.CallbackInvocation(ERIKA, saved));
     }
@@ -324,28 +324,28 @@ class SaveLetterServiceTest {
 
     @Test
     void theHostRejectsTheNewLetterWithAReason() {
-        callback.result = newOne -> CallbackResult.rejected("Die Aufgabe ist bereits erledigt");
+        callback.result = newOne -> CallbackResult.rejected("The task is already done");
 
         var result = saving.save(ERIKA, previewOfErika);
 
-        assertThat(result).isEqualTo(new SaveResult.RejectedByHost("Die Aufgabe ist bereits erledigt"));
+        assertThat(result).isEqualTo(new SaveResult.RejectedByHost("The task is already done"));
         assertThat(callback.invocations).hasSize(1);
     }
 
     @Test
     void anErrorInTheCallbackIsATechnicalError() {
         callback.result = newOne -> {
-            throw new IllegalStateException("Aufgabenverwaltung nicht erreichbar");
+            throw new IllegalStateException("Task management not reachable");
         };
 
         assertThatThrownBy(() -> saving.save(ERIKA, previewOfErika))
-                .isInstanceOf(IllegalStateException.class).hasMessage("Aufgabenverwaltung nicht erreichbar");
-        assertThat(callback.invocations).as("nicht wiederholt").hasSize(1);
+                .isInstanceOf(IllegalStateException.class).hasMessage("Task management not reachable");
+        assertThat(callback.invocations).as("not repeated").hasSize(1);
     }
 
     @Test
     void ifNothingIsCreatedThereIsNoCallback() {
-        checker.result = pdf -> Conformance.notConformant(List.of("PDF/UA-1: Bild ohne Alternativtext"));
+        checker.result = pdf -> Conformance.notConformant(List.of("PDF/UA-1: Image without alternative text"));
         saving.save(ERIKA, previewOfErika);
         host.allowed = false;
         saving.save(ERIKA, previewOfErika);
@@ -357,7 +357,7 @@ class SaveLetterServiceTest {
         var policy = new Fakes.DeletionPolicy();
         policy.decision = kind.equals("hard") ? DeletionDecision.hard() : DeletionDecision.logical();
         host.allow(ERIKA, LetterAction.DELETE, CUSTOMER_4711);
-        new DeleteLetterService(letter, host, policy, documents, clock).delete(ERIKA, id);
+        new DeleteLetterService(letters, host, policy, documents, clock).delete(ERIKA, id);
     }
 
     @Test
@@ -366,7 +366,7 @@ class SaveLetterServiceTest {
 
         assertThatThrownBy(() -> saving.save(ERIKA, previewOfErika))
                 .isInstanceOf(IllegalStateException.class).hasMessageContaining("missing");
-        templates.letterTemplate.clear();
+        templates.letterTemplates.clear();
         assertThatThrownBy(() -> saving.save(ERIKA, previewOfErika))
                 .isInstanceOf(IllegalStateException.class).hasMessageContaining("missing");
     }
@@ -376,9 +376,9 @@ class SaveLetterServiceTest {
         return ((PreviewResult.Created) preview.create(user, CUSTOMER_4711, reminder.id())).snapshot();
     }
 
-    /** Auch der Snapshot bleibt offen und behält seinen Datenkontext für einen weiteren Versuch. */
+    /** The snapshot also stays open and keeps its data context for another attempt. */
     private void nothingSavedOrStored() {
-        assertThat(letter.saved).isEmpty();
+        assertThat(letters.saved).isEmpty();
         assertThat(documents.stored).isEmpty();
         assertThat(snapshots.load(previewOfErika).orElseThrow().state())
                 .isInstanceOf(SnapshotState.Open.class);

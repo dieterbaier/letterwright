@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.spi;
 
 import org.springframework.stereotype.Component;
 
-/** Fixture: absichtlicher Verstoß, eine SPI-Klasse mit Spring-Abhängigkeit. */
+/** Fixture: deliberate violation, an SPI class with a Spring dependency. */
 @Component
 public class SpiWithSpring {
 }

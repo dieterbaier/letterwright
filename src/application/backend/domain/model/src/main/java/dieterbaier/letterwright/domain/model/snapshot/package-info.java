@@ -1,5 +1,5 @@
 /**
- * Das Aggregat Snapshot: befristet gespeicherter Datenkontext einer Vorschau.
+ * The snapshot aggregate: temporarily stored data context of a preview.
  */
 @NullMarked
 package dieterbaier.letterwright.domain.model.snapshot;

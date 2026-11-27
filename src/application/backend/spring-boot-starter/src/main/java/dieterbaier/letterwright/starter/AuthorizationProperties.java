@@ -8,14 +8,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
- * Rollen der Default-{@link dieterbaier.letterwright.spi.AuthorizationCheck}. Ohne Eintrag gilt die Authority
- * {@code ROLE_LETTERWRIGHT_TEMPLATES_<AKTION>} oder {@code ROLE_LETTERWRIGHT_LETTERS_<AKTION>}, etwa {@code ROLE_LETTERWRIGHT_LETTERS_CREATE};
- * ein Host vergibt sie in Spring Security mit {@code roles("SSW_SCHREIBEN_ERZEUGEN")}. Abweichend:
+ * Roles of the default {@link dieterbaier.letterwright.spi.AuthorizationCheck}. Without an entry the authority
+ * {@code ROLE_LETTERWRIGHT_TEMPLATES_<ACTION>} or {@code ROLE_LETTERWRIGHT_LETTERS_<ACTION>} applies, for example
+ * {@code ROLE_LETTERWRIGHT_LETTERS_CREATE}; a host grants it in Spring Security with
+ * {@code roles("LETTERWRIGHT_LETTERS_CREATE")}. To deviate, set {@code templates.<ACTION>} or {@code letters.<ACTION>}:
  *
- * <pre>letterwright.authorization.roles.letters.CREATE=ROLE_SACHBEARBEITUNG</pre>
+ * <pre>letterwright.authorization.roles.letters.CREATE=ROLE_CASEWORK</pre>
  *
- * @param templates die Authority je Aktion an Vorlagen, wo sie vom Default abweicht
- * @param letters die Authority je Rolle an Schreiben, wo sie vom Default abweicht
+ * @param templates the authority per action on templates, where it deviates from the default
+ * @param letters the authority per action on letters, where it deviates from the default
  */
 @ConfigurationProperties("letterwright.authorization.roles")
 record AuthorizationProperties(
@@ -28,7 +29,7 @@ record AuthorizationProperties(
         letters = checked(letters, PREFIX + "letters.");
     }
 
-    /** Die Authority, die ein Benutzer für die Anfrage braucht. */
+    /** The authority a user needs for the request. */
     String role(AuthorizationRequest request) {
         return switch (request) {
             case AuthorizationRequest.ForTemplates forTemplates -> templates.getOrDefault(
@@ -49,7 +50,7 @@ record AuthorizationProperties(
     private static <A extends Enum<A>> Map<A, String> checked(Map<A, String> roles, String key) {
         roles.forEach((action, role) -> {
             if (role.isBlank()) {
-                throw new IllegalArgumentException(key + action.name() + " darf nicht leer sein");
+                throw new IllegalArgumentException(key + action.name() + " must not be blank");
             }
         });
         return roles.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(roles));

@@ -6,17 +6,17 @@ import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
 /**
- * Ein Stand eines Briefpapiers oder Standardschreibens (ADR-007). Der Inhalt ist semantisches HTML mit CSS Paged Media
+ * A revision of a letterhead or letter template (ADR-007). The content is semantic HTML with CSS Paged Media
  * (ADR-003).
  *
- * <p>Entität im Aggregat ihrer Vorlage: Zustandswechsel gibt es nur über {@link Letterhead} bzw.
- * {@link LetterTemplate}, die dabei die Regeln über alle Versionen hinweg sichern. Gleich sind zwei Instanzen, wenn
- * sie dieselbe Version derselben Vorlage meinen, auch in verschiedenen Zuständen.
+ * <p>Entity in the aggregate of its template: state changes happen only through {@link Letterhead} or
+ * {@link LetterTemplate}, which secure the rules across all versions. Two instances are equal if they denote the same
+ * version of the same template, even in different states.
  *
- * <p>Der Inhalt darf leer sein, solange die Version ein Entwurf ist. Veröffentlichen verlangt Inhalt.
+ * <p>The content may be empty while the version is a draft. Publishing requires content.
  *
- * <p>Die Beispieldaten füllen die Platzhalter im Probe-PDF, das vor dem Veröffentlichen geprüft wird. Sie gehören zur
- * Version, damit nachvollziehbar bleibt, womit eine veröffentlichte Version geprüft wurde (ADR-022).
+ * <p>The sample data fills the placeholders in the proof PDF that is checked before publishing. It belongs to the
+ * version so that it stays traceable what a published version was checked with (ADR-022).
  */
 @Entity
 public final class TemplateVersion {
@@ -29,13 +29,13 @@ public final class TemplateVersion {
 
     private TemplateVersion(TemplateId template, VersionNumber number, TemplateVersionState state, String content,
             DataContext sampleData) {
-        this.template = Validate.required(template, "Die Vorlage der Version");
-        this.number = Validate.required(number, "Die Versionsnummer");
-        this.state = Validate.required(state, "Der Zustand der Version");
-        this.content = Validate.required(content, "Der Inhalt der Version");
-        this.sampleData = Validate.required(sampleData, "Die Beispieldaten der Version");
+        this.template = Validate.required(template, "The template of the version");
+        this.number = Validate.required(number, "The VersionNumber");
+        this.state = Validate.required(state, "The state of the version");
+        this.content = Validate.required(content, "The content of the version");
+        this.sampleData = Validate.required(sampleData, "The sample data of the version");
         if (state != TemplateVersionState.DRAFT) {
-            Validate.notBlank(content, "Der Inhalt einer freigegebenen Version");
+            Validate.notBlank(content, "The content of a released version");
         }
     }
 
@@ -77,13 +77,13 @@ public final class TemplateVersion {
         return sampleData;
     }
 
-    /** Ein Entwurf mit Inhalt, der nicht nur aus Leerraum besteht. */
+    /** A draft whose content is not only whitespace. */
     public boolean isPublishable() {
         return state == TemplateVersionState.DRAFT && !content.isBlank();
     }
 
     /**
-     * Die Identität der Version: Vorlage und Nummer. Snapshot und Schreiben speichern genau diesen Verweis.
+     * The identity of the version: template and number. Snapshot and letter store exactly this reference.
      */
     @Identity
     public VersionReference reference() {
@@ -102,6 +102,6 @@ public final class TemplateVersion {
 
     @Override
     public String toString() {
-        return "Vorlagenversion[vorlage=" + template.value() + ", nummer=" + number.value() + ", zustand=" + state + "]";
+        return "TemplateVersion[template=" + template.value() + ", number=" + number.value() + ", state=" + state + "]";
     }
 }

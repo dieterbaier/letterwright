@@ -17,9 +17,9 @@ class PageTest {
         assertThat(new Page<>(List.of("c", "d"), 5, secondPage).pageCount()).isEqualTo(3);
         assertThat(new Page<>(List.of("c", "d"), 4, secondPage).pageCount()).isEqualTo(2);
         assertThat(new Page<>(List.of(), 0, new PageRequest(0, 2)).pageCount()).isZero();
-        assertThat(new Page<>(List.of(), 2, secondPage).pageCount()).as("direkt hinter dem Ende").isEqualTo(1);
+        assertThat(new Page<>(List.of(), 2, secondPage).pageCount()).as("right past the end").isEqualTo(1);
         assertThat(new Page<>(List.of(), 3, new PageRequest(2, 2)).pageCount())
-                .as("weiter hinter dem Ende").isEqualTo(2);
+                .as("further past the end").isEqualTo(2);
     }
 
     @Test
@@ -34,12 +34,12 @@ class PageTest {
 
     @Test
     void thePageMatchesTheRequestAndTheTotal() {
-        rejects(() -> new Page<>(null, 0, secondPage), "Einträge der Seite");
-        rejects(() -> new Page<>(Arrays.asList("c", null), 4, secondPage), "Einträge der Seite[1]");
+        rejects(() -> new Page<>(null, 0, secondPage), "entries of the page");
+        rejects(() -> new Page<>(Arrays.asList("c", null), 4, secondPage), "entries of the page[1]");
         rejects(() -> new Page<>(List.of("c"), 3, null), "PageRequest");
-        rejects(() -> new Page<>(List.of("c", "d", "e"), 5, secondPage), "höchstens 2");
-        rejects(() -> new Page<>(List.of("c", "d"), 3, secondPage), "Gesamtzahl 3");
-        rejects(() -> new Page<>(List.of("e"), 3, new PageRequest(3, 2)), "Gesamtzahl 3");
-        rejects(() -> new Page<>(List.of(), -1, secondPage), "nicht negativ");
+        rejects(() -> new Page<>(List.of("c", "d", "e"), 5, secondPage), "at most 2");
+        rejects(() -> new Page<>(List.of("c", "d"), 3, secondPage), "total 3");
+        rejects(() -> new Page<>(List.of("e"), 3, new PageRequest(3, 2)), "total 3");
+        rejects(() -> new Page<>(List.of(), -1, secondPage), "must not be negative");
     }
 }

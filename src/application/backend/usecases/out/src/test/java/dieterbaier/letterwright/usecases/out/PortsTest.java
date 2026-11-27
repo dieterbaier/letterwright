@@ -9,8 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 
 /**
- * Die ausgehenden Ports sind reine Schnittstellen in Domänenbegriffen: keine Default-Methoden, keine statische Logik.
- * Kommt doch Logik hinzu, greift das Abdeckungs-Gate dieses Moduls, weil es Testausführungsdaten gibt.
+ * The outbound ports are pure interfaces in domain terms: no default methods, no static logic. If logic is added after
+ * all, the coverage gate of this module applies, because there is test execution data.
  */
 class PortsTest {
 

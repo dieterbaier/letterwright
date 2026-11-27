@@ -21,7 +21,7 @@ class PreviewResultTest {
         assertThat(created.expiry()).isEqualTo(expiry);
     }
 
-    /** So unterscheidet ein eingehender Adapter die Ergebnisse; der Compiler prüft, dass keines fehlt. */
+    /** This is how an inbound adapter tells the results apart; the compiler checks that none is missing. */
     @Test
     void everyResultIsDistinguishable() {
         assertThat(java.util.stream.Stream.of(new PreviewResult.Created(snapshot, "<p/>", expiry),
@@ -43,8 +43,8 @@ class PreviewResultTest {
 
     @Test
     void requiredAttributes() {
-        assertThatThrownBy(() -> new PreviewResult.Created(null, "<p/>", expiry)).hasMessageContaining("Snapshot");
+        assertThatThrownBy(() -> new PreviewResult.Created(null, "<p/>", expiry)).hasMessageContaining("snapshot");
         assertThatThrownBy(() -> new PreviewResult.Created(snapshot, null, expiry)).hasMessageContaining("HTML");
-        assertThatThrownBy(() -> new PreviewResult.Created(snapshot, "<p/>", null)).hasMessageContaining("Ablauf");
+        assertThatThrownBy(() -> new PreviewResult.Created(snapshot, "<p/>", null)).hasMessageContaining("expiry");
     }
 }

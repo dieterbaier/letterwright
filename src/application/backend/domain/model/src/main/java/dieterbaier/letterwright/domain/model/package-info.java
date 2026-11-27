@@ -1,12 +1,12 @@
 /**
- * Fachmodell von Standardschreiben. Frei von Frameworks, siehe ADR-002. Kennt keine Domänenservices (ADR-015). Die
- * Bezeichner folgen dem Glossar (arc42 Kapitel 12).
+ * Domain model of letterwright. Free of frameworks, see ADR-002. Knows no domain services (ADR-015). The identifiers
+ * follow the glossary (arc42 chapter 12).
  *
- * <p>Je Aggregat gibt es ein Unterpaket: {@code template} (Briefpapier und Standardschreiben), {@code snapshot} und
- * {@code letter}. Was nur ein Aggregat braucht, liegt in dessen Paket und ist dort so weit wie möglich gekapselt.
- * Dieses Paket enthält die Werttypen, die mehrere Aggregate und die Ports teilen; es kennt keines der Unterpakete.
+ * <p>There is one subpackage per aggregate: {@code template} (letterheads and letter templates), {@code snapshot} and
+ * {@code letter}. What only one aggregate needs lives in its package and is encapsulated there as far as possible.
+ * This package holds the value types shared by several aggregates and the ports; it knows none of the subpackages.
  *
- * <p>Alle Typen sind unveränderlich. Zustandswechsel liefern neue Instanzen.
+ * <p>All types are immutable. State changes return new instances.
  */
 @NullMarked
 package dieterbaier.letterwright.domain.model;

@@ -1,5 +1,5 @@
 /**
- * Spring-Boot-Autokonfiguration und Default-Adapter für die Host-Anwendung, siehe ADR-001.
+ * Spring Boot auto-configuration and default adapters for the host application, see ADR-001.
  */
 @NullMarked
 package dieterbaier.letterwright.starter;

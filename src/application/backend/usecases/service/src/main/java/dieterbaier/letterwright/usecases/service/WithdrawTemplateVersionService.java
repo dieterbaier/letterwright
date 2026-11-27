@@ -23,7 +23,7 @@ public final class WithdrawTemplateVersionService implements WithdrawTemplateVer
         this.permissions = permissions;
     }
 
-    /** Zurückziehen gehört zum Veröffentlichen: Beides bestimmt, was in neue Schreiben eingeht. */
+    /** Withdrawing belongs to publishing: both determine what goes into new letters. */
     @Override
     public WithdrawalResult withdraw(UserId user, TemplateId template) {
         if (!permissions.may(user, TemplateAction.PUBLISH)) {

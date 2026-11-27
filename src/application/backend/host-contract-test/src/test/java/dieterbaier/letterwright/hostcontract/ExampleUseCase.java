@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Ein Anwendungsfall des Hosts, der ein Schreiben über die Java-API speichert und es mit eigenen Daten verknüpft
- * (ADR-023). Dass diese Klasse kompiliert, belegt, dass der Host die API sieht und alle Fälle unterscheiden kann.
+ * A use case of the host that saves a letter through the Java API and links it with its own data (ADR-023). That this
+ * class compiles proves that the host sees the API and can distinguish all cases.
  */
 final class ExampleUseCase {
 
@@ -17,7 +17,7 @@ final class ExampleUseCase {
         this.letter = letter;
     }
 
-    /** Liefert die ID des Schreibens, mit der der Host die Aufgabe abschließt, oder nichts bei einer Ablehnung. */
+    /** Returns the ID of the letter with which the host completes the task, or nothing on a rejection. */
     Optional<UUID> completeTask(String user, UUID snapshot) {
         return switch (letter.save(user, snapshot)) {
             case SaveResult.Saved saved -> Optional.of(saved.letter().id());

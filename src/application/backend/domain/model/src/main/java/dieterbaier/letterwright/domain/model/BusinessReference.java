@@ -4,19 +4,19 @@ import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Das Domänenobjekt der Host-Anwendung, zu dem ein Schreiben erzeugt wird, als Typ und ID (z. B. Kunde 4711). Die
- * Bibliothek deutet beides nicht, sie gibt es nur an den Host zurück.
+ * The domain object of the host application for which a letter is created, as type and ID (e.g. customer 4711). The
+ * library does not interpret either; it only hands them back to the host.
  *
- * <p>Die Bibliothek vergleicht Bezüge trotzdem per Gleichheit: in der Übersicht, beim Löschen und bei den
- * Berechtigungen. Außerdem speichert sie den Bezug dauerhaft mit jedem Schreiben. Das trägt nur, weil der Host die ID
- * kanonisch und dauerhaft stabil vergibt und mehrere Schlüssel bei Bedarf selbst darin kodiert; den Vertrag nennt
- * {@code spi.BusinessReference}. Einen strukturierten Schlüssel gibt es deshalb bewusst nicht.
+ * <p>The library still compares references by equality: in the list, when deleting and for permissions. It also stores
+ * the reference permanently with every letter. This only holds because the host assigns the ID canonically and stably
+ * for good and encodes several keys in it itself if needed; the contract is stated by {@code spi.BusinessReference}.
+ * There is therefore deliberately no structured key.
  */
 @ValueObject
 public record BusinessReference(String type, String id) {
 
     public BusinessReference {
-        Validate.notBlank(type, "Der Typ des fachlichen Bezugs");
-        Validate.notBlank(id, "Die ID des fachlichen Bezugs");
+        Validate.notBlank(type, "The type of the business reference");
+        Validate.notBlank(id, "The ID of the business reference");
     }
 }

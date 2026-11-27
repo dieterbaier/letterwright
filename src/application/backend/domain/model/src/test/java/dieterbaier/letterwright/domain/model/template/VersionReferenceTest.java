@@ -9,8 +9,8 @@ class VersionReferenceTest {
 
     @Test
     void versionReferenceRequiresTemplateAndNumber() {
-        rejects(() -> new VersionReference(null, VersionNumber.FIRST), "Vorlage des Versionsverweises");
-        rejects(() -> new VersionReference(TemplateId.generate(), null), "Nummer des Versionsverweises");
+        rejects(() -> new VersionReference(null, VersionNumber.FIRST), "template of the VersionReference");
+        rejects(() -> new VersionReference(TemplateId.generate(), null), "number of the VersionReference");
     }
 
     @Test

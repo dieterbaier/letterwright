@@ -9,7 +9,7 @@ import dieterbaier.letterwright.spi.AuthorizationRequest;
 import dieterbaier.letterwright.spi.AuthorizationCheck;
 import dieterbaier.letterwright.usecases.out.Permissions;
 
-/** Fragt die {@link AuthorizationCheck} des Hosts, oder die Default-Implementierung des Starters. */
+/** Asks the host's {@link AuthorizationCheck}, or the starter's default implementation. */
 public final class HostPermissions implements Permissions {
 
     private final AuthorizationCheck check;

@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Ausgehende Ports: nur von Adaptern der Bibliothek implementiert, kein Vertrag mit dem Host (ADR-002, ADR-016)."
+description = "Outbound ports: implemented only by adapters of the library, no contract with the host (ADR-002, ADR-016)."
 
 dependencies {
     api(project(":domain-model"))

@@ -3,11 +3,11 @@ package dieterbaier.letterwright.domain.model.letter;
 import dieterbaier.letterwright.validation.Validate;
 import org.jmolecules.ddd.annotation.ValueObject;
 
-/** Verweis auf das in der Dokumentablage abgelegte PDF eines Schreibens. Was er bedeutet, weiß nur die Ablage. */
+/** Reference to the PDF of a letter in the document store. Only the store knows what it means. */
 @ValueObject
 public record DocumentReference(String value) {
 
     public DocumentReference {
-        Validate.notBlank(value, "Der Dokumentverweis");
+        Validate.notBlank(value, "The DocumentReference");
     }
 }

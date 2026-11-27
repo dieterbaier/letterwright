@@ -1,5 +1,5 @@
 /**
- * Das Aggregat Schreiben: ein gespeichertes Dokument, ob es noch sichtbar ist, und die Entscheidung über sein Löschen.
+ * The letter aggregate: a stored document, whether it is still visible, and the decision about its deletion.
  */
 @NullMarked
 package dieterbaier.letterwright.domain.model.letter;

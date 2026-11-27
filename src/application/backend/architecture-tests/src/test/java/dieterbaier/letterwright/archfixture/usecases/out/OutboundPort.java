@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.usecases.out;
 
-/** Fixture: ein regelkonformer ausgehender Port. */
+/** Fixture: a compliant outbound port. */
 public interface OutboundPort {
 }

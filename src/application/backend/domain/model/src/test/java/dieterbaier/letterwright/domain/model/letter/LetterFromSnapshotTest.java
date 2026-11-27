@@ -19,8 +19,8 @@ class LetterFromSnapshotTest {
     void requiredAttributesOfTheResult() {
         Letter letter = Letter.fromSnapshot(LetterId.generate(), snapshot, document, pdf, NOW).letter();
 
-        rejects(() -> new LetterFromSnapshot(null, snapshot), "Das Schreiben");
-        rejects(() -> new LetterFromSnapshot(letter, null), "verbrauchte Snapshot");
+        rejects(() -> new LetterFromSnapshot(null, snapshot), "The letter");
+        rejects(() -> new LetterFromSnapshot(letter, null), "consumed snapshot");
     }
 
     @Test
@@ -29,7 +29,7 @@ class LetterFromSnapshotTest {
         Snapshot otherConsumed = Letter.fromSnapshot(LetterId.generate(), TestData.snapshot(), document, pdf, NOW)
                 .consumedSnapshot();
 
-        rejects(() -> new LetterFromSnapshot(created.letter(), snapshot), "nicht verbraucht");
-        rejects(() -> new LetterFromSnapshot(created.letter(), otherConsumed), "entstand nicht aus Snapshot");
+        rejects(() -> new LetterFromSnapshot(created.letter(), snapshot), "not consumed");
+        rejects(() -> new LetterFromSnapshot(created.letter(), otherConsumed), "was not created from snapshot");
     }
 }

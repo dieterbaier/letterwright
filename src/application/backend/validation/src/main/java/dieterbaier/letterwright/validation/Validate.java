@@ -4,11 +4,11 @@ import java.util.Collection;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Prüfungen für Konstruktoren und Fabrikmethoden. Jede liefert den geprüften Wert zurück, damit sie sich direkt in einer
- * Zuweisung verwenden lässt.
+ * Checks for constructors and factory methods. Each returns the checked value so that it can be used directly in an
+ * assignment.
  *
- * <p>{@link #notEmpty(String, String)} und {@link #notBlank(String, String)} sind verschiedene Verträge: Ein Text aus
- * Leerzeichen ist nicht leer, aber blank.
+ * <p>{@link #notEmpty(String, String)} and {@link #notBlank(String, String)} are different contracts: a text of
+ * spaces is not empty, but blank.
  */
 public final class Validate {
 
@@ -17,37 +17,37 @@ public final class Validate {
 
     public static <T> T required(@Nullable T value, String label) {
         if (value == null) {
-            throw new ValidationException(label + " fehlt");
+            throw new ValidationException(label + " is missing");
         }
         return value;
     }
 
-    /** Der Text muss vorhanden sein und mindestens ein Zeichen haben. Leerraum zählt als Zeichen. */
+    /** The text must be present and have at least one character. Whitespace counts as a character. */
     public static String notEmpty(@Nullable String text, String label) {
         String present = required(text, label);
         if (present.isEmpty()) {
-            throw new ValidationException(label + " darf nicht leer sein");
+            throw new ValidationException(label + " must not be empty");
         }
         return present;
     }
 
-    /** Der Text muss vorhanden sein und mindestens ein Zeichen haben, das kein Leerraum ist. */
+    /** The text must be present and have at least one character that is not whitespace. */
     public static String notBlank(@Nullable String text, String label) {
         String present = required(text, label);
         if (present.isBlank()) {
-            throw new ValidationException(label + " darf nicht leer sein oder nur aus Leerraum bestehen");
+            throw new ValidationException(label + " must not be empty or consist only of whitespace");
         }
         return present;
     }
 
     public static int atLeast(int value, int minimum, String label) {
         if (value < minimum) {
-            throw new ValidationException(label + " muss mindestens " + minimum + " sein, war " + value);
+            throw new ValidationException(label + " must be at least " + minimum + ", was " + value);
         }
         return value;
     }
 
-    /** Die Sammlung muss vorhanden sein und darf kein fehlendes Element enthalten. */
+    /** The collection must be present and must not contain a missing element. */
     public static <C extends Collection<?>> C requiredWithoutGaps(@Nullable C collection, String label) {
         C present = required(collection, label);
         int position = 0;

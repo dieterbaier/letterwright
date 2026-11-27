@@ -4,25 +4,23 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Die stabilen Identifikatoren eines gespeicherten Schreibens (ADR-023). Über die ID verknüpft der Host seine eigenen
- * Daten mit dem Schreiben.
+ * The stable identifiers of a saved letter (ADR-023). The host links its own data to the letter via the ID.
  *
- * @param id die ID des Schreibens, ein technischer Schlüssel, der sich nie ändert
- * @param reference der fachliche Bezug, zu dem das Schreiben erzeugt wurde
- * @param letterTemplate die Version des Standardschreibens, aus der es entstand
- * @param userId der Benutzer, der die Vorschau erzeugt und gespeichert hat; nicht leer und nicht nur aus
- *     Leerraum
- * @param created der Zeitpunkt der Erstellung
+ * @param id the ID of the letter, a technical key that never changes
+ * @param reference the business reference the letter was created for
+ * @param letterTemplate the version of the letter template it was created from
+ * @param userId the user who created and saved the preview; not empty and not only whitespace
+ * @param created the time of creation
  */
 public record SavedLetter(
         UUID id, BusinessReference reference, LetterTemplateVersion letterTemplate, String userId,
         Instant created) {
 
     public SavedLetter {
-        Require.value(id, "Die ID des Schreibens");
-        Require.value(reference, "Der fachliche Bezug");
-        Require.value(letterTemplate, "Das Standardschreiben");
-        Require.text(userId, "Die Benutzerkennung");
-        Require.value(created, "Der Zeitpunkt der Erstellung");
+        Require.value(id, "The ID of the letter");
+        Require.value(reference, "The business reference");
+        Require.value(letterTemplate, "The letter template");
+        Require.text(userId, "The user ID");
+        Require.value(created, "The time of creation");
     }
 }

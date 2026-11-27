@@ -49,7 +49,7 @@ class SnapshotTest {
 
     @Test
     void itCannotBeUsedForAnotherReference() {
-        assertThat(snapshot.isUsableFor(CLERK, new BusinessReference("Kunde", "4712"), NOW))
+        assertThat(snapshot.isUsableFor(CLERK, new BusinessReference("Customer", "4712"), NOW))
                 .isFalse();
     }
 
@@ -75,7 +75,7 @@ class SnapshotTest {
         Snapshot consumed = snapshot.consumed();
 
         org.assertj.core.api.Assertions.assertThatIllegalStateException().isThrownBy(consumed::consumed)
-                .withMessageContaining("schon ein Schreiben");
+                .withMessageContaining("already created");
     }
 
     @Test
@@ -83,23 +83,23 @@ class SnapshotTest {
         SnapshotId id = SnapshotId.generate();
 
         rejects(() -> Snapshot.create(null, CLERK, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3,
-                DATA_CONTEXT, NOW), "ID des Snapshots");
+                DATA_CONTEXT, NOW), "ID of the snapshot");
         rejects(() -> Snapshot.create(id, null, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3, DATA_CONTEXT, NOW),
-                "Benutzer des Snapshots");
+                "user of the snapshot");
         rejects(() -> Snapshot.create(id, CLERK, null, LETTERHEAD_V1, LETTER_TEMPLATE_V3, DATA_CONTEXT,
-                NOW), "fachliche Bezug des Snapshots");
+                NOW), "business reference of the snapshot");
         rejects(() -> Snapshot.create(id, CLERK, CUSTOMER, null, LETTER_TEMPLATE_V3, DATA_CONTEXT, NOW),
-                "Letterhead-Version");
+                "letterhead version");
         rejects(() -> Snapshot.create(id, CLERK, CUSTOMER, LETTERHEAD_V1, null, DATA_CONTEXT, NOW),
-                "LetterTemplate-Version");
+                "letter template version");
         rejects(() -> Snapshot.create(id, CLERK, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3, null, NOW),
-                "Datenkontext des Snapshots");
+                "data context of the snapshot");
         rejects(() -> Snapshot.create(id, CLERK, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3, DATA_CONTEXT,
-                null), "Zeitpunkt der Anlage");
+                null), "time of creation");
         rejects(() -> Snapshot.restore(id, CLERK, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3,
-                new SnapshotState.Open(DATA_CONTEXT), null), "Ablaufzeitpunkt");
+                new SnapshotState.Open(DATA_CONTEXT), null), "expiry time");
         rejects(() -> Snapshot.restore(id, CLERK, CUSTOMER, LETTERHEAD_V1, LETTER_TEMPLATE_V3, null,
-                NOW), "Zustand des Snapshots");
+                NOW), "state of the snapshot");
     }
 
     @Test
@@ -110,7 +110,7 @@ class SnapshotTest {
                 LETTER_TEMPLATE_V3, new SnapshotState.Consumed(), expiry);
 
         assertThat(loaded.expiry()).isEqualTo(expiry);
-        assertThat(loaded).as("gleich über die ID").isEqualTo(snapshot).hasSameHashCodeAs(snapshot);
+        assertThat(loaded).as("equal by ID").isEqualTo(snapshot).hasSameHashCodeAs(snapshot);
     }
 
     @Test

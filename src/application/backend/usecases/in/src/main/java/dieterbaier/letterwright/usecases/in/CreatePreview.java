@@ -6,16 +6,16 @@ import dieterbaier.letterwright.domain.model.snapshot.SnapshotId;
 import dieterbaier.letterwright.domain.model.template.TemplateId;
 
 /**
- * Anwendungsfall „Vorschau erzeugen“: Ein Sachbearbeiter sieht ein Standardschreiben zu einem fachlichen Bezug, bevor
- * er es speichert. Jede Vorschau legt einen Snapshot an (ADR-007).
+ * Use case "create preview": a clerk sees a letter template for a business reference before saving it. Every preview
+ * creates a snapshot (ADR-007).
  */
 public interface CreatePreview {
 
     PreviewResult create(UserId user, BusinessReference reference, TemplateId letterTemplate);
 
     /**
-     * Wie {@link #create}, ersetzt aber den Snapshot der bisherigen Vorschau. Gehört er einem anderen Benutzer, gibt
-     * es ihn nicht oder ist aus ihm schon ein Schreiben entstanden, bleibt er unberührt.
+     * Like {@link #create}, but replaces the snapshot of the previous preview. If it belongs to another user, does not
+     * exist or has already produced a letter, it stays untouched.
      */
     PreviewResult update(
             UserId user, BusinessReference reference, TemplateId letterTemplate, SnapshotId previous);

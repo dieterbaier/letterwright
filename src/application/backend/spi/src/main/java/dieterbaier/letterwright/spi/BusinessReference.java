@@ -1,32 +1,31 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Das Domänenobjekt des Hosts, zu dem ein Schreiben erzeugt wird, als Typ und ID (z. B. {@code Kunde}, {@code 4711}).
- * Die Bibliothek deutet beides nicht, sie reicht es nur weiter.
+ * The host's domain object for which a letter is created, as type and ID (e.g. {@code Customer}, {@code 4711}). The
+ * library does not interpret either; it only passes them on.
  *
- * <p>Typ und ID zusammen bezeichnen genau ein Objekt des Hosts. Braucht der Host mehrere Schlüssel, kodiert er sie
- * selbst in der ID und zerlegt sie wieder. Die Bibliothek vergleicht Bezüge per Gleichheit und speichert sie mit jedem
- * Schreiben. Die ID muss deshalb
+ * <p>Type and ID together identify exactly one object of the host. If the host needs several keys, it encodes them in
+ * the ID itself and decodes them again. The library compares references by equality and stores them with every
+ * letter. The ID must therefore be
  *
  * <ul>
- *   <li>eindeutig sein: Verschiedene Objekte desselben Bezugstyps erhalten verschiedene IDs. Eine Kodierung mehrerer
- *       Schlüssel muss daher kollisionsfrei und eindeutig dekodierbar sein,
- *   <li>kanonisch sein: dasselbe Objekt ergibt immer dieselbe Zeichenkette,
- *   <li>dauerhaft stabil sein: keine fachlichen Werte, die sich ändern können,
- *   <li>ohne Schaden sichtbar sein: Sie kommt vom Browser, der Host prüft sie und gibt keine vertraulichen Daten darin
- *       preis.
+ *   <li>unique: different objects of the same reference type get different IDs. An encoding of several keys must
+ *       therefore be free of collisions and unambiguously decodable,
+ *   <li>canonical: the same object always yields the same string,
+ *   <li>permanently stable: no business values that can change,
+ *   <li>safe to expose: it comes from the browser, the host checks it and reveals no confidential data in it.
  * </ul>
  *
- * <p>Bevor der Host mehrere Schlüssel in eine ID kodiert, prüft er, ob der Bezug richtig geschnitten ist: Oft passt
- * ein eigener Bezugstyp mit eigener ID besser.
+ * <p>Before the host encodes several keys in one ID, it checks whether the reference is cut correctly: often a
+ * separate reference type with its own ID fits better.
  *
- * @param type der Bezugstyp des Hosts, z. B. {@code Kunde}; nicht leer und nicht nur aus Leerraum
- * @param id die ID des Objekts nach dem obigen Vertrag; nicht leer und nicht nur aus Leerraum
+ * @param type the host's reference type, e.g. {@code Customer}; not empty and not only whitespace
+ * @param id the ID of the object according to the contract above; not empty and not only whitespace
  */
 public record BusinessReference(String type, String id) {
 
     public BusinessReference {
-        Require.text(type, "Der Typ des fachlichen Bezugs");
-        Require.text(id, "Die ID des fachlichen Bezugs");
+        Require.text(type, "The type of the business reference");
+        Require.text(id, "The ID of the business reference");
     }
 }

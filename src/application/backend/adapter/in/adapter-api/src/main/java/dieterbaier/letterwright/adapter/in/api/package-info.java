@@ -1,6 +1,6 @@
 /**
- * Eingehender Adapter für die Java-API, siehe ADR-023: implementiert {@code api}, ruft die eingehenden Ports in der
- * Transaktion des Hosts und bildet zwischen API-Typen und Domänenmodell ab.
+ * Inbound adapter for the Java API, see ADR-023: implements {@code api}, calls the inbound ports in the host's
+ * transaction and maps between API types and the domain model.
  */
 @NullMarked
 package dieterbaier.letterwright.adapter.in.api;

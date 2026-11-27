@@ -1,4 +1,4 @@
-// Build-Logik: Convention-Plugins für die Backend-Module (ADR-009, ADR-011).
+// Build logic: convention plugins for the backend modules (ADR-009, ADR-011).
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {

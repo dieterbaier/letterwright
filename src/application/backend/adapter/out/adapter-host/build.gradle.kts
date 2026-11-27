@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "Ausgehender Adapter zur Host-Anwendung: implementiert ausgehende Ports gegen das SPI und bildet zwischen SPI-Typen und Domänenmodell ab (ADR-016)."
+description = "Outbound adapter to the host application: implements outbound ports against the SPI and maps between SPI types and the domain model (ADR-016)."
 
 dependencies {
     implementation(project(":usecases-out"))

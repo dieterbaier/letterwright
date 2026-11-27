@@ -5,55 +5,55 @@ import dieterbaier.letterwright.validation.Validate;
 import java.util.List;
 
 /**
- * Was beim Speichern eines Schreibens herauskommt. Nur die ersten beiden Fälle haben ein Schreiben. Sie tragen das ganze
- * Schreiben, weil die Java-API dem Host seine Identifikatoren zurückgibt (ADR-023).
+ * The outcome of saving a letter. Only the first two cases have a letter. They carry the whole letter because the Java
+ * API returns its identifiers to the host (ADR-023).
  */
 public sealed interface SaveResult {
 
     record Saved(Letter letter) implements SaveResult {
 
         public Saved {
-            Validate.required(letter, "Das gespeicherte Schreiben");
+            Validate.required(letter, "The saved letter");
         }
     }
 
-    /** Zum Snapshot gab es schon ein Schreiben, etwa nach einem Doppelklick oder einem Retry. Es entstand kein neues. */
+    /** The snapshot already had a letter, for example after a double click or a retry. No new one was created. */
     record AlreadySaved(Letter letter) implements SaveResult {
 
         public AlreadySaved {
-            Validate.required(letter, "Das bereits gespeicherte Schreiben");
+            Validate.required(letter, "The already saved letter");
         }
     }
 
-    /** Den Snapshot gibt es nicht, er gehört einem anderen Benutzer, oder das Schreiben aus ihm ist gelöscht. */
+    /** The snapshot does not exist, belongs to another user, or the letter created from it is deleted. */
     record SnapshotUnknown() implements SaveResult {}
 
-    /** Der Snapshot ist abgelaufen; eine neue Vorschau ist nötig. */
+    /** The snapshot has expired; a new preview is needed. */
     record SnapshotExpired() implements SaveResult {}
 
-    /** Der Host erlaubt dem Benutzer nicht mehr, aus dem Standardschreiben zu dem Bezug ein Schreiben zu erzeugen. */
+    /** The host no longer allows the user to create a letter from the letter template for the reference. */
     record NotAllowed() implements SaveResult {}
 
-    /** Der Host liefert inzwischen andere Daten als in der Vorschau; eine neue Vorschau ist nötig. */
+    /** The host now provides different data than in the preview; a new preview is needed. */
     record DataContextChanged() implements SaveResult {}
 
     /**
-     * Der Rückruf des Hosts hat das neue Schreiben abgelehnt (ADR-023). Die Bibliothek hat ihre Änderungen schon
-     * geschrieben; erst der Rollback an der äußeren Transaktionsgrenze nimmt sie zurück, der Snapshot ist dann wieder
-     * offen. Diese Grenze meldet den Grund erst nach dem Rollback.
+     * The host's callback rejected the new letter (ADR-023). The library has already written its changes; only the
+     * rollback at the outer transaction boundary undoes them, and the snapshot is then open again. That boundary reports
+     * the reason only after the rollback.
      */
     record RejectedByHost(String reason) implements SaveResult {
 
         public RejectedByHost {
-            Validate.notBlank(reason, "Der Grund der Ablehnung");
+            Validate.notBlank(reason, "The reason for the rejection");
         }
     }
 
-    /** Das erzeugte PDF ist nicht konform; gespeichert wurde nichts. */
+    /** The generated PDF is not conformant; nothing was saved. */
     record NotConformant(List<String> findings) implements SaveResult {
 
         public NotConformant {
-            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "Die Befunde"));
+            findings = List.copyOf(Validate.requiredWithoutGaps(findings, "The findings"));
         }
     }
 }

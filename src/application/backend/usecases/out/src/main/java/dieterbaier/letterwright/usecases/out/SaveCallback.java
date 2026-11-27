@@ -5,8 +5,8 @@ import dieterbaier.letterwright.domain.model.letter.CallbackResult;
 import dieterbaier.letterwright.domain.model.letter.Letter;
 
 /**
- * Meldet dem Host ein neu angelegtes Schreiben, vor dem Commit der Transaktion (ADR-023). Implementiert von
- * {@code adapter-host}; stellt der Host keinen Rückruf bereit, nimmt die Implementierung jedes Schreiben an.
+ * Reports a newly created letter to the host before the transaction commits (ADR-023). Implemented by
+ * {@code adapter-host}; if the host provides no callback, the implementation accepts every letter.
  */
 public interface SaveCallback {
 

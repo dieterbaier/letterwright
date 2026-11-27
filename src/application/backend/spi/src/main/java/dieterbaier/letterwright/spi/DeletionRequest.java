@@ -4,18 +4,18 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Anfrage an die {@link DeletionPolicy}: Ein Benutzer will dieses Schreiben löschen.
+ * A request to the {@link DeletionPolicy}: a user wants to delete this letter.
  *
- * @param userId der angemeldete Benutzer, wie ihn die Spring Security des Hosts kennt
- * @param letter die ID des Schreibens
- * @param created wann das Schreiben gespeichert wurde, etwa für Aufbewahrungsfristen
+ * @param userId the signed-in user as the host's Spring Security knows them
+ * @param letter the ID of the letter
+ * @param created when the letter was saved, for example for retention periods
  */
 public record DeletionRequest(String userId, UUID letter, BusinessReference reference, Instant created) {
 
     public DeletionRequest {
-        Require.text(userId, "Die Benutzerkennung");
-        Require.value(letter, "Die ID des Schreibens");
-        Require.value(reference, "Der fachliche Bezug");
-        Require.value(created, "Der Erstellungszeitpunkt");
+        Require.text(userId, "The user ID");
+        Require.value(letter, "The ID of the letter");
+        Require.value(reference, "The business reference");
+        Require.value(created, "The creation time");
     }
 }

@@ -27,8 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Brücke zu {@code features/templates/vorlagenversion-veroeffentlichen.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind {@link Fakes}.
+ * Bridge to {@code features/templates/publish-template-version.feature}: one test per scenario, named after the
+ * scenario title. The outbound ports are {@link Fakes}.
  */
 class PublishTemplateVersionServiceTest {
 
@@ -43,17 +43,17 @@ class PublishTemplateVersionServiceTest {
     private final PublishTemplateVersionService publication =
             new PublishTemplateVersionService(templates, host, renderer, checker);
 
-    // Grundlage: Briefpapier "Standard" V1 veröffentlicht mit Beispieldaten; "Mahnung" V1 veröffentlicht, Entwurf V2
-    // mit eigenen Beispieldaten; Vera darf veröffentlichen.
+    // Background: letterhead "Standard" V1 published with sample data; "Payment reminder" V1 published, draft V2 with
+    // its own sample data; Vera may publish.
     private final Letterhead letterhead = templates.store(Letterhead.createWithDefaultType(TemplateId.generate(),
             "Standard", "<header/>").changeDraft("<header/>",
-                    DataContext.from(Map.of("absender", "Muster GmbH", "betreff", "Allgemein")))
+                    DataContext.from(Map.of("sender", "Muster GmbH", "subject", "General")))
             .publishDraft());
-    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Mahnung",
-            letterhead.id(), "Kunde", "<p>{{name}}</p>").publishDraft()
-            .newDraft("<p>Erneut: {{name}}</p>")
-            .changeDraft("<p>Erneut: {{name}}</p>",
-                    DataContext.from(Map.of("name", "Erika Mustermann GmbH", "betreff", "Mahnung"))));
+    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Payment reminder",
+            letterhead.id(), "Customer", "<p>{{name}}</p>").publishDraft()
+            .newDraft("<p>Again: {{name}}</p>")
+            .changeDraft("<p>Again: {{name}}</p>",
+                    DataContext.from(Map.of("name", "Erika Mustermann GmbH", "subject", "Payment reminder"))));
 
     {
         host.mayPublish.add(VERA);
@@ -84,13 +84,13 @@ class PublishTemplateVersionServiceTest {
         publication.publish(VERA, reminder.id());
 
         assertThat(renderer.pdfData).containsExactly(DataContext.from(Map.of(
-                "absender", "Muster GmbH", "betreff", "Mahnung", "name", "Erika Mustermann GmbH")));
-        assertThat(checked).containsExactly("<header/><p>Erneut: Erika Mustermann GmbH</p>");
+                "sender", "Muster GmbH", "subject", "Payment reminder", "name", "Erika Mustermann GmbH")));
+        assertThat(checked).containsExactly("<header/><p>Again: Erika Mustermann GmbH</p>");
     }
 
     @Test
     void aLetterheadIsCheckedWithTheBuiltInSampleContentAndPublished() {
-        templates.store(letterhead.newDraft("<header>neu</header>"));
+        templates.store(letterhead.newDraft("<header>new</header>"));
         List<String> checked = new ArrayList<>();
         checker.result = pdf -> {
             checked.add(new String(pdf, StandardCharsets.UTF_8));
@@ -99,7 +99,7 @@ class PublishTemplateVersionServiceTest {
 
         var result = publication.publish(VERA, letterhead.id());
 
-        assertThat(checked).containsExactly("<header>neu</header>Beispielinhalt");
+        assertThat(checked).containsExactly("<header>new</header>Sample content");
         assertThat(renderer.pdfData).containsExactly(letterhead.publishedVersion().orElseThrow()
                 .sampleData());
         assertThat(result).isEqualTo(
@@ -111,22 +111,22 @@ class PublishTemplateVersionServiceTest {
 
     @Test
     void ifTheProofPdfFailsTheCheckTheVersionStaysADraft() {
-        checker.result = pdf -> Conformance.notConformant(List.of("Bild ohne Alternativtext"));
+        checker.result = pdf -> Conformance.notConformant(List.of("Image without alternative text"));
 
         var result = publication.publish(VERA, reminder.id());
 
-        assertThat(result).isEqualTo(new PublicationResult.NotConformant(List.of("Bild ohne Alternativtext")));
+        assertThat(result).isEqualTo(new PublicationResult.NotConformant(List.of("Image without alternative text")));
         assertThatReminderUnchanged();
     }
 
     @Test
     void ifTheCheckCannotRunNothingIsPublished() {
         checker.result = pdf -> {
-            throw new IllegalStateException("veraPDF nicht erreichbar");
+            throw new IllegalStateException("veraPDF not reachable");
         };
 
         assertThatIllegalStateException().isThrownBy(() -> publication.publish(VERA, reminder.id()))
-                .withMessage("veraPDF nicht erreichbar");
+                .withMessage("veraPDF not reachable");
         assertThatReminderUnchanged();
     }
 
@@ -147,7 +147,7 @@ class PublishTemplateVersionServiceTest {
         assertThat(publication.publish(VERA, reminder.id()))
                 .isEqualTo(new PublicationResult.NoDraft());
         assertThat(publication.publish(VERA, letterhead.id()))
-                .as("ebenso beim Briefpapier").isEqualTo(new PublicationResult.NoDraft());
+                .as("likewise for the letterhead").isEqualTo(new PublicationResult.NoDraft());
         assertThat(renderer.pdfs).isZero();
     }
 
@@ -159,7 +159,7 @@ class PublishTemplateVersionServiceTest {
         assertThat(publication.publish(VERA, reminder.id()))
                 .isEqualTo(new PublicationResult.DraftWithoutContent());
         assertThat(publication.publish(VERA, letterhead.id()))
-                .as("ebenso beim Briefpapier").isEqualTo(new PublicationResult.DraftWithoutContent());
+                .as("likewise for the letterhead").isEqualTo(new PublicationResult.DraftWithoutContent());
         assertThat(renderer.pdfs).isZero();
     }
 
@@ -182,21 +182,21 @@ class PublishTemplateVersionServiceTest {
 
     @Test
     void ifSomeoneElseChangedTheTemplateMeanwhileNothingIsPublished() {
-        LetterTemplate unchecked = reminder.changeDraft("<p>ungeprüft</p>");
+        LetterTemplate unchecked = reminder.changeDraft("<p>unchecked</p>");
         templates.before = () -> templates.store(unchecked);
 
         var result = publication.publish(VERA, reminder.id());
 
         assertThat(result).isEqualTo(new PublicationResult.Stale());
         assertThat(savedReminder().draft()).get().extracting(TemplateVersion::content)
-                .isEqualTo("<p>ungeprüft</p>");
+                .isEqualTo("<p>unchecked</p>");
         assertThat(templates.replacements).isZero();
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = {"durch Version 2 abgelöst", "zurückgezogen"})
+    @ValueSource(strings = {"superseded by version 2", "withdrawn"})
     void ifTheLetterheadChangesDuringTheCheckTheCheckTimeCounts(String change) {
-        Letterhead changed = change.equals("zurückgezogen")
+        Letterhead changed = change.equals("withdrawn")
                 ? letterhead.withdraw()
                 : letterhead.newDraft("<header>2</header>").publishDraft();
         List<String> checked = new ArrayList<>();
@@ -213,7 +213,7 @@ class PublishTemplateVersionServiceTest {
                 new PublicationResult.Published(new VersionReference(reminder.id(), TWO)));
         assertThat(templates.letterhead(letterhead.id()).orElseThrow().publishedVersion())
                 .map(TemplateVersion::number)
-                .isEqualTo(change.equals("zurückgezogen") ? Optional.empty() : Optional.of(TWO));
+                .isEqualTo(change.equals("withdrawn") ? Optional.empty() : Optional.of(TWO));
     }
 
     @Test
@@ -221,9 +221,9 @@ class PublishTemplateVersionServiceTest {
         publication.publish(VERA, reminder.id());
         LetterTemplate published = savedReminder();
 
-        assertThatThrownBy(() -> published.changeDraft("<p>anders</p>"))
+        assertThatThrownBy(() -> published.changeDraft("<p>different</p>"))
                 .isInstanceOf(IllegalStateTransition.class);
-        TemplateVersion newDraft = published.newDraft("<p>anders</p>").draft().orElseThrow();
+        TemplateVersion newDraft = published.newDraft("<p>different</p>").draft().orElseThrow();
         assertThat(newDraft.number()).isEqualTo(new VersionNumber(3));
         assertThat(newDraft.sampleData()).isEqualTo(reminder.draft().orElseThrow().sampleData());
     }

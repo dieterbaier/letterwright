@@ -6,31 +6,31 @@ import java.util.List;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Eine Seite einer Übersicht. Einträge und Gesamtzahl beziehen sich auf dieselbe, schon gefilterte Menge: Was der
- * Benutzer nicht sehen darf, zählt nicht mit (QS-009).
+ * A page of a list. Entries and total refer to the same, already filtered set: what the user may not see is not
+ * counted (QS-009).
  *
- * <p>Eine Seite hinter dem Ende ist leer, aber gültig, etwa wenn seit dem letzten Abruf Schreiben gelöscht wurden.
+ * <p>A page past the end is empty but valid, for example when letters were deleted since the last request.
  */
 @ValueObject
 public record Page<T>(List<T> entries, long total, PageRequest request) {
 
     public Page {
-        entries = List.copyOf(Validate.requiredWithoutGaps(entries, "Die Einträge der Seite"));
-        Validate.required(request, "Die Seitenanfrage");
+        entries = List.copyOf(Validate.requiredWithoutGaps(entries, "The entries of the page"));
+        Validate.required(request, "The PageRequest");
         if (entries.size() > request.size()) {
-            throw new ValidationException("Die Seite hat " + entries.size() + " Einträge, höchstens "
-                    + request.size() + " sind erlaubt");
+            throw new ValidationException("The page has " + entries.size() + " entries, at most "
+                    + request.size() + " are allowed");
         }
         if (total < 0) {
-            throw new ValidationException("Die Gesamtzahl darf nicht negativ sein, war " + total);
+            throw new ValidationException("The total must not be negative, was " + total);
         }
         if (!entries.isEmpty() && total < request.offset() + entries.size()) {
-            throw new ValidationException("Die Gesamtzahl " + total + " ist kleiner als die Einträge bis "
-                    + "einschließlich dieser Seite");
+            throw new ValidationException("The total " + total + " is less than the entries up to "
+                    + "and including this page");
         }
     }
 
-    /** Wie viele Seiten dieser Größe die Gesamtzahl füllt; ohne Einträge keine. */
+    /** How many pages of this size the total fills; none without entries. */
     public long pageCount() {
         return (total + request.size() - 1) / request.size();
     }

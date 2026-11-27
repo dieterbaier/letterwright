@@ -1,5 +1,5 @@
 /**
- * Eingehende Ports: Schnittstellen der Anwendungsfälle, siehe ADR-002.
+ * Inbound ports: the interfaces of the use cases, see ADR-002.
  */
 @NullMarked
 package dieterbaier.letterwright.usecases.in;

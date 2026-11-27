@@ -22,15 +22,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Brücke zu {@code features/letter/preview-create.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind {@link Fakes}, die festhalten, was gefragt wurde.
+ * Bridge to {@code features/letters/create-preview.feature}: one test per scenario, named after the
+ * scenario title. The outbound ports are {@link Fakes} that record what was asked.
  */
 class CreatePreviewServiceTest {
 
     private static final Instant NOW = Instant.parse("2026-11-22T10:00:00Z");
     private static final UserId ERIKA = new UserId("erika");
     private static final UserId MAX = new UserId("max");
-    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Customer", "4711");
 
     private final Fakes.Templates templates = new Fakes.Templates();
     private final Fakes.Host host = new Fakes.Host();
@@ -39,26 +39,26 @@ class CreatePreviewServiceTest {
     private final Fakes.Renderer renderer = new Fakes.Renderer();
     private final CreatePreviewService preview = new CreatePreviewService(templates, host, host, renderer, store, clock);
 
-    // Grundlage: "Mahnung" zum Bezugstyp Kunde, Version 1 abgelöst, veröffentlicht ist Version 2, Entwurf 3; Briefpapier in Version 1;
-    // der Host liefert zum Kunden 4711 den Datenkontext "name" = "Erika Mustermann GmbH".
+    // Background: "Payment reminder" for reference type Customer, version 1 superseded, version 2 published, draft 3;
+    // letterhead in version 1; for customer 4711 the host provides the data context "name" = "Erika Mustermann GmbH".
     private final Letterhead letterhead =
             templates.store(Letterhead.createWithDefaultType(TemplateId.generate(), "Standard", "<header/>")
                     .publishDraft());
-    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Mahnung",
-            letterhead.id(), "Kunde", "<p>{{name}}</p>").publishDraft()
-            .newDraft("<p>Erneut: {{name}}</p>").publishDraft().newDraft("<p>Entwurf</p>"));
+    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Payment reminder",
+            letterhead.id(), "Customer", "<p>{{name}}</p>").publishDraft()
+            .newDraft("<p>Again: {{name}}</p>").publishDraft().newDraft("<p>Draft</p>"));
 
     @Test
     void withPermissionAPreviewWithSnapshotIsCreated() {
-        // Given: Erika darf zum Kunden 4711 aus der Mahnung ein Schreiben erzeugen
+        // Given: Erika may create a letter from the payment reminder for customer 4711
         host.allowed = true;
 
-        // When: Erika erzeugt die Vorschau der Mahnung zum Kunden 4711
+        // When: Erika creates the preview of the payment reminder for customer 4711
         var result = preview.create(ERIKA, CUSTOMER_4711, reminder.id());
 
-        // Then: Vorschau mit den Daten; Snapshot gebunden an Erika, Kunde, Briefpapier V1 und Mahnung V2; 30 Minuten
+        // Then: preview with the data; snapshot bound to Erika, customer, letterhead V1 and payment reminder V2; 30 minutes
         var created = (PreviewResult.Created) result;
-        assertThat(created.html()).contains("Erneut: Erika Mustermann GmbH").contains("<header/>");
+        assertThat(created.html()).contains("Again: Erika Mustermann GmbH").contains("<header/>");
         Snapshot snapshot = store.snapshots.get(created.snapshot());
         assertThat(snapshot.user()).isEqualTo(ERIKA);
         assertThat(snapshot.reference()).isEqualTo(CUSTOMER_4711);
@@ -71,7 +71,7 @@ class CreatePreviewServiceTest {
 
     @Test
     void withoutPermissionNoDataContextIsRequested() {
-        // Given: Erika darf aus der Mahnung kein Schreiben erzeugen
+        // Given: Erika may not create a letter from the payment reminder
         host.allowed = false;
 
         // When
@@ -89,7 +89,7 @@ class CreatePreviewServiceTest {
     void forAReferenceOfAnotherTypeTheHostIsNotAsked() {
         host.allowed = true;
 
-        var result = preview.create(ERIKA, new BusinessReference("Lieferant", "0815"), reminder.id());
+        var result = preview.create(ERIKA, new BusinessReference("Supplier", "0815"), reminder.id());
 
         assertThat(result).isInstanceOf(PreviewResult.ReferenceMismatch.class);
         assertThat(host.wasAsked()).isFalse();
@@ -107,9 +107,9 @@ class CreatePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"das Standardschreiben", "das Briefpapier"})
+    @ValueSource(strings = {"the letter template", "the letterhead"})
     void withoutPublishedVersionThereIsNoPreview(String template) {
-        // Given: <vorlage> hat keine veröffentlichte Version; Erika darf erzeugen
+        // Given: <template> has no published version; Erika may create
         withoutPublishedVersion(template);
         host.allowed = true;
 
@@ -122,15 +122,15 @@ class CreatePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"das Standardschreiben", "das Briefpapier"})
+    @ValueSource(strings = {"the letter template", "the letterhead"})
     void withoutPermissionItStaysHiddenWhetherAVersionIsPublished(String template) {
-        // Given: <vorlage> hat keine veröffentlichte Version; Erika darf nicht erzeugen
+        // Given: <template> has no published version; Erika may not create
         withoutPublishedVersion(template);
         host.allowed = false;
 
         var result = preview.create(ERIKA, CUSTOMER_4711, reminder.id());
 
-        // Then: nicht erlaubt, wie mit veröffentlichter Version; kein Datenkontext, kein Rendering, kein Snapshot
+        // Then: not allowed, as with a published version; no data context, no rendering, no snapshot
         assertThat(result).isInstanceOf(PreviewResult.NotAllowed.class);
         assertThat(host.dataContextRequested).isZero();
         assertThat(renderer.invocations).isZero();
@@ -138,7 +138,7 @@ class CreatePreviewServiceTest {
     }
 
     private void withoutPublishedVersion(String template) {
-        if (template.equals("das Standardschreiben")) {
+        if (template.equals("the letter template")) {
             templates.store(reminder.withdraw());
         } else {
             templates.store(letterhead.withdraw());
@@ -156,31 +156,31 @@ class CreatePreviewServiceTest {
 
     @Test
     void anUpdatedPreviewReplacesTheOwnSnapshot() {
-        // Given: Erika darf erzeugen und hat vor 20 Minuten eine Vorschau erzeugt
+        // Given: Erika may create and created a preview 20 minutes ago
         host.allowed = true;
         var previous = (PreviewResult.Created) preview.create(ERIKA, CUSTOMER_4711, reminder.id());
         clock.now = NOW.plus(Duration.ofMinutes(20));
 
-        // When: Erika aktualisiert diese Vorschau
-        var newOnes = (PreviewResult.Created) preview.update(ERIKA, CUSTOMER_4711, reminder.id(),
+        // When: Erika updates this preview
+        var newOne = (PreviewResult.Created) preview.update(ERIKA, CUSTOMER_4711, reminder.id(),
                 previous.snapshot());
 
-        // Then: Der bisherige Snapshot ist gelöscht, der neue läuft in 30 Minuten ab
-        assertThat(store.snapshots).containsOnlyKeys(newOnes.snapshot());
-        assertThat(newOnes.expiry()).isEqualTo(clock.now.plus(Duration.ofMinutes(30)));
+        // Then: the previous snapshot is deleted, the new one expires in 30 minutes
+        assertThat(store.snapshots).containsOnlyKeys(newOne.snapshot());
+        assertThat(newOne.expiry()).isEqualTo(clock.now.plus(Duration.ofMinutes(30)));
     }
 
     @Test
     void aForeignSnapshotBehavesLikeAMissingOne() {
-        // Given: Erika darf erzeugen; Max hat eine Vorschau der Mahnung zum Kunden 4711
+        // Given: Erika may create; Max has a preview of the payment reminder for customer 4711
         host.allowed = true;
         var ofMax = (PreviewResult.Created) preview.create(MAX, CUSTOMER_4711, reminder.id());
         Snapshot snapshotOfMax = store.snapshots.get(ofMax.snapshot());
 
-        // When: Erika aktualisiert und gibt dabei den Snapshot von Max an
+        // When: Erika updates, passing the snapshot of Max
         var result = preview.update(ERIKA, CUSTOMER_4711, reminder.id(), ofMax.snapshot());
 
-        // Then: Für Erika entsteht eine neue Vorschau; der Snapshot von Max ist unverändert gespeichert
+        // Then: a new preview is created for Erika; the snapshot of Max is stored unchanged
         var forErika = (PreviewResult.Created) result;
         assertThat(store.snapshots.get(forErika.snapshot()).user()).isEqualTo(ERIKA);
         assertThat(store.snapshots.get(ofMax.snapshot())).isSameAs(snapshotOfMax);
@@ -189,17 +189,17 @@ class CreatePreviewServiceTest {
 
     @Test
     void anUpdatedPreviewLeavesAConsumedSnapshotInPlace() {
-        // Given: Erika hat aus ihrer bisherigen Vorschau schon ein Schreiben gespeichert
+        // Given: Erika has already saved a letter from her previous preview
         host.allowed = true;
         var previous = (PreviewResult.Created) preview.create(ERIKA, CUSTOMER_4711, reminder.id());
         store.save(store.snapshots.get(previous.snapshot()).consumed());
 
-        // When: Erika aktualisiert diese Vorschau
-        var newOnes = (PreviewResult.Created) preview.update(ERIKA, CUSTOMER_4711, reminder.id(),
+        // When: Erika updates this preview
+        var newOne = (PreviewResult.Created) preview.update(ERIKA, CUSTOMER_4711, reminder.id(),
                 previous.snapshot());
 
-        // Then: Der verbrauchte Snapshot bleibt, damit eine Wiederholung des Speicherns das Schreiben noch findet
-        assertThat(store.snapshots).containsOnlyKeys(previous.snapshot(), newOnes.snapshot());
+        // Then: the consumed snapshot stays so that a retry of the save still finds the letter
+        assertThat(store.snapshots).containsOnlyKeys(previous.snapshot(), newOne.snapshot());
         assertThat(store.deleted).isEmpty();
     }
 

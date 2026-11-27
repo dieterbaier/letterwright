@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.api;
 
 import org.springframework.stereotype.Component;
 
-/** Fixture: absichtlicher Verstoß, eine API-Klasse mit Spring-Abhängigkeit. */
+/** Fixture: deliberate violation, an API class with a Spring dependency. */
 @Component
 public class ApiWithSpring {
 }

@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.starter;
 
-/** Fixture: der Starter, von dem Adapter nicht abhängen dürfen. */
+/** Fixture: the starter, which adapters must not depend on. */
 public class FixtureAutoConfiguration {
 }

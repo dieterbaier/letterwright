@@ -11,22 +11,22 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 /**
- * Befristet gespeicherter Datenkontext einer Vorschau, aus dem beim Speichern das PDF erzeugt wird (ADR-007).
+ * Temporarily stored data context of a preview, from which the PDF is created on saving (ADR-007).
  *
- * <p>Ein Snapshot ist an Benutzer, fachlichen Bezug und beide Vorlagenversionen gebunden. Für einen anderen Benutzer
- * oder Bezug und nach Ablauf ist er nicht verwendbar; der Anwendungsfall behandelt ihn dann wie einen nicht
- * vorhandenen. Die Vorlagenversionen kennt er nur als {@link VersionReference}, sie gehören zu ihren Vorlagen.
+ * <p>A snapshot is bound to the user, the business reference and both template versions. For another user or
+ * reference and after expiry it is not usable; the use case then treats it like a non-existent one. It knows the
+ * template versions only as {@link VersionReference}; they belong to their templates.
  *
- * <p>Aus einem Snapshot entsteht höchstens ein Schreiben: {@link #consumed()} geht nur von einem offenen aus und
- * gibt den Datenkontext frei (ADR-021).
+ * <p>A snapshot yields at most one letter: {@link #consumed()} starts only from an open one and releases the data
+ * context (ADR-021).
  *
- * <p>Den Zeitpunkt bekommen die Methoden als Parameter. Der Anwendungsfall liest seine Uhr einmal und prüft und erzeugt
- * mit demselben Zeitpunkt; das Modell selbst liest keine Uhr.
+ * <p>The methods receive the time as a parameter. The use case reads its clock once and checks and creates with the
+ * same time; the model itself reads no clock.
  */
 @AggregateRoot
 public final class Snapshot {
 
-    /** So lange ist ein Snapshot nach seiner Anlage verwendbar (ADR-007). */
+    /** How long a snapshot is usable after its creation (ADR-007). */
     public static final Duration VALIDITY = Duration.ofMinutes(30);
 
     @Identity
@@ -40,38 +40,37 @@ public final class Snapshot {
 
     private Snapshot(SnapshotId id, UserId user, BusinessReference reference, VersionReference letterhead,
             VersionReference letterTemplate, SnapshotState state, Instant expiry) {
-        this.id = Validate.required(id, "Die ID des Snapshots");
-        this.user = Validate.required(user, "Der Benutzer des Snapshots");
-        this.reference = Validate.required(reference, "Der fachliche Bezug des Snapshots");
-        this.letterhead = Validate.required(letterhead, "Die Briefpapier-Version des Snapshots");
-        this.letterTemplate = Validate.required(letterTemplate, "Die Standardschreiben-Version des Snapshots");
-        this.state = Validate.required(state, "Der Zustand des Snapshots");
-        this.expiry = Validate.required(expiry, "Der Ablaufzeitpunkt des Snapshots");
+        this.id = Validate.required(id, "The ID of the snapshot");
+        this.user = Validate.required(user, "The user of the snapshot");
+        this.reference = Validate.required(reference, "The business reference of the snapshot");
+        this.letterhead = Validate.required(letterhead, "The letterhead version of the snapshot");
+        this.letterTemplate = Validate.required(letterTemplate, "The letter template version of the snapshot");
+        this.state = Validate.required(state, "The state of the snapshot");
+        this.expiry = Validate.required(expiry, "The expiry time of the snapshot");
     }
 
-    /** Legt einen Snapshot an, der {@link #VALIDITY} nach {@code now} abläuft. */
+    /** Creates a snapshot that expires {@link #VALIDITY} after {@code now}. */
     public static Snapshot create(SnapshotId id, UserId user, BusinessReference reference,
             VersionReference letterhead, VersionReference letterTemplate, DataContext dataContext, Instant now) {
         return new Snapshot(id, user, reference, letterhead, letterTemplate,
                 new SnapshotState.Open(dataContext),
-                Validate.required(now, "Der Zeitpunkt der Anlage").plus(VALIDITY));
+                Validate.required(now, "The time of creation").plus(VALIDITY));
     }
 
-    /** Stellt einen gespeicherten Snapshot mit Zustand und Ablaufzeitpunkt wieder her. */
+    /** Restores a stored snapshot with its state and expiry time. */
     public static Snapshot restore(SnapshotId id, UserId user, BusinessReference reference,
             VersionReference letterhead, VersionReference letterTemplate, SnapshotState state, Instant expiry) {
         return new Snapshot(id, user, reference, letterhead, letterTemplate, state, expiry);
     }
 
     /**
-     * Der Snapshot, nachdem aus ihm ein Schreiben entstanden ist, ohne Datenkontext. Gedacht für
-     * {@code Letter.fromSnapshot}.
+     * The snapshot after a letter was created from it, without data context. Meant for {@code Letter.fromSnapshot}.
      *
-     * @throws IllegalStateException wenn aus dem Snapshot schon ein Schreiben entstanden ist
+     * @throws IllegalStateException if a letter was already created from the snapshot
      */
     public Snapshot consumed() {
         if (state instanceof SnapshotState.Consumed) {
-            throw new IllegalStateException("Aus Snapshot " + id.value() + " ist schon ein Schreiben entstanden");
+            throw new IllegalStateException("A letter was already created from snapshot " + id.value());
         }
         return new Snapshot(id, user, reference, letterhead, letterTemplate, new SnapshotState.Consumed(),
                 expiry);
@@ -105,19 +104,19 @@ public final class Snapshot {
         return expiry;
     }
 
-    /** Ab dem Ablaufzeitpunkt ist der Snapshot abgelaufen. */
+    /** From the expiry time on, the snapshot is expired. */
     public boolean isExpired(Instant now) {
         return !now.isBefore(expiry);
     }
 
-    /** Verwendbar nur für denselben Benutzer und Bezug und nur vor dem Ablauf. */
+    /** Usable only for the same user and reference and only before expiry. */
     public boolean isUsableFor(UserId requester, BusinessReference requestedReference, Instant now) {
         return user.equals(requester)
                 && reference.equals(requestedReference)
                 && !isExpired(now);
     }
 
-    /** Gleich sind zwei Instanzen mit derselben ID. */
+    /** Two instances with the same ID are equal. */
     @Override
     public boolean equals(Object other) {
         return other instanceof Snapshot snapshot && id.equals(snapshot.id);
@@ -130,7 +129,7 @@ public final class Snapshot {
 
     @Override
     public String toString() {
-        // Ohne Datenkontext: Er kann personenbezogen sein.
-        return "Snapshot[id=" + id.value() + ", ablauf=" + expiry + "]";
+        // Without data context: it may contain personal data.
+        return "Snapshot[id=" + id.value() + ", expiry=" + expiry + "]";
     }
 }

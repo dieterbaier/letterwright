@@ -18,8 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Brücke zu {@code features/templates/vorlagenversion-withdraw.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind {@link Fakes}.
+ * Bridge to {@code features/templates/withdraw-template-version.feature}: one test per scenario, named after the
+ * scenario title. The outbound ports are {@link Fakes}.
  */
 class WithdrawTemplateVersionServiceTest {
 
@@ -30,19 +30,19 @@ class WithdrawTemplateVersionServiceTest {
     private final Fakes.Host host = new Fakes.Host();
     private final WithdrawTemplateVersionService withdrawal = new WithdrawTemplateVersionService(templates, host);
 
-    // Grundlage: Briefpapier und Standardschreiben je mit veröffentlichter Version 1 und Entwurf 2; Vera darf
-    // veröffentlichen.
+    // Background: a letterhead and a letter template, each with published version 1 and draft 2; Vera may
+    // publish.
     private final Letterhead letterhead = templates.store(Letterhead.createWithDefaultType(TemplateId.generate(),
             "Standard", "<header/>").publishDraft().newDraft("<header>2</header>"));
-    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Mahnung",
-            letterhead.id(), "Kunde", "<p>1</p>").publishDraft().newDraft("<p>2</p>"));
+    private final LetterTemplate reminder = templates.store(LetterTemplate.create(TemplateId.generate(), "Payment reminder",
+            letterhead.id(), "Customer", "<p>1</p>").publishDraft().newDraft("<p>2</p>"));
 
     {
         host.mayPublish.add(VERA);
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = {"ein Standardschreiben", "ein Briefpapier"})
+    @ValueSource(strings = {"a letter template", "a letterhead"})
     void thePublishedVersionIsWithdrawnWithoutSuccessor(String template) {
         TemplateId id = id(template);
 
@@ -52,8 +52,8 @@ class WithdrawTemplateVersionServiceTest {
                 new WithdrawalResult.Withdrawn(new VersionReference(id, VersionNumber.FIRST)));
         assertThat(versions(template)).extracting(TemplateVersion::state)
                 .containsExactly(TemplateVersionState.WITHDRAWN, TemplateVersionState.DRAFT);
-        assertThat(versions(template).getLast().content()).as("der Entwurf bleibt unverändert")
-                .isEqualTo(template.contains("Brief") ? "<header>2</header>" : "<p>2</p>");
+        assertThat(versions(template).getLast().content()).as("the draft stays unchanged")
+                .isEqualTo(template.contains("letterhead") ? "<header>2</header>" : "<p>2</p>");
         assertThat(host.templateActionRequested).containsExactly(TemplateAction.PUBLISH);
     }
 
@@ -66,10 +66,10 @@ class WithdrawTemplateVersionServiceTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = {"ein Standardschreiben", "ein Briefpapier"})
+    @ValueSource(strings = {"a letter template", "a letterhead"})
     void withoutPublishedVersionThereIsNothingToWithdraw(String template) {
         templates.store(Letterhead.createWithDefaultType(letterhead.id(), "Standard", "<header/>"));
-        templates.store(LetterTemplate.create(reminder.id(), "Mahnung", letterhead.id(), "Kunde", "<p>1</p>"));
+        templates.store(LetterTemplate.create(reminder.id(), "Payment reminder", letterhead.id(), "Customer", "<p>1</p>"));
 
         var result = withdrawal.withdraw(VERA, id(template));
 
@@ -89,16 +89,16 @@ class WithdrawTemplateVersionServiceTest {
         var result = withdrawal.withdraw(VERA, reminder.id());
 
         assertThat(result).isEqualTo(new WithdrawalResult.Stale());
-        assertThat(versions("ein Standardschreiben")).extracting(TemplateVersion::state)
+        assertThat(versions("a letter template")).extracting(TemplateVersion::state)
                 .containsExactly(TemplateVersionState.SUPERSEDED, TemplateVersionState.PUBLISHED);
     }
 
     private TemplateId id(String template) {
-        return template.contains("Brief") ? letterhead.id() : reminder.id();
+        return template.contains("letterhead") ? letterhead.id() : reminder.id();
     }
 
     private List<TemplateVersion> versions(String template) {
-        return template.contains("Brief")
+        return template.contains("letterhead")
                 ? templates.letterhead(letterhead.id()).orElseThrow().versions()
                 : templates.letterTemplate(reminder.id()).orElseThrow().versions();
     }

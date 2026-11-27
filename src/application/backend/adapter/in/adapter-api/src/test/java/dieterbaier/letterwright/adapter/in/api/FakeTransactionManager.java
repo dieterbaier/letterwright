@@ -6,9 +6,9 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.SmartTransactionObject;
 
 /**
- * Ein Transaktionsmanager ohne Datenbank. Beitreten, Eröffnen, Commit und Rollback samt rollback-only übernimmt die
- * echte Logik von {@link AbstractPlatformTransactionManager}; die Attrappe zählt nur mit. Eine unabhängige Transaktion
- * ({@code REQUIRES_NEW}) würde die laufende aussetzen; das unterstützt sie nicht und scheitert dann.
+ * A transaction manager without a database. Joining, opening, commit and rollback including rollback-only are handled
+ * by the real logic of {@link AbstractPlatformTransactionManager}; the fake only counts. An independent transaction
+ * ({@code REQUIRES_NEW}) would suspend the running one; the fake does not support that and fails.
  */
 final class FakeTransactionManager extends AbstractPlatformTransactionManager {
 
@@ -19,7 +19,7 @@ final class FakeTransactionManager extends AbstractPlatformTransactionManager {
     int opened;
     int committed;
     int rolledBack;
-    /** Ob beim letzten Aufruf des Anwendungsfalls eine Transaktion lief, und wie viele bis dahin eröffnet waren. */
+    /** Whether a transaction was running at the last call of the use case, and how many had been opened by then. */
     boolean ranAtInvocation;
     int openedAtInvocation;
 
@@ -62,7 +62,7 @@ final class FakeTransactionManager extends AbstractPlatformTransactionManager {
         openedAtInvocation = opened;
     }
 
-    /** Meldet den globalen rollback-only-Zustand, damit ein Commit danach wie in echt scheitert. */
+    /** Reports the global rollback-only state so that a subsequent commit fails as it would for real. */
     private final class Transaction implements SmartTransactionObject {
 
         private final boolean existing;

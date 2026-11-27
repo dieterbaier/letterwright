@@ -22,15 +22,15 @@ class TemplateVersionTest {
         VersionNumber one = VersionNumber.FIRST;
         TemplateVersionState draft = TemplateVersionState.DRAFT;
 
-        rejects(() -> TemplateVersion.restore(null, one, draft, "", EMPTY), "Vorlage der Version");
+        rejects(() -> TemplateVersion.restore(null, one, draft, "", EMPTY), "template of the version");
         rejects(() -> TemplateVersion.restore(id, null, draft, "", EMPTY), "VersionNumber");
-        rejects(() -> TemplateVersion.restore(id, one, null, "", EMPTY), "Zustand der Version");
-        rejects(() -> TemplateVersion.restore(id, one, draft, null, EMPTY), "Inhalt der Version");
-        rejects(() -> TemplateVersion.restore(id, one, draft, "", null), "Beispieldaten der Version");
+        rejects(() -> TemplateVersion.restore(id, one, null, "", EMPTY), "state of the version");
+        rejects(() -> TemplateVersion.restore(id, one, draft, null, EMPTY), "content of the version");
+        rejects(() -> TemplateVersion.restore(id, one, draft, "", null), "sample data of the version");
         for (TemplateVersionState released : new TemplateVersionState[] {TemplateVersionState.PUBLISHED,
                 TemplateVersionState.SUPERSEDED, TemplateVersionState.WITHDRAWN}) {
             rejects(() -> TemplateVersion.restore(id, one, released, " ", EMPTY),
-                    "Inhalt einer freigegebenen");
+                    "content of a released");
         }
     }
 
@@ -38,7 +38,7 @@ class TemplateVersionTest {
     void onlyADraftWithContentIsPublishable() {
         assertThat(version(id, 1, TemplateVersionState.DRAFT).isPublishable()).isTrue();
         assertThat(TemplateVersion.restore(id, VersionNumber.FIRST, TemplateVersionState.DRAFT, " \n", EMPTY)
-                .isPublishable()).as("nur Leerraum").isFalse();
+                .isPublishable()).as("only whitespace").isFalse();
         assertThat(version(id, 1, TemplateVersionState.PUBLISHED).isPublishable()).isFalse();
         assertThat(version(id, 1, TemplateVersionState.SUPERSEDED).isPublishable()).isFalse();
     }
@@ -52,6 +52,6 @@ class TemplateVersionTest {
         assertThat(version(id, 2, TemplateVersionState.DRAFT)).isNotEqualTo(draft);
         assertThat(version(TemplateId.generate(), 1, TemplateVersionState.DRAFT)).isNotEqualTo(draft);
         assertThat(draft).isNotEqualTo(draft.reference());
-        assertThat(draft.toString()).contains("nummer=1", "DRAFT").doesNotContain("<p>");
+        assertThat(draft.toString()).contains("number=1", "DRAFT").doesNotContain("<p>");
     }
 }

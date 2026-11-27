@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.domain.model;
 
 import org.jmolecules.ddd.annotation.Entity;
 
-/** Fixture: absichtlicher Verstoß, eine Entität ohne gekennzeichnete Identität. */
+/** Fixture: deliberate violation, an entity without a marked identity. */
 @Entity
 public class EntityWithoutIdentity {
 

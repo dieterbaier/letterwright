@@ -3,12 +3,12 @@ package dieterbaier.letterwright.usecases.in;
 import dieterbaier.letterwright.domain.model.letter.Letter;
 import dieterbaier.letterwright.validation.Validate;
 
-/** Was beim Herunterladen eines Schreibens herauskommt. Nur {@link Delivered} enthält ein PDF. */
+/** The outcome of downloading a letter. Only {@link Delivered} contains a PDF. */
 public sealed interface DownloadResult {
 
     /**
-     * Das PDF mit derselben Prüfsumme wie beim Speichern. Eine Klasse statt eines Records, weil ein Record ein Array per
-     * Referenz vergleicht und herausgibt.
+     * The PDF with the same checksum as when it was saved. A class instead of a record, because a record compares and
+     * hands out an array by reference.
      */
     final class Delivered implements DownloadResult {
 
@@ -16,8 +16,8 @@ public sealed interface DownloadResult {
         private final byte[] pdf;
 
         public Delivered(Letter letter, byte[] pdf) {
-            this.letter = Validate.required(letter, "Das Schreiben");
-            this.pdf = Validate.required(pdf, "Das PDF").clone();
+            this.letter = Validate.required(letter, "The letter");
+            this.pdf = Validate.required(pdf, "The PDF").clone();
         }
 
         public Letter letter() {
@@ -30,8 +30,8 @@ public sealed interface DownloadResult {
     }
 
     /**
-     * Das Schreiben gibt es nicht, es ist logisch gelöscht, oder der Benutzer darf es nicht herunterladen. Die Fälle sind
-     * absichtlich nicht unterscheidbar (QS-009).
+     * The letter does not exist, is logically deleted, or the user may not download it. The cases are deliberately
+     * indistinguishable (QS-009).
      */
     record Unknown() implements DownloadResult {}
 }

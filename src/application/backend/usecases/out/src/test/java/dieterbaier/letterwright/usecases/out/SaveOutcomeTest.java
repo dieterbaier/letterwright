@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class SaveOutcomeTest {
 
     private final Letter existing = Letter.restore(LetterId.generate(), SnapshotId.generate(),
-            new BusinessReference("Kunde", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
+            new BusinessReference("Customer", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
             new VersionReference(TemplateId.generate(), VersionNumber.FIRST), new DocumentReference("store/1"),
             Checksum.of(new byte[] {1}), Instant.parse("2026-11-22T10:00:00Z"),
             new LetterState.Visible());
@@ -31,6 +31,6 @@ class SaveOutcomeTest {
         assertThat(new SaveOutcome.SnapshotNoLongerExists()).isInstanceOf(SaveOutcome.class);
         assertThat(new SaveOutcome.LetterRemoved()).isInstanceOf(SaveOutcome.class);
         assertThatThrownBy(() -> new SaveOutcome.SnapshotAlreadyConsumed(null))
-                .hasMessageContaining("vorhandene Schreiben");
+                .hasMessageContaining("existing letter");
     }
 }

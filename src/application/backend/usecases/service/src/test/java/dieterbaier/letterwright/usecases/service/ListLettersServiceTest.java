@@ -14,24 +14,24 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 /**
- * Brücke zu {@code features/letter/letter-auflisten.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind {@link Fakes}.
+ * Bridge to {@code features/letters/list-letters.feature}: one test per scenario, named after the
+ * scenario title. The outbound ports are {@link Fakes}.
  */
 class ListLettersServiceTest {
 
     private static final Instant MONDAY = Instant.parse("2026-11-16T09:00:00Z");
     private static final UserId ERIKA = new UserId("erika");
-    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Kunde", "4711");
-    private static final BusinessReference CUSTOMER_0815 = new BusinessReference("Kunde", "0815");
+    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Customer", "4711");
+    private static final BusinessReference CUSTOMER_0815 = new BusinessReference("Customer", "0815");
     private static final PageRequest FIRST_PAGE_OF_2 = new PageRequest(0, 2);
 
     private final Fakes.Host host = new Fakes.Host();
     private final Fakes.Documents documents = new Fakes.Documents();
-    private final Fakes.LetterStore letter = new Fakes.LetterStore(new Fakes.Snapshots());
-    private final SavedLetters saved = new SavedLetters(letter, documents);
-    private final ListLettersService list = new ListLettersService(host, letter);
+    private final Fakes.LetterStore letters = new Fakes.LetterStore(new Fakes.Snapshots());
+    private final SavedLetters saved = new SavedLetters(letters, documents);
+    private final ListLettersService list = new ListLettersService(host, letters);
 
-    // Grundlage: drei Schreiben zum Kunden 4711, an drei Tagen gespeichert; Erika darf sie ansehen.
+    // Background: three letters for customer 4711, saved on three days; Erika may view them.
     private final Letter oldest = saved.save(CUSTOMER_4711, MONDAY);
     private final Letter middle = saved.save(CUSTOMER_4711, MONDAY.plus(Duration.ofDays(1)));
     private final Letter newest = saved.save(CUSTOMER_4711, MONDAY.plus(Duration.ofDays(2)));
@@ -49,21 +49,21 @@ class ListLettersServiceTest {
         assertThat(page.total()).isEqualTo(3);
         assertThat(page.pageCount()).isEqualTo(2);
         assertThat(list.list(ERIKA, CUSTOMER_4711, new PageRequest(1, 2)))
-                .as("die zweite Seite hat das älteste")
+                .as("the second page has the oldest")
                 .isEqualTo(new ListResult.Found(new Page<>(java.util.List.of(oldest), 3,
                         new PageRequest(1, 2))));
     }
 
     @Test
     void invisibleLettersCountNeitherInThePageNorInTheTotal() {
-        // Given: zwei neuere Schreiben zu einem anderen Kunden; das neueste zum Kunden 4711 ist logisch gelöscht
+        // Given: two newer letters for another customer; the newest for customer 4711 is logically deleted
         saved.save(CUSTOMER_0815, MONDAY.plus(Duration.ofDays(3)));
         saved.save(CUSTOMER_0815, MONDAY.plus(Duration.ofDays(4)));
         saved.deleteLogically(newest, MONDAY.plus(Duration.ofDays(5)));
 
         var result = list.list(ERIKA, CUSTOMER_4711, FIRST_PAGE_OF_2);
 
-        // Then: nur die übrigen beiden; Gesamtzahl und Seitenzahl zählen nur sie
+        // Then: only the other two; the total and the page count count only them
         Page<Letter> page = ((ListResult.Found) result).page();
         assertThat(page.entries()).containsExactly(middle, oldest);
         assertThat(page.entries()).allMatch(entry -> entry.reference().equals(CUSTOMER_4711))
@@ -89,6 +89,6 @@ class ListLettersServiceTest {
         var result = list.list(ERIKA, CUSTOMER_4711, FIRST_PAGE_OF_2);
 
         assertThat(result).isEqualTo(new ListResult.NotAllowed());
-        assertThat(letter.query).as("nichts gelesen oder gezählt").isZero();
+        assertThat(letters.query).as("nothing read or counted").isZero();
     }
 }

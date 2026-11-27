@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 
-/** Gemeinsame Zusicherung für den Fehlervertrag des SPI. */
+/** Shared assertion for the error contract of the SPI. */
 final class Checks {
 
     private Checks() {
     }
 
-    /** Der Aufruf scheitert mit genau einer IllegalArgumentException, die den Fehler benennt, nicht mit einer NPE. */
+    /** The call fails with exactly an IllegalArgumentException that names the error, not with an NPE. */
     static void rejects(ThrowingCallable invocation, String messagePart) {
         assertThatThrownBy(invocation).isExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(messagePart);

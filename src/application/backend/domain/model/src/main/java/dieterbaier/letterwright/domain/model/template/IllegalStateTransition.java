@@ -3,9 +3,9 @@ package dieterbaier.letterwright.domain.model.template;
 import java.io.Serial;
 
 /**
- * Eine Vorlage soll etwas tun, das der Zustand ihrer Versionen nicht erlaubt, etwa eine veröffentlichte Version ändern.
- * Anders als ein {@link dieterbaier.letterwright.validation.ValidationException} ist das kein ungültiger Wert,
- * sondern ein fachlich verbotener Schritt.
+ * A template is asked to do something the state of its versions does not allow, such as changing a published version.
+ * Unlike a {@link dieterbaier.letterwright.validation.ValidationException} this is not an invalid value but a step the
+ * domain forbids.
  */
 public final class IllegalStateTransition extends IllegalStateException {
 
@@ -13,6 +13,6 @@ public final class IllegalStateTransition extends IllegalStateException {
     private static final long serialVersionUID = 1L;
 
     IllegalStateTransition(TemplateId template, String message) {
-        super("Vorlage " + template.value() + ": " + message);
+        super("Template " + template.value() + ": " + message);
     }
 }

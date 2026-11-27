@@ -8,26 +8,26 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Die Werte, die der Host für ein Standardschreiben und einen fachlichen Bezug liefert.
+ * The values the host delivers for a letter template and a business reference.
  *
- * <p>Die Werte sind bereits formatiert (Beträge, Datum; ADR-008). Erlaubt sind Texte ({@link String}), Listen und Maps
- * mit Text-Schlüsseln, beliebig verschachtelt. Ein fehlender Wert wird weggelassen, nicht als {@code null} geliefert.
- * Ob die Werte diese Regeln erfüllen, prüft die Bibliothek beim Übernehmen.
+ * <p>The values are already formatted (amounts, dates; ADR-008). Allowed are texts ({@link String}), lists and maps
+ * with text keys, nested to any depth. A missing value is left out, not delivered as {@code null}. The library checks
+ * whether the values follow these rules when it takes them over.
  *
- * <p>Der Datenkontext ist unveränderlich: Er kopiert Listen und Maps auf jeder Ebene und sperrt die Kopien. Spätere
- * Änderungen an den übergebenen Sammlungen wirken sich nicht aus. {@link #toString()} gibt keine Werte aus, weil sie
- * personenbezogen sein können.
+ * <p>The data context is immutable: it copies lists and maps on every level and makes the copies unmodifiable. Later
+ * changes to the collections passed in have no effect. {@link #toString()} reveals no values because they may be
+ * personal data.
  */
 public record DataContext(Map<String, ?> values) {
 
     public DataContext {
-        values = copyMap(Require.value(values, "Die Werte des Datenkontexts"));
+        values = copyMap(Require.value(values, "The values of the data context"));
     }
 
-    /** Nur die Zahl der Werte auf oberster Ebene, keine Schlüssel und keine Werte. */
+    /** Only the number of top-level values, no keys and no values. */
     @Override
     public String toString() {
-        return "Datenkontext[" + values.size() + " Werte]";
+        return "DataContext[" + values.size() + " values]";
     }
 
     private static <K> Map<K, @Nullable Object> copyMap(Map<K, ?> source) {

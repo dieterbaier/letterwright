@@ -8,8 +8,8 @@ import dieterbaier.letterwright.domain.model.UserId;
 import dieterbaier.letterwright.domain.model.letter.Letter;
 
 /**
- * Bildet zwischen dem Domänenmodell und den Typen der API ab (ADR-023). Die Typen tragen dieselben Fachbegriffe; die
- * Typen der Anwendungsfälle sind hier voll qualifiziert, die der API importiert.
+ * Maps between the domain model and the types of the API (ADR-023). The types carry the same domain terms; the types of
+ * the use cases are fully qualified here, those of the API are imported.
  */
 final class Mapping {
 
@@ -17,8 +17,8 @@ final class Mapping {
     }
 
     /**
-     * Der Anwendungsfall speichert nur aus einem eigenen Snapshot des Benutzers. Wer ein Schreiben erhält, hat es deshalb
-     * auch erzeugt, auch bei {@code AlreadySaved}; das Schreiben selbst führt keine Benutzerkennung.
+     * The use case saves only from the user's own snapshot. Whoever receives a letter has therefore also created it, even
+     * for {@code AlreadySaved}; the letter itself does not carry a user ID.
      */
     static SaveResult toApi(
             dieterbaier.letterwright.usecases.in.SaveResult result, UserId user) {
@@ -37,11 +37,11 @@ final class Mapping {
                     new SaveResult.DataContextChanged();
             case dieterbaier.letterwright.usecases.in.SaveResult.NotConformant notConformant ->
                     new SaveResult.NotConformant(notConformant.findings());
-            // Der Anwendungsfall hinter der Java-API ist ohne Rückruf verdrahtet (ADR-023). Kommt der Fall trotzdem,
-            // ist die Verdrahtung falsch; die Ausnahme rollt die Transaktion des Hosts zurück.
+            // The use case behind the Java API is wired without a callback (ADR-023). If this case occurs anyway, the
+            // wiring is wrong; the exception rolls back the host's transaction.
             case dieterbaier.letterwright.usecases.in.SaveResult.RejectedByHost rejected ->
-                    throw new IllegalStateException("Über die Java-API gibt es keinen Rückruf, der Host hat aber"
-                            + " abgelehnt: " + rejected.reason());
+                    throw new IllegalStateException("The Java API has no callback, but the host rejected"
+                            + " the save: " + rejected.reason());
         };
     }
 

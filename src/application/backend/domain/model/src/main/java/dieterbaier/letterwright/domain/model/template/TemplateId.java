@@ -5,15 +5,15 @@ import java.util.UUID;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 /**
- * Identität eines Briefpapiers oder Standardschreibens über alle Versionen hinweg.
+ * Identity of a letterhead or letter template across all versions.
  *
- * <p>Der Konstruktor stellt eine bestehende Identität wieder her, {@link #generate()} vergibt eine neue.
+ * <p>The constructor restores an existing identity, {@link #generate()} assigns a new one.
  */
 @ValueObject
 public record TemplateId(UUID value) {
 
     public TemplateId {
-        Validate.required(value, "Der Wert der VorlagenId");
+        Validate.required(value, "The value of the TemplateId");
     }
 
     public static TemplateId generate() {

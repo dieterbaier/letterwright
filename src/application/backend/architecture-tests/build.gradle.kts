@@ -2,7 +2,7 @@ plugins {
     id("letterwright.java-module")
 }
 
-description = "ArchUnit-Regeln für die hexagonale Abhängigkeitsrichtung (ADR-002). Nur Tests, wird nicht veröffentlicht."
+description = "ArchUnit rules for the hexagonal dependency direction (ADR-002). Tests only, not published."
 
 dependencies {
     testImplementation(project(":validation"))
@@ -20,29 +20,29 @@ dependencies {
     testImplementation(project(":adapter-api"))
     testImplementation(project(":spring-boot-starter"))
     testImplementation(libs.archunit.junit5)
-    // Für die Fixtures, die die DDD-Annotationen verwenden (ADR-018).
+    // For the fixtures that use the DDD annotations (ADR-018).
     testImplementation(libs.jmolecules.ddd)
-    // Nur für die Fixture-Klassen, die einen Regelverstoß nachstellen.
+    // Only for the fixture classes that reproduce a rule violation.
     testImplementation(libs.spring.context)
 }
 
-// Nachweis, dass das Null-Gate mit den Argumenten des Produktionscodes greift (ADR-019).
-val produktionsKompilierung = tasks.named<JavaCompile>("compileJava")
-val pruefeNullVertrag = tasks.register<PruefeNullVertrag>("pruefeNullVertrag") {
-    description = "Kompiliert Proben mit der Konfiguration des Produktionscodes und erwartet die Befunde von NullAway."
+// Proof that the null gate takes effect with the arguments of the production code (ADR-019).
+val productionCompilation = tasks.named<JavaCompile>("compileJava")
+val checkNullContract = tasks.register<CheckNullContract>("checkNullContract") {
+    description = "Compiles probes with the configuration of the production code and expects the findings of NullAway."
     group = "verification"
-    proben = layout.projectDirectory.dir("src/nullprobe")
-    javac = produktionsKompilierung.flatMap { it.javaCompiler }.map { it.executablePath.asFile.absolutePath }
-    jvmArgumente = produktionsKompilierung.map { aufgabe ->
-        aufgabe.options.forkOptions.jvmArgs.orEmpty() +
-            aufgabe.options.forkOptions.jvmArgumentProviders.flatMap { it.asArguments() }
+    probes = layout.projectDirectory.dir("src/nullprobe")
+    javac = productionCompilation.flatMap { it.javaCompiler }.map { it.executablePath.asFile.absolutePath }
+    jvmArguments = productionCompilation.map { task ->
+        task.options.forkOptions.jvmArgs.orEmpty() +
+            task.options.forkOptions.jvmArgumentProviders.flatMap { it.asArguments() }
     }
-    compilerArgumente = produktionsKompilierung.map { it.options.allCompilerArgs }
-    release = produktionsKompilierung.flatMap { it.options.release }
-    prozessorPfad.from(configurations.named("annotationProcessor"))
-    klassenPfad.from(configurations.named("compileClasspath"))
+    compilerArguments = productionCompilation.map { it.options.allCompilerArgs }
+    release = productionCompilation.flatMap { it.options.release }
+    processorPath.from(configurations.named("annotationProcessor"))
+    classPath.from(configurations.named("compileClasspath"))
 }
 
 tasks.named("check") {
-    dependsOn(pruefeNullVertrag)
+    dependsOn(checkNullContract)
 }

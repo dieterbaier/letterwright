@@ -15,23 +15,23 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 /**
- * Brücke zu {@code features/letter/letter-herunterladen.feature}: ein Test je Szenario, benannt nach dem
- * Szenariotitel. Die ausgehenden Ports sind {@link Fakes}.
+ * Bridge to {@code features/letters/download-letter.feature}: one test per scenario, named after the
+ * scenario title. The outbound ports are {@link Fakes}.
  */
 class DownloadLetterServiceTest {
 
     private static final Instant SAVED = Instant.parse("2026-11-20T09:00:00Z");
     private static final UserId ERIKA = new UserId("erika");
     private static final UserId MAX = new UserId("max");
-    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Kunde", "4711");
+    private static final BusinessReference CUSTOMER_4711 = new BusinessReference("Customer", "4711");
 
     private final Fakes.Host host = new Fakes.Host();
     private final Fakes.Documents documents = new Fakes.Documents();
-    private final Fakes.LetterStore letter = new Fakes.LetterStore(new Fakes.Snapshots());
-    private final SavedLetters saved = new SavedLetters(letter, documents);
-    private final DownloadLetterService retrieval = new DownloadLetterService(letter, host, documents);
+    private final Fakes.LetterStore letters = new Fakes.LetterStore(new Fakes.Snapshots());
+    private final SavedLetters saved = new SavedLetters(letters, documents);
+    private final DownloadLetterService retrieval = new DownloadLetterService(letters, host, documents);
 
-    // Grundlage: ein Schreiben zum Kunden 4711; Erika darf herunterladen.
+    // Background: a letter for customer 4711; Erika may download it.
     private final Letter reminder = saved.save(CUSTOMER_4711, SAVED);
 
     {
@@ -54,7 +54,7 @@ class DownloadLetterServiceTest {
         var result = retrieval.load(MAX, reminder.id());
 
         assertThat(result).isEqualTo(new DownloadResult.Unknown());
-        assertThat(documents.read).as("kein PDF gelesen").isZero();
+        assertThat(documents.read).as("no PDF read").isZero();
     }
 
     @Test
@@ -78,10 +78,10 @@ class DownloadLetterServiceTest {
 
     @Test
     void aChangedPdfIsNotDelivered() {
-        documents.stored.put(reminder.document(), "%PDF verändert".getBytes(StandardCharsets.UTF_8));
+        documents.stored.put(reminder.document(), "%PDF changed".getBytes(StandardCharsets.UTF_8));
 
         assertThatIllegalStateException().isThrownBy(() -> retrieval.load(ERIKA, reminder.id()))
-                .withMessageContaining("Prüfsumme")
+                .withMessageContaining("checksum")
                 .withMessageNotContaining("4711");
     }
 }

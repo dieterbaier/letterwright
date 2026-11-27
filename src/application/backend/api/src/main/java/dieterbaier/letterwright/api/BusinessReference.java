@@ -1,17 +1,17 @@
 package dieterbaier.letterwright.api;
 
 /**
- * Das Domänenobjekt des Hosts, zu dem das Schreiben erzeugt wurde, als Typ und ID (z. B. {@code Kunde}, {@code 4711}).
- * Es sind genau die Werte, die der Host beim Erzeugen der Vorschau übergeben hat; für sie gilt der Vertrag von
- * {@code spi.BusinessReference}. Die API hat einen eigenen Typ, weil sie nicht vom SPI abhängt.
+ * The host's domain object for which the letter was created, as type and ID (e.g. {@code Customer}, {@code 4711}).
+ * These are exactly the values the host passed when the preview was created; the contract of
+ * {@code spi.BusinessReference} applies to them. The API has its own type because it does not depend on the SPI.
  *
- * @param type der Bezugstyp des Hosts, z. B. {@code Kunde}; nicht leer und nicht nur aus Leerraum
- * @param id die ID des Objekts; nicht leer und nicht nur aus Leerraum
+ * @param type the host's reference type, e.g. {@code Customer}; not empty and not only whitespace
+ * @param id the ID of the object; not empty and not only whitespace
  */
 public record BusinessReference(String type, String id) {
 
     public BusinessReference {
-        Require.text(type, "Der Typ des fachlichen Bezugs");
-        Require.text(id, "Die ID des fachlichen Bezugs");
+        Require.text(type, "The type of the business reference");
+        Require.text(id, "The ID of the business reference");
     }
 }

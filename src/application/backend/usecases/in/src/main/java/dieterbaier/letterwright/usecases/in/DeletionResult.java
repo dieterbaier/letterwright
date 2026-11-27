@@ -2,23 +2,23 @@ package dieterbaier.letterwright.usecases.in;
 
 import dieterbaier.letterwright.validation.Validate;
 
-/** Was beim Löschen eines Schreibens herauskommt. */
+/** The outcome of deleting a letter. */
 public sealed interface DeletionResult {
 
-    /** Das Schreiben ist für den Benutzer weg, ob hart oder logisch gelöscht, hat die Löschrichtlinie entschieden. */
+    /** The letter is gone for the user; the deletion policy decided whether it was hard or logically deleted. */
     record Deleted() implements DeletionResult {}
 
-    /** Die Löschrichtlinie des Hosts sperrt das Löschen; der Grund ist für den Benutzer bestimmt. */
+    /** The host's deletion policy blocks the deletion; the reason is meant for the user. */
     record Blocked(String reason) implements DeletionResult {
 
         public Blocked {
-            Validate.notBlank(reason, "Der Grund der Löschsperre");
+            Validate.notBlank(reason, "The reason for the deletion block");
         }
     }
 
     /**
-     * Das Schreiben gibt es nicht, es ist schon logisch gelöscht, oder der Benutzer darf es nicht löschen. Die Fälle sind
-     * absichtlich nicht unterscheidbar (QS-009).
+     * The letter does not exist, is already logically deleted, or the user may not delete it. The cases are deliberately
+     * indistinguishable (QS-009).
      */
     record Unknown() implements DeletionResult {}
 }

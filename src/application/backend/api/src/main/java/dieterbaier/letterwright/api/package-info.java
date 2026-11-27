@@ -1,18 +1,18 @@
 /**
- * Java-API für die Host-Anwendung, siehe ADR-023: Anwendungsfälle, die der Host in seinem eigenen Code und in seiner
- * eigenen Transaktion aufruft, und die Datentypen, die über sie fließen. Hängt wie das SPI an keinem anderen Modul der
- * Bibliothek und nicht an Spring (Muster aus ADR-016). Den Rückruf beim Speichern über die Oberfläche beschreibt das
- * SPI, nicht dieses Paket.
+ * Java API for the host application, see ADR-023: use cases the host calls from its own code and in its own
+ * transaction, and the data types that flow through them. Like the SPI, it depends on no other module of the library
+ * and not on Spring (pattern from ADR-016). The callback on saving through the user interface is described by the SPI,
+ * not by this package.
  *
- * <p>Heute gibt es einen Anwendungsfall: {@link dieterbaier.letterwright.api.SaveLetter}.
+ * <p>Today there is one use case: {@link dieterbaier.letterwright.api.SaveLetter}.
  *
- * <p>Für alle Typen dieses Pakets gilt:
+ * <p>For all types of this package:
  * <ul>
- *   <li>Kein Parameter und kein Rückgabewert ist {@code null}. Das Paket ist {@code @NullMarked} (JSpecify); wo ein Wert
- *       fehlen darf, sagt es der Typ.</li>
- *   <li>Alle Datentypen sind unveränderlich und prüfen sich beim Erzeugen. Ein fehlender oder ungültiger Wert ergibt
- *       eine {@link IllegalArgumentException} mit dem Namen des Attributs.</li>
- *   <li>Fachliche Ablehnungen sind Fälle des Ergebnistyps, keine Ausnahmen. Eine Ausnahme ist ein technischer Fehler.</li>
+ *   <li>No parameter and no return value is {@code null}. The package is {@code @NullMarked} (JSpecify); where a value
+ *       may be absent, the type says so.</li>
+ *   <li>All data types are immutable and validate themselves on creation. A missing or invalid value results in an
+ *       {@link IllegalArgumentException} naming the attribute.</li>
+ *   <li>Business rejections are cases of the result type, not exceptions. An exception is a technical error.</li>
  * </ul>
  */
 @NullMarked

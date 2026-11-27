@@ -46,7 +46,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-/** Attrappen der ausgehenden Ports für die Tests der Anwendungsfälle. Sie halten fest, was gefragt wurde. */
+/** Fakes of the outbound ports for the use case tests. They record what was asked. */
 final class Fakes {
 
     private Fakes() {
@@ -54,11 +54,11 @@ final class Fakes {
 
     static final class Templates implements TemplateRepository {
 
-        final Map<TemplateId, LetterTemplate> letterTemplate = new HashMap<>();
+        final Map<TemplateId, LetterTemplate> letterTemplates = new HashMap<>();
         final Map<TemplateId, Letterhead> letterheads = new HashMap<>();
 
         LetterTemplate store(LetterTemplate template) {
-            letterTemplate.put(template.id(), template);
+            letterTemplates.put(template.id(), template);
             return template;
         }
 
@@ -69,10 +69,10 @@ final class Fakes {
 
         @Override
         public Optional<LetterTemplate> letterTemplate(TemplateId id) {
-            return Optional.ofNullable(letterTemplate.get(id));
+            return Optional.ofNullable(letterTemplates.get(id));
         }
 
-        /** Läuft unmittelbar vor dem bedingten Ersetzen, etwa als gleichzeitige Änderung eines anderen Benutzers. */
+        /** Runs immediately before the conditional replacement, for example as a concurrent change by another user. */
         Runnable before = () -> { };
         int replacements;
 
@@ -84,7 +84,7 @@ final class Fakes {
         @Override
         public ReplaceOutcome replace(LetterTemplate loaded, LetterTemplate changed) {
             before.run();
-            LetterTemplate saved = letterTemplate.get(loaded.id());
+            LetterTemplate saved = letterTemplates.get(loaded.id());
             if (saved == null || !state(saved.versions()).equals(state(loaded.versions()))) {
                 return new ReplaceOutcome.Stale();
             }
@@ -105,7 +105,7 @@ final class Fakes {
             return new ReplaceOutcome.Replaced();
         }
 
-        /** Vorlagenversionen sind über ihren Verweis gleich; der Vergleich braucht den ganzen Stand. */
+        /** Template versions are equal by their reference; the comparison needs the whole state. */
         private static List<List<Object>> state(List<TemplateVersion> versions) {
             return versions.stream()
                     .map(version -> List.<Object>of(version.reference(), version.state(), version.content(),
@@ -138,14 +138,14 @@ final class Fakes {
             letterActions.remove(new Grant(user, action, reference));
         }
 
-        /** Erlaubt ist nur das Veröffentlichen, und nur den Benutzern in {@link #mayPublish}. */
+        /** Only publishing is allowed, and only to the users in {@link #mayPublish}. */
         @Override
         public boolean may(UserId user, TemplateAction action) {
             templateActionRequested.add(action);
             return action == TemplateAction.PUBLISH && mayPublish.contains(user);
         }
 
-        /** Erlaubt ist, was {@link #allow} freigegeben hat. */
+        /** Allowed is what {@link #allow} has granted. */
         @Override
         public boolean may(UserId user, LetterAction action, BusinessReference reference) {
             Grant request = new Grant(user, action, reference);
@@ -168,7 +168,7 @@ final class Fakes {
 
     record Grant(UserId user, LetterAction action, BusinessReference reference) {}
 
-    /** Antwortet mit der vorgegebenen Entscheidung und hält fest, wonach gefragt wurde. */
+    /** Answers with the given decision and records what was asked. */
     static final class DeletionPolicy implements DeletionRules {
 
         DeletionDecision decision = DeletionDecision.hard();
@@ -181,7 +181,7 @@ final class Fakes {
         }
     }
 
-    /** Ersetzt nur {@code {{name}}}; wie wirklich zusammengeführt wird, prüft {@code adapter-rendering}. */
+    /** Replaces only {@code {{name}}}; {@code adapter-rendering} tests how the real merge works. */
     static final class Renderer implements dieterbaier.letterwright.usecases.out.Renderer {
 
         int invocations;
@@ -194,7 +194,7 @@ final class Fakes {
             return letterhead.content() + content.content().replace("{{name}}", String.valueOf(data.values().get("name")));
         }
 
-        /** Das „PDF“ ist das HTML als Bytes; so sieht ein Test, aus welchen Versionen und Daten es entstand. */
+        /** The "PDF" is the HTML as bytes; this way a test sees which versions and data it was created from. */
         @Override
         public byte[] createPdf(TemplateVersion letterhead, TemplateVersion content, DataContext data) {
             pdfs++;
@@ -202,12 +202,12 @@ final class Fakes {
             return merge(letterhead, content, data).getBytes(StandardCharsets.UTF_8);
         }
 
-        /** Wie {@link #createPdf}, mit „Beispielinhalt“ an der Stelle des Standardschreibens. */
+        /** Like {@link #createPdf}, with "Sample content" in place of the letter template. */
         @Override
         public byte[] createProofPdf(TemplateVersion letterhead, DataContext sampleData) {
             pdfs++;
             pdfData.add(sampleData);
-            return (letterhead.content() + "Beispielinhalt").getBytes(StandardCharsets.UTF_8);
+            return (letterhead.content() + "Sample content").getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -215,7 +215,7 @@ final class Fakes {
 
         final Map<SnapshotId, Snapshot> snapshots = new HashMap<>();
         final List<SnapshotId> deleted = new ArrayList<>();
-        /** Läuft vor dem bedingten Löschen und simuliert eine gleichzeitige Anfrage. */
+        /** Runs before the conditional deletion and simulates a concurrent request. */
         Runnable beforeDeletion = () -> { };
 
         @Override
@@ -263,7 +263,7 @@ final class Fakes {
         }
     }
 
-    /** Hält jeden Rückruf fest; ohne Vorgabe nimmt der Host jedes Schreiben an. */
+    /** Records every callback; by default the host accepts every letter. */
     static final class Callback implements SaveCallback {
 
         final List<CallbackInvocation> invocations = new ArrayList<>();
@@ -278,7 +278,7 @@ final class Fakes {
 
     record CallbackInvocation(UserId user, Letter letter) {}
 
-    /** Ein konfigurierbares Ergebnis; ohne Vorgabe ist jedes PDF konform. */
+    /** A configurable result; by default every PDF is conformant. */
     static final class Checker implements ConformanceChecker {
 
         Function<byte[], Conformance> result = pdf -> Conformance.conformant();
@@ -307,7 +307,7 @@ final class Fakes {
             read++;
             byte[] pdf = stored.get(document);
             if (pdf == null) {
-                throw new IllegalStateException("Kein PDF zu " + document.value());
+                throw new IllegalStateException("No PDF for " + document.value());
             }
             return pdf.clone();
         }
@@ -319,9 +319,9 @@ final class Fakes {
     }
 
     /**
-     * Verhält sich wie die Persistenz: Schreiben speichern und Snapshot verbrauchen geschieht in einem Schritt und nur bei
-     * offenem Snapshot. {@link #before} läuft vor diesem Schritt und simuliert eine gleichzeitige Anfrage;
-     * {@link #after} wirft nach dem Speichern, als ginge die Bestätigung verloren.
+     * Behaves like the persistence: saving the letter and consuming the snapshot happen in one step and only with an
+     * open snapshot. {@link #before} runs before this step and simulates a concurrent request; {@link #after} throws
+     * after saving, as if the acknowledgement were lost.
      */
     static final class LetterStore implements LetterRepository {
 
@@ -335,7 +335,7 @@ final class Fakes {
             this.snapshots = snapshots;
         }
 
-        /** Legt ein Schreiben ab, als wäre es früher gespeichert worden. */
+        /** Stores a letter as if it had been saved earlier. */
         Letter store(Letter letter) {
             saved.put(letter.snapshot(), letter);
             return letter;
@@ -355,7 +355,7 @@ final class Fakes {
             return Optional.ofNullable(saved.get(snapshot));
         }
 
-        /** Filtert wie die Datenbankabfrage vor dem Paginieren und Zählen. */
+        /** Filters like the database query, before paginating and counting. */
         @Override
         public Page<Letter> visibleFor(BusinessReference reference, PageRequest request) {
             query++;
@@ -379,18 +379,18 @@ final class Fakes {
         }
 
         @Override
-        public SaveOutcome save(LetterFromSnapshot generate) {
+        public SaveOutcome save(LetterFromSnapshot creation) {
             before.run();
-            SaveOutcome outcome = adopt(generate);
+            SaveOutcome outcome = adopt(creation);
             after.ifPresent(error -> {
                 throw error;
             });
             return outcome;
         }
 
-        /** Der atomare Schritt selbst, ohne die simulierten Störungen. */
-        SaveOutcome adopt(LetterFromSnapshot generate) {
-            SnapshotId id = generate.consumedSnapshot().id();
+        /** The atomic step itself, without the simulated failures. */
+        SaveOutcome adopt(LetterFromSnapshot creation) {
+            SnapshotId id = creation.consumedSnapshot().id();
             Snapshot current = snapshots.snapshots.get(id);
             if (current == null) {
                 return new SaveOutcome.SnapshotNoLongerExists();
@@ -401,8 +401,8 @@ final class Fakes {
                         ? new SaveOutcome.LetterRemoved()
                         : new SaveOutcome.SnapshotAlreadyConsumed(existing);
             }
-            saved.put(id, generate.letter());
-            snapshots.snapshots.put(id, generate.consumedSnapshot());
+            saved.put(id, creation.letter());
+            snapshots.snapshots.put(id, creation.consumedSnapshot());
             return new SaveOutcome.Saved();
         }
     }

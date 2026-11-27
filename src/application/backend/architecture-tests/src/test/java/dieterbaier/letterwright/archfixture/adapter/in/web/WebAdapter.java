@@ -1,5 +1,5 @@
 package dieterbaier.letterwright.archfixture.adapter.in.web;
 
-/** Fixture: ein regelkonformer eingehender Adapter. */
+/** Fixture: a compliant inbound adapter. */
 public class WebAdapter {
 }

@@ -8,9 +8,9 @@ import dieterbaier.letterwright.usecases.out.SaveCallback;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Ruft den optionalen Rückruf {@link LetterSaveCallback} des Hosts (ADR-023). Der Host liegt außerhalb der
- * Vertrauensgrenze: Hält er den Null-Vertrag des SPI nicht ein, meldet der Adapter das als {@link HostContractViolated}.
- * Eine Ausnahme des Hosts reicht er unverändert durch; sie ist ein technischer Fehler.
+ * Calls the host's optional callback {@link LetterSaveCallback} (ADR-023). The host lies outside the trust boundary: if
+ * it does not keep the SPI's null contract, the adapter reports this as {@link HostContractViolated}. It passes an
+ * exception of the host through unchanged; it is a technical error.
  */
 public final class HostSaveCallback implements SaveCallback {
 
@@ -20,12 +20,12 @@ public final class HostSaveCallback implements SaveCallback {
         this.callback = callback;
     }
 
-    /** Für einen Host, der den Rückruf bereitstellt. */
+    /** For a host that provides the callback. */
     public static SaveCallback forReference(LetterSaveCallback callback) {
         return new HostSaveCallback(callback);
     }
 
-    /** Für einen Host ohne Rückruf und für die Java-API: Jedes Schreiben ist angenommen, gefragt wird niemand. */
+    /** For a host without a callback and for the Java API: every letter is accepted, nobody is asked. */
     public static SaveCallback none() {
         return (user, letter) -> CallbackResult.accepted();
     }
@@ -35,8 +35,8 @@ public final class HostSaveCallback implements SaveCallback {
         dieterbaier.letterwright.spi.@Nullable CallbackResult answer =
                 callback.created(Mapping.savedLetter(user, letter));
         if (answer == null) {
-            throw new HostContractViolated("Der Rückruf NachDemSpeichern des Hosts hat null statt eines Ergebnisses"
-                    + " geliefert");
+            throw new HostContractViolated("The LetterSaveCallback of the host returned null instead of a"
+                    + " CallbackResult");
         }
         return Mapping.toDomain(answer);
     }

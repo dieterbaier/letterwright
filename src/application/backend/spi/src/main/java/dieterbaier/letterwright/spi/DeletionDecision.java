@@ -1,43 +1,43 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Wie ein Schreiben gelöscht wird. Lösch- und Aufbewahrungsregeln bestimmt der Host. Erzeugt wird eine Entscheidung mit
- * {@link #hard()}, {@link #logical()} oder {@link #blocked(String)}.
+ * How a letter is deleted. The host determines the deletion and retention rules. A decision is created with
+ * {@link #hard()}, {@link #logical()} or {@link #blocked(String)}.
  */
 public sealed interface DeletionDecision {
 
-    /** Das Schreiben und sein PDF werden entfernt. */
+    /** The letter and its PDF are removed. */
     static DeletionDecision hard() {
         return new Hard();
     }
 
-    /** Das Schreiben wird als gelöscht markiert und nicht mehr angezeigt; das PDF bleibt erhalten. */
+    /** The letter is marked as deleted and no longer shown; the PDF is kept. */
     static DeletionDecision logical() {
         return new Logical();
     }
 
     /**
-     * Das Schreiben darf nicht gelöscht werden, etwa wegen einer Aufbewahrungsfrist.
+     * The letter must not be deleted, for example because of a retention period.
      *
-     * @param reason warum nicht; die Bibliothek zeigt ihn dem Benutzer an
+     * @param reason why not; the library shows it to the user
      */
     static DeletionDecision blocked(String reason) {
         return new Blocked(reason);
     }
 
-    /** Siehe {@link #hard()}. */
+    /** See {@link #hard()}. */
     record Hard() implements DeletionDecision {
     }
 
-    /** Siehe {@link #logical()}. */
+    /** See {@link #logical()}. */
     record Logical() implements DeletionDecision {
     }
 
-    /** Siehe {@link #blocked(String)}. */
+    /** See {@link #blocked(String)}. */
     record Blocked(String reason) implements DeletionDecision {
 
         public Blocked {
-            Require.text(reason, "Der Grund der Löschsperre");
+            Require.text(reason, "The reason for the deletion block");
         }
     }
 }

@@ -10,36 +10,36 @@ import dieterbaier.letterwright.domain.model.snapshot.SnapshotId;
 import java.util.Optional;
 
 /**
- * Speichert und lädt Schreiben. Dass aus einem Snapshot höchstens ein Schreiben entsteht, entscheidet die Domäne; das
- * Repository setzt es gegen gleichzeitige Zugriffe atomar durch (ADR-021).
+ * Saves and loads letters. The domain decides that a snapshot yields at most one letter; the repository enforces this
+ * atomically against concurrent access (ADR-021).
  */
 public interface LetterRepository {
 
-    /** Auch ein logisch gelöschtes Schreiben; ob es sichtbar ist, entscheidet die Domäne. */
+    /** Also a logically deleted letter; the domain decides whether it is visible. */
     Optional<Letter> load(LetterId id);
 
-    /** Auch ein logisch gelöschtes Schreiben; ob es sichtbar ist, entscheidet die Domäne. */
+    /** Also a logically deleted letter; the domain decides whether it is visible. */
     Optional<Letter> forSnapshot(SnapshotId snapshot);
 
     /**
-     * Die sichtbaren Schreiben zum Bezug, neueste zuerst. Logisch gelöschte filtert das Repository in der Abfrage, also
-     * vor dem Paginieren und Zählen (QS-009); was sichtbar heißt, legt {@link Letter#isVisible()} fest.
+     * The visible letters for the reference, newest first. The repository filters out logically deleted ones in the
+     * query, that is before paginating and counting (QS-009); {@link Letter#isVisible()} defines what visible means.
      */
     Page<Letter> visibleFor(BusinessReference reference, PageRequest request);
 
-    /** Ersetzt das gespeicherte Schreiben mit derselben ID, etwa durch das logisch gelöschte. */
+    /** Replaces the saved letter with the same ID, for example with the logically deleted one. */
     void replace(Letter changed);
 
-    /** Entfernt das Schreiben; sein PDF entfernt der Aufrufer aus der {@link DocumentStore}. */
+    /** Removes the letter; the caller removes its PDF from the {@link DocumentStore}. */
     void remove(LetterId id);
 
     /**
-     * Speichert das Schreiben und ersetzt den Snapshot durch den verbrauchten, beides in einem Schritt und nur, wenn der
-     * gespeicherte Snapshot noch offen ist. Ist er schon verbraucht, auch durch eine gleichzeitige Anfrage, speichert
-     * es nichts und liefert das vorhandene Schreiben, auch ein logisch gelöschtes. Ist dieses inzwischen hart gelöscht,
-     * meldet es das. Gibt es den Snapshot nicht mehr, speichert es ebenfalls nichts.
+     * Saves the letter and replaces the snapshot with the consumed one, both in one step and only if the stored snapshot
+     * is still open. If it is already consumed, even by a concurrent request, it saves nothing and returns the existing
+     * letter, even a logically deleted one. If that letter has since been hard deleted, it reports so. If the snapshot no
+     * longer exists, it saves nothing either.
      *
-     * <p>Eine Ausnahme heißt: Ob gespeichert wurde, ist ungewiss. Der Aufrufer darf dann nichts zurücknehmen.
+     * <p>An exception means: whether anything was saved is uncertain. The caller must then not undo anything.
      */
-    SaveOutcome save(LetterFromSnapshot generate);
+    SaveOutcome save(LetterFromSnapshot creation);
 }

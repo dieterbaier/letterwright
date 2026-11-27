@@ -22,12 +22,12 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 
 /**
- * Verdrahtet die Bibliothek mit den SPI-Implementierungen des Hosts (ADR-016).
+ * Wires the library with the host's SPI implementations (ADR-016).
  *
- * <p>{@link PlaceholderDataProvider} und {@link DeletionPolicy} muss der Host bereitstellen; fehlt eine, startet der
- * Kontext nicht. Für die {@link AuthorizationCheck} gibt es eine Default-Implementierung, die zurücktritt, sobald der
- * Host eine eigene Bean bereitstellt. Den Rückruf {@link LetterSaveCallback} stellt der Host nur bereit, wenn er ihn
- * braucht (ADR-023).
+ * <p>The host must provide {@link PlaceholderDataProvider} and {@link DeletionPolicy}; if one is missing, the context
+ * does not start. For the {@link AuthorizationCheck} there is a default implementation that steps back as soon as the
+ * host provides a bean of its own. The host provides the callback {@link LetterSaveCallback} only if it needs it
+ * (ADR-023).
  */
 @AutoConfiguration
 @EnableConfigurationProperties(AuthorizationProperties.class)
@@ -57,14 +57,14 @@ public class LetterwrightAutoConfiguration {
     }
 
     /**
-     * Für das Speichern über die Oberfläche. Der Anwendungsfall hinter der Java-API bekommt
-     * {@link HostSaveCallback#none()}, sobald er verdrahtet ist (#10).
+     * For saving through the user interface. The use case behind the Java API gets
+     * {@link HostSaveCallback#none()} as soon as it is wired (#10).
      */
     @Bean
     SaveCallback saveCallback(ObjectProvider<LetterSaveCallback> callback) {
-        // Bei mehreren Beans gilt die Auswahl von Spring, wie im Vertrag von NachDemSpeichern beschrieben:
-        // getIfAvailable wählt nach den üblichen Regeln von Spring (etwa @Primary) und lässt den Kontext nicht
-        // starten, wenn die Auswahl mehrdeutig bleibt.
+        // With several beans Spring's selection applies, as described in the contract of LetterSaveCallback:
+        // getIfAvailable selects by Spring's usual rules (for example @Primary) and prevents the context from
+        // starting if the selection remains ambiguous.
         return Optional.ofNullable(callback.getIfAvailable()).map(HostSaveCallback::forReference)
                 .orElseGet(HostSaveCallback::none);
     }

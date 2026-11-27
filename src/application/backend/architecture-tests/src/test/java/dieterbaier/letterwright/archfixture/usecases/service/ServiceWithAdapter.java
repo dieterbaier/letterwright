@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.usecases.service;
 
 import dieterbaier.letterwright.archfixture.adapter.out.rendering.RenderingAdapter;
 
-/** Fixture: absichtlicher Verstoß, die Implementierung der Anwendungsfälle greift direkt auf einen Adapter zu. */
+/** Fixture: deliberate violation, the implementation of the use cases accesses an adapter directly. */
 public class ServiceWithAdapter {
 
     private final RenderingAdapter adapter = new RenderingAdapter();

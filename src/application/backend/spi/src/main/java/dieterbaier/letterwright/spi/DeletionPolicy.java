@@ -1,13 +1,13 @@
 package dieterbaier.letterwright.spi;
 
 /**
- * Entscheidet, ob und wie ein Schreiben gelöscht wird. Lösch- und Aufbewahrungsregeln bestimmt der Host (RB-10). Der
- * Host implementiert diese Schnittstelle als Bean.
+ * Decides whether and how a letter is deleted. The host determines the deletion and retention rules (RB-10). The host
+ * implements this interface as a bean.
  *
- * <p>Die Bibliothek fragt erst, nachdem die {@link AuthorizationCheck} {@link LetterAction#DELETE} erlaubt hat.
+ * <p>The library asks only after the {@link AuthorizationCheck} has allowed {@link LetterAction#DELETE}.
  */
 public interface DeletionPolicy {
 
-    /** Wie das Schreiben gelöscht wird. */
+    /** How the letter is deleted. */
     DeletionDecision decide(DeletionRequest request);
 }

@@ -11,14 +11,14 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 /**
- * Ein aus einem Standardschreiben erzeugtes und gespeichertes Dokument. Gespeichert werden das PDF, seine Prüfsumme und
- * die verwendeten Vorlagenversionen; ein Schreiben wird nie neu gerendert (ADR-007).
+ * A document created from a letter template and stored. The PDF, its checksum and the template versions used are
+ * stored; a letter is never rendered again (ADR-007).
  *
- * <p>Jedes Schreiben kennt den Snapshot, aus dem es entstand. Zu einem Snapshot gibt es höchstens ein Schreiben, damit
- * ein wiederholtes Speichern derselben Vorschau kein zweites erzeugt (ADR-021).
+ * <p>Every letter knows the snapshot it was created from. There is at most one letter per snapshot so that saving the
+ * same preview again does not create a second one (ADR-021).
  *
- * <p>Ob ein Schreiben noch sichtbar ist, sagt sein {@link LetterState}. Ein logisch gelöschtes behandeln alle
- * Anwendungsfälle wie ein nicht vorhandenes.
+ * <p>Whether a letter is still visible is told by its {@link LetterState}. All use cases treat a logically deleted
+ * letter like a non-existent one.
  */
 @AggregateRoot
 public final class Letter {
@@ -37,32 +37,32 @@ public final class Letter {
     private Letter(LetterId id, SnapshotId snapshot, BusinessReference reference, VersionReference letterhead,
             VersionReference letterTemplate, DocumentReference document, Checksum pdfChecksum, Instant created,
             LetterState state) {
-        this.id = Validate.required(id, "Die ID des Schreibens");
-        this.snapshot = Validate.required(snapshot, "Der Snapshot des Schreibens");
-        this.reference = Validate.required(reference, "Der fachliche Bezug des Schreibens");
-        this.letterhead = Validate.required(letterhead, "Die Briefpapier-Version des Schreibens");
-        this.letterTemplate = Validate.required(letterTemplate, "Die Standardschreiben-Version des Schreibens");
-        this.document = Validate.required(document, "Der Dokumentverweis des Schreibens");
-        this.pdfChecksum = Validate.required(pdfChecksum, "Die Prüfsumme des PDFs");
-        this.created = Validate.required(created, "Der Erstellungszeitpunkt des Schreibens");
-        this.state = Validate.required(state, "Der Zustand des Schreibens");
+        this.id = Validate.required(id, "The ID of the letter");
+        this.snapshot = Validate.required(snapshot, "The snapshot of the letter");
+        this.reference = Validate.required(reference, "The business reference of the letter");
+        this.letterhead = Validate.required(letterhead, "The letterhead version of the letter");
+        this.letterTemplate = Validate.required(letterTemplate, "The letter template version of the letter");
+        this.document = Validate.required(document, "The document reference of the letter");
+        this.pdfChecksum = Validate.required(pdfChecksum, "The checksum of the PDF");
+        this.created = Validate.required(created, "The creation time of the letter");
+        this.state = Validate.required(state, "The state of the letter");
     }
 
     /**
-     * Erzeugt das Schreiben aus dem Snapshot, aus dem sein PDF gerendert wurde, und verbraucht ihn. Bezug und
-     * Vorlagenversionen kommen aus dem Snapshot, damit das Schreiben nicht von der Vorschau abweichen kann. Aus einem
-     * verbrauchten Snapshot entsteht kein weiteres Schreiben (ADR-021).
+     * Creates the letter from the snapshot its PDF was rendered from, and consumes it. Reference and template versions
+     * come from the snapshot so that the letter cannot deviate from the preview. A consumed snapshot yields no further
+     * letter (ADR-021).
      *
-     * <p>{@code now} ist zugleich Prüfzeitpunkt für den Ablauf und Erstellungszeitpunkt. Der Anwendungsfall übergibt
-     * den Zeitpunkt seiner Uhr, damit beides übereinstimmt und Tests die Grenze ohne Warten prüfen können.
+     * <p>{@code now} is both the time checked against the expiry and the creation time. The use case passes the time
+     * of its clock so that both match and tests can check the boundary without waiting.
      *
-     * @throws IllegalStateException wenn der Snapshot zum Zeitpunkt {@code now} abgelaufen oder schon verbraucht ist
+     * @throws IllegalStateException if the snapshot has expired at {@code now} or is already consumed
      */
     public static LetterFromSnapshot fromSnapshot(
             LetterId id, Snapshot snapshot, DocumentReference document, Checksum pdfChecksum, Instant now) {
-        Validate.required(snapshot, "Der Snapshot");
-        if (snapshot.isExpired(Validate.required(now, "Der Zeitpunkt"))) {
-            throw new IllegalStateException("Snapshot " + snapshot.id().value() + " ist abgelaufen");
+        Validate.required(snapshot, "The snapshot");
+        if (snapshot.isExpired(Validate.required(now, "The time"))) {
+            throw new IllegalStateException("Snapshot " + snapshot.id().value() + " has expired");
         }
         Snapshot consumed = snapshot.consumed();
         return new LetterFromSnapshot(new Letter(id, snapshot.id(), snapshot.reference(), snapshot.letterhead(),
@@ -78,17 +78,17 @@ public final class Letter {
     }
 
     /**
-     * Das Schreiben, wie es nach einer logischen Löschung ist: Das PDF bleibt, sichtbar ist es nicht mehr. Ob gelöscht
-     * werden darf und wie, entscheiden Berechtigung und Löschrichtlinie des Hosts, nicht das Schreiben.
+     * The letter as it is after a logical deletion: the PDF remains, but it is no longer visible. Whether and how it
+     * may be deleted is decided by the host's permissions and deletion policy, not by the letter.
      *
-     * @throws IllegalStateException wenn das Schreiben schon logisch gelöscht ist
+     * @throws IllegalStateException if the letter is already logically deleted
      */
     public Letter logicallyDeleted(Instant now) {
         if (state instanceof LetterState.LogicallyDeleted) {
-            throw new IllegalStateException("Schreiben " + id.value() + " ist schon logisch gelöscht");
+            throw new IllegalStateException("Letter " + id.value() + " is already logically deleted");
         }
         return new Letter(id, snapshot, reference, letterhead, letterTemplate, document, pdfChecksum, created,
-                new LetterState.LogicallyDeleted(Validate.required(now, "Der Zeitpunkt")));
+                new LetterState.LogicallyDeleted(Validate.required(now, "The time")));
     }
 
     public boolean isVisible() {
@@ -131,7 +131,7 @@ public final class Letter {
         return state;
     }
 
-    /** Gleich sind zwei Instanzen mit derselben ID. */
+    /** Two instances with the same ID are equal. */
     @Override
     public boolean equals(Object other) {
         return other instanceof Letter letter && id.equals(letter.id);
@@ -144,6 +144,6 @@ public final class Letter {
 
     @Override
     public String toString() {
-        return "Schreiben[id=" + id.value() + ", erstellt=" + created + "]";
+        return "Letter[id=" + id.value() + ", created=" + created + "]";
     }
 }

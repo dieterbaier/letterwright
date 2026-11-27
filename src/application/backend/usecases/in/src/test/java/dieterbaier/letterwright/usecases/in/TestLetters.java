@@ -12,13 +12,13 @@ import dieterbaier.letterwright.domain.model.template.VersionReference;
 import dieterbaier.letterwright.domain.model.template.TemplateId;
 import java.time.Instant;
 
-/** Ein gespeichertes Schreiben für die Tests der Ergebnistypen. */
+/** A saved letter for the tests of the result types. */
 final class TestLetters {
 
-    /** Nur lesen; wer es ändern will, nimmt eine Kopie. */
+    /** Read only; to change it, take a copy. */
     static final byte[] PDF = {1, 2, 3};
     static final Letter LETTER = Letter.restore(LetterId.generate(), SnapshotId.generate(),
-            new BusinessReference("Kunde", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
+            new BusinessReference("Customer", "4711"), new VersionReference(TemplateId.generate(), VersionNumber.FIRST),
             new VersionReference(TemplateId.generate(), VersionNumber.FIRST), new DocumentReference("store/1"),
             Checksum.of(PDF), Instant.parse("2026-11-22T10:00:00Z"), new LetterState.Visible());
 

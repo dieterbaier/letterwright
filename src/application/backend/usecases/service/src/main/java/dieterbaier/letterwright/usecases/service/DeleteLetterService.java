@@ -14,23 +14,23 @@ import dieterbaier.letterwright.usecases.out.LetterRepository;
 import java.time.Clock;
 
 /**
- * Fragt die Löschrichtlinie erst, wenn die Berechtigung erteilt ist, wie es das SPI zusagt. Ein nicht vorhandenes, ein
- * logisch gelöschtes und ein nicht erlaubtes Schreiben ergeben dasselbe {@code Unknown} (QS-009).
+ * Asks the deletion policy only once permission is granted, as the SPI promises. A non-existent, a logically deleted
+ * and a forbidden letter all yield the same {@code Unknown} (QS-009).
  *
- * <p>Hart gelöscht wird erst das Schreiben, dann sein PDF. Scheitert das Entfernen des PDFs, bleibt es ohne Schreiben
- * liegen; umgekehrt bliebe ein Schreiben, dessen PDF fehlt.
+ * <p>A hard deletion removes the letter first, then its PDF. If removing the PDF fails, the PDF is left without a
+ * letter; the other way round, a letter would remain whose PDF is missing.
  */
 public final class DeleteLetterService implements DeleteLetter {
 
-    private final LetterRepository letter;
+    private final LetterRepository letters;
     private final Permissions permissions;
     private final DeletionRules deletionRules;
     private final DocumentStore documents;
     private final Clock clock;
 
-    public DeleteLetterService(LetterRepository letter, Permissions permissions, DeletionRules deletionRules,
+    public DeleteLetterService(LetterRepository letters, Permissions permissions, DeletionRules deletionRules,
             DocumentStore documents, Clock clock) {
-        this.letter = letter;
+        this.letters = letters;
         this.permissions = permissions;
         this.deletionRules = deletionRules;
         this.documents = documents;
@@ -39,7 +39,7 @@ public final class DeleteLetterService implements DeleteLetter {
 
     @Override
     public DeletionResult delete(UserId user, LetterId id) {
-        return letter.load(id)
+        return letters.load(id)
                 .filter(Letter::isVisible)
                 .filter(found -> permissions.may(user, LetterAction.DELETE, found.reference()))
                 .map(found -> delete(user, found))
@@ -49,12 +49,12 @@ public final class DeleteLetterService implements DeleteLetter {
     private DeletionResult delete(UserId user, Letter found) {
         return switch (deletionRules.decide(user, found)) {
             case DeletionDecision.Hard hard -> {
-                letter.remove(found.id());
+                letters.remove(found.id());
                 documents.remove(found.document());
                 yield new DeletionResult.Deleted();
             }
             case DeletionDecision.Logical logical -> {
-                letter.replace(found.logicallyDeleted(clock.instant()));
+                letters.replace(found.logicallyDeleted(clock.instant()));
                 yield new DeletionResult.Deleted();
             }
             case DeletionDecision.Blocked blocked -> new DeletionResult.Blocked(blocked.reason());

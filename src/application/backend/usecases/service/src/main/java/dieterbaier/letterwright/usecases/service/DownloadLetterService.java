@@ -12,25 +12,25 @@ import dieterbaier.letterwright.usecases.out.DocumentStore;
 import dieterbaier.letterwright.usecases.out.LetterRepository;
 
 /**
- * Ein nicht vorhandenes, ein logisch gelöschtes und ein nicht erlaubtes Schreiben ergeben dasselbe {@code Unknown}
- * (QS-009). Das PDF liefert es nur mit der Prüfsumme vom Speichern aus; weicht sie ab, ist der Bestand defekt, und es
- * liefert nichts (QS-008).
+ * A non-existent, a logically deleted and a forbidden letter all yield the same {@code Unknown} (QS-009). It delivers
+ * the PDF only with the checksum from saving; if the checksum differs, the stored data is corrupt and it delivers
+ * nothing (QS-008).
  */
 public final class DownloadLetterService implements DownloadLetter {
 
-    private final LetterRepository letter;
+    private final LetterRepository letters;
     private final Permissions permissions;
     private final DocumentStore documents;
 
-    public DownloadLetterService(LetterRepository letter, Permissions permissions, DocumentStore documents) {
-        this.letter = letter;
+    public DownloadLetterService(LetterRepository letters, Permissions permissions, DocumentStore documents) {
+        this.letters = letters;
         this.permissions = permissions;
         this.documents = documents;
     }
 
     @Override
     public DownloadResult load(UserId user, LetterId id) {
-        return letter.load(id)
+        return letters.load(id)
                 .filter(Letter::isVisible)
                 .filter(found -> permissions.may(user, LetterAction.DOWNLOAD, found.reference()))
                 .<DownloadResult>map(this::deliver)
@@ -41,7 +41,7 @@ public final class DownloadLetterService implements DownloadLetter {
         byte[] pdf = documents.read(found.document());
         if (!Checksum.of(pdf).equals(found.pdfChecksum())) {
             throw new IllegalStateException(
-                    "Das PDF von Schreiben " + found.id().value() + " weicht von der gespeicherten Prüfsumme ab");
+                    "The PDF of letter " + found.id().value() + " does not match the saved checksum");
         }
         return new DownloadResult.Delivered(found, pdf);
     }

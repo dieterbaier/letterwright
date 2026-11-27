@@ -2,7 +2,7 @@ package dieterbaier.letterwright.archfixture.adapter.in.web;
 
 import dieterbaier.letterwright.archfixture.usecases.out.OutboundPort;
 
-/** Fixture: absichtlicher Verstoß, ein eingehender Adapter nutzt einen ausgehenden Port. */
+/** Fixture: deliberate violation, an inbound adapter uses an outbound port. */
 public class WebAdapterWithOutboundPort {
 
     private OutboundPort port;
