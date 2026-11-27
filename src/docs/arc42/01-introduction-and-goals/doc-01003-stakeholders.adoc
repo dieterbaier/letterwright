@@ -1,28 +1,28 @@
 ---
 id: DOC-01003-stakeholders
 type: Document
-title: 'Stakeholder'
+title: 'Stakeholders'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Stakeholder und ihre Erwartungen.'
+summary: 'Stakeholders and their expectations.'
 tags:
 - stakeholder
 relations: []
 metadata_version: '1.0'
 ---
 [[stakeholders]]
-== Stakeholder
+== Stakeholders
 
 [cols="1,3", options="header"]
 |===
-| Stakeholder | Erwartung
-| Owner | Wiederverwendbares, KI-gestützt gebautes Paket mit sauberer Architektur.
-| Sachbearbeiter | Schreiben schnell prüfen, speichern, herunterladen.
-| Vorlagenverwalter (Fachanwender) | Briefpapier und Vorlagen ohne Entwickler pflegen; heute in Word.
-| Empfänger | Lesbare, barrierefreie Schreiben, normgerecht für Fensterumschläge.
-| Entwickler der Host-Anwendung | Einfache Integration, stabile SPIs, keine Seiteneffekte.
-| KI-Agenten | Klare Verträge, nachvollziehbare Architekturentscheidungen, prüfbare Gates.
+| Stakeholder | Expectation
+| Owner | Reusable package, built with AI assistance, with a clean architecture.
+| Clerk | Check, save and download letters quickly.
+| Template manager (business user) | Maintain letterheads and templates without developers; today in Word.
+| Recipient | Readable, accessible letters, conforming to the standard for window envelopes.
+| Developers of the host application | Simple integration, stable SPIs, no side effects.
+| AI agents | Clear contracts, traceable architecture decisions, verifiable gates.
 |===

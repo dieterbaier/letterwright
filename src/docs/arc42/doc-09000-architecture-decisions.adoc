@@ -1,13 +1,13 @@
 ---
 id: DOC-09000-architecture-decisions
 type: Document
-title: 'Architekturentscheidungen'
+title: 'Architecture Decisions'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'ADRs für Standardschreiben.'
+summary: 'ADRs for letterwright.'
 tags:
 - arc42
 - decisions
@@ -15,82 +15,82 @@ relations:
 - type: documents
   target: ADR-001-einbettbare-bibliothek
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-002-hexagonale-architektur-und-ports
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-003-vorlagenformat-fuer-fachanwender
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-004-rendering-pipeline-fuer-vorschau-und-pdf
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-005-pdfa-und-barrierefreiheit
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-006-datenbankagnostische-persistenz
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-007-versionierung-und-unveraenderlichkeit
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-008-platzhaltersprache
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-009-build-monorepo-und-versionen
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-010-frontend-tests-mit-vitest
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-011-qualitaetsgates-im-build
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 - type: documents
   target: ADR-012-distribution-ueber-github-packages
   status: proposed
-  rationale: 'Das Kapitel enthält diesen ADR.'
+  rationale: 'The chapter contains this ADR.'
   evidence: src/docs/arc42/doc-09000-architecture-decisions.adoc
   reviewed: false
 metadata_version: '1.0'
 ---
 [[architecture-decisions]]
-= Architekturentscheidungen
+= Architecture Decisions
 
-Den Status jedes ADR nennt der Index unten. ADR-003 und ADR-004 hängen von
-einem Prototyp ab.
+The index below names the status of each ADR. ADR-003 and ADR-004 depend on
+a prototype.
 
 include::09-architecture-decisions/generated/doc-09001-adr-index.adoc[]
 include::09-architecture-decisions/generated/open-questions.adoc[]

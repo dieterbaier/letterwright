@@ -1,13 +1,13 @@
 ---
 id: DOC-10000-quality-requirements
 type: Document
-title: 'Qualitätsanforderungen'
+title: 'Quality Requirements'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Qualitätsbaum und messbare Qualitätsszenarien.'
+summary: 'Quality tree and measurable quality scenarios.'
 tags:
 - arc42
 - quality
@@ -15,25 +15,25 @@ relations: []
 metadata_version: '1.0'
 ---
 [[quality-requirements]]
-= Qualitätsanforderungen
+= Quality Requirements
 
-== Qualitätsbaum
+== Quality Tree
 
-* Barrierefreiheit und Normkonformität
+* Accessibility and standards conformance
 ** PDF/A (QS-001)
-** Barrierefreies PDF (QS-002)
-** Barrierefreie Vorschau (QS-003)
-* Wiedergabetreue
-** Vorschau gleich PDF (QS-004)
+** Accessible PDF (QS-002)
+** Accessible preview (QS-003)
+* Fidelity
+** Preview equals PDF (QS-004)
 ** DIN 5008 (QS-005)
-** Stiltreue zur zentralen DOCX-Vorgabe (QS-013)
-* Pflegbarkeit durch Fachanwender (QS-006)
-* Integrierbarkeit (QS-007)
-* Nachvollziehbarkeit (QS-008)
-* Sicherheit (QS-009)
-* Benutzbarkeit bei fehlenden Daten (QS-010)
-* Testbarkeit (QS-011)
-* Effizienz (QS-012)
+** Style fidelity to the central DOCX specification (QS-013)
+* Maintainability by business users (QS-006)
+* Integrability (QS-007)
+* Traceability (QS-008)
+* Security (QS-009)
+* Usability with missing data (QS-010)
+* Testability (QS-011)
+* Efficiency (QS-012)
 
 include::10-quality-requirements/generated/doc-10001-quality-scenarios.adoc[]
 

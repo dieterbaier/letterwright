@@ -1,13 +1,13 @@
 ---
 id: DOC-11000-risks-and-technical-debt
 type: Document
-title: 'Risiken und technische Schulden'
+title: 'Risks and Technical Debt'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Erste Risiken; technische Schulden gibt es noch keine.'
+summary: 'First risks; there is no technical debt yet.'
 tags:
 - arc42
 - risk
@@ -15,13 +15,13 @@ relations: []
 metadata_version: '1.0'
 ---
 [[risks-and-technical-debt]]
-= Risiken und technische Schulden
+= Risks and Technical Debt
 
 include::11-risks-and-technical-debt/generated/doc-11001-risks.adoc[]
 
 include::generated/doc-11000-risks-and-technical-debt-includes.adoc[]
 
-== Technische Schulden
+== Technical Debt
 
-Es sind noch keine technischen Schulden erfasst. Kandidaten werden nach dem
-ersten Umsetzungsschritt hier aufgenommen.
+No technical debt is recorded yet. Candidates will be added here after the
+first implementation step.

@@ -1,13 +1,13 @@
 ---
 id: DOC-05000-building-block-view
 type: Document
-title: 'Bausteinsicht'
+title: 'Building Block View'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Ebene-1-Bausteine der Bibliothek innerhalb der Host-Anwendung mit ihren Technologien und Bibliotheken; Ebene 2 für adapter-rendering.'
+summary: 'Level 1 building blocks of the library within the host application with their technologies and libraries; level 2 for adapter-rendering.'
 tags:
 - arc42
 - building-blocks
@@ -15,323 +15,323 @@ relations: []
 metadata_version: '1.0'
 ---
 [[building-block-view]]
-= Bausteinsicht
+= Building Block View
 
-Die Bausteinsicht nennt je Baustein die Technologien und Bibliotheken, die er
-einsetzt. Viele Module sind noch Gerüste. _Kursiv_ steht deshalb eine
-Technologie, die durch einen ADR festgelegt, aber noch nicht im Build
-eingebunden ist. Ein Baustein mit dem Zusatz _(geplant)_ ist durch einen ADR
-festgelegt, aber noch nicht als Modul angelegt. Was im Prototyp (`prototyp/`) erprobt ist, steht bei
+The building block view names, for each building block, the technologies and
+libraries it uses. Many modules are still skeletons. A technology in _italics_
+is therefore defined by an ADR but not yet included in the build. A building
+block with the suffix _(planned)_ is defined by an ADR but not yet created as a
+module. What has been tried out in the prototype (`prototyp/`) is described at
 xref:bausteine-ebene-2-adapter-rendering[adapter-rendering].
 
-== Ebene 1
+== Level 1
 
 [plantuml,bausteine-ebene-1,svg]
 ----
 @startuml
 !include <C4/C4_Component>
-System_Boundary(host, "Host-Anwendung") {
-  Container_Boundary(fe, "Frontend (npm-Paket)") {
-    Component(ui_vorschau, "Vorschau", "React, Paged.js", "Zeigt paginierte Vorschau im sandboxed iframe")
-    Component(ui_uebersicht, "Übersicht", "React", "Gespeicherte Schreiben listen, laden, löschen")
-    Component(ui_editor, "Vorlagen-Editor", "React, ProseMirror/TipTap", "Briefpapier und Standardschreiben pflegen")
+System_Boundary(host, "Host application") {
+  Container_Boundary(fe, "Frontend (npm package)") {
+    Component(ui_vorschau, "Preview", "React, Paged.js", "Shows a paginated preview in a sandboxed iframe")
+    Component(ui_uebersicht, "List", "React", "List, load and delete saved letters")
+    Component(ui_editor, "Template editor", "React, ProseMirror/TipTap", "Maintain letterheads and letter templates")
   }
-  Container_Boundary(be, "Backend (Spring-Boot-Starter)") {
-    Component(web, "adapter-web", "Spring MVC", "REST-Endpunkte")
-    Component(aapi, "adapter-api", "Spring Transaction", "Bildet die Java-API auf die Anwendungsfälle ab")
-    Component(api, "api", "Java, ohne Spring", "Java-API für den Host mit eigenen Datentypen")
-    Component(uin, "usecases-in", "Java, ohne Spring", "Eingehende Ports: Anwendungsfälle")
-    Component(app, "usecases-service", "Java", "Implementierung der Anwendungsfälle")
-    Component(uout, "usecases-out", "Java, ohne Spring", "Ausgehende Ports (intern)")
-    Component(spiapi, "spi", "Java, ohne Spring", "Schnittstelle zum Host mit eigenen Datentypen")
-    Component(dom, "domain-model", "Java, ohne Spring", "Briefpapier, Standardschreiben, Vorlagenversion, Snapshot, Schreiben")
-    Component(val, "validation", "Java, ohne Spring", "Allgemeine Prüfungen für selbstvalidierende Typen")
-    Component(dsvc, "domain-service", "Java, ohne Spring", "Domänenservices: fachliche Regeln über mehrere Modellobjekte")
-    Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Zusammenführen, Bereinigen, PDF, Konformität")
-    Component(per, "adapter-persistence-jdbc", "Spring JDBC, Liquibase", "Vorlagen, Schreiben, BLOBs")
-    Component(ahost, "adapter-host", "Java", "Bildet interne Ports auf das SPI ab")
+  Container_Boundary(be, "Backend (Spring Boot starter)") {
+    Component(web, "adapter-web", "Spring MVC", "REST endpoints")
+    Component(aapi, "adapter-api", "Spring Transaction", "Maps the Java API to the use cases")
+    Component(api, "api", "Java, without Spring", "Java API for the host with its own data types")
+    Component(uin, "usecases-in", "Java, without Spring", "Inbound ports: use cases")
+    Component(app, "usecases-service", "Java", "Implementation of the use cases")
+    Component(uout, "usecases-out", "Java, without Spring", "Outbound ports (internal)")
+    Component(spiapi, "spi", "Java, without Spring", "Interface to the host with its own data types")
+    Component(dom, "domain-model", "Java, without Spring", "Letterhead, letter template, template version, snapshot, letter")
+    Component(val, "validation", "Java, without Spring", "General checks for self-validating types")
+    Component(dsvc, "domain-service", "Java, without Spring", "Domain services: business rules across several model objects")
+    Component(ren, "adapter-rendering", "FreeMarker, jsoup, openhtmltopdf, PDFBox, veraPDF", "Merging, sanitizing, PDF, conformance")
+    Component(per, "adapter-persistence-jdbc", "Spring JDBC, Liquibase", "Templates, letters, BLOBs")
+    Component(ahost, "adapter-host", "Java", "Maps internal ports to the SPI")
   }
-  Component_Ext(spi, "Host-SPI-Implementierungen", "Java", "Platzhalterdaten, Berechtigung, Löschrichtlinie, optional Rückruf nach dem Speichern")
-  Component_Ext(hostuc, "Host-Anwendungsfälle", "Java", "Speichern in eigener Transaktion")
-  ContainerDb_Ext(db, "Host-Datenbank", "SQL")
-  ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType", "Lizenzierte Schriften der DOCX-Vorgabe")
+  Component_Ext(spi, "Host SPI implementations", "Java", "Placeholder data, permission, deletion policy, optional letter save callback")
+  Component_Ext(hostuc, "Host use cases", "Java", "Saving in the host's own transaction")
+  ContainerDb_Ext(db, "Host database", "SQL")
+  ContainerDb_Ext(schriften, "Host font folder", "TrueType, OpenType", "Licensed fonts of the DOCX specification")
 }
 Rel(ui_vorschau, web, "REST/JSON, HTML")
 Rel(ui_uebersicht, web, "REST/JSON, PDF")
 Rel(ui_editor, web, "REST/JSON")
-Rel(web, uin, "ruft")
-Rel(hostuc, api, "ruft")
-Rel(aapi, api, "implementiert")
-Rel(aapi, uin, "ruft")
-Rel(app, uin, "implementiert")
-Rel(app, uout, "nutzt")
-Rel(app, dom, "nutzt")
-Rel(app, dsvc, "nutzt")
-Rel(dsvc, dom, "arbeitet auf")
-Rel(dom, val, "prüft mit")
-Rel(ren, uout, "implementiert Renderer, ConformanceChecker")
-Rel(per, uout, "implementiert TemplateRepository, SnapshotStore, LetterRepository, DocumentStore")
-Rel(ahost, uout, "implementiert Platzhalterdaten, Berechtigung, Löschrichtlinie, Rückruf")
-Rel(ahost, spiapi, "ruft, bildet ab")
-Rel(spi, spiapi, "implementiert")
+Rel(web, uin, "calls")
+Rel(hostuc, api, "calls")
+Rel(aapi, api, "implements")
+Rel(aapi, uin, "calls")
+Rel(app, uin, "implements")
+Rel(app, uout, "uses")
+Rel(app, dom, "uses")
+Rel(app, dsvc, "uses")
+Rel(dsvc, dom, "works on")
+Rel(dom, val, "checks with")
+Rel(ren, uout, "implements Renderer, ConformanceChecker")
+Rel(per, uout, "implements TemplateRepository, SnapshotStore, LetterRepository, DocumentStore")
+Rel(ahost, uout, "implements placeholder data, permission, deletion policy, callback")
+Rel(ahost, spiapi, "calls, maps")
+Rel(spi, spiapi, "implements")
 Rel(per, db, "JDBC")
-Rel(ren, schriften, "liest Schriftdateien")
+Rel(ren, schriften, "reads font files")
 @enduml
 ----
 
-Jeder Baustein des Backends ist ein gleichnamiges Gradle-Modul. Wo es im
-Repository liegt, steht nur in `settings.gradle.kts`; die Modulgrenzen setzen
-Compiler und ArchUnit durch (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
-Das Frontend-Paket ist der npm-Workspace unter `src/application/frontend`.
+Every building block of the backend is a Gradle module of the same name. Where
+it lives in the repository is stated only in `settings.gradle.kts`; the compiler
+and ArchUnit enforce the module boundaries
+(xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]).
+The frontend package is the npm workspace under `src/application/frontend`.
 
-Die Spalte „Tragende Bibliotheken“ nennt nur Bibliotheken, die eine
-Architekturanforderung umsetzen. Alle Abhängigkeiten und ihre Versionen stehen im
-Versionskatalog `gradle/libs.versions.toml` und in `package.json`
-(xref:adr-009-build-monorepo-und-versionen[ADR-009]). Alle Backend-Module nutzen
-Java 21 und JSpecify; das steht deshalb nicht in jeder Zeile.
+The column “Key libraries” names only libraries that implement an architecture
+requirement. All dependencies and their versions are in the version catalog
+`gradle/libs.versions.toml` and in `package.json`
+(xref:adr-009-build-monorepo-und-versionen[ADR-009]). All backend modules use
+Java 21 and JSpecify; this is therefore not stated in every row.
 
 [cols="2,5,3", options="header"]
 |===
-| Baustein | Verantwortung | Tragende Bibliotheken
-| domain-model | Fachmodell, frei von Frameworks; kennt keine Domänenservices. DDD-Rollen und Selbstvalidierung nach xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]. Ein Paket je Aggregat (`template`, `snapshot`, `letter`), geteilte Werttypen im Wurzelpaket (xref:crosscutting-concepts[Querschnittskonzept Fachmodell]) | jMolecules DDD (nur Annotationen)
-| validation | Allgemeine Prüfungen (Pflichtwert, nicht leer, nicht blank, Untergrenze) mit einheitlichem Fehlervertrag; kennt kein anderes Modul, das SPI nutzt es nicht (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | –
-| domain-service | Domänenservices, frei von Frameworks; beim Kompilieren nur für `usecases-service` sichtbar, zur Laufzeit bringt der Starter sie transitiv mit (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | –
-| usecases-in | Eingehende Ports: Schnittstellen der Anwendungsfälle | –
-| usecases-out | Ausgehende Ports, nur von Adaptern der Bibliothek implementiert; darunter `SaveCallback`, über den der Anwendungsfall „Schreiben speichern“ ein neu angelegtes Schreiben vor dem Commit meldet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
-| spi | Schnittstelle zur Host-Anwendung mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek; neben `api` das einzige Modul, das der Host beim Kompilieren sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] kommt die optionale Schnittstelle `LetterSaveCallback` hinzu: ein Rückruf vor dem gemeinsamen Commit, nur bei einer Neuanlage, mit dem Ergebnis `CallbackResult` | –
-| api | Java-API für den Host mit eigenen Datentypen, ohne Abhängigkeit zur Bibliothek: Schreiben in der Transaktion des Hosts speichern (`SaveLetter`) und das Ergebnis als Rückgabewert erhalten (`SaveResult`). Sie tritt einer laufenden Transaktion bei und eröffnet eine eigene, wenn keine läuft (Spring `REQUIRED`). Gemeinsam atomar mit weiteren Aktionen des Hosts ist das Speichern nur, wenn der Host die Transaktion vor dem Aufruf eröffnet (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
-| usecases-service | Implementierung der Anwendungsfälle | –
-| adapter-web | Eingehender Adapter: REST-Endpunkte, Fehlerabbildung. Beim Speichern äußere Grenze der Transaktion; lehnt der Rückruf des Hosts ab, rollt er ausdrücklich zurück und meldet danach den Grund (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | _Spring MVC_
-| adapter-api | Eingehender Adapter: implementiert `api`, ruft die Anwendungsfälle und bildet zwischen API-Typen und Domänenmodell ab. Steuert die Transaktion mit `REQUIRED` selbst über ein `TransactionTemplate`, nicht über einen Proxy; eine fachliche Ablehnung kehrt regulär zurück und markiert die Transaktion nicht als rollback-only (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | Spring Transaction
-| adapter-rendering | Ausgehender Adapter: Zusammenführen, HTML-Bereinigung, Schriftauflösung, PDF-Erzeugung und Konformitätsprüfung; Whitebox in xref:bausteine-ebene-2-adapter-rendering[Ebene 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox und FontBox, veraPDF_, freie OFL-Ersatzschriften
-| adapter-persistence-jdbc | Ausgehender Adapter: Repositories, DocumentStore, Liquibase-Changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006])
-| adapter-host | Ausgehender Adapter: implementiert die Ports `PlaceholderDataSource`, `Permissions` und `DeletionRules`, ruft die SPI-Implementierungen des Hosts und bildet zwischen SPI-Typen und Domänenmodell ab. Liefert der Host `null` oder ungültige Werte, meldet er `HostContractViolated`. Mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] implementiert `HostSaveCallback` den Port `SaveCallback` und ruft den optionalen Rückruf `LetterSaveCallback`; ohne Rückruf des Hosts nimmt er jedes Schreiben an | –
-| spring-boot-starter | Autokonfiguration `LetterwrightAutoConfiguration`, Default-Adapter, Default-`AuthorizationCheck` auf Spring Security (tritt zurück, sobald der Host eine eigene Bean bereitstellt); exportiert nur `spi` und, mit xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], `api`; `adapter-api` bleibt intern. Eine Bean für `api.SaveLetter` verdrahtet er noch nicht, weil die Anwendungsfälle selbst noch nicht verdrahtet sind (#10). Den Port `SaveCallback` verdrahtet er mit dem Rückruf `LetterSaveCallback` des Hosts, falls es ihn gibt. Fehlt `PlaceholderDataProvider` oder `DeletionPolicy`, startet der Kontext nicht | Spring Boot Autoconfigure, _Spring Security_
-| Frontend-Paket | Vorschau, Übersicht, Editor. Die Vorschau soll barrierefrei sein (xref:qs-003-barrierefreie-vorschau[QS-003]); der Nachweis ist in #3 noch offen (VoiceOver am Seitenwechsel, Reflow bei 200 %, Einzelkriterien mit NVDA). | React, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003])
+| Building block | Responsibility | Key libraries
+| domain-model | Domain model, free of frameworks; knows no domain services. DDD roles and self-validation according to xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]. One package per aggregate (`template`, `snapshot`, `letter`), shared value types in the root package (xref:crosscutting-concepts[crosscutting concept domain model]) | jMolecules DDD (annotations only)
+| validation | General checks (required value, not empty, not blank, lower bound) with a uniform error contract; knows no other module; the SPI does not use it (xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018]) | –
+| domain-service | Domain services, free of frameworks; at compile time visible only to `usecases-service`; at runtime the starter brings them in transitively (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]) | –
+| usecases-in | Inbound ports: interfaces of the use cases | –
+| usecases-out | Outbound ports, implemented only by adapters of the library; among them `SaveCallback`, through which the use case “save letter” reports a newly created letter before the commit (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
+| spi | Interface to the host application with its own data types, without dependency on the library; besides `api` the only module the host sees at compile time (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023] adds the optional interface `LetterSaveCallback`: a callback before the shared commit, only for a new letter, with the result `CallbackResult` | –
+| api | Java API for the host with its own data types, without dependency on the library: save a letter in the host's transaction (`SaveLetter`) and receive the result as a return value (`SaveResult`). It joins a running transaction and opens one of its own if none is running (Spring `REQUIRED`). Saving is atomic together with further actions of the host only if the host opens the transaction before the call (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | –
+| usecases-service | Implementation of the use cases | –
+| adapter-web | Inbound adapter: REST endpoints, error mapping. When saving, the outer boundary of the transaction; if the host's callback rejects, it rolls back explicitly and then reports the reason (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | _Spring MVC_
+| adapter-api | Inbound adapter: implements `api`, calls the use cases and maps between API types and the domain model. Controls the transaction with `REQUIRED` itself through a `TransactionTemplate`, not through a proxy; a business rejection returns normally and does not mark the transaction as rollback-only (xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]) | Spring Transaction
+| adapter-rendering | Outbound adapter: merging, HTML sanitizing, font resolution, PDF generation and conformance check; white box in xref:bausteine-ebene-2-adapter-rendering[level 2] | _Apache FreeMarker, jsoup, openhtmltopdf, Apache PDFBox and FontBox, veraPDF_, free OFL substitute fonts
+| adapter-persistence-jdbc | Outbound adapter: repositories, DocumentStore, Liquibase changelog | _Spring JDBC, Liquibase_ (xref:adr-006-datenbankagnostische-persistenz[ADR-006])
+| adapter-host | Outbound adapter: implements the ports `PlaceholderDataSource`, `Permissions` and `DeletionRules`, calls the host's SPI implementations and maps between SPI types and the domain model. If the host returns `null` or invalid values, it reports `HostContractViolated`. With xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], `HostSaveCallback` implements the port `SaveCallback` and calls the optional callback `LetterSaveCallback`; without a callback from the host it accepts every letter | –
+| spring-boot-starter | Auto-configuration `LetterwrightAutoConfiguration`, default adapters, default `AuthorizationCheck` based on Spring Security (steps back as soon as the host provides a bean of its own); exports only `spi` and, with xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], `api`; `adapter-api` stays internal. It does not yet wire a bean for `api.SaveLetter`, because the use cases themselves are not wired yet (#10). It wires the port `SaveCallback` with the host's callback `LetterSaveCallback` if there is one. If `PlaceholderDataProvider` or `DeletionPolicy` is missing, the context does not start | Spring Boot Autoconfigure, _Spring Security_
+| Frontend package | Preview, list, editor. The preview is to be accessible (xref:qs-003-barrierefreie-vorschau[QS-003]); the evidence is still open in #3 (VoiceOver at page change, reflow at 200 %, individual criteria with NVDA). | React, TypeScript, Vite, UnoCSS (xref:adr-013-styling-der-frontend-komponenten[ADR-013]), _Paged.js_ (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]), _ProseMirror/TipTap_ (xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003])
 |===
 
-Querschnittlich, ohne eigenen Baustein:
+Crosscutting, without a building block of its own:
 
-* *Backend-Build und Tests:* Gradle mit Kotlin DSL und Versionskatalog
-  `gradle/libs.versions.toml`, Versionen über die Spring-Boot-BOM
+* *Backend build and tests:* Gradle with Kotlin DSL and version catalog
+  `gradle/libs.versions.toml`, versions via the Spring Boot BOM
   (xref:adr-009-build-monorepo-und-versionen[ADR-009]); JUnit 5, Mockito, AssertJ,
-  JaCoCo als Abdeckungs-Gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
-  ArchUnit im Modul `architecture-tests`
+  JaCoCo as coverage gate (xref:adr-011-qualitaetsgates-im-build[ADR-011]);
+  ArchUnit in the module `architecture-tests`
   (xref:adr-015-durchsetzung-der-modulgrenzen-im-backend[ADR-015]); Error Prone
-  als Linter, mit NullAway für den Null-Vertrag
+  as linter, with NullAway for the null contract
   (xref:adr-011-qualitaetsgates-im-build[ADR-011],
-  xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]); im Modul
-  `host-contract-test` der Nachweis, dass ein Host mit dem Starter nur SPI und
-  Java-API kompiliert sieht (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016],
-  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]); für die
-  Persistenz _Testcontainers_ mit PostgreSQL und MariaDB.
-* *Frontend-Build und Tests:* npm-Workspaces, Vitest mit V8-Abdeckung, React
+  xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]); in the module
+  `host-contract-test` the evidence that a host with the starter sees only the SPI
+  and the Java API at compile time (xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016],
+  xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]); for
+  persistence _Testcontainers_ with PostgreSQL and MariaDB.
+* *Frontend build and tests:* npm workspaces, Vitest with V8 coverage, React
   Testing Library, jsdom, axe-core, ESLint
-  (xref:adr-010-frontend-tests-mit-vitest[ADR-010]); _Playwright_ für E2E-Tests
-  in der Beispielanwendung.
+  (xref:adr-010-frontend-tests-mit-vitest[ADR-010]); _Playwright_ for E2E tests
+  in the example application.
 
-Die Grenze entspricht der xref:system-scope-and-context[Kontextabgrenzung].
+The boundary corresponds to the xref:system-scope-and-context[system scope and context].
 
 [[bausteine-ebene-2]]
-== Ebene 2
+== Level 2
 
 [[bausteine-ebene-2-adapter-rendering]]
-=== adapter-rendering (Whitebox)
+=== adapter-rendering (White Box)
 
-Die Implementierungen in `adapter-rendering` sind der Kern des Werkzeugs: Aus
-Vorlagenversionen und Datenkontext entstehen hier Vorschau-HTML und PDF
-(xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]). Das Modul
-kennt nur `usecases-out` und implementiert zwei Ports: `Renderer` und
+The implementations in `adapter-rendering` are the core of the tool: here,
+preview HTML and PDF are created from template versions and the data context
+(xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004]). The module
+knows only `usecases-out` and implements two ports: `Renderer` and
 `ConformanceChecker` (xref:adr-002-hexagonale-architektur-und-ports[ADR-002]).
 
-Der Schnitt ist ein Entwurf. Er folgt dem Wegwerf-Prototyp aus #3
-(`prototyp/README.adoc`), dessen Code nicht übernommen wird. Die Unterpakete
-sind ein Vorschlag, bis das Epic #7 das Modul umsetzt.
+The decomposition is a draft. It follows the throwaway prototype from #3
+(`prototyp/README.adoc`), whose code is not taken over. The subpackages
+are a proposal until epic #7 implements the module.
 
 [plantuml,bausteine-ebene-2-adapter-rendering,svg]
 ----
 @startuml
 !include <C4/C4_Component>
-Component_Ext(uout, "usecases-out", "Java", "Ports Renderer und ConformanceChecker")
-ContainerDb_Ext(schriften, "Schriftordner des Hosts", "TrueType, OpenType")
+Component_Ext(uout, "usecases-out", "Java", "Ports Renderer and ConformanceChecker")
+ContainerDb_Ext(schriften, "Host font folder", "TrueType, OpenType")
 Container_Boundary(ren, "adapter-rendering") {
-  Component(steuerung, "Rendering-Steuerung", "Java", "Implementiert Renderer; steuert die Pipeline für Vorschau und PDF")
-  Component(zus, "Zusammenführung", "Apache FreeMarker, abgesichert", "Briefpapier, Standardschreiben und Datenkontext zu einem HTML-Dokument")
-  Component(ber, "HTML-Bereinigung", "jsoup", "Allowlist für Elemente, Attribute, URLs und CSS; meldet Befunde; gibt XHTML aus")
-  Component(schr, "Schriftauflösung", "Apache FontBox", "Familie zu Schriftdatei: Ordner des Hosts, Ersatzschrift, Standardschrift")
-  ComponentDb(ersatz, "Ersatzschriften", "OFL-Schriften, Zuordnungstabelle", "Liberation Sans, PT Sans Narrow u. a.")
-  Component(vor, "Vorschau-Aufbereitung", "Java", "Ergänzt CSP, @font-face und Bildschirmdarstellung, ohne das Layout zu ändern")
-  Component(pdf, "PDF-Erzeugung", "openhtmltopdf mit PDFBox-Backend", "PDF/A-2b mit PDF/UA-1-Tagging, Schriften eingebettet")
-  Component(nach, "PDF-Nachbearbeitung", "Apache PDFBox", "Taggt die inhaltliche Fußzeile und weist das Ergebnis nach")
-  Component(kon, "Konformitätsprüfung", "veraPDF, Greenfield-Modell", "Implementiert ConformanceChecker: PDF/A-2b und PDF/UA-1")
+  Component(steuerung, "Rendering control", "Java", "Implements Renderer; controls the pipeline for preview and PDF")
+  Component(zus, "Merging", "Apache FreeMarker, hardened", "Letterhead, letter template and data context into one HTML document")
+  Component(ber, "HTML sanitizing", "jsoup", "Allowlist for elements, attributes, URLs and CSS; reports findings; outputs XHTML")
+  Component(schr, "Font resolution", "Apache FontBox", "Family to font file: host folder, substitute font, default font")
+  ComponentDb(ersatz, "Substitute fonts", "OFL fonts, mapping table", "Liberation Sans, PT Sans Narrow and others")
+  Component(vor, "Preview preparation", "Java", "Adds CSP, @font-face and screen rendering without changing the layout")
+  Component(pdf, "PDF generation", "openhtmltopdf with PDFBox backend", "PDF/A-2b with PDF/UA-1 tagging, fonts embedded")
+  Component(nach, "PDF post-processing", "Apache PDFBox", "Tags the content footer and verifies the result")
+  Component(kon, "Conformance check", "veraPDF, Greenfield model", "Implements ConformanceChecker: PDF/A-2b and PDF/UA-1")
 }
-Rel(steuerung, uout, "implementiert Renderer")
-Rel(kon, uout, "implementiert ConformanceChecker")
-Rel(steuerung, zus, "1. zusammenführen")
-Rel(steuerung, ber, "2. bereinigen")
-Rel(steuerung, vor, "3a. Vorschau")
+Rel(steuerung, uout, "implements Renderer")
+Rel(kon, uout, "implements ConformanceChecker")
+Rel(steuerung, zus, "1. merge")
+Rel(steuerung, ber, "2. sanitize")
+Rel(steuerung, vor, "3a. preview")
 Rel(steuerung, pdf, "3b. PDF")
-Rel(steuerung, nach, "4b. nachbearbeiten")
-Rel(vor, schr, "Schriften für @font-face")
-Rel(pdf, schr, "Schriften zum Einbetten")
-Rel(schr, schriften, "liest")
-Rel(schr, ersatz, "fällt zurück auf")
+Rel(steuerung, nach, "4b. post-process")
+Rel(vor, schr, "fonts for @font-face")
+Rel(pdf, schr, "fonts for embedding")
+Rel(schr, schriften, "reads")
+Rel(schr, ersatz, "falls back to")
 @enduml
 ----
 
-Vorschau und PDF entstehen aus demselben bereinigten HTML. Die Vorschau bekommt
-nur Zusätze im Kopf, die das Layout nicht ändern; paginiert wird sie im Browser
-mit Paged.js in der Vorschau-Komponente des Frontends
-(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). Die
-Konformitätsprüfung ruft `usecases-service` über den Port auf, nicht die
-Rendering-Steuerung, und zwar an zwei Stellen: vor jedem Speichern eines
-Schreibens und beim Veröffentlichen einer Vorlagenversion für ein Probe-PDF mit
-Beispieldaten. Die Prüfung ist Pflicht. Ohne Prüfer startet der
-Anwendungskontext des Hosts nicht; ist das PDF nicht konform oder die Prüfung
-nicht ausführbar, wird nichts gespeichert
-(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], Abschnitt Entscheidung).
+Preview and PDF are created from the same sanitized HTML. The preview gets
+only additions in the head that do not change the layout; it is paginated in
+the browser with Paged.js in the preview component of the frontend
+(xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]). `usecases-service`
+calls the conformance check through the port, not the rendering control, and
+it does so in two places: before every saving of a letter, and when a template
+version is published, for a proof PDF with sample data. The check is
+mandatory. Without a checker, the host's application context does not start;
+if the PDF is not conformant or the check cannot be run, nothing is saved
+(xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], section Decision).
 
 [cols="2,4,3,3,3", options="header"]
 |===
-| Baustein | Verantwortung | Schnittstelle | Technologie und Bibliotheken | Ablage (Vorschlag)
+| Building block | Responsibility | Interface | Technology and libraries | Location (proposal)
 
-| Rendering-Steuerung
-| Führt die Schritte für Vorschau und PDF in fester Reihenfolge aus. Bricht ab,
-  wenn ein Schritt fehlschlägt; nichts wird still repariert.
-| Implementiert `Renderer` aus `usecases-out`
+| Rendering control
+| Runs the steps for preview and PDF in a fixed order. Aborts
+  if a step fails; nothing is silently repaired.
+| Implements `Renderer` from `usecases-out`
 | Java 21
 | `…rendering`
 
-| Zusammenführung
-| Führt Briefpapier, Standardschreiben und Datenkontext in zwei Durchläufen zu
-  einem vollständigen HTML-Dokument mit Paged-Media-CSS zusammen. Escaped
-  Platzhalterwerte; fehlende Werte erscheinen sichtbar als Platzhalter.
-| Intern: Vorlagenversionen und Datenkontext rein, HTML raus
-| Apache FreeMarker mit abgesicherter Konfiguration
+| Merging
+| Merges letterhead, letter template and data context in two passes into
+  one complete HTML document with Paged Media CSS. Escapes
+  placeholder values; missing values appear visibly as placeholders.
+| Internal: template versions and data context in, HTML out
+| Apache FreeMarker with hardened configuration
   (xref:adr-008-platzhaltersprache[ADR-008])
-| `…rendering.zusammenfuehrung`
+| `…rendering.merge`
 
-| HTML-Bereinigung
-| Bereinigt das zusammengeführte Dokument nach Allowlist: Elemente, Attribute,
-  URL-Schemata und CSS. Meldet jede Entfernung als Befund. Gibt wohlgeformtes
-  XHTML ohne zusätzlichen Leerraum aus, weil openhtmltopdf XML braucht.
-| Intern: HTML rein, XHTML und Befunde raus
+| HTML sanitizing
+| Sanitizes the merged document according to an allowlist: elements, attributes,
+  URL schemes and CSS. Reports every removal as a finding. Outputs well-formed
+  XHTML without additional whitespace, because openhtmltopdf needs XML.
+| Internal: HTML in, XHTML and findings out
 | jsoup (xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014])
-| `…rendering.bereinigung`
+| `…rendering.sanitization`
 
-| Schriftauflösung
-| Löst jede Schriftfamilie der Vorlage in fester Reihenfolge zu einer Datei auf:
-  Ordner des Hosts, sonst Ersatzschrift aus der Zuordnungstabelle, sonst
-  Standardschrift. Liest Familie, Gewicht und Stil aus der Datei, nicht aus dem
-  Dateinamen. Meldet jede ersetzte Familie.
-| Intern: Familie rein, Schriftdatei raus; liest den konfigurierten Schriftordner
+| Font resolution
+| Resolves every font family of the template to a file in a fixed order:
+  host folder, otherwise substitute font from the mapping table, otherwise
+  default font. Reads family, weight and style from the file, not from the
+  file name. Reports every substituted family.
+| Internal: family in, font file out; reads the configured font folder
 | Apache FontBox (xref:adr-017-bereitstellung-der-schriften[ADR-017])
-| `…rendering.schriften`
+| `…rendering.fonts`
 
-| Ersatzschriften
-| Freie Ersatzschriften, eine freie Standardschrift und die Zuordnungstabelle.
-  Keine lizenzpflichtigen Schriften.
-| Klassenpfad-Ressourcen
-| Liberation Sans 2.1.5 für Arial, PT Sans Narrow für Arial Narrow, weitere
-  laut ADR-017; alle SIL OFL 1.1
-| Ressourcen des Moduls
+| Substitute fonts
+| Free substitute fonts, one free default font and the mapping table.
+  No licensed fonts.
+| Classpath resources
+| Liberation Sans 2.1.5 for Arial, PT Sans Narrow for Arial Narrow, others
+  according to ADR-017; all SIL OFL 1.1
+| Resources of the module
 
-| Vorschau-Aufbereitung
-| Ergänzt das bereinigte HTML um eine Content Security Policy, die Schriften als
-  `@font-face` und eine Bildschirmdarstellung der Seiten.
-| Intern: XHTML rein, Vorschau-HTML raus; geht über `Renderer` an `adapter-web`
-| Java 21; CSP mit SHA-256-Hash für das Skript von Paged.js
+| Preview preparation
+| Adds to the sanitized HTML a Content Security Policy, the fonts as
+  `@font-face` and a screen rendering of the pages.
+| Internal: XHTML in, preview HTML out; goes via `Renderer` to `adapter-web`
+| Java 21; CSP with SHA-256 hash for the Paged.js script
 | `…rendering.preview`
 
-| PDF-Erzeugung
-| Rendert das bereinigte XHTML zu einem PDF/A-2b mit PDF/UA-1-Tagging und bettet
-  die aufgelösten Schriften ein. Läuft in der JVM des Hosts, ohne externen
-  Prozess.
-| Intern: XHTML und Schriften rein, PDF raus
-| openhtmltopdf mit PDFBox-Backend (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004])
+| PDF generation
+| Renders the sanitized XHTML into a PDF/A-2b with PDF/UA-1 tagging and embeds
+  the resolved fonts. Runs in the host's JVM, without an external
+  process.
+| Internal: XHTML and fonts in, PDF out
+| openhtmltopdf with PDFBox backend (xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004])
 | `…rendering.pdf`
 
-| PDF-Nachbearbeitung
-| Taggt die inhaltliche Fußzeile, die openhtmltopdf als Artefakt ausgibt, als
-  lesbaren Inhalt: die beiden Textblöcke der ersten Seite, Öffnungszeiten und
-  Homepage, je einmal nach dem Brieftext. Prüft bei jeder Erzeugung, dass genau die Fußzeilentexte aus dem HTML
-  in dieser Reihenfolge am Ende des Strukturbaums stehen, sonst Abbruch.
-  Seitenzahlen, Dekoration und identische Wiederholungen bleiben Artefakte.
-  Vom Owner akzeptiert, sofern der Ausweichweg dokumentiert ist (Review zu
-  PR #47, Übernahme in QS-002 über #3).
-| Intern: PDF rein, PDF raus
+| PDF post-processing
+| Tags the content footer, which openhtmltopdf outputs as an artifact, as
+  readable content: the two text blocks of the first page, opening hours and
+  homepage, each once after the letter text. Checks on every generation that exactly the footer texts from the HTML
+  are at the end of the structure tree in this order; otherwise it aborts.
+  Page numbers, decoration and identical repetitions stay artifacts.
+  Accepted by the owner provided the fallback is documented (review of
+  PR #47, adoption into QS-002 via #3).
+| Internal: PDF in, PDF out
 | Apache PDFBox
 | `…rendering.pdf`
 
-| Konformitätsprüfung
-| Prüft ein PDF gegen PDF/A-2b und PDF/UA-1, vor jedem Speichern und beim
-  Veröffentlichen einer Vorlagenversion. Default-Prüfer, den der Starter
-  automatisch konfiguriert; ohne Prüfer startet der Host nicht (fail-fast), bei
-  nicht konformem PDF oder nicht ausführbarer Prüfung wird nichts gespeichert
+| Conformance check
+| Checks a PDF against PDF/A-2b and PDF/UA-1, before every saving and when
+  a template version is published. Default checker that the starter
+  configures automatically; without a checker the host does not start (fail-fast); if
+  the PDF is not conformant or the check cannot be run, nothing is saved
   (fail-closed).
-| Implementiert `ConformanceChecker` aus `usecases-out`
-| veraPDF-Bibliothek mit Greenfield-Modell (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005])
-| `…rendering.konformitaet`
+| Implements `ConformanceChecker` from `usecases-out`
+| veraPDF library with Greenfield model (xref:adr-005-pdfa-und-barrierefreiheit[ADR-005])
+| `…rendering.conformance`
 |===
 
-`…` steht für `dieterbaier.letterwright.adapter.out`.
+`…` stands for `dieterbaier.letterwright.adapter.out`.
 
-==== Bibliotheken
+==== Libraries
 
-Die Tabelle nennt die Bibliotheken, mit denen das Modul seine
-Architekturanforderungen umsetzt, etwa PDF/A und PDF/UA. Welche Versionen der
-Prototyp erprobt hat, steht in `prototyp/build.gradle.kts`. Ins Produkt kommen
-sie über den Versionskatalog, wenn Epic #7 das Modul umsetzt.
+The table names the libraries with which the module implements its
+architecture requirements, such as PDF/A and PDF/UA. Which versions the
+prototype tried out is in `prototyp/build.gradle.kts`. They enter the product
+via the version catalog when epic #7 implements the module.
 
 [cols="2,2,3", options="header"]
 |===
-| Bibliothek | Lizenz | Zweck
-| Apache FreeMarker | Apache-2.0 | Zusammenführung, Platzhaltersprache
-| jsoup | MIT | HTML-Bereinigung nach Allowlist, XHTML-Ausgabe
-| openhtmltopdf (`openhtmltopdf-pdfbox`) | LGPL-2.1 | HTML mit Paged-Media-CSS zu PDF/A und PDF/UA
-| Apache PDFBox und FontBox | Apache-2.0 | Backend von openhtmltopdf, Nachbearbeitung, Schriftdateien lesen
-| veraPDF (`validation-model`) | MPL-2.0 oder GPL-3.0 | Konformitätsprüfung PDF/A-2b und PDF/UA-1
+| Library | License | Purpose
+| Apache FreeMarker | Apache-2.0 | Merging, placeholder language
+| jsoup | MIT | HTML sanitizing by allowlist, XHTML output
+| openhtmltopdf (`openhtmltopdf-pdfbox`) | LGPL-2.1 | HTML with Paged Media CSS to PDF/A and PDF/UA
+| Apache PDFBox and FontBox | Apache-2.0 | Backend of openhtmltopdf, post-processing, reading font files
+| veraPDF (`validation-model`) | MPL-2.0 or GPL-3.0 | Conformance check PDF/A-2b and PDF/UA-1
 |===
 
-Nur Werkzeuge des Prototyps, nicht Teil des Moduls: Jackson für die
-Testdaten und Playwright für die Prüfung der Vorschau. Lage, Text und Bild der
-PDFs vergleichen dort eigene Werkzeuge auf Basis von PDFBox; ob sie als
-Testwerkzeuge für QS-004 ins Produkt wandern, ist offen.
+Prototype tools only, not part of the module: Jackson for the
+test data and Playwright for checking the preview. Position, text and image of
+the PDFs are compared there by custom tools based on PDFBox; whether they move
+into the product as test tools for QS-004 is open.
 
-==== Betroffen von
+==== Affected by
 
 [cols="2,5", options="header"]
 |===
-| Baustein | Betroffen von
-| Rendering-Steuerung | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-012-erzeugungsdauer[QS-012], xref:r-002-abweichung-zweier-render-engines[R-002]
-| Zusammenführung | xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003], xref:adr-008-platzhaltersprache[ADR-008], xref:qs-010-fehlende-platzhalter-sichtbar[QS-010], xref:r-004-template-injection-durch-vorlagen[R-004]
-| HTML-Bereinigung | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:r-004-template-injection-durch-vorlagen[R-004]
-| Schriftauflösung, Ersatzschriften | xref:adr-017-bereitstellung-der-schriften[ADR-017], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]
-| Vorschau-Aufbereitung | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]
-| PDF-Erzeugung | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
-| PDF-Nachbearbeitung | xref:qs-002-barrierefreies-pdf[QS-002], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
-| Konformitätsprüfung | xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002]
+| Building block | Affected by
+| Rendering control | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-012-erzeugungsdauer[QS-012], xref:r-002-abweichung-zweier-render-engines[R-002]
+| Merging | xref:adr-003-vorlagenformat-fuer-fachanwender[ADR-003], xref:adr-008-platzhaltersprache[ADR-008], xref:qs-010-fehlende-platzhalter-sichtbar[QS-010], xref:r-004-template-injection-durch-vorlagen[R-004]
+| HTML sanitizing | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:r-004-template-injection-durch-vorlagen[R-004]
+| Font resolution, substitute fonts | xref:adr-017-bereitstellung-der-schriften[ADR-017], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013]
+| Preview preparation | xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014], xref:qs-004-wiedergabetreue-vorschau-und-pdf[QS-004]
+| PDF generation | xref:adr-004-rendering-pipeline-fuer-vorschau-und-pdf[ADR-004], xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002], xref:qs-013-stiltreue-zur-zentralen-docx-vorgabe[QS-013], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
+| PDF post-processing | xref:qs-002-barrierefreies-pdf[QS-002], xref:r-003-reife-der-html-zu-pdf-bibliothek[R-003]
+| Conformance check | xref:adr-005-pdfa-und-barrierefreiheit[ADR-005], xref:qs-001-pdfa-konformitaet[QS-001], xref:qs-002-barrierefreies-pdf[QS-002]
 |===
 
-==== Offene Punkte
+==== Open Points
 
-* *PDF-Nachbearbeitung:* Der Owner hat den Schritt im Review zu PR #47
-  akzeptiert. Die Fußzeilen-Semantik ist noch nicht in QS-002 übernommen, dessen
-  Antwortmaß Fußzeilen bisher als Artefakt verlangt (#3). Ausweichweg, falls
-  der Nachweis bricht: die Fußzeile als regulärer, getaggter Block im
-  Brieflayout; eine geänderte Platzierung braucht die Abnahme nach QS-013. Der
-  Schritt muss bei jedem Update von openhtmltopdf mitgeprüft werden (R-003).
-* *Befunde der Bereinigung:* Die Vorlagenpflege braucht sie beim Speichern
-  (Ablehnen, Trotzdem akzeptieren, Bereinigen; #8, #9). Auch nach „Trotzdem
-  akzeptieren“ bereinigt die Pipeline vor jeder Ausgabe. Über welchen Port die
-  Befunde den Kern erreichen, ist offen.
-* *Schriften für die Vorschau:* Ob sie eingebettet als `data:`-URI oder vom
-  Ressourcen-Endpunkt in `adapter-web` kommen, ist offen (ADR-014). Im zweiten
-  Fall braucht `adapter-web` die aufgelösten Dateien über einen Port.
-* *Paged.js im iframe:* Im Prototyp fügt das Backend das Skript inline ein. Ob
-  im Produkt die Vorschau-Aufbereitung oder die Vorschau-Komponente es
-  einbringt, ist offen. Die CSP muss in beiden Fällen den Hash kennen.
-* *Chromium (Option 2 aus ADR-004):* Würde die PDF-Erzeugung ersetzen. Der
-  Owner hat die Prüfung zurückgestellt (Review zu PR #47). Sie kommt wieder
-  infrage, wenn die PDF/UA-Stichprobe ein Problem zeigt, das openhtmltopdf und
-  PDFBox nicht zuverlässig lösen (#3).
+* *PDF post-processing:* the owner accepted the step in the review of PR #47.
+  The footer semantics are not yet adopted into QS-002, whose response measure
+  so far requires footers as artifacts (#3). Fallback if the evidence breaks:
+  the footer as a regular, tagged block in the letter layout; a changed
+  placement needs acceptance according to QS-013. The step must be rechecked
+  with every update of openhtmltopdf (R-003).
+* *Findings of the sanitizing:* template maintenance needs them when saving
+  (reject, accept anyway, sanitize; #8, #9). Even after “accept anyway”, the
+  pipeline sanitizes before every output. Through which port the findings
+  reach the core is open.
+* *Fonts for the preview:* whether they come embedded as a `data:` URI or from
+  the resource endpoint in `adapter-web` is open (ADR-014). In the second case
+  `adapter-web` needs the resolved files through a port.
+* *Paged.js in the iframe:* in the prototype the backend inserts the script
+  inline. Whether in the product the preview preparation or the preview
+  component brings it in is open. In both cases the CSP must know the hash.
+* *Chromium (option 2 from ADR-004):* would replace the PDF generation. The
+  owner has deferred the evaluation (review of PR #47). It comes back into
+  consideration if the PDF/UA sample shows a problem that openhtmltopdf and
+  PDFBox do not solve reliably (#3).

@@ -1,13 +1,13 @@
 ---
 id: DOC-08000-crosscutting-concepts
 type: Document
-title: 'Querschnittliche Konzepte'
+title: 'Crosscutting Concepts'
 status: draft
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Bedrohungsmodell, Sicherheit, Test, Beobachtbarkeit, Fehlerbehandlung, Barrierefreiheit und Platzhalter.'
+summary: 'Threat model, security, testing, observability, error handling, accessibility and placeholders.'
 tags:
 - arc42
 - concepts
@@ -15,141 +15,143 @@ relations: []
 metadata_version: '1.0'
 ---
 [[crosscutting-concepts]]
-= Querschnittliche Konzepte
+= Crosscutting Concepts
 
-== Bedrohungsmodell
+== Threat Model
 
 [cols="1,2,2", options="header"]
 |===
-| Bedrohung | Angriffsweg | Gegenmaßnahme
-| Template-Injection | Manipulierte Vorlage führt Code aus | Abgesicherte FreeMarker-Konfiguration, Tests (xref:r-004-template-injection-durch-vorlagen[R-004])
-| Unberechtigter Zugriff auf Schreiben | Erratene oder fremde IDs | UUIDs, Berechtigungsprüfung bei jedem Zugriff, 404 statt 403 (xref:qs-009-zugriffsschutz-beim-download[QS-009])
-| Cross-Site-Scripting | Platzhalterwerte oder Vorlageninhalt mit Skript | HTML-Escaping als Standard, HTML-Sanitizing des Editor-Inhalts, kein Skript in Vorlagen
-| Schadhafte Uploads | Manipulierte Logos (SVG mit Skript) | SVG bereinigen oder nur Rasterformate, Größenlimit
-| Datenabfluss über Logs | Personenbezogene Daten im Log | Nur IDs und Versionen loggen
+| Threat | Attack vector | Countermeasure
+| Template injection | A manipulated template executes code | Hardened FreeMarker configuration, tests (xref:r-004-template-injection-durch-vorlagen[R-004])
+| Unauthorized access to letters | Guessed or foreign IDs | UUIDs, authorization check on every access, 404 instead of 403 (xref:qs-009-zugriffsschutz-beim-download[QS-009])
+| Cross-site scripting | Placeholder values or template content with script | HTML escaping as default, HTML sanitizing of the editor content, no script in templates
+| Malicious uploads | Manipulated logos (SVG with script) | Clean SVG or allow only raster formats, size limit
+| Data leakage via logs | Personal data in the log | Log only IDs and versions
 |===
 
-== Sicherheit
+== Security
 
-Authentifizierung und Autorisierung kommen aus der Spring Security des Hosts. Die
-Bibliothek fragt für jede Aktion die `AuthorizationCheck` des SPI
-(xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). Die
-`AuthorizationRequest` hat drei Arten, und ihr Typ sagt, welche Daten sie trägt
+Authentication and authorization come from the host's Spring Security. For
+every action the library asks the SPI's `AuthorizationCheck`
+(xref:adr-016-schnittstelle-zur-host-anwendung[ADR-016]). The
+`AuthorizationRequest` has three kinds, and its type says which data it carries
 (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019],
 xref:adr-020-zulaessige-kombination-aus-standardschreiben-und-bezug[ADR-020]):
 
-* `ForTemplates` mit einer `TemplateAction` (`EDIT`, `PUBLISH`),
-  ohne Bezug;
-* `ForLetter` mit einer `LetterAction` (`VIEW`, `DOWNLOAD`,
-  `DELETE`) und einem fachlichen Bezug;
-* `ForCreation` mit einem fachlichen Bezug und dem Standardschreiben, aus dem das
-  Schreiben entstehen soll.
+* `ForTemplates` with a `TemplateAction` (`EDIT`, `PUBLISH`),
+  without reference;
+* `ForLetter` with a `LetterAction` (`VIEW`, `DOWNLOAD`,
+  `DELETE`) and a business reference;
+* `ForCreation` with a business reference and the letter template from which the
+  letter is to be created.
 
-Bevor die Bibliothek den Host zum Erzeugen fragt, prüft sie selbst, ob der
-Bezugstyp des Standardschreibens zum Bezug passt. Erst mit der Berechtigung
-prüft sie, ob es veröffentlichte Versionen gibt, damit ein Unberechtigter deren
-Stand nicht erfährt, und fragt den Datenkontext an. Dass es ein Standardschreiben
-gibt und zu welchem Bezugstyp es gehört, bleibt dagegen auch für Unberechtigte
-unterscheidbar. Bearbeiten und Veröffentlichen sind getrennt, damit der Host ein
-Vier-Augen-Prinzip abbilden kann: Was veröffentlicht ist, geht in alle neuen
-Schreiben ein. Zurückziehen gehört zum Veröffentlichen; Vorlagen löschen gibt es
-nicht, weil Versionen unveränderlich sind
+Before the library asks the host about creating, it checks itself whether the
+reference type of the letter template matches the reference. Only once it has
+the permission does it check whether there are published versions, so that an
+unauthorized user does not learn their state, and request the data context.
+Whether a letter template exists and which reference type it belongs to, on the
+other hand, stays distinguishable for unauthorized users as well. Editing and
+publishing are separate so that the host can implement a four-eyes principle:
+what is published goes into all new letters. Withdrawing belongs to publishing;
+there is no deleting of templates, because versions are immutable
 (xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007]).
 
-Stellt der Host keine eigene `AuthorizationCheck` bereit, gilt die
-Default-Implementierung des Starters. Sie erlaubt eine Anfrage, wenn der angemeldete
-Benutzer der angefragte ist und die Authority `ROLE_LETTERWRIGHT_TEMPLATES_<AKTION>` bzw.
-`ROLE_LETTERWRIGHT_LETTERS_<AKTION>` hat, etwa `ROLE_LETTERWRIGHT_LETTERS_CREATE` für
-`ForCreation` (in Spring Security `roles("LETTERWRIGHT_LETTERS_CREATE")`). Abweichende Authorities setzt der Host
-mit `letterwright.authorization.roles.templates.<AKTION>` und
-`letterwright.authorization.roles.letters.<AKTION>`. Ein anonymer Zugriff
-zählt nicht als Anmeldung, auch wenn Spring Security ihn als authentifiziert führt
-und seine Authority (`ROLE_ANONYMOUS`) auf eine Aktion abgebildet ist. Was anonym
-ist, entscheidet ein `AuthenticationTrustResolver` des Hosts, wenn er einen als
-Bean bereitstellt, sonst der von Spring Security. Den fachlichen Bezug und das
-Standardschreiben wertet die Default-Implementierung nicht aus. Wer Schreiben nach Bezug sichtbar machen will
-(Q-PO-003), stellt eine eigene Bean bereit; dann tritt die Default-Implementierung
-zurück.
+If the host provides no `AuthorizationCheck` of its own, the starter's default
+implementation applies. It allows a request if the logged-in user is the
+requested one and has the authority `ROLE_LETTERWRIGHT_TEMPLATES_<ACTION>` or
+`ROLE_LETTERWRIGHT_LETTERS_<ACTION>`, for example `ROLE_LETTERWRIGHT_LETTERS_CREATE` for
+`ForCreation` (in Spring Security `roles("LETTERWRIGHT_LETTERS_CREATE")`). The host sets
+different authorities with `letterwright.authorization.roles.templates.<ACTION>` and
+`letterwright.authorization.roles.letters.<ACTION>`. Anonymous access does not
+count as a login, even if Spring Security treats it as authenticated and its
+authority (`ROLE_ANONYMOUS`) is mapped to an action. What is anonymous is
+decided by an `AuthenticationTrustResolver` of the host if the host provides one
+as a bean, otherwise by the one from Spring Security. The default
+implementation does not evaluate the business reference and the letter
+template. Whoever wants to make letters visible by reference (Q-PO-003)
+provides a bean of their own; the default implementation then steps back.
 
-Das Verhalten der Default-Implementierung ist als Feature spezifiziert. Die Tests
-in `BuiltInAuthorizationCheckTest` (Modul `spring-boot-starter`) bilden die
-Szenarien eins zu eins ab:
+The behavior of the default implementation is specified as a feature. The tests
+in `BuiltInAuthorizationCheckTest` (module `spring-boot-starter`) map the
+scenarios one to one:
 
 [source,gherkin]
 ----
 include::../../../features/built-in-authorization-check.feature[lines=4..-1]
 ----
 
-== Test
+== Testing
 
-* Domäne und Anwendung: JUnit 5 und Mockito, ohne Spring.
-* Adapter: Testcontainers (PostgreSQL, MariaDB), Spring-Slice-Tests.
-* Architektur: ArchUnit.
-* Rendering: Referenzvorlagen mit veraPDF-Prüfung und Wiedergabetreue-Test.
-* Frontend: Vitest, React Testing Library, axe-core; E2E mit Playwright in der Beispielanwendung.
-* Gate: 80 % Zeilen- und Zweigabdeckung je Modul (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
+* Domain and application: JUnit 5 and Mockito, without Spring.
+* Adapters: Testcontainers (PostgreSQL, MariaDB), Spring slice tests.
+* Architecture: ArchUnit.
+* Rendering: reference templates with veraPDF check and fidelity test.
+* Frontend: Vitest, React Testing Library, axe-core; E2E with Playwright in the example application.
+* Gate: 80 % line and branch coverage per module (xref:adr-011-qualitaetsgates-im-build[ADR-011]).
 
-== Beobachtbarkeit
+== Observability
 
-Micrometer-Metriken für Dauer von Vorschau und PDF-Erzeugung sowie Anzahl
-fehlgeschlagener Konformitätsprüfungen; strukturierte Logs mit Korrelations-ID,
-ohne personenbezogene Inhalte. Die Metriken laufen in das Monitoring des Hosts.
+Micrometer metrics for the duration of preview and PDF generation and the number
+of failed conformance checks; structured logs with correlation ID,
+without personal content. The metrics flow into the host's monitoring.
 
-== Fehlerbehandlung
+== Error Handling
 
-Fachliche Fehler (fehlende Berechtigung, abgelaufener Snapshot, nicht konformes
-PDF) gibt ein Anwendungsfall als Fall seines Ergebnistyps zurück, nicht als
-Ausnahme (xref:loesungsstrategie-code-stil[Code-Stil]). `adapter-web` bildet
-jeden Fall ab; sie werden als RFC-9457-Problem-Details an das Frontend gegeben und dort
-barrierefrei angezeigt. Technische Fehler brechen das Speichern ab, ohne
-Teilergebnisse zu persistieren.
+A use case returns business errors (missing permission, expired snapshot,
+non-conformant PDF) as a case of its result type, not as an exception
+(xref:loesungsstrategie-code-stil[code style]). `adapter-web` maps every case;
+they are passed to the frontend as RFC 9457 problem details and shown there in
+an accessible way. Technical errors abort saving without persisting partial
+results.
 
-== Barrierefreiheit
+== Accessibility
 
-Vorlagen tragen Semantik (Überschriften, Listen, Tabellen, Alternativtexte,
-Dokumentsprache). Der Editor erzwingt Alternativtexte. Die Vorschau ist HTML mit
-Landmarken und Tastaturbedienung; das PDF ist nach PDF/UA-1 getaggt.
+Templates carry semantics (headings, lists, tables, alternative texts,
+document language). The editor enforces alternative texts. The preview is HTML
+with landmarks and keyboard operation; the PDF is tagged according to PDF/UA-1.
 
-== Fachmodell
+== Domain Model
 
-Die Konventionen für Typen im Fachmodell legt
-xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] fest:
+xref:adr-018-ddd-rollen-und-selbstvalidierung-im-fachmodell[ADR-018] defines the
+conventions for types in the domain model:
 
-* **Rolle sichtbar machen.** Jeder Typ trägt eine jMolecules-Annotation:
-  `@AggregateRoot`, `@Entity` oder `@ValueObject`. Die Identität eines Aggregats
-  oder einer Entität ist mit `@Identity` markiert, am Feld oder an der Methode, die
-  sie liefert. Der Name ist der Begriff aus dem
-  Glossar, ohne technisches Suffix.
-* **Gleichheit.** Aggregate und Entitäten sind finale Klassen, gleich über ihre
-  Identität. Value Objects sind Records, Enums oder unveränderliche Klassen mit
-  Wertgleichheit.
-* **Unveränderlich.** Jeder Zustandswechsel liefert eine neue Instanz.
-* **Selbstvalidierung.** Der Konstruktor oder die Fabrikmethode prüft jedes
-  Pflichtattribut mit `Validate` aus dem Modul `validation`. Fehlende oder
-  ungültige Werte ergeben `ValidationException` mit dem Attributnamen, fachlich
-  verbotene Schritte `IllegalStateTransition`. Nur der Typ prüft:
-  Abfragemethoden, Anwendungsfälle und Adapter prüfen ihre Parameter nicht
+* **Make the role visible.** Every type carries a jMolecules annotation:
+  `@AggregateRoot`, `@Entity` or `@ValueObject`. The identity of an aggregate
+  or entity is marked with `@Identity`, on the field or on the method that
+  provides it. The name is the term from the
+  glossary, without a technical suffix.
+* **Equality.** Aggregates and entities are final classes, equal by their
+  identity. Value objects are records, enums or immutable classes with
+  value equality.
+* **Immutable.** Every state change returns a new instance.
+* **Self-validation.** The constructor or the factory method checks every
+  required attribute with `Validate` from the module `validation`. Missing or
+  invalid values result in a `ValidationException` with the attribute name;
+  steps that are forbidden by the business rules result in
+  `IllegalStateTransition`. Only the type checks: query methods, use cases and
+  adapters do not check their parameters
   (xref:adr-019-validierung-in-den-typen-und-null-vertrag[ADR-019]).
-* **Erzeugen und Wiederherstellen.** Fabrikmethoden wie `create` erzeugen neue
-  Objekte, `restore` stellt gespeicherte her. Beide prüfen alle Regeln.
-* **Zeit.** Das Modell liest keine Uhr. Methoden, die eine Zeit brauchen,
-  bekommen `now` als Parameter.
-* **Personenbezogene Daten.** `toString` gibt keinen Datenkontext aus, weder im
-  Fachmodell noch im SPI.
-* **Pakete je Aggregat.** Innerhalb von `domain-model` gibt es je Aggregat ein
-  Paket: `template` (Briefpapier und Standardschreiben), `snapshot` und
-  `letter`. Briefpapier und Standardschreiben teilen sich ein Paket, weil sie
-  dieselben Versionsregeln haben; die `VersionSequence`, die sie durchsetzt, bleibt
-  so paketintern. Was nur ein Aggregat braucht, liegt in dessen Paket und ist dort
-  so weit wie möglich gekapselt. Die Werttypen, die mehrere Aggregate und die
-  Ports teilen (`UserId`, `BusinessReference`, `DataContext`, `Checksum`,
-  `Aktion` mit `TemplateAction` und `LetterAction`), liegen im Wurzelpaket `domain.model`. Eine weitere Unterteilung nach
-  Rollen (Entitäten, Value Objects) gibt es nicht, und kein Aggregat bekommt ein
-  eigenes Gradle-Modul (Owner, 2026-11-21). ArchUnit prüft, dass die Aggregatpakete
-  keinen Zyklus bilden und das Wurzelpaket keines von ihnen kennt.
+* **Creating and restoring.** Factory methods such as `create` create new
+  objects; `restore` restores saved ones. Both check all rules.
+* **Time.** The model reads no clock. Methods that need a time
+  get `now` as a parameter.
+* **Personal data.** `toString` outputs no data context, neither in the
+  domain model nor in the SPI.
+* **Packages per aggregate.** Within `domain-model` there is one package per
+  aggregate: `template` (letterhead and letter template), `snapshot` and
+  `letter`. Letterhead and letter template share a package because they have
+  the same version rules; the `VersionSequence` that enforces them thus stays
+  package-internal. What only one aggregate needs lives in its package and is
+  encapsulated there as far as possible. The value types that several aggregates
+  and the ports share (`UserId`, `BusinessReference`, `DataContext`, `Checksum`,
+  `TemplateAction` and `LetterAction`) live in the root package
+  `domain.model`. There is no further split by roles (entities, value objects),
+  and no aggregate gets a Gradle module of its own (owner, 2026-11-21). ArchUnit
+  checks that the aggregate packages form no cycle and that the root package
+  knows none of them.
 
-== Platzhalter
+== Placeholders
 
-Syntax `${pfad.zum.wert}`, Defaults, Wiederholungs- und Bedingungsblöcke; fehlende
-Werte bleiben sichtbar (xref:adr-008-platzhaltersprache[ADR-008]). Werte liefert der
-Host bereits formatiert.
+Syntax `${pfad.zum.wert}`, defaults, repeat and condition blocks; missing
+values stay visible (xref:adr-008-platzhaltersprache[ADR-008]). The host
+provides values already formatted.
