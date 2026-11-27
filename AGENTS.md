@@ -122,7 +122,7 @@ thin routing wrappers instead of hand-writing them:
 - Put OpenAI skill UI metadata under `adapters/openai/<skill-name>/openai.yaml`.
 - Run `node scripts/check-agent-adapters.js` in CI to fail on stale adapters.
 
-## Projektspezifische Regeln (standardschreiben)
+## Projektspezifische Regeln (letterwright)
 
 - Das Toolkit ist als Git-Submodule unter `tools/architecture-knowledge-toolkit`
   eingebunden und auf einen festen Commit gepinnt. Das ist Schritt 3 der
@@ -172,9 +172,9 @@ thin routing wrappers instead of hand-writing them:
   integriert `session-diary` per Fast-Forward in `main` und lässt den Branch für
   die nächste Sitzung stehen.
 - Git-Worktrees liegen neben dem Projektordner unter
-  `../worktree/standardschreiben/<branch>`, nie in einem temporären Verzeichnis
+  `../worktree/letterwright/<branch>`, nie in einem temporären Verzeichnis
   oder Scratchpad des Agenten. Anlegen aus dem Projektordner mit
-  `git worktree add ../worktree/standardschreiben/<branch> <branch>`, nach dem
+  `git worktree add ../worktree/letterwright/<branch> <branch>`, nach dem
   Merge mit `git worktree remove` entfernen. Grund: Ein lokaler `pre-push`-Hook
   sperrt Pushes aus Pfaden unter `/private/`, wo unter macOS die temporären
   Verzeichnisse liegen. Ein Worktree dort lässt sich auch vom Owner nicht pushen.
