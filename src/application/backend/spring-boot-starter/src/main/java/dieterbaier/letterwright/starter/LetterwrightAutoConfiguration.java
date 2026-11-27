@@ -65,7 +65,7 @@ public class LetterwrightAutoConfiguration {
         // With several beans Spring's selection applies, as described in the contract of LetterSaveCallback:
         // getIfAvailable selects by Spring's usual rules (for example @Primary) and prevents the context from
         // starting if the selection remains ambiguous.
-        return Optional.ofNullable(callback.getIfAvailable()).map(HostSaveCallback::forReference)
+        return Optional.ofNullable(callback.getIfAvailable()).map(HostSaveCallback::withCallback)
                 .orElseGet(HostSaveCallback::none);
     }
 }
