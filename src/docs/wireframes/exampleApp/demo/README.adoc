@@ -1,117 +1,117 @@
-= Klick-Demo der Beispielanwendung
+= Click Demo of the Example Application
 :status: draft
 :reviewed: false
 
-Klickbarer Prototyp der Wireframes aus `../exampleApp.pen`.
-Er zeigt den Kundenweg (Bestellmaske) und den Administratorweg
-(Login, Bestellungen, Standardschreiben, Vorlagen, Briefpapiere).
+Clickable prototype of the wireframes from `../exampleApp.pen`.
+It shows the customer path (order form) and the administrator path
+(login, orders, letter templates, templates, letterheads).
 
-== Demo starten
+== Starting the Demo
 
-Die Demo besteht aus statischen HTML-Dateien. Sie braucht keinen Server und
-keine Installation, aber eine Internetverbindung (Schriften von Google Fonts,
-Fahrzeugbilder von Unsplash).
+The demo consists of static HTML files. It needs no server and
+no installation, but an internet connection (fonts from Google Fonts,
+vehicle images from Unsplash).
 
 [source,bash]
 ----
 open src/docs/wireframes/exampleApp/demo/bestellmaske.html
 ----
 
-Alternativ die Datei im Finder doppelt anklicken.
+Alternatively, double-click the file in the Finder.
 
-Einstiege::
-* `bestellmaske.html` – Kundenweg: Modell wählen, Extras wählen, Daten eingeben, bestellen
-* `index.html#login` – Administratorweg
+Entry points::
+* `bestellmaske.html` – customer path: choose model, choose extras, enter data, order
+* `index.html#login` – administrator path
 
-Über die dunkle Leiste oben wechselt man zwischen beiden Wegen. Ein Klick ins
-Leere zeigt auf den Admin-Seiten die klickbaren Bereiche.
+The dark bar at the top switches between the two paths. On the admin pages, a
+click into empty space shows the clickable areas.
 
-== Abläufe
+== Flows
 
 [cols="1,2"]
 |===
-| Bildschirm | Klickbar
+| Screen | Clickable
 
-| Bestellmaske
-| Modell und Extras wählen (Zusammenfassung und Gesamtpreis rechnen mit),
-  Felder bearbeiten (E-Mail wird geprüft), „Bestellung bestätigen“ → Danke-Seite,
-  „Anmelden“ → Admin-Login
+| Order form
+| Choose model and extras (summary and total price update along),
+  edit fields (e-mail is validated), “Bestellung bestätigen” → thank-you page,
+  “Anmelden” → admin login
 
-| Danke-Seite
-| „Zurück zur Bestellmaske“, Logo → Bestellmaske, „Anmelden“ → Admin-Login
+| Thank-you page
+| “Zurück zur Bestellmaske”, logo → order form, “Anmelden” → admin login
 
-| Admin-Login
-| „Anmelden“ → Bestellübersicht, „Zurück zur Bestellmaske“
+| Admin login
+| “Anmelden” → order list, “Zurück zur Bestellmaske”
 
-| Bestellübersicht
-| jede Zeile → Bestellung B-1006 (nur diese ist ausgestaltet)
+| Order list
+| every row → order B-1006 (only this one is worked out)
 
-| Bestellung (Bestellbestätigung)
-| „Abschließen“ → Auslieferungsanordnung, „Zurück“ → Bestellübersicht,
-  „Drucken“ zeigt nur einen Hinweis
+| Order (order confirmation)
+| “Abschließen” → delivery order, “Zurück” → order list,
+  “Drucken” only shows a notice
 
-| Auslieferungsanordnung
-| „Abschließen“ → Bestellübersicht, „Drucken“ zeigt nur einen Hinweis
+| Delivery order
+| “Abschließen” → order list, “Drucken” only shows a notice
 
-| Vorlagen Standardschreiben
-| „Bearbeiten“ bei der Bestellbestätigung → Vorlage bearbeiten; bei der
-  Auslieferungsanordnung nur ein Hinweis
+| Templates for letter templates
+| “Bearbeiten” on the order confirmation → edit template; on the
+  delivery order only a notice
 
-| Briefpapiere
-| „Bearbeiten“ zeigt nur einen Hinweis (Bildschirm noch nicht entworfen)
+| Letterheads
+| “Bearbeiten” only shows a notice (screen not designed yet)
 
-| Vorlage bearbeiten (Bestellbestätigung)
-| Briefpapier auswählen und Brief-Körper bearbeiten (echte Eingabefelder über
-  dem Bild), „Speichern“ merkt sich den Stand für die Browsersitzung,
-  „Abbrechen“ verwirft ihn; beide → Vorlagen Standardschreiben
+| Edit template (order confirmation)
+| Select a letterhead and edit the letter body (real input fields on top of
+  the image), “Speichern” keeps the state for the browser session,
+  “Abbrechen” discards it; both → templates for letter templates
 
 | Administration
-| Reiter „Vorlagen für Standardschreiben“ / „Briefpapiere“
+| Tabs “Vorlagen für Standardschreiben” / “Briefpapiere”
 
-| Alle Admin-Seiten
-| Menü „Bestellungen“ / „Administration“, „Abmelden“ → Admin-Login
+| All admin pages
+| Menu “Bestellungen” / “Administration”, “Abmelden” → admin login
 |===
 
-== Dateien
+== Files
 
 [cols="1,1,2"]
 |===
-| Datei | Art | Inhalt
+| File | Kind | Content
 
-| `index.html` | von Hand gepflegt
-| Navigation der Admin-Seiten: Bildschirme, Koordinaten der Klickflächen und
-  der Eingabefelder (`fields`) auf der Maske „Vorlage bearbeiten“
+| `index.html` | maintained by hand
+| Navigation of the admin pages: screens, coordinates of the click areas and
+  of the input fields (`fields`) on the “edit template” form
 
-| `bestellmaske-demo.js` | von Hand gepflegt
-| Klicklogik der Bestellmaske; findet Elemente über die Ebenennamen aus pen.dev
+| `bestellmaske-demo.js` | maintained by hand
+| Click logic of the order form; finds elements by the layer names from pen.dev
   (`Car – …`, `Extra – …`, `Field – …`, `Summary Card`, `Primary Button`, `Menüpunkt Anmelden`)
 
-| `bestellmaske.html` | aus pen.dev exportiert
-| HTML-Export der Bestellmaske, ergänzt um `<script src="bestellmaske-demo.js">`
+| `bestellmaske.html` | exported from pen.dev
+| HTML export of the order form, extended with `<script src="bestellmaske-demo.js">`
 
-| `screens/*.png` | aus pen.dev exportiert
-| Bilder der übrigen Bildschirme, Dateiname = Knoten-ID in der `.pen`-Datei
+| `screens/*.png` | exported from pen.dev
+| Images of the other screens, file name = node ID in the `.pen` file
 |===
 
-Die exportierten Dateien sind eingecheckt, obwohl sie erzeugt sind: Der Export
-braucht die pen.dev-App und lässt sich nicht in der Pipeline wiederholen.
+The exported files are checked in although they are generated: the export
+needs the pen.dev app and cannot be repeated in the pipeline.
 
-== Demo nach Designänderungen aktualisieren
+== Updating the Demo after Design Changes
 
-Das Design in `../exampleApp.pen` ist die Quelle. Nach Änderungen dort:
+The design in `../exampleApp.pen` is the source. After changes there:
 
-. *Admin-Seiten, Login, Danke-Seite:* den Bildschirm als PNG (Skalierung 1)
-  nach `screens/<Knoten-ID>.png` exportieren. Haben sich Buttons verschoben,
-  die Koordinaten `[x, y, Breite, Höhe]` in `index.html` anpassen.
-. *Bestellmaske:* als „HTML + CSS“ nach `bestellmaske.html` exportieren, dann
-  wieder `<script src="bestellmaske-demo.js"></script>` vor `</body>` einfügen.
-  Die Ebenennamen (siehe oben) nicht umbenennen, sonst findet das Skript die
-  Elemente nicht mehr.
-. *Neuer Bildschirm:* PNG exportieren und in `index.html` unter `screens` mit
-  seinen Klickflächen eintragen.
-. Die Demo im Browser einmal durchklicken.
+. *Admin pages, login, thank-you page:* export the screen as PNG (scale 1)
+  to `screens/<node ID>.png`. If buttons have moved, adjust the
+  coordinates `[x, y, width, height]` in `index.html`.
+. *Order form:* export as “HTML + CSS” to `bestellmaske.html`, then
+  insert `<script src="bestellmaske-demo.js"></script>` before `</body>` again.
+  Do not rename the layer names (see above), otherwise the script no longer
+  finds the elements.
+. *New screen:* export the PNG and enter it in `index.html` under `screens` with
+  its click areas.
+. Click through the demo once in the browser.
 
-Mit einem KI-Agenten in pen.dev genügt die Anweisung „Demo aktualisieren“.
+With an AI agent in pen.dev, the instruction “Update the demo” is enough.
 
-Die SVG-Screenshots der Masken im übergeordneten Ordner werden ebenfalls aus
-pen.dev exportiert (Export als SVG) und bei Designänderungen neu erzeugt.
+The SVG screenshots of the forms in the parent folder are also exported from
+pen.dev (export as SVG) and regenerated on design changes.

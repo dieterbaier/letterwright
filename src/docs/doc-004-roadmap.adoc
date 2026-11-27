@@ -2,40 +2,40 @@
 = Roadmap
 :id: DOC-004-roadmap
 
-== Phase 0: Architektur (dieses Inkrement)
+== Phase 0: Architecture (this increment)
 
-arc42-Entwurf, ADRs, Qualitätsszenarien, Risiken; Review durch den Owner.
+arc42 draft, ADRs, quality scenarios, risks; review by the owner.
 
-== Phase 1: Prototyp (Spike)
+== Phase 1: Prototype (spike)
 
-Voraussetzung: die nachgelieferten DOCX-Referenzen (Q-PO-004).
+Prerequisite: the DOCX references delivered later (Q-PO-004).
 
-. **Zuerst Schriften klären:** Schriftquelle und freie Ersatzschriften nach
-  xref:adr-017-bereitstellung-der-schriften[ADR-017] (Q-PO-010). Der Prototyp prüft,
-  ob beide Renderer dieselbe Datei gleich setzen und wie gut die Ersatzschriften
-  treffen.
-. Reale DOCX-Vorlagen im Vorlagenmodell nachbauen (ein- und mehrseitig).
-. Gegen die Abnahmekriterien aus ADR-004 messen: PDF/A (QS-001), PDF/UA (QS-002),
-  Wiedergabetreue (QS-004) und **Stiltreue zur DOCX-Vorgabe (QS-013)**.
-. Die gerenderte, paginierte Vorschau am mehrseitigen Referenzschreiben nach QS-003
-  prüfen (automatisch und mit Screenreader).
-. Akzeptanz bei Fachanwendern prüfen.
+. **Clarify fonts first:** font source and free substitute fonts according to
+  xref:adr-017-bereitstellung-der-schriften[ADR-017] (Q-PO-010). The prototype checks
+  whether both renderers set the same file the same way and how closely the
+  substitute fonts match.
+. Rebuild real DOCX templates in the template model (single and multi-page).
+. Measure against the acceptance criteria from ADR-004: PDF/A (QS-001), PDF/UA (QS-002),
+  fidelity (QS-004) and **style fidelity to the DOCX specification (QS-013)**.
+. Check the rendered, paginated preview on the multi-page reference letter according to QS-003
+  (automatically and with a screen reader).
+. Check acceptance with business users.
 
-Das Ergebnis entscheidet über die Annahme von ADR-003, ADR-004 und ADR-005.
+The result decides whether ADR-003, ADR-004 and ADR-005 are accepted.
 
-== Phase 2: MVP (Epic-Kandidaten)
+== Phase 2: MVP (epic candidates)
 
-. Projektgerüst und Qualitätsgates (Monorepo, Gradle, Vite, CI, Abdeckung, ArchUnit, veraPDF).
-. Domänenmodell und Ports (Briefpapier, Standardschreiben, Versionen, Schreiben, SPIs).
-. Rendering-Pipeline (Zusammenführen, Paged.js-Vorschau, PDF/A- und PDF/UA-Erzeugung).
-. Briefpapier-Pflege (Editor, DIN 5008 Form A/B, privat).
-. Standardschreiben-Pflege (Richtext, Platzhalter, Blöcke, Defaults, Zuweisung Briefpapier).
-. Vorschau, Speichern, Übersicht, Download, Drucken, Löschen.
-. Persistenz (JDBC, Liquibase, PostgreSQL, MariaDB).
-. Beispielanwendung und Integrationsdokumentation.
+. Project skeleton and quality gates (monorepo, Gradle, Vite, CI, coverage, ArchUnit, veraPDF).
+. Domain model and ports (letterhead, letter template, versions, letter, SPIs).
+. Rendering pipeline (merging, Paged.js preview, PDF/A and PDF/UA generation).
+. Letterhead maintenance (editor, DIN 5008 form A/B, private).
+. Letter template maintenance (rich text, placeholders, blocks, defaults, letterhead assignment).
+. Preview, save, list, download, print, delete.
+. Persistence (JDBC, Liquibase, PostgreSQL, MariaDB).
+. Example application and integration documentation.
 
-Die Epics werden nach dem Review dieser Architektur als GitHub-Issues angelegt.
+The epics are created as GitHub issues after the review of this architecture.
 
-== Später
+== Later
 
-Mehrsprachigkeit, Anlagen, DOCX-Import für Textinhalte, Objektspeicher-Adapter.
+Multiple languages, enclosures, DOCX import for text content, object storage adapter.

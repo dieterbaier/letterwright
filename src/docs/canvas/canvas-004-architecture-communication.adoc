@@ -2,8 +2,8 @@
 = Architecture Communication Canvas
 :id: CANVAS-004-architecture-communication
 
-Entwurf, KI-gestützt erstellt, nicht reviewed.
+Draft, created with AI assistance, not reviewed.
 
-* *Zielgruppen*: Owner, Fachanwender, Entwickler der Hosts, KI-Agenten.
-* *Kernbotschaft*: Ein HTML für Vorschau und PDF; Host liefert Daten und Regeln über schmale Ports.
-* *Artefakte*: arc42 in diesem Repository, ADRs, Qualitätsszenarien, Beispielanwendung.
+* *Audiences*: owner, business users, developers of the hosts, AI agents.
+* *Core message*: one HTML for preview and PDF; the host provides data and rules through narrow ports.
+* *Artifacts*: arc42 in this repository, ADRs, quality scenarios, example application.

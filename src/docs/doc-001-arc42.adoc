@@ -1,107 +1,107 @@
 ---
 id: DOC-001-arc42
 type: Document
-title: 'Standardschreiben arc42-Architektur'
+title: 'letterwright arc42 Architecture'
 status: draft
-owner: 'Projekt-Maintainer'
+owner: 'Project maintainer'
 created: '2026-11-14'
 reviewed: false
 generated: false
-summary: 'Zusammengesetzte arc42-Architekturdokumentation der Bibliothek Standardschreiben (Entwurf).'
+summary: 'Assembled arc42 architecture documentation of the letterwright library (draft).'
 tags:
 - arc42
-- standardschreiben
+- letterwright
 relations:
 - type: documents
   target: DOC-01000-introduction-and-goals
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Einführung und Ziele.'
+  rationale: 'The complete documentation contains the chapter Introduction and Goals.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-02000-architecture-constraints
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Randbedingungen.'
+  rationale: 'The complete documentation contains the chapter Architecture Constraints.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-03000-system-scope-and-context
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Kontextabgrenzung.'
+  rationale: 'The complete documentation contains the chapter System Scope and Context.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-04000-solution-strategy
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Lösungsstrategie.'
+  rationale: 'The complete documentation contains the chapter Solution Strategy.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-05000-building-block-view
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Bausteinsicht.'
+  rationale: 'The complete documentation contains the chapter Building Block View.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-06000-runtime-view
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Laufzeitsicht.'
+  rationale: 'The complete documentation contains the chapter Runtime View.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-07000-deployment-view
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Verteilungssicht.'
+  rationale: 'The complete documentation contains the chapter Deployment View.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-08000-crosscutting-concepts
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Querschnittliche Konzepte.'
+  rationale: 'The complete documentation contains the chapter Crosscutting Concepts.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-09000-architecture-decisions
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Architekturentscheidungen.'
+  rationale: 'The complete documentation contains the chapter Architecture Decisions.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-10000-quality-requirements
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Qualitätsanforderungen.'
+  rationale: 'The complete documentation contains the chapter Quality Requirements.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-11000-risks-and-technical-debt
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Risiken und technische Schulden.'
+  rationale: 'The complete documentation contains the chapter Risks and Technical Debt.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-12000-glossary
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Glossar.'
+  rationale: 'The complete documentation contains the chapter Glossary.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 - type: documents
   target: DOC-13000-appendix
   status: proposed
-  rationale: 'Die Gesamtdokumentation enthält das Kapitel Anhang.'
+  rationale: 'The complete documentation contains the chapter Appendix.'
   evidence: src/docs/doc-001-arc42.adoc
   reviewed: false
 metadata_version: '1.0'
 ---
-= [[standardschreiben-arc42]]Standardschreiben – Architekturdokumentation
+= [[standardschreiben-arc42]]letterwright – Architecture Documentation
 :toc:
 :toclevels: 2
 :sectnums:
 :skip-front-matter:
-:lang: de
+:lang: en
 
-Entwurf der Architektur für die einbettbare Bibliothek *Standardschreiben*
-(siehe Issue #1). Alle Inhalte sind KI-gestützt erstellt und haben den Status
-`draft` oder `proposed`, bis der Owner sie geprüft hat.
+Draft of the architecture for the embeddable library *letterwright*
+(see issue #1). All content is created with AI assistance and has the status
+`draft` or `proposed` until the owner has reviewed it.
 
 include::arc42/doc-01000-introduction-and-goals.adoc[leveloffset=+1]
 include::arc42/doc-02000-architecture-constraints.adoc[leveloffset=+1]

@@ -1,709 +1,707 @@
 [[questions-and-answers]]
-= Fragen und Antworten
+= Questions and Answers
 :id: DOC-005-questions-and-answers
 
-Beantwortete Fragen aus Issue #1 sind in die ADRs eingeflossen. Offen sind:
+Answered questions from issue #1 have gone into the ADRs. Still open:
 
 == Open Questions For Product Owner
 
 [[q-po-001]]
-=== Q-PO-001: Mehrseitige Schreiben im MVP?
+=== Q-PO-001: Multi-page letters in the MVP?
 
-Seitenzahlen sind gefordert, mehrseitige Schreiben aber als „später u. U.“ markiert.
-Annahme: Ein Schreiben darf im MVP auf Folgeseiten umbrechen (mit Seitenzahlen);
-„später“ bezieht sich auf Anlagen. Bitte bestätigen.
+Page numbers are required, but multi-page letters are marked as “later, possibly”.
+Assumption: In the MVP a letter may break onto following pages (with page numbers);
+“later” refers to enclosures. Please confirm.
 
-Answer: Ja, Seitenumbruch auf Folgeseiten gehört in das MVP (Owner, 2026-11-14). Anlagen und Mehrsprachigkeit folgen später.
+Answer: Yes, page breaks onto following pages belong in the MVP (Owner, 2026-11-14). Enclosures and multilingual support follow later.
 
 [[q-po-002]]
-=== Q-PO-002: Drucken und Zielarchiv
+=== Q-PO-002: Printing and target archive
 
-Soll „Drucken“ aus der Vorschau das endgültige PDF drucken (Vorschlag) oder die
-HTML-Vorschau? Gibt es ein Zielarchiv mit eigenen PDF/A-Vorgaben?
+Should “Drucken” (print) from the preview print the final PDF (proposal) or the
+HTML preview? Is there a target archive with its own PDF/A requirements?
 
-Präzisierung aus dem Convergence Check gegen Issue #1 (2026-11-16): Kann schon
-aus einer ungespeicherten Vorschau gedruckt werden? Falls ja: Welches Artefakt
-wird gedruckt, und entsteht dabei ein gespeichertes Schreiben? Falls Speichern
-Voraussetzung ist: Der Ablauf bis zum Druck des gespeicherten PDFs wird
-festgehalten. Die Antwort bestimmt die Aktionen der Vorschau und ist ein
-Akzeptanzkriterium von #10. Danach wird die Laufzeitsicht um den Druckablauf
-ergänzt.
+Clarification from the convergence check against issue #1 (2026-11-16): Can a
+user print from an unsaved preview? If yes: Which artifact is printed, and does
+this create a stored letter? If saving is a precondition: The flow up to
+printing the stored PDF is recorded. The answer determines the actions of the
+preview and is an acceptance criterion of #10. After that, the runtime view is
+extended with the print flow.
 
-Answer: Drucken beantwortet (Owner, PR #21, 2026-11-16):
+Answer: Printing answered (Owner, PR #21, 2026-11-16):
 
-* Eine Vorschau kann nicht gedruckt werden. „Drucken“ meint das gezielte Drucken
-  des Dokuments.
-* Die Schaltfläche „Drucken“ gibt es nur beim endgültig gespeicherten Schreiben,
-  nicht in der Vorschau. Sie nutzt die Druckfunktion des Browsers mit dem Inhalt
-  des gespeicherten Dokuments.
-* Druckt jemand die Vorschau über die Druckfunktion des Browsers, verhindert die
-  Anwendung das nicht aktiv. Für das Ergebnis ist die Anwendung aber nicht
-  verantwortlich.
+* A preview cannot be printed. “Drucken” means deliberately printing the
+  document.
+* The “Drucken” button exists only for the finally stored letter, not in the
+  preview. It uses the browser's print function with the content of the stored
+  document.
+* If someone prints the preview with the browser's print function, the
+  application does not actively prevent it. But the application is not
+  responsible for the result.
 
-Umgesetzt in der Laufzeitsicht („Gespeichertes Schreiben drucken“), in QS-003
-und in ADR-004. Noch offen ist das Zielarchiv: Gibt es eines mit eigenen
-PDF/A-Vorgaben (ADR-005)?
+Implemented in the runtime view (“Print a Saved Letter”), in QS-003
+and in ADR-004. The target archive is still open: Is there one with its own
+PDF/A requirements (ADR-005)?
 
 [[q-po-003]]
-=== Q-PO-003: Sichtbarkeit in der Übersicht
+=== Q-PO-003: Visibility in the list
 
-Wessen Schreiben darf ein Sachbearbeiter auflisten, herunterladen und löschen:
-alle, eigene oder die zu einem fachlichen Bezug? Vorschlag: Die Host-Anwendung
-entscheidet über den Port `AuthorizationCheck`; die Übersicht filtert nach
-fachlichem Bezug.
+Whose letters may a clerk list, download and delete:
+all, their own, or those for a business reference? Proposal: The host application
+decides through the port `AuthorizationCheck`; the list filters by
+business reference.
 
-Answer: Rollen und Sichtbarkeit bestimmt die Host-Anwendung (Owner, 2026-11-14). Umsetzung über den Port `AuthorizationCheck` (ADR-002).
+Answer: The host application determines roles and visibility (Owner, 2026-11-14). Implemented through the port `AuthorizationCheck` (ADR-002).
 
 [[q-po-004]]
-=== Q-PO-004: Beispielvorlagen für den Prototyp
+=== Q-PO-004: Sample templates for the prototype
 
-Können zwei oder drei typische DOCX-Vorlagen für den Prototyp
-bereitgestellt werden?
+Can two or three typical DOCX templates be provided for the
+prototype?
 
-Answer: Ja, der Owner liefert Beispiel-DOCX nach (2026-11-14). Geliefert in
+Answer: Yes, the owner will supply sample DOCX files (2026-11-14). Delivered in
 `src/examples/` (`Geschaeftsbrief.docx`, `Formular_intern.docx`,
-2026-11-15). Der Prototyp (#3) hat `Geschaeftsbrief.docx` ein- und
-mehrseitig nachgebaut; die Ergebnisse stehen in ADR-003, ADR-004, ADR-005,
-ADR-014 und ADR-017. `Formular_intern.docx` ist nicht nachgebaut.
+2026-11-15). The prototype (#3) rebuilt `Geschaeftsbrief.docx` as single-page
+and multi-page; the results are in ADR-003, ADR-004, ADR-005,
+ADR-014 and ADR-017. `Formular_intern.docx` has not been rebuilt.
 
 [[q-po-005]]
-=== Q-PO-005: Abschied von Word für Vorlagen
+=== Q-PO-005: Moving away from Word for templates
 
-Ist es akzeptabel, dass Fachanwender Vorlagen künftig in einem Editor statt in Word
-pflegen, wenn das Ergebnis exakt dem Druck entspricht?
+Is it acceptable that business users maintain templates in an editor instead of
+Word in the future, if the result matches the print exactly?
 
-Answer: Ein Editor statt Word ist in Ordnung (Owner, 2026-11-14). Die DOCX kommen als Vorgabe von einer zentralen Abteilung; ihre Bestandteile in den Editor zu übertragen ist kein Problem, die Styles müssen aber im Ergebnis stimmen (QS-013).
+Answer: An editor instead of Word is fine (Owner, 2026-11-14). The DOCX files come as a specification from a central department; transferring their parts into the editor is no problem, but the styles must be right in the result (QS-013).
 
 [[q-po-006]]
-=== Q-PO-006: Manuelle Änderungen in der Vorschau
+=== Q-PO-006: Manual changes in the preview
 
-Darf der Sachbearbeiter ein Schreiben vor dem Speichern noch individuell ändern
-(z. B. einen Satz ergänzen)?
+May the clerk still change a letter individually before saving it
+(for example, add a sentence)?
 
 Answer: Open.
 
 [[q-po-007]]
-=== Q-PO-007: Speichern mit fehlenden Werten
+=== Q-PO-007: Saving with missing values
 
-Darf ein Schreiben gespeichert werden, wenn Platzhalter ohne Wert und ohne Default
-sind? Vorschlag: konfigurierbar, Default „nicht erlaubt“.
+May a letter be saved if placeholders have no value and no default?
+Proposal: configurable, default “not allowed”.
 
 Answer: Open.
 
 [[q-po-008]]
-=== Q-PO-008: Begriff „Schreiben“
+=== Q-PO-008: The term “Schreiben” (letter)
 
-Vorschlag für die Ubiquitous Language: *Standardschreiben* ist die Vorlage,
-*Schreiben* ist das erzeugte, gespeicherte Dokument. Passt das?
+Proposal for the ubiquitous language: *Standardschreiben* (letter template) is
+the template, *Schreiben* (letter) is the generated, stored document. Does that fit?
 
 Answer: Open.
 
 [[q-po-009]]
-=== Q-PO-009: Änderungen der zentralen DOCX-Vorgabe
+=== Q-PO-009: Changes to the central DOCX specification
 
-Wie oft ändert die zentrale Abteilung ihre DOCX-Vorgabe, und wer überträgt
-Änderungen in das Briefpapier? Wird eine Kennung oder ein Stand der Vorgabe
-mitgeführt, damit Abweichungen erkennbar sind?
+How often does the central department change its DOCX specification, and who
+transfers changes into the letterhead? Is an identifier or a revision of the
+specification carried along, so that deviations can be detected?
 
 Answer: Open.
 
 [[q-po-010]]
-=== Q-PO-010: Schriften der zentralen Vorgabe
+=== Q-PO-010: Fonts of the central specification
 
-Welche Schriften verwendet die zentrale DOCX-Vorgabe, und erlaubt ihre Lizenz die
-Einbettung in PDFs und die Auslieferung als Webfont für die Vorschau? Falls nicht:
-Welche Ersatzschrift bestätigt die zentrale Abteilung?
+Which fonts does the central DOCX specification use, and does their license allow
+embedding in PDFs and delivery as a web font for the preview? If not:
+Which substitute font does the central department confirm?
 
-Answer: Die Bibliothek liefert keine lizenzpflichtigen Schriften aus. Der Host
-stellt sie über einen konfigurierbaren Ordner bereit, auf Systemschriften des
-Zielsystems verlässt sich die Bibliothek nicht. Fehlt eine Schrift, verwendet die
-Bibliothek eine freie Ersatzschrift, die das Schriftbild erhält, und die
-Administration weist darauf hin. Vorgeschlagen werden nur freie Schriften. Der
-Ordner ist die einzige Quelle (Owner, 2026-11-19). Festgehalten in
+Answer: The library does not ship any fonts that require a license. The host
+provides them through a configurable folder; the library does not rely on
+system fonts of the target system. If a font is missing, the library uses a
+free substitute font that preserves the look of the text, and the
+administration points this out. Only free fonts are proposed. The
+folder is the only source (Owner, 2026-11-19). Recorded in
 xref:adr-017-bereitstellung-der-schriften[ADR-017].
 
-Befund (Issue #39): Die Beispiel-DOCX verwenden für sichtbaren Text nur Arial und
-Arial Narrow, im Formular dazu Segoe UI Symbol oder MS Gothic für das Kästchen ☐.
+Finding (issue #39): For visible text, the sample DOCX files use only Arial and
+Arial Narrow; the form also uses Segoe UI Symbol or MS Gothic for the box ☐.
 
 [[q-po-011]]
-=== Q-PO-011: Lebensdauer der Vorschau und geänderte Daten
+=== Q-PO-011: Lifetime of the preview and changed data
 
-Wie lange bleibt eine Vorschau gespeichert, wenn der Sachbearbeiter das Schreiben
-nicht speichert? Und was gilt, wenn sich die Domänendaten zwischen Vorschau und
-Speichern ändern?
+How long does a preview stay stored if the clerk does not save the
+letter? And what applies if the domain data changes between preview and
+saving?
 
-Stand der Architektur: Nach
-xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] erzeugt die Vorschau
-einen befristeten Snapshot. Gespeichert wird genau dieser Datenstand, spätere
-Datenänderungen fließen also nicht ein. Die Ablaufzeit ist eine Annahme
-(30 Minuten). Ist der Snapshot abgelaufen, lehnt die Bibliothek das Speichern ab
-und verlangt eine neue Vorschau (Laufzeitsicht, Fehlerfall „Snapshot abgelaufen“).
+State of the architecture: According to
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007], the preview creates
+a time-limited snapshot. Exactly this data state is saved, so later
+data changes are not included. The expiry time is an assumption
+(30 minutes). If the snapshot has expired, the library rejects saving
+and requires a new preview (runtime view, error case “Snapshot Expired”).
 
-Vorschlag des Owners für das MVP (Kommentar in PR #15, 2026-11-15): Auf
-Datenänderungen wird nicht eingegangen. Die Vorschau zeigt einen Hinweis, dass
-sie nur eine Vorschau ist, und bietet eine Schaltfläche „Aktualisieren“, die sie
-neu erzeugt. Dieser Vorschlag lässt zu, dass das gespeicherte Schreiben von der
-Vorschau abweicht, wenn beim Speichern neu gelesene Daten verwendet werden. Das
-widerspricht ADR-007, das aus dem Snapshot der Vorschau rendert.
+Owner's proposal for the MVP (comment in PR #15, 2026-11-15): Data changes are
+not addressed. The preview shows a notice that it is only a preview, and
+offers an “Aktualisieren” (refresh) button that creates it
+again. This proposal allows the stored letter to differ from the
+preview if data read anew at saving is used. This
+contradicts ADR-007, which renders from the snapshot of the preview.
 
-Zu klären:
+To clarify:
 
-. *Snapshot-Treue oder zulässige Abweichung:* Gilt für das MVP, dass das
-  gespeicherte Schreiben genau der Vorschau entspricht (Snapshot nach ADR-007)?
-  Oder darf es abweichen, weil beim Speichern die aktuellen Daten gelesen werden?
-  Im zweiten Fall sind
-  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und QS-004
-  (Wiedergabetreue zwischen Vorschau und PDF) zu überarbeiten.
-. *Hinweis und „Aktualisieren“:* Gehören sie in beiden Varianten in das MVP?
-  Mit Snapshot lautet der Hinweis: Das Schreiben zeigt den Datenstand zum
-  Zeitpunkt der Vorschau, „Aktualisieren“ erzeugt einen neuen Snapshot.
-. *Ablaufzeit:* Die angenommenen 30 Minuten bestätigen oder eine andere Dauer
-  festlegen.
-. *Löschen:* Wann wird ein abgelaufener oder durch „Aktualisieren“ ersetzter
-  Snapshot tatsächlich gelöscht? Sofort beim Ablauf, durch eine regelmäßige
-  Bereinigung oder spätestens beim nächsten Zugriff? Der Snapshot enthält
-  personenbezogene Daten aus dem Host.
+. *Snapshot fidelity or permitted deviation:* Does it hold for the MVP that the
+  stored letter matches the preview exactly (snapshot according to ADR-007)?
+  Or may it differ because the current data is read at saving?
+  In the second case,
+  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] and QS-004
+  (fidelity between preview and PDF) must be revised.
+. *Notice and “Aktualisieren”:* Do they belong in the MVP in both variants?
+  With a snapshot, the notice reads: The letter shows the data state at the
+  time of the preview; “Aktualisieren” creates a new snapshot.
+. *Expiry time:* Confirm the assumed 30 minutes or set a different
+  duration.
+. *Deletion:* When is an expired snapshot, or one replaced by “Aktualisieren”,
+  actually deleted? Immediately on expiry, by a regular
+  cleanup, or at the latest on the next access? The snapshot contains
+  personal data from the host.
 
-Answer: Beantwortet (Owner, 2026-11-15):
+Answer: Answered (Owner, 2026-11-15):
 
-* *Ausbaustufe:* Das gespeicherte Schreiben entspricht genau der Vorschau.
-* *MVP:* Es genügt, wenn das endgültige Schreiben mit geänderten Daten
-  gespeichert wird und ein Hinweis den Benutzer darüber informiert. Ist es ohne
-  großen Aufwand möglich, meldet schon das MVP Datenänderungen zurück und
-  erzwingt ein Aktualisieren der Vorschau.
-* *Löschen:* Ein abgelaufener oder durch „Aktualisieren“ ersetzter Snapshot wird
-  sofort gelöscht.
+* *Later stage:* The stored letter matches the preview exactly.
+* *MVP:* It is enough if the final letter is saved with changed data
+  and a notice informs the user about it. If it is possible without
+  much effort, the MVP already reports data changes and
+  forces a refresh of the preview.
+* *Deletion:* An expired snapshot, or one replaced by “Aktualisieren”, is
+  deleted immediately.
 
-Vorschlag der Architektur, vom Owner am 2026-11-15 bestätigt: Die Erkennung von
-Datenänderungen ist mit wenig Aufwand schon im MVP möglich. Der Snapshot speichert
-zusätzlich einen Hash (SHA-256) des formatierten Datenkontexts. Beim Speichern
-fragt die Bibliothek den Host ohnehin erneut nach der Berechtigung. Dabei liest
-sie auch den Datenkontext neu und vergleicht den Hash. Weicht er ab, wird nicht
-gespeichert. Die Oberfläche meldet die Änderung und verlangt „Aktualisieren“.
-Gerendert wird weiter aus dem Snapshot. Damit gilt die Snapshot-Treue der
-Ausbaustufe schon im MVP, und die Variante „mit geänderten Daten speichern“
-entfällt. ADR-007 bleibt gültig und wird nur um den Hash-Vergleich ergänzt, die
-Laufzeitsicht um den Fehlerfall „Daten geändert“.
+Architecture proposal, confirmed by the owner on 2026-11-15: Detecting
+data changes is possible with little effort already in the MVP. The snapshot also
+stores a hash (SHA-256) of the formatted data context. At saving, the library
+asks the host for the permission again anyway. In doing so, it also reads the
+data context anew and compares the hash. If it differs, nothing is
+saved. The UI reports the change and requires “Aktualisieren”.
+Rendering continues from the snapshot. This means the snapshot fidelity of the
+later stage already applies in the MVP, and the variant “save with changed data”
+is dropped. ADR-007 stays valid and is only extended with the hash comparison,
+the runtime view with the error case “Data changed”.
 
-Zum Löschen: Ein durch „Aktualisieren“ ersetzter Snapshot wird im selben Schritt
-gelöscht, in dem der neue entsteht. Bei Ablauf löscht eine Bereinigung in kurzem
-Abstand (zum Beispiel jede Minute). Bis dahin behandelt die Bibliothek einen
-abgelaufenen Snapshot wie einen nicht vorhandenen.
+On deletion: A snapshot replaced by “Aktualisieren” is deleted in the same step
+in which the new one is created. On expiry, a cleanup deletes it at a short
+interval (for example, every minute). Until then, the library treats an
+expired snapshot like a non-existent one.
 
-Die Ablaufzeit beträgt 30 Minuten (Owner, 2026-11-15). Danach wird die Vorschau
-gelöscht. Ein Neuladen erzeugt eine neue Vorschau. Umgesetzt in
-xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und der Laufzeitsicht.
+The expiry time is 30 minutes (Owner, 2026-11-15). After that, the preview is
+deleted. Reloading creates a new preview. Implemented in
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] and the runtime view.
 
 == Open Questions For Architect
 
 [[q-arch-001]]
-=== Q-ARCH-001: Zieldatenbanken
+=== Q-ARCH-001: Target databases
 
-Welche Datenbanken setzen die geplanten Host-Anwendungen ein? Vorschlag für das MVP:
-PostgreSQL und MariaDB/MySQL.
+Which databases do the planned host applications use? Proposal for the MVP:
+PostgreSQL and MariaDB/MySQL.
 
 Answer: Open.
 
 [[q-arch-002]]
-=== Q-ARCH-002: Bekannte Hosts
+=== Q-ARCH-002: Known hosts
 
-Gibt es bereits Host-Anwendungen mit fester Spring-Boot- oder Java-Version?
+Are there already host applications with a fixed Spring Boot or Java version?
 
-Die Frage wird spätestens mit dem Referenzfall für die zwei Einstiegspunkte des
-Beispiel-Hosts beantwortet (#11). Dabei wird die Version des ersten Zielhosts mit
-der Baseline aus xref:adr-009-build-monorepo-und-versionen[ADR-009] abgeglichen.
+The question will be answered at the latest with the reference case for the two
+entry points of the example host (#11). There, the version of the first target
+host is compared with the baseline from xref:adr-009-build-monorepo-und-versionen[ADR-009].
 
-Answer: Eine bestehende Host-Anwendung verwendet Java 21 und Spring Boot 4.2.x
+Answer: An existing host application uses Java 21 and Spring Boot 4.2.x
 (Owner, PR #21, 2026-11-16).
 
-Abgleich mit ADR-009: Java 21 ist genau die Bytecode-Baseline (`--release 21`) und
-läuft in der CI-Matrix mit. Spring Boot 4.2 liegt in derselben Hauptversion wie
-der Starter, R-007 trifft diesen Host also nicht. Der Build verwendet derzeit die
-BOM 4.1.2. Am 2026-11-16 ist 4.2.0 auf Maven Central erst als Release Candidate
-(RC2) verfügbar. Folgearbeit: Sobald 4.2.0 erscheint, die BOM anheben und die
-Integration in einem Host auf 4.2 prüfen (Beispiel-Host in #11).
+Comparison with ADR-009: Java 21 is exactly the bytecode baseline (`--release 21`) and
+runs in the CI matrix. Spring Boot 4.2 is in the same major version as
+the starter, so R-007 does not affect this host. The build currently uses the
+BOM 4.1.2. On 2026-11-16, 4.2.0 is available on Maven Central only as a release
+candidate (RC2). Follow-up work: As soon as 4.2.0 is released, raise the BOM and
+check the integration in a host on 4.2 (example host in #11).
 
 [[q-arch-003]]
-=== Q-ARCH-003: Styling der Frontend-Komponenten durch die Host-Anwendung
+=== Q-ARCH-003: Styling of the frontend components by the host application
 
-Wie ist gewährleistet, dass die React-Komponenten so aussehen, wie die
-Host-Anwendung es vorgibt (Kommentar des Owners in PR #15, 2026-11-15)?
+How is it ensured that the React components look the way the
+host application specifies (owner's comment in PR #15, 2026-11-15)?
 
-Die Frage prägt die Frontend-Architektur und den Integrationsvertrag des
-npm-Pakets (xref:adr-001-einbettbare-bibliothek[ADR-001]). Voraussichtlich wird
-sie als eigener ADR entschieden. Nicht alle Teile müssen gleich früh feststehen:
+The question shapes the frontend architecture and the integration contract of the
+npm package (xref:adr-001-einbettbare-bibliothek[ADR-001]). It will probably
+be decided as a separate ADR. Not all parts need to be settled equally early:
 
-* *Für das Frontend-Gerüst (#13):* Nur die Art, wie das Paket CSS ausliefert.
-  #13 sieht UnoCSS vor. Zu entscheiden ist, ob das Paket eigenes CSS mitbringt
-  und wie es verhindert, dass dieses CSS den Host verändert (kein globales Reset,
-  Klassen mit eigenem Präfix oder in einer CSS-Ebene). Das passt zu allen drei
-  Ansätzen unten und blockiert das Gerüst nicht.
-* *Vor der ersten Komponente der Bedienoberfläche:* Welcher der drei Ansätze gilt.
-* *Vor der Vorschau-Komponente:* Wie die Vorschau isoliert wird. Neben der
-  Stiltreue (QS-013) zählen hier QS-003 (barrierefreie Vorschau, etwa Fokus und
-  Screenreader über die Grenze eines `iframe` hinweg) und QS-004
-  (Wiedergabetreue zwischen Vorschau und PDF, also dieselben Styles und
-  Schriften in Vorschau und Rendering).
+* *For the frontend scaffold (#13):* Only the way the package ships CSS.
+  #13 plans UnoCSS. To decide is whether the package brings its own CSS
+  and how it prevents this CSS from changing the host (no global reset,
+  classes with their own prefix or in a CSS layer). This fits all three
+  approaches below and does not block the scaffold.
+* *Before the first component of the user interface:* Which of the three approaches applies.
+* *Before the preview component:* How the preview is isolated. Besides
+  style fidelity (QS-013), QS-003 (accessible preview, for example focus and
+  screen readers across the boundary of an `iframe`) and QS-004
+  (fidelity between preview and PDF, that is, the same styles and
+  fonts in preview and rendering) count here.
 
-Zwei Bereiche brauchen gegensätzliche Regeln:
+Two areas need opposite rules:
 
-* *Bedienoberfläche* (Formulare, Listen, Schaltflächen): Sie soll das Aussehen
-  des Hosts übernehmen.
-* *Schreiben in der Vorschau*: Es muss der zentralen DOCX-Vorgabe folgen (QS-013)
-  und darf von den Styles des Hosts nicht verändert werden. Es braucht also eine
-  Isolation, zum Beispiel ein `iframe` oder Shadow DOM.
+* *User interface* (forms, lists, buttons): It should adopt the look
+  of the host.
+* *Letter in the preview*: It must follow the central DOCX specification (QS-013)
+  and must not be changed by the host's styles. So it needs
+  isolation, for example an `iframe` or Shadow DOM.
 
-Mögliche Ansätze für die Bedienoberfläche:
+Possible approaches for the user interface:
 
-. *Design-Tokens über CSS Custom Properties:* Die Bibliothek stylt selbst
-  (UnoCSS), liest Farben, Schriften und Abstände aber aus Variablen, die der Host
-  setzt.
-. *Ungestylte Komponenten (headless):* Die Bibliothek liefert Verhalten und
-  Barrierefreiheit, der Host stylt vollständig selbst.
-. *Komponentenbibliothek des Hosts als Peer-Abhängigkeit:* Die Bibliothek
-  importiert die UI-Komponenten einer bestimmten Komponentenbibliothek. Das
-  bindet sie an genau diese Bibliothek und deren Versionen.
-. *Render-Props (Slots):* Die Bibliothek legt für einzelne Bausteine, etwa
-  Schaltfläche oder Eingabefeld, eine eigene Schnittstelle fest (welche Props
-  sie übergibt). Der Host kann dafür eigene Komponenten übergeben, sonst greift
-  die Standarddarstellung der Bibliothek. Die Bibliothek hängt dabei von keiner
-  fremden Bibliothek ab, nur von ihrer eigenen Schnittstelle. Der Preis: Diese
-  Schnittstelle ist Teil des öffentlichen Vertrags und muss stabil bleiben. Für
-  übergebene Komponenten ist der Host bei der Barrierefreiheit (QS-003)
-  mitverantwortlich.
+. *Design tokens through CSS custom properties:* The library does its own styling
+  (UnoCSS), but reads colors, fonts and spacing from variables that the host
+  sets.
+. *Unstyled components (headless):* The library provides behavior and
+  accessibility; the host does all the styling itself.
+. *The host's component library as a peer dependency:* The library
+  imports the UI components of a specific component library. This
+  binds it to exactly this library and its versions.
+. *Render props (slots):* For individual building blocks, such as a
+  button or input field, the library defines its own interface (which props
+  it passes). The host can pass its own components for them; otherwise the
+  library's default rendering applies. The library depends on no
+  third-party library, only on its own interface. The price: This
+  interface is part of the public contract and must stay stable. For
+  passed components, the host shares responsibility for accessibility
+  (QS-003).
 
-Zu klären: Welche Komponentenbibliotheken oder Designsysteme setzen die bekannten
-Hosts ein (siehe Q-ARCH-002)? Welcher Ansatz gilt?
+To clarify: Which component libraries or design systems do the known
+hosts use (see Q-ARCH-002)? Which approach applies?
 
-Answer: Beantwortet (Owner, 2026-11-15): Die Komponenten bringen eigene
-Styles mit, die der Host überschreiben kann. Die bisher bekannte primäre
-Host-Anwendung ist eine React-Anwendung mit UnoCSS. Design-Tokens über CSS Custom
-Properties sind für die Admin-Oberfläche und die Anzeigekomponente in Ordnung.
-Render-Props sind interessant, wenn die Abhängigkeit überschaubar bleibt.
+Answer: Answered (Owner, 2026-11-15): The components bring their own
+styles, which the host can override. The primary host application known so far
+is a React application with UnoCSS. Design tokens through CSS custom
+properties are fine for the admin UI and the display component.
+Render props are interesting if the dependency stays manageable.
 
-Vorschlag der Architektur, vom Owner am 2026-11-15 bestätigt und als
-xref:adr-013-styling-der-frontend-komponenten[ADR-013] festgehalten:
+Architecture proposal, confirmed by the owner on 2026-11-15 and recorded as
+xref:adr-013-styling-der-frontend-komponenten[ADR-013]:
 
-* Die Bibliothek bringt Standard-Styles mit, erzeugt mit UnoCSS, mit eigenem
-  Klassenpräfix und ohne globales Reset. Sie liegen in einer eigenen CSS-Ebene
-  (`@layer`). Styles des Hosts haben dadurch Vorrang, ohne `!important`.
-* Farben, Schriften und Abstände kommen aus CSS Custom Properties mit eigenem
-  Präfix. Der Host setzt sie, sonst gelten Standardwerte.
-* Render-Props sind eine spätere Erweiterung für einzelne Bausteine, wenn ein
-  Host eigene Komponenten einsetzen will. Sie erzeugen keine Abhängigkeit zu einer
-  fremden Bibliothek.
-* Bei der Anzeigekomponente gelten Tokens nur für die Bedienelemente um das
-  Schreiben herum, etwa Hinweis und „Aktualisieren“. Das Schreiben selbst bleibt
-  isoliert und folgt nur der DOCX-Vorgabe (QS-013).
+* The library brings default styles, generated with UnoCSS, with its own
+  class prefix and without a global reset. They sit in their own CSS layer
+  (`@layer`). This gives the host's styles precedence, without `!important`.
+* Colors, fonts and spacing come from CSS custom properties with their own
+  prefix. The host sets them; otherwise default values apply.
+* Render props are a later extension for individual building blocks, if a
+  host wants to use its own components. They create no dependency on a
+  third-party library.
+* For the display component, tokens apply only to the controls around the
+  letter, such as the notice and “Aktualisieren”. The letter itself stays
+  isolated and follows only the DOCX specification (QS-013).
 
-Isolation der Vorschau: `iframe` (Owner, 2026-11-15), festgehalten als
-xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]. Damit ist die Frage
-beantwortet.
+Isolation of the preview: `iframe` (Owner, 2026-11-15), recorded as
+xref:adr-014-isolation-der-vorschau-im-iframe[ADR-014]. This answers the
+question.
 
 [[q-arch-004]]
-=== Q-ARCH-004: Wiederholtes Speichern derselben Vorschau
+=== Q-ARCH-004: Repeated saving of the same preview
 
-Was passiert, wenn das Speichern mit derselben Snapshot-ID mehrfach ankommt? Das
-geschieht bei einem Doppelklick, bei parallelen Anfragen oder bei einer
-Wiederholung, nachdem die Antwort auf ein erfolgreiches Speichern verloren ging
-(Timeout). Ein unbeabsichtigtes zweites Schreiben soll dabei nicht entstehen
-(Convergence Check gegen Issue #1, 2026-11-16).
+What happens if the save request with the same snapshot ID arrives several times? This
+happens with a double click, with parallel requests, or with a
+retry after the response to a successful save was lost
+(timeout). An unintended second letter must not be created
+(convergence check against issue #1, 2026-11-16).
 
-Zu klären:
+To clarify:
 
-* Welche Antwort erhält eine Wiederholung, nachdem das Speichern schon gelungen
-  ist? Zum Beispiel dasselbe Schreiben statt eines Fehlers.
-* Wie wird eine Wiederholung desselben Speichervorgangs von einer bewusst neuen
-  Dokumenterzeugung unterschieden?
-* Wie verhalten sich zwei gleichzeitige Anfragen?
+* Which response does a retry get after saving has already succeeded?
+  For example, the same letter instead of an error.
+* How is a retry of the same save operation distinguished from a deliberate new
+  document creation?
+* How do two simultaneous requests behave?
 
-Die Regel wird mit #5 und #10 festgelegt, bevor der Persistenzentwurf (#6)
-beginnt. Sie ergänzt
-xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] und die Laufzeitsicht.
+The rule is set with #5 and #10, before the persistence design (#6)
+starts. It extends
+xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] and the runtime view.
 
-Answer: Beantwortet im Grundsatz (Owner, PR #21, 2026-11-16). Die Idempotenz hängt
-nicht an der Snapshot-ID, sondern an einem **fachlichen Schlüssel**:
+Answer: Answered in principle (Owner, PR #21, 2026-11-16). Idempotency does not
+depend on the snapshot ID but on a **domain key**:
 
-* Jede Vorschau und jedes endgültige Dokument gehört zu einer fachlich
-  getriebenen Situation mit einem fachlichen Schlüssel, zum Beispiel einer
-  Vorgangs-ID. Der Schlüssel ist in der Host-Anwendung eindeutig und wird
-  voraussichtlich Teil des Dateinamens.
-* Eine Vorschau mit demselben fachlichen Schlüssel liefert immer dasselbe
-  Ergebnis. Gibt es schon einen Snapshot, wird er ausgeliefert. Sonst wird er
-  gespeichert und ausgeliefert.
-* Für das endgültige Dokument gilt dasselbe: Ist es schon gespeichert, wird es
-  ausgeliefert. Sonst wird es erzeugt, gespeichert und ausgeliefert.
-* Dasselbe Dokument wird nie wiederholt erzeugt. Ein neues Dokument hätte einen
-  neuen fachlichen Schlüssel.
-* Den Schlüssel gibt die Host-Anwendung vor. Das SPI wird dafür voraussichtlich
-  um eine Anfrage nach dem eindeutigen Identifier erweitert.
+* Every preview and every final document belongs to a business-driven
+  situation with a domain key, for example a
+  matter ID. The key is unique in the host application and will
+  probably become part of the file name.
+* A preview with the same domain key always returns the same
+  result. If a snapshot already exists, it is delivered. Otherwise it is
+  stored and delivered.
+* The same applies to the final document: If it is already stored, it is
+  delivered. Otherwise it is created, stored and delivered.
+* The same document is never created repeatedly. A new document would have a
+  new domain key.
+* The host application specifies the key. For this, the SPI will probably be
+  extended with a request for the unique identifier.
 
-Dahinter steht ein Szenario, das die ursprüngliche Anforderung präzisiert oder
-erweitert: Im Laufe eines Geschäftsprozesses der Host-Anwendung fallen Aufgaben
-an, bei denen Standardschreiben erzeugt werden. Prozess und Aufgabe sind
-eindeutig identifizierbar, etwa als
-`prozessname.instanzid.aufgabenName.aufgabenInstanz`. Jede Prozessinstanz gehört
-zu einem konkreten Fall, in Camunda etwa dem Business Key.
+Behind this is a scenario that refines or extends the original
+requirement: In the course of a business process of the host application, tasks
+arise in which letter templates are generated. Process and task are
+uniquely identifiable, for example as
+`prozessname.instanzid.aufgabenName.aufgabenInstanz`. Every process instance belongs
+to a concrete case, in Camunda for example the business key.
 
-Folgefragen, bevor die Regel als ADR festgehalten wird:
+Follow-up questions before the rule is recorded as an ADR:
 
-. *Aktualisieren und Ablauf:* Nach
-  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007] erzeugen
-  „Aktualisieren“, ein abgelaufener Snapshot (30 Minuten) und geänderte Daten
-  einen neuen Snapshot. Vorschlag: Der Schlüssel benennt den jeweils aktuellen
-  Snapshot. Diese drei Auslöser ersetzen ihn unter demselben Schlüssel. Eine
-  bloße Wiederholung liefert den bestehenden.
-. *Benutzerbindung:* Der Snapshot ist bisher an den Benutzer gebunden. Was gilt,
-  wenn ein anderer Benutzer dieselbe Aufgabe öffnet, etwa nach einer
-  Neuzuweisung?
+. *Refresh and expiry:* According to
+  xref:adr-007-versionierung-und-unveraenderlichkeit[ADR-007],
+  “Aktualisieren”, an expired snapshot (30 minutes) and changed data
+  create a new snapshot. Proposal: The key names the current
+  snapshot at any time. These three triggers replace it under the same key. A
+  mere retry returns the existing one.
+. *User binding:* So far the snapshot is bound to the user. What applies
+  if another user opens the same task, for example after a
+  reassignment?
 +
-Antwort (Owner, 2026-11-16): Der Snapshot bleibt an einen Benutzer gebunden. Es
-soll unterbunden werden, dass zwei verschiedene Benutzer zum selben fachlichen
-Schlüssel einen Snapshot erzeugen.
-. *Begriffe:* Wie verhalten sich fachlicher Schlüssel (Aufgabeninstanz), Fall
-  (Business Key) und der bisherige fachliche Bezug (Typ und ID, Glossar)
-  zueinander? Ist der Fall der Bezug, nach dem die Übersicht filtert (Q-PO-003)?
-. *Ein Schlüssel, ein Schreiben:* Erzeugt eine Aufgabe immer genau ein Schreiben,
-  oder können zu einer Aufgabe mehrere Standardschreiben gehören, etwa an
-  verschiedene Empfänger?
+Answer (Owner, 2026-11-16): The snapshot stays bound to one user. It
+must be prevented that two different users create a snapshot for the same domain
+key.
+. *Terms:* How do the domain key (task instance), the case
+  (business key) and the existing business reference (type and ID, glossary)
+  relate to each other? Is the case the reference by which the list filters (Q-PO-003)?
+. *One key, one letter:* Does a task always create exactly one letter,
+  or can several letter templates belong to one task, for example to
+  different recipients?
 +
-Antwort (Owner, 2026-11-16): Entstehen aus einer Aufgabe mehrere
-Standardschreiben, kann das trotzdem als ein Fall gelten. Ein Fall ist ähnlich
-einem Human Task in BPMN zu verstehen: Jemand hat die Aufgabe, ein
-Standardschreiben zu erzeugen. Bearbeitet ein Benutzer diese Aufgabe, kann kein
-anderer Benutzer sie und damit dieses Standardschreiben erzeugen. Die Aufgabe
-bleibt blockiert, bis sie wieder freigegeben ist. Ist das Standardschreiben schon
-erzeugt, kann ein anderer Benutzer es nicht noch einmal erzeugen. Er bekommt das
-gespeicherte Standardschreiben angezeigt.
-. *Löschen:* Darf nach dem Löschen eines Schreibens über die `DeletionPolicy`
-  unter demselben Schlüssel ein neues entstehen?
+Answer (Owner, 2026-11-16): If several letter templates arise from one task,
+this can still count as one case. A case is to be understood similarly to
+a human task in BPMN: Someone has the task of creating a
+letter template. If a user is working on this task, no
+other user can create it and thus this letter template. The task
+stays blocked until it is released again. If the letter template has already been
+created, another user cannot create it again. They are shown the
+stored letter template.
+. *Deletion:* After a letter has been deleted through the `DeletionPolicy`,
+  may a new one be created under the same key?
 +
-Antwort (Owner, 2026-11-16): Ja.
-. *Dateiname:* Wie wird der Dateiname gebildet? Das Thema ist neu.
+Answer (Owner, 2026-11-16): Yes.
+. *File name:* How is the file name formed? This topic is new.
 +
-Antwort (Owner, 2026-11-16): Die Host-Anwendung gibt den Dateinamen vor. Für die
-Eindeutigkeit sorgt die Bibliothek: Gibt es schon eine Datei mit diesem Namen,
-hängt sie am Ende einen hochgezählten Index an. Nach dem Speichern des
-endgültigen Schreibens informiert die Bibliothek die Host-Anwendung über den
-endgültigen Dateinamen und den technischen Schlüssel des Dokuments. So kann der
-Host eine Beziehung zwischen Fachdaten und Dokument herstellen. Dafür ist die
-Host-Anwendung verantwortlich.
+Answer (Owner, 2026-11-16): The host application specifies the file name. The
+library ensures uniqueness: If a file with this name already exists,
+it appends an incremented index at the end. After saving the
+final letter, the library informs the host application about the
+final file name and the technical key of the document. This lets the
+host establish a relationship between business data and the document. The
+host application is responsible for that.
 +
-Zurückgestellt (Owner, 2026-11-23, nach dem Review von PR #74): Der Dateiname
-gehört nicht zum Vertrag für das Speichern in einer Transaktion des Hosts
-(xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]). Der Host
-verknüpft seine Daten über die ID des Schreibens. Für später festgehalten:
+Deferred (Owner, 2026-11-23, after the review of PR #74): The file name
+is not part of the contract for saving in a transaction of the host
+(xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023]). The host
+links its data through the ID of the letter. Recorded for later:
 +
 --
-* *Zwei Namen trennen:* Der *Ablagename* ist der technische Schlüssel, unter dem
-  das PDF liegt. Der *Anzeigename* ist der Name, den der Benutzer beim Download
-  sieht. Nur der Ablagename muss eindeutig sein, und nur, wenn er in einem
-  gemeinsamen Namensraum liegt, etwa im DMS des Hosts (#60). Der Anzeigename ist
-  beim Download nur ein Vorschlag an den Browser.
-* *Varianten:*
-** Vorgabe des Hosts mit hochgezähltem Index bei einer Kollision (Antwort vom
-   2026-11-16 oben). Die Vergabe muss auch bei gleichzeitigem Speichern
-   kollisionsfrei sein, ohne innerhalb der Transaktion des Hosts eine
-   Constraint-Verletzung abzufangen. Die ID des Bezugs kann Zeichen enthalten,
-   die in Dateinamen nicht erlaubt sind (#69).
-** Ein generierter Name, etwa die ID des Schreibens als UUID: ohne Kollision
-   und ohne ungültige Zeichen, für Menschen aber nicht lesbar.
-** Ein Pattern je Vorlage, das Fachanwender mit der Vorlage pflegen, etwa
-   `+Mahnung-${bezug.id}-${datum}.pdf+`, mit der Platzhaltersprache
-   (xref:adr-008-platzhaltersprache[ADR-008]) und dem Datenkontext (Epic #9).
+* *Separate two names:* The *storage name* is the technical key under which
+  the PDF is stored. The *display name* is the name the user sees when
+  downloading. Only the storage name must be unique, and only if it lives in a
+  shared namespace, for example in the host's DMS (#60). The display name is
+  only a suggestion to the browser when downloading.
+* *Variants:*
+** Specified by the host, with an incremented index on a collision (answer from
+   2026-11-16 above). The assignment must be collision-free even with concurrent
+   saving, without catching a constraint violation inside the host's
+   transaction. The ID of the reference can contain characters
+   that are not allowed in file names (#69).
+** A generated name, for example the ID of the letter as a UUID: without collision
+   and without invalid characters, but not readable for humans.
+** A pattern per template that business users maintain with the template, for example
+   `+PaymentReminder-${reference.id}-${date}.pdf+`, with the placeholder language
+   (xref:adr-008-platzhaltersprache[ADR-008]) and the data context (epic #9).
 --
 
-Noch offen, bevor die Regel als ADR festgehalten wird:
+Still open before the rule is recorded as an ADR:
 
-* *Aktualisieren und Ablauf (Frage 1):* Gilt der Vorschlag, dass „Aktualisieren“,
-  Ablauf und geänderte Daten den Snapshot unter demselben Schlüssel ersetzen?
-* *Ein Schlüssel, mehrere Schreiben:* Gehören zu einer Aufgabe mehrere
-  Standardschreiben, braucht jedes einen eigenen Schlüssel, sonst liefert der
-  zweite Aufruf das erste Schreiben aus. Vorschlag: Der Host gibt je
-  Standardschreiben einen eigenen fachlichen Schlüssel vor, etwa die
-  Aufgabeninstanz mit einem Zusatz. Mehrere Schlüssel können zum selben Fall
-  gehören.
-* *Begriffe (Frage 3):* Bisher war der Fall der Business Key der Prozessinstanz.
-  Die Antwort zu Frage 4 beschreibt ihn wie einen Human Task. Was ist der Fall, und
-  wie verhält er sich zum fachlichen Bezug (Typ und ID) und zur Übersicht
+* *Refresh and expiry (question 1):* Does the proposal hold that “Aktualisieren”,
+  expiry and changed data replace the snapshot under the same key?
+* *One key, several letters:* If several letter templates belong to one task,
+  each needs its own key; otherwise the second call delivers the first
+  letter. Proposal: The host specifies a separate domain key per
+  letter template, for example the task instance with a suffix. Several keys can
+  belong to the same case.
+* *Terms (question 3):* So far the case was the business key of the process instance.
+  The answer to question 4 describes it like a human task. What is the case, and
+  how does it relate to the business reference (type and ID) and to the list
   (Q-PO-003)?
-* *Sperre und Freigabe:* Wer sperrt die Aufgabe, und wodurch wird sie wieder frei?
-  Vorschlag: Ein nicht abgelaufener Snapshot eines Benutzers sperrt den Schlüssel
-  für andere Benutzer. Die Sperre endet mit dem Speichern, mit dem Ablauf nach
-  30 Minuten oder mit einem ausdrücklichen Abbruch. Alternativ übernimmt die
-  Sperre der Host, etwa über das Claim eines Human Task in der Process Engine.
-* *Benachrichtigung des Hosts:* Was gilt, wenn die Benachrichtigung über
-  Dateiname und technischen Schlüssel fehlschlägt? Vorschlag: Das Schreiben bleibt
-  gespeichert, und die Benachrichtigung wird wiederholt. Alternativ läuft sie in
-  derselben Transaktion, und ein Fehler verhindert das Speichern. Beides
-  zugleich geht nicht, siehe „Atomar oder entkoppelt“ unten.
-* *Speichern in einer Transaktion des Hosts:* Der Host muss das Speichern
-  zusammen mit eigenen Datenbankaktionen atomar ausführen können, etwa mit dem
-  Abschließen eines Human Task. Heute löst er das Speichern nur über die
-  React-Komponenten und REST aus. Die Vorschau bleibt dort, denn gespeichert wird
-  der Snapshot, den der Benutzer gesehen hat (ADR-007).
+* *Lock and release:* Who locks the task, and what releases it again?
+  Proposal: A non-expired snapshot of a user locks the key
+  for other users. The lock ends with saving, with expiry after
+  30 minutes, or with an explicit cancellation. Alternatively, the host takes over the
+  lock, for example through the claim of a human task in the process engine.
+* *Notification of the host:* What applies if the notification about
+  file name and technical key fails? Proposal: The letter stays
+  stored, and the notification is retried. Alternatively, it runs in
+  the same transaction, and an error prevents saving. Both
+  at once is not possible, see “Atomic or decoupled” below.
+* *Saving in a transaction of the host:* The host must be able to execute saving
+  atomically together with its own database actions, for example with
+  completing a human task. Today it triggers saving only through the
+  React components and REST. The preview stays there, because what is saved is
+  the snapshot the user has seen (ADR-007).
 +
-Tendenz (Owner, 2026-11-22, präzisiert im Review von PR #70): Die Bibliothek
-bietet beides an. Die beiden Wege erfüllen verschiedene Integrationsbedürfnisse:
-+
---
-.. *Java-API, der primäre Weg:* Der Host orchestriert in einem eigenen
-   Anwendungsfall. Er speichert das Schreiben, wertet das Ergebnis aus, ändert
-   eigene Daten oder schließt den Task ab und committet alles gemeinsam. Er
-   ruft die API auf und implementiert kein SPI. Wie in ADR-016 als
-   Erweiterungsweg vorgesehen, ist das ein eigenes API-Modul mit eigenen Typen
-   und eingehendem Adapter, ohne öffentliche Kopplung an das Domänenmodell oder
-   an die internen Use-Case-Ports. REST und Java-API nutzen denselben
-   Anwendungsfall.
-.. *Optionaler synchroner Rückruf:* Speichert der Benutzer über den Endpunkt der
-   Bibliothek, bindet der Rückruf Aktionen des Hosts ein. Er läuft nach den
-   Datenbankänderungen der Bibliothek, aber vor dem gemeinsamen Commit. Ein
-   Listener nach dem Commit (`AFTER_COMMIT`) kann die verlangte Atomarität nicht
-   liefern. Der Rückruf darf nicht noch einmal ausführen, was ein Aufrufer der
-   Java-API schon selbst erledigt hat.
---
-+
-*Verantwortungsgrenze* (Owner, im Review von PR #70):
+Tendency (Owner, 2026-11-22, refined in the review of PR #70): The library
+offers both. The two paths meet different integration needs:
 +
 --
-* *Die Bibliothek* verantwortet ihre eigene Idempotenz nach ADR-021, also
-  höchstens ein Schreiben je Snapshot. Im Vertrag von API und Rückruf sichert
-  sie zu, wann der Rückruf läuft (bei einer Neuanlage und/oder bei
-  `AlreadySaved`), welche stabilen Identifikatoren er erhält, dass er vor
-  dem gemeinsamen Commit läuft und wie Fehler des Rückrufs auf die gemeinsame
-  Transaktion wirken.
-* *Der Host* verantwortet die Idempotenz seiner eigenen Fachaktionen, das
-  Zusammenspiel seiner Orchestrierung mit einem konfigurierten Rückruf sowie
-  Wiederholung, Recovery und gegebenenfalls Kompensation externer
-  Seiteneffekte, etwa beim Abschluss eines Tasks in einer entfernten Engine
-  oder bei der Ablage im eigenen DMS. Outbox und Kompensation sind mögliche
-  Muster des Hosts, keine Vorgabe und keine Aufgabe der Bibliothek. Die
-  Bibliothek übernimmt keine allgemeine Workflow- oder Kompensationssteuerung.
-* Eine idempotente Speicherung durch die Bibliothek garantiert ausdrücklich
-  nicht, dass der gesamte Anwendungsfall des Hosts idempotent ist.
-* Die Zusicherungen der Bibliothek gehören in den API- und SPI-Vertrag, die
-  Pflichten des Hosts samt Integrationsbeispielen in die Dokumentation zur
-  Host-Integration. Technische Grenzen der jeweiligen Ablage bleiben Teil des
-  Ablagevertrags (#60).
+.. *Java API, the primary path:* The host orchestrates in its own
+   use case. It saves the letter, evaluates the result, changes
+   its own data or completes the task, and commits everything together. It
+   calls the API and does not implement an SPI. As ADR-016 foresees as an
+   extension path, this is a separate API module with its own types
+   and inbound adapter, without public coupling to the domain model or
+   to the internal use case ports. REST and the Java API use the same
+   use case.
+.. *Optional synchronous callback:* If the user saves through the library's
+   endpoint, the callback includes actions of the host. It runs after the
+   library's database changes, but before the shared commit. A
+   listener after the commit (`AFTER_COMMIT`) cannot provide the required
+   atomicity. The callback must not repeat what a caller of the
+   Java API has already done itself.
 --
 +
-Offen dazu:
+*Responsibility boundary* (Owner, in the review of PR #70):
 +
 --
-* *Transaktionskontext:* Die Bibliothek muss sich einer laufenden Transaktion
-  anschließen (Spring `REQUIRED`, nie `REQUIRES_NEW`). Für die lokale atomare
-  Variante müssen Host, Bibliothek und gegebenenfalls eine eingebettete Engine
-  dieselbe physische Transaktion teilen. Eine gemeinsame Datenquelle allein
-  genügt nicht: Ohne passend integrierten Transaktionsmanager kann die Engine
-  schon committet haben, wenn der Host zurückrollt. Die Bibliothek bleibt für
-  Hosts ohne Process Engine verwendbar.
-* *Fehler des Rückrufs:* Welche Fehler rollen die gemeinsame Transaktion zurück?
-  Checked Exceptions und fachliche Fehler als Rückgabewert tun das nicht
-  automatisch; der Vertrag muss es festlegen.
-* *Atomar oder entkoppelt* (Präzisierung, vom Owner reviewt, 2026-11-23):
-  Für die Benachrichtigung nach dem Speichern schließen sich zwei Semantiken
-  aus. Ein Rückruf kann nicht beides liefern.
+* *The library* is responsible for its own idempotency according to ADR-021, that is,
+  at most one letter per snapshot. In the contract of the API and the callback, it
+  guarantees when the callback runs (on a new creation and/or on
+  `AlreadySaved`), which stable identifiers it receives, that it runs before
+  the shared commit, and how errors of the callback affect the shared
+  transaction.
+* *The host* is responsible for the idempotency of its own business actions, the
+  interplay of its orchestration with a configured callback, and
+  retry, recovery and, where needed, compensation of external
+  side effects, for example when completing a task in a remote engine
+  or when storing in its own DMS. Outbox and compensation are possible
+  patterns of the host, not a requirement and not a task of the library. The
+  library takes on no general workflow or compensation control.
+* Idempotent saving by the library explicitly does not
+  guarantee that the host's whole use case is idempotent.
+* The library's guarantees belong in the API and SPI contract; the
+  host's obligations, including integration examples, belong in the
+  documentation on host integration. Technical limits of the respective store
+  stay part of the store contract (#60).
+--
++
+Open on this:
++
+--
+* *Transaction context:* The library must join a running transaction
+  (Spring `REQUIRED`, never `REQUIRES_NEW`). For the local atomic
+  variant, host, library and, where present, an embedded engine must
+  share the same physical transaction. A shared data source alone is
+  not enough: Without a suitably integrated transaction manager, the engine
+  may already have committed when the host rolls back. The library stays
+  usable for hosts without a process engine.
+* *Errors of the callback:* Which errors roll back the shared transaction?
+  Checked exceptions and business errors as a return value do not do this
+  automatically; the contract must define it.
+* *Atomic or decoupled* (clarification, reviewed by the owner, 2026-11-23):
+  For the notification after saving, two semantics exclude each other.
+  A callback cannot provide both.
 +
 [horizontal]
-Atomar:: Der Rückruf läuft vor dem gemeinsamen Commit. Schlägt eine Aktion des
-  Hosts fehl, rollen Schreiben, Verbrauch des Snapshots und die Daten des Hosts
-  gemeinsam zurück. Ein Retry innerhalb der Transaktion gibt es nicht, denn nach
-  dem Fehler ist sie nur noch zum Zurückrollen markiert (Spring: rollback-only).
-  Die Wiederholung ist ein neuer Speicherversuch des Benutzers, solange der
-  Snapshot gültig ist.
-Entkoppelt:: Die Benachrichtigung läuft nach dem Commit (`AFTER_COMMIT` oder
-  Outbox). Das Schreiben bleibt gespeichert, auch wenn die Aktion des Hosts
-  fehlschlägt. Dann muss jemand die Benachrichtigung wiederholen, und der Host
-  muss sie idempotent verarbeiten. Das entspricht dem Vorschlag unter
-  „Benachrichtigung des Hosts“, ist aber nicht atomar.
+Atomic:: The callback runs before the shared commit. If an action of the
+  host fails, the letter, the consumption of the snapshot and the host's data roll back
+  together. There is no retry inside the transaction, because after
+  the error it is only marked for rollback (Spring: rollback-only).
+  The retry is a new save attempt by the user while the
+  snapshot is valid.
+Decoupled:: The notification runs after the commit (`AFTER_COMMIT` or
+  outbox). The letter stays stored even if the host's action
+  fails. Then someone must retry the notification, and the host
+  must process it idempotently. This matches the proposal under
+  “Notification of the host”, but is not atomic.
 +
-Für den Weg über die Java-API braucht es keinen Rückruf: Der Host ist schon in
-seinem eigenen Anwendungsfall, erhält das Ergebnis als Rückgabewert und macht in
-derselben Transaktion weiter. Ein Rückruf betrifft nur das Speichern über den
-Endpunkt der Bibliothek, bei dem kein Anwendungsfall des Hosts läuft.
+The path through the Java API needs no callback: The host is already in
+its own use case, receives the result as a return value and continues in
+the same transaction. A callback concerns only saving through the
+library's endpoint, where no use case of the host is running.
 +
-Die Tendenz vom 2026-11-22 verlangt Atomarität und widerspricht damit dem
-Vorschlag unter „Benachrichtigung des Hosts“. Zu entscheiden ist, was für das
-Speichern über die Oberfläche gilt: nur atomar, nur entkoppelt, oder beides mit
-einer Wahl des Hosts je Rückruf. Im entkoppelten Fall ist außerdem offen, wer
-wiederholt. Nach der Verantwortungsgrenze oben übernimmt die Bibliothek keine
-Workflow-Steuerung, eine Outbox wäre also Sache des Hosts.
+The tendency from 2026-11-22 requires atomicity and so contradicts the
+proposal under “Notification of the host”. To decide is what applies to
+saving through the UI: only atomic, only decoupled, or both with
+a choice by the host per callback. In the decoupled case it is also open who
+retries. According to the responsibility boundary above, the library takes on no
+workflow control, so an outbox would be the host's business.
 +
-.Empfehlung (Vorschlag, 2026-11-23, vom Owner am selben Tag angenommen)
+.Recommendation (proposal, 2026-11-23, accepted by the owner on the same day)
 ====
-Die Bibliothek bietet nur den atomaren Rückruf an, keine eigene
-Benachrichtigung nach dem Commit und keine eigene Wiederholung.
+The library offers only the atomic callback, no notification of its own
+after the commit and no retry of its own.
 
-* Das erfüllt die Tendenz vom 2026-11-22 und passt zur Verantwortungsgrenze:
-  Die Bibliothek sichert nur zu, dass der Rückruf vor dem gemeinsamen Commit
-  läuft und ein Fehler alles zurückrollt.
-* Braucht der Host eine entkoppelte Wirkung, etwa den Abschluss eines Tasks in
-  einer entfernten Engine oder die Ablage im eigenen DMS, schreibt er im
-  Rückruf einen Outbox-Auftrag in dieselbe Transaktion und führt ihn danach
-  wiederholbar selbst aus. Der Outbox-Auftrag entsteht so genau dann, wenn
-  auch das Schreiben gespeichert ist.
-* Folgt man der Empfehlung, entfällt der Vorschlag unter „Benachrichtigung
-  des Hosts“, dass die Bibliothek die Benachrichtigung wiederholt. Ein Fehler im Rückruf verhindert
-  das Speichern, und der Benutzer speichert erneut.
-* Eine Wahl zwischen beiden Semantiken je Rückruf vergrößert den Vertrag und die
-  Testmatrix, ohne etwas zu ermöglichen, was der Host mit der Outbox nicht
-  schon selbst erreicht.
+* This meets the tendency from 2026-11-22 and fits the responsibility boundary:
+  The library only guarantees that the callback runs before the shared commit
+  and that an error rolls everything back.
+* If the host needs a decoupled effect, for example completing a task in
+  a remote engine or storing in its own DMS, it writes an outbox job
+  into the same transaction in the callback and then executes it itself
+  in a retryable way. The outbox job is thus created exactly when
+  the letter is stored too.
+* If the recommendation is followed, the proposal under “Notification
+  of the host” that the library retries the notification is dropped. An error in the callback prevents
+  saving, and the user saves again.
+* A choice between both semantics per callback enlarges the contract and the
+  test matrix, without enabling anything that the host does not already
+  achieve itself with the outbox.
 ====
 +
-Antwort (Owner, 2026-11-23): Der Empfehlung wird gefolgt. Der Vertrag steht in
-xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], angenommen am
+Answer (Owner, 2026-11-23): The recommendation is followed. The contract is in
+xref:adr-023-speichern-in-einer-transaktion-des-hosts[ADR-023], accepted on
 2026-11-23:
 +
 --
-* Beim Speichern über die Oberfläche gibt es nur den atomaren Rückruf. Damit
-  entfällt der Vorschlag unter „Benachrichtigung des Hosts“: Die Bibliothek
-  wiederholt nichts, ein Fehler im Rückruf verhindert das Speichern.
-* Der Rückruf läuft nur, wenn das Schreiben in dieser Transaktion entsteht. Bei
-  `AlreadySaved` läuft er nicht noch einmal.
-* Der Rückruf lehnt fachlich über ein Sealed-Ergebnis mit einem Grund für den
-  Benutzer ab. Eine Ablehnung rollt die gemeinsame Transaktion zurück, ebenso
-  jede Ausnahme.
+* For saving through the UI there is only the atomic callback. This
+  drops the proposal under “Notification of the host”: The library
+  retries nothing; an error in the callback prevents saving.
+* The callback runs only if the letter is created in this transaction. On
+  `AlreadySaved` it does not run again.
+* The callback rejects on business grounds through a sealed result with a reason for the
+  user. A rejection rolls back the shared transaction, as does
+  any exception.
 --
 +
-.Skizze 4: Empfehlung, atomarer Rückruf mit Outbox des Hosts
+.Sketch 4: Recommendation, atomic callback with an outbox of the host
 [plantuml,q-arch-004-empfehlung-outbox,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Vorschau (React)" as UI
-participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
-participant "Host: Rückruf" as Host
-database "Datenbank\n(gemeinsame Transaktion)" as DB
-participant "Host: Outbox-Verarbeitung" as Outbox
-participant "Entfernte Engine\noder DMS" as Ext
-SB -> UI: Speichern
-UI -> Lib: POST /schreiben (Snapshot-ID)
-Lib -> DB: Transaktion beginnen
-Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
-Lib -> Host: Rückruf (Dateiname, technischer Schlüssel)
-Host -> DB: eigene Daten ändern, Outbox-Auftrag anlegen
-Lib -> DB: Commit (Schreiben, Snapshot, Daten und Outbox-Auftrag des Hosts)
-Lib --> UI: gespeichert
-... nach dem Commit, in der Verantwortung des Hosts ...
-loop bis erfolgreich
-  Outbox -> DB: offenen Auftrag lesen
-  Outbox -> Ext: Task abschließen oder ablegen (idempotent)
+actor Clerk as SB
+participant "Preview (React)" as UI
+participant "Library\n(adapter-web, use case)" as Lib
+participant "Host: callback" as Host
+database "Database\n(shared transaction)" as DB
+participant "Host: outbox processing" as Outbox
+participant "Remote engine\nor DMS" as Ext
+SB -> UI: Save
+UI -> Lib: POST /letters (snapshot ID)
+Lib -> DB: Begin transaction
+Lib -> DB: Create letter, consume snapshot
+Lib -> Host: Callback (file name, technical key)
+Host -> DB: Change own data, create outbox job
+Lib -> DB: Commit (letter, snapshot, host's data and outbox job)
+Lib --> UI: saved
+... after the commit, under the host's responsibility ...
+loop until successful
+  Outbox -> DB: Read open job
+  Outbox -> Ext: Complete task or store (idempotent)
 end
-Outbox -> DB: Auftrag als erledigt markieren
+Outbox -> DB: Mark job as done
 @enduml
 ----
 +
-.Skizze 1: Java-API, der Host orchestriert (kein Rückruf)
+.Sketch 1: Java API, the host orchestrates (no callback)
 [plantuml,q-arch-004-java-api,svg]
 ----
 @startuml
-participant "Host: Anwendungsfall" as Host
-participant "Java-API (Bibliothek)" as Api
-database "Datenbank\n(gemeinsame Transaktion)" as DB
-Host -> DB: Transaktion beginnen
-Host -> Api: Schreiben speichern (Snapshot-ID)
-Api -> DB: Schreiben anlegen, Snapshot verbrauchen
-Api --> Host: Ergebnis (Neuanlage oder AlreadySaved,\nDateiname, technischer Schlüssel)
-Host -> DB: eigene Fachdaten ändern, Task abschließen
-alt alles erfolgreich
+participant "Host: use case" as Host
+participant "Java API (library)" as Api
+database "Database\n(shared transaction)" as DB
+Host -> DB: Begin transaction
+Host -> Api: Save letter (snapshot ID)
+Api -> DB: Create letter, consume snapshot
+Api --> Host: Result (new creation or AlreadySaved,\nfile name, technical key)
+Host -> DB: Change own business data, complete task
+alt all successful
   Host -> DB: Commit
-else Fehler im Host
-  Host -> DB: Rollback (auch das Schreiben)
+else Error in the host
+  Host -> DB: Rollback (including the letter)
 end
-note over Host, Api: Das Ergebnis kommt als Rückgabewert.\nEin Rückruf ist nicht nötig.
+note over Host, Api: The result comes as a return value.\nA callback is not needed.
 @enduml
 ----
 +
-.Skizze 2: Speichern über die Oberfläche, synchroner Rückruf vor dem Commit (atomar)
+.Sketch 2: Saving through the UI, synchronous callback before the commit (atomic)
 [plantuml,q-arch-004-rueckruf-atomar,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Vorschau (React)" as UI
-participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
-participant "Host: Rückruf" as Host
-database "Datenbank\n(gemeinsame Transaktion)" as DB
-SB -> UI: Speichern
-UI -> Lib: POST /schreiben (Snapshot-ID)
-Lib -> DB: Transaktion beginnen
-Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
-Lib -> Host: Rückruf (Dateiname, technischer Schlüssel)
-Host -> DB: eigene Aktionen, z. B. Task abschließen
-alt Rückruf erfolgreich
+actor Clerk as SB
+participant "Preview (React)" as UI
+participant "Library\n(adapter-web, use case)" as Lib
+participant "Host: callback" as Host
+database "Database\n(shared transaction)" as DB
+SB -> UI: Save
+UI -> Lib: POST /letters (snapshot ID)
+Lib -> DB: Begin transaction
+Lib -> DB: Create letter, consume snapshot
+Lib -> Host: Callback (file name, technical key)
+Host -> DB: Own actions, e.g. complete task
+alt Callback successful
   Lib -> DB: Commit
-  Lib --> UI: gespeichert
-else Rückruf wirft einen Fehler
-  Lib -> DB: Rollback (Schreiben, Snapshot, Daten des Hosts)
-  Lib --> UI: Fehler
-  note over SB, UI: Kein Retry durch die Bibliothek.\nDer Benutzer speichert erneut,\nsolange der Snapshot gültig ist.
+  Lib --> UI: saved
+else Callback throws an error
+  Lib -> DB: Rollback (letter, snapshot, host's data)
+  Lib --> UI: Error
+  note over SB, UI: No retry by the library.\nThe user saves again\nwhile the snapshot is valid.
 end
 @enduml
 ----
 +
-.Skizze 3: Speichern über die Oberfläche, Benachrichtigung nach dem Commit (entkoppelt)
+.Sketch 3: Saving through the UI, notification after the commit (decoupled)
 [plantuml,q-arch-004-benachrichtigung-entkoppelt,svg]
 ----
 @startuml
-actor Sachbearbeiter as SB
-participant "Vorschau (React)" as UI
-participant "Bibliothek\n(adapter-web, Anwendungsfall)" as Lib
-database "Datenbank" as DB
+actor Clerk as SB
+participant "Preview (React)" as UI
+participant "Library\n(adapter-web, use case)" as Lib
+database "Database" as DB
 participant "Host" as Host
-SB -> UI: Speichern
-UI -> Lib: POST /schreiben (Snapshot-ID)
-Lib -> DB: Schreiben anlegen, Snapshot verbrauchen
+SB -> UI: Save
+UI -> Lib: POST /letters (snapshot ID)
+Lib -> DB: Create letter, consume snapshot
 Lib -> DB: Commit
-Lib --> UI: gespeichert
-Lib -> Host: Benachrichtigung (Dateiname, technischer Schlüssel)
-alt Benachrichtigung erfolgreich
-  Host -> Host: eigene Aktionen, eigener Commit
-else Benachrichtigung schlägt fehl
-  note over Lib, Host: Das Schreiben bleibt gespeichert.\nDie Benachrichtigung wird wiederholt (wer? offen),\nder Host verarbeitet sie idempotent.
+Lib --> UI: saved
+Lib -> Host: Notification (file name, technical key)
+alt Notification successful
+  Host -> Host: Own actions, own commit
+else Notification fails
+  note over Lib, Host: The letter stays stored.\nThe notification is retried (by whom? open),\nthe host processes it idempotently.
 end
 @enduml
 ----
-* *Umfang der Atomarität:* Metadaten des Schreibens, Verbrauch des Snapshots und
-  transaktionale Daten des Hosts committen oder rollen gemeinsam zurück. Eine
-  externe Ablage (#60) nimmt daran nicht automatisch teil. Ein verwaistes
-  Dokument kann deshalb auch dann entstehen, wenn das Speichern erfolgreich
-  zurückkehrt und der Host danach zurückrollt. Der Fehlerpfad aus ADR-021 wird
-  breiter; wie oft er eintritt, ist unbekannt. #60 braucht einen ausdrücklichen
-  Weg zur Recovery oder Bereinigung.
-* *Vorbereiten und Festschreiben:* Rendering und Konformitätsprüfung verlängern
-  die Transaktion des Hosts. Sie sollten möglichst vor einer kurzen
-  Schreibtransaktion liegen. Ein vorbereitetes PDF bleibt dann serverseitig an
-  genau den Snapshot und seine Prüfsumme gebunden. Beim Festschreiben werden
-  Besitzer, Berechtigung, Ablauf, aktueller Datenkontext und der atomare
-  Zustandswechsel weiter geprüft, sonst entsteht eine Lücke zur Treue des
-  Snapshots. Der heutige Anwendungsfall `SaveLetterService` rendert und prüft
-  erst beim Speichern; das wäre eine bewusste Umstrukturierung.
-* *Entfernte Engine:* Die Bibliothek bekommt keine Abhängigkeit zu einer Process
-  Engine. Der Host kann in derselben lokalen Transaktion einen Outbox-Auftrag
-  schreiben und den entfernten Aufruf wiederholbar ausführen. Idempotenz
-  verhindert eine doppelte Wirkung, garantiert allein aber nicht, dass der
-  zweite Schritt nach einem Absturz überhaupt noch ausgeführt wird.
-* Berechtigung (`ForCreation`) und Idempotenz (ADR-021) gelten für beide Wege
-  gleich.
-* *Vor der Umsetzung* braucht es den konkreten Vertrag für API und Transaktion
-  sowie Integrationsnachweise für den gemeinsamen Commit, einen späten Rollback
-  des Hosts, Fehler des Rückrufs und eine verlorene Antwort mit Retry.
+* *Scope of atomicity:* Metadata of the letter, consumption of the snapshot and
+  transactional data of the host commit or roll back together. An
+  external store (#60) does not take part in this automatically. An orphaned
+  document can therefore be created even if saving returns successfully
+  and the host rolls back afterwards. The error path from ADR-021 becomes
+  wider; how often it occurs is unknown. #60 needs an explicit
+  path to recovery or cleanup.
+* *Prepare and commit:* Rendering and the conformance check lengthen
+  the host's transaction. They should preferably happen before a short
+  write transaction. A prepared PDF then stays bound on the server side to
+  exactly the snapshot and its checksum. At commit, the
+  owner, permission, expiry, current data context and the atomic
+  state change are still checked; otherwise a gap to the fidelity of the
+  snapshot opens. Today's use case `SaveLetterService` renders and checks
+  only at saving; this would be a deliberate restructuring.
+* *Remote engine:* The library gets no dependency on a process
+  engine. The host can write an outbox job in the same local transaction
+  and execute the remote call in a retryable way. Idempotency
+  prevents a double effect, but on its own does not guarantee that the
+  second step is executed at all after a crash.
+* Permission (`ForCreation`) and idempotency (ADR-021) apply equally to both
+  paths.
+* *Before implementation*, the concrete contract for API and transaction is needed,
+  as well as integration evidence for the shared commit, a late rollback
+  of the host, errors of the callback and a lost response with retry.
 --
 
-Betroffen sind voraussichtlich ADR-002 und ADR-016: Schlüssel und Dateiname
-übergibt der Host nach der Annahme in ADR-016 über die React-Komponenten und
-REST, nicht über das SPI. Die Benachrichtigung nach dem Speichern ist ein
-eigener Rückkanal zum Host; über welchen Mechanismus sie läuft, ist offen.
-Ebenfalls betroffen sind ADR-007 (Snapshot und Sperre), die Laufzeitsicht, das Glossar
-sowie #5, #6, #10 und #11. Das Speichern in einer Transaktion des Hosts betrifft
-zusätzlich ADR-006, ADR-021, die Bausteinsicht und QS-007; ein zusätzlicher
-Rückruf zählt beim Integrationsaufwand mit. Die zwei Einstiegspunkte des Beispiel-Hosts in #11
-lassen sich als zwei Aufgaben eines Prozesses abbilden.
+Probably affected are ADR-002 and ADR-016: According to the assumption in ADR-016,
+the host passes the key and file name through the React components and
+REST, not through the SPI. The notification after saving is a
+separate back channel to the host; which mechanism it uses is open.
+Also affected are ADR-007 (snapshot and lock), the runtime view, the glossary,
+and #5, #6, #10 and #11. Saving in a transaction of the host additionally affects
+ADR-006, ADR-021, the building block view and QS-007; an additional
+callback counts toward the integration effort. The two entry points of the example host in #11
+can be modelled as two tasks of one process.
 
-== Beantwortete Fragen
+== Answered Questions
 
-Siehe Kommentare in Issue #1: Toolkit als Submodule; Doku auf Deutsch; Bibliothek;
-Port (SPI); keine Mandantenfähigkeit; Pflege durch Nicht-Techniker, keine
-kommerziellen Werkzeuge; PDF/A einfach starten und im Build prüfen; HTML-Vorschau
-mit Paged.js; Platzhalter mit Schleifen, Blöcken und Defaults; Seitenzahlen; DIN 5008
-Form A/B wählbar, Default B; Vorlagen versioniert; Löschen entscheidet der Host;
-BLOB mit Port; Vitest; aktuelle Versionen; 80 % für alles; MIT; GitHub Packages.
+See comments in issue #1: toolkit as a submodule; docs in German; library;
+port (SPI); no multi-tenancy; maintenance by non-technical users, no
+commercial tools; start PDF/A simply and check it in the build; HTML preview
+with Paged.js; placeholders with loops, blocks and defaults; page numbers; DIN 5008
+form A/B selectable, default B; templates versioned; the host decides on deletion;
+BLOB with port; Vitest; current versions; 80 % for everything; MIT; GitHub Packages.

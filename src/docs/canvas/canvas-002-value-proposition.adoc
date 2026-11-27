@@ -2,10 +2,10 @@
 = Value Proposition Canvas
 :id: CANVAS-002-value-proposition
 
-Entwurf, KI-gestützt erstellt, nicht reviewed.
+Draft, created with AI assistance, not reviewed.
 
-* *Jobs*: Schreiben erzeugen, prüfen, ablegen, versenden; Vorlagen aktuell halten.
-* *Pains*: Word-Vorlagen manuell befüllen; Layoutfehler; nicht barrierefreie PDFs; Entwickler für jede Textänderung.
-* *Gains*: Ein Klick zur Vorschau mit echten Daten; Fachanwender pflegen selbst; PDF/A automatisch.
-* *Pain Reliever*: Platzhalter aus Domänendaten; DIN-5008-Bausteine; Konformitätsprüfung.
-* *Gain Creator*: Versionierte Vorlagen; Wiedergabetreue Vorschau = PDF.
+* *Jobs*: create, check, file and send letters; keep templates up to date.
+* *Pains*: filling Word templates by hand; layout errors; PDFs that are not accessible; a developer for every text change.
+* *Gains*: one click to a preview with real data; business users maintain templates themselves; PDF/A automatically.
+* *Pain Reliever*: placeholders from domain data; DIN 5008 building blocks; conformance check.
+* *Gain Creator*: versioned templates; fidelity preview = PDF.

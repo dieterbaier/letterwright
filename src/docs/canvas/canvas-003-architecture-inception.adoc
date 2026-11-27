@@ -2,11 +2,11 @@
 = Architecture Inception Canvas
 :id: CANVAS-003-architecture-inception
 
-Entwurf, KI-gestützt erstellt, nicht reviewed.
+Draft, created with AI assistance, not reviewed.
 
-* *Wertversprechen*: siehe Value Proposition.
-* *Kernfunktionen*: Vorlagen pflegen, Vorschau, Speichern, Übersicht, Download, Löschen.
-* *Qualitätsziele*: Barrierefreiheit und Normkonformität, Wiedergabetreue, Pflegbarkeit, Integrierbarkeit, Nachvollziehbarkeit.
-* *Randbedingungen*: Spring Boot, React, Liquibase, MIT, keine kommerziellen Werkzeuge, 80 % Abdeckung.
-* *Kritische Entscheidungen*: Vorlagenformat (ADR-003), Rendering (ADR-004).
-* *Größte Unsicherheit*: Akzeptanz eines Editors statt Word; Gleichheit zweier Render-Engines.
+* *Value proposition*: see Value Proposition.
+* *Core functions*: maintain templates, preview, save, list, download, delete.
+* *Quality goals*: accessibility and standards conformance, fidelity, maintainability, integrability, traceability.
+* *Constraints*: Spring Boot, React, Liquibase, MIT, no commercial tools, 80 % coverage.
+* *Critical decisions*: template format (ADR-003), rendering (ADR-004).
+* *Biggest uncertainty*: acceptance of an editor instead of Word; equality of two render engines.
