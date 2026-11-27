@@ -1,49 +1,49 @@
 ---
 id: QS-010-fehlende-platzhalter-sichtbar
 type: QualityScenario
-title: 'Fehlende Platzhalterwerte sind sichtbar'
+title: 'Missing placeholder values are visible'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Fehlt ein Wert ohne Default, zeigt die Vorschau den Platzhalter markiert an, statt still einen leeren Text zu erzeugen.'
+summary: 'If a value without a default is missing, the preview shows the placeholder marked instead of silently producing an empty text.'
 tags:
 - quality
-- platzhalter
+- placeholders
 - usability
 relations: []
 metadata_version: '1.0'
 ---
 [[qs-010-fehlende-platzhalter-sichtbar]]
-== QS-010: Fehlende Platzhalterwerte sind sichtbar
+== QS-010: Missing Placeholder Values Are Visible
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Das Antwortmaß ist ein prüfbarer Zielwert. Unsichere Werte gelten als Annahmen,
-bis sie bestätigt sind.
+The response measure is a reviewable target. Treat uncertain values as
+assumptions until confirmed.
 
-=== Szenario
+=== Scenario
 
 [cols="1,3", options="header"]
 |===
-| Element | Beschreibung
-| Source | Benutzer
-| Stimulus | Öffnet die Vorschau eines Standardschreibens, für das der Host einen Wert nicht liefert.
-| Environment | Normalbetrieb.
-| Artifact | Zusammenführung von Vorlage und Daten, Vorschau.
-| Response | Der Platzhalter erscheint sichtbar markiert und ist für Screenreader als fehlender Wert erkennbar; ein Defaultwert wird verwendet, wenn definiert.
-| Response Measure | 100 % der fehlenden Werte ohne Default sind in Tests sichtbar markiert; 0 Abbrüche der Vorschau wegen fehlender Werte.
+| Element | Description
+| Source | User
+| Stimulus | Opens the preview of a letter template for which the host does not supply a value.
+| Environment | Normal operation.
+| Artifact | Merging of template and data, preview.
+| Response | The placeholder appears visibly marked and can be recognized by screen readers as a missing value; a default value is used if defined.
+| Response Measure | 100 % of the missing values without a default are visibly marked in tests; 0 aborts of the preview because of missing values.
 |===
 
-=== Begründung
+=== Rationale
 
-Vom Owner gefordertes Verhalten.
+Behavior required by the owner.
 
-=== Annahmen
+=== Assumptions
 
-* Die Markierung erscheint nicht im gespeicherten PDF, wenn Speichern mit fehlenden Werten gesperrt ist.
+* The marking does not appear in the saved PDF if saving with missing values is blocked.
 
 === Impact
 
@@ -54,7 +54,7 @@ include::generated/qs-010-fehlende-platzhalter-sichtbar-impact.adoc[leveloffset=
 include::generated/qs-010-fehlende-platzhalter-sichtbar-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -62,9 +62,9 @@ include::generated/qs-010-fehlende-platzhalter-sichtbar-traceability.adoc[levelo
 
 === Open Questions
 
-* Darf mit fehlenden Werten gespeichert werden? (Q-PO-007)
+* May a letter be saved with missing values? (Q-PO-007)
 
 === Review Notes
 
-Das Szenario wird erst nach Bestätigung von Antwortmaß, Umgebung und
-Stakeholder-Nutzen als reviewed markiert.
+Mark this scenario as reviewed only after the measure, environment, and
+stakeholder value are confirmed.

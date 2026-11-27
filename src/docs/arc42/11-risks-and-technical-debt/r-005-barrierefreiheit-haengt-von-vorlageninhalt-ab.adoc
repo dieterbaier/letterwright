@@ -1,37 +1,37 @@
 ---
 id: R-005-barrierefreiheit-haengt-von-vorlageninhalt-ab
 type: Risk
-title: 'Barrierefreiheit hängt vom Vorlageninhalt ab'
+title: 'Accessibility depends on the template content'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Fachanwender können Inhalte ohne Alternativtexte oder mit falscher Struktur erstellen.'
+summary: 'Business users can create content without alternative texts or with a wrong structure.'
 tags:
 - risk
-- barrierefreiheit
-- vorlagen
+- accessibility
+- templates
 relations:
 - type: affects
   target: QS-002-barrierefreies-pdf
   status: proposed
-  rationale: 'Fehlende Alternativtexte oder Struktur verletzen PDF/UA.'
+  rationale: 'Missing alternative texts or structure violate PDF/UA.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab]]
-== R-005: Barrierefreiheit hängt vom Vorlageninhalt ab
+== R-005: Accessibility Depends on the Template Content
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil Fachanwender Inhalte pflegen, können Logos ohne Alternativtext oder Überschriften als fetter Text entstehen, was zu nicht barrierefreien Schreiben führt.
+Because business users maintain content, logos without alternative text or headings as bold text may arise, leading to letters that are not accessible.
 
 === Assessment
 
@@ -45,17 +45,17 @@ Weil Fachanwender Inhalte pflegen, können Logos ohne Alternativtext oder Übers
 | Confidence | High.
 |===
 
-Typisches Problem redaktioneller Systeme.
+A typical problem of editorial systems.
 
 === Mitigation Options
 
-* Editor erzwingt Alternativtexte für Bilder.
-* Prüfung der Vorlage beim Veröffentlichen mit axe-core und veraPDF.
+* The editor enforces alternative texts for images.
+* Check of the template on publishing with axe-core and veraPDF.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -66,7 +66,7 @@ include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-impact.ad
 include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -74,9 +74,9 @@ include::generated/r-005-barrierefreiheit-haengt-von-vorlageninhalt-ab-traceabil
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

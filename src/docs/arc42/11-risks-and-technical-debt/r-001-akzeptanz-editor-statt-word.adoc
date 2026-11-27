@@ -1,37 +1,37 @@
 ---
 id: R-001-akzeptanz-editor-statt-word
 type: Risk
-title: 'Akzeptanz eines Editors statt Word'
+title: 'Acceptance of an editor instead of Word'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Fachanwender könnten einen geführten Editor gegenüber ihren gewohnten DOCX-Vorlagen ablehnen.'
+summary: 'Business users could reject a guided editor in favor of their familiar DOCX templates.'
 tags:
 - risk
 - usability
-- vorlagen
+- templates
 relations:
 - type: affects
   target: QS-006-briefpapier-pflege-durch-fachanwender
   status: proposed
-  rationale: 'Ablehnung gefährdet die Pflege durch Fachanwender.'
+  rationale: 'Rejection endangers maintenance by business users.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-001-akzeptanz-editor-statt-word]]
-== R-001: Akzeptanz eines Editors statt Word
+== R-001: Acceptance of an Editor Instead of Word
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil die Fachanwender heute mit DOCX-Dateien arbeiten, kann ein neuer, bausteinbasierter Editor abgelehnt werden, was zu Vorlagenpflege durch Entwickler oder zur Forderung nach DOCX-Unterstützung führt.
+Because business users work with DOCX files today, a new, building-block-based editor may be rejected, leading to template maintenance by developers or to a demand for DOCX support.
 
 === Assessment
 
@@ -45,17 +45,17 @@ Weil die Fachanwender heute mit DOCX-Dateien arbeiten, kann ein neuer, bausteinb
 | Confidence | Medium.
 |===
 
-Der Owner hat bestätigt, dass ein Editor statt Word in Ordnung ist (Q-PO-005). Restrisiko: Akzeptanz bei den tatsächlichen Fachanwendern ist noch nicht getestet.
+The owner has confirmed that an editor instead of Word is fine (Q-PO-005). Residual risk: acceptance by the actual business users has not been tested yet.
 
 === Mitigation Options
 
-* Prototyp mit echten DOCX-Vorlagen und Fachanwendern vor Annahme von ADR-003.
-* DOCX-Import für Textinhalte als Erweiterung einplanen.
+* Prototype with real DOCX templates and business users before accepting ADR-003.
+* Plan a DOCX import for text content as an extension.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -66,7 +66,7 @@ include::generated/r-001-akzeptanz-editor-statt-word-impact.adoc[leveloffset=+2]
 include::generated/r-001-akzeptanz-editor-statt-word-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -74,9 +74,9 @@ include::generated/r-001-akzeptanz-editor-statt-word-traceability.adoc[leveloffs
 
 === Open Questions
 
-* Welche Fachanwender können am Prototyp-Test teilnehmen?
+* Which business users can take part in the prototype test?
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

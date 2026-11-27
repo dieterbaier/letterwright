@@ -1,38 +1,38 @@
 ---
 id: R-007-bindung-an-spring-boot-hauptversion
 type: Risk
-title: 'Bindung an die Spring-Boot-Hauptversion'
+title: 'Binding to the Spring Boot major version'
 status: accepted
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: true
-summary: 'Hosts auf einer anderen Spring-Boot-Hauptversion können den Starter nicht nutzen.'
+summary: 'Hosts on a different Spring Boot major version cannot use the starter.'
 tags:
 - risk
 - integration
-- versionen
+- versions
 relations:
 - type: affects
   target: QS-007-integration-in-host-anwendung
   status: accepted
-  rationale: 'Versionskonflikte verhindern die Integration.'
+  rationale: 'Version conflicts prevent the integration.'
   reviewed: true
 metadata_version: '1.0'
 ---
 [[r-007-bindung-an-spring-boot-hauptversion]]
-== R-007: Bindung an die Spring-Boot-Hauptversion
+== R-007: Binding to the Spring Boot Major Version
 
 === Status
 
-Angenommen (accepted) am 2026-11-18.
+Accepted on 2026-11-18.
 
-Dieses Risiko ist KI-gestützt identifiziert. Der Owner hat es bei der Prüfung
-von Epic #4 geprüft und akzeptiert (Issue #37), ebenso seine ausgehende
-Relation.
+This risk was identified with AI assistance. The owner reviewed and accepted it
+during the review of epic #4 (issue #37), as well as its outgoing
+relation.
 
 === Risk Statement
 
-Weil ein Spring-Boot-Starter an die Hauptversion von Spring Boot und Spring Framework gebunden ist, können Hosts auf älteren Versionen die Bibliothek nicht einbinden, was die Zielgruppe einschränkt.
+Because a Spring Boot starter is bound to the major version of Spring Boot and Spring Framework, hosts on older versions cannot include the library, which restricts the target group.
 
 === Assessment
 
@@ -46,17 +46,17 @@ Weil ein Spring-Boot-Starter an die Hauptversion von Spring Boot und Spring Fram
 | Confidence | Medium.
 |===
 
-Hängt davon ab, welche Hosts tatsächlich integrieren.
+Depends on which hosts actually integrate.
 
 === Mitigation Options
 
-* Domäne und Anwendung frei von Spring halten (ADR-002), damit eine zweite Starter-Linie günstig ist.
-* Unterstützte Versionen in der Doku klar nennen.
+* Keep the domain and application free of Spring (ADR-002), so that a second starter line is cheap.
+* Name the supported versions clearly in the documentation.
 
 === Decision or Acceptance
 
-Der Owner hat Bewertung und Mitigation bestätigt und das Risiko am 2026-11-18
-akzeptiert (Issue #37).
+The owner has confirmed the assessment and mitigation and accepted the risk on
+2026-11-18 (issue #37).
 
 === Impact
 
@@ -67,7 +67,7 @@ include::generated/r-007-bindung-an-spring-boot-hauptversion-impact.adoc[levelof
 include::generated/r-007-bindung-an-spring-boot-hauptversion-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -75,11 +75,11 @@ include::generated/r-007-bindung-an-spring-boot-hauptversion-traceability.adoc[l
 
 === Open Questions
 
-* Keine. Der bekannte Host läuft auf Spring Boot 4.2.x und Java 21 und liegt damit
-  in der unterstützten Hauptversion (Q-ARCH-002, 2026-11-16).
+* None. The known host runs on Spring Boot 4.2.x and Java 21 and is therefore
+  in the supported major version (Q-ARCH-002, 2026-11-16).
 
 === Review Notes
 
-Eintrittswahrscheinlichkeit, Auswirkung und Mitigationspfad sind mit dem Owner
-abgestimmt. Die ausgehende Relation zu QS-007 hat er im
-https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[Review von PR #38] angenommen.
+Likelihood, impact and mitigation path have been agreed with the owner. He
+accepted the outgoing relation to QS-007 in the
+https://github.com/dieterbaier/standardschreiben/pull/38#pullrequestreview-5962686450[review of PR #38].

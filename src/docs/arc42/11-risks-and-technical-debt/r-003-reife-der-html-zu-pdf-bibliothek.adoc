@@ -1,42 +1,42 @@
 ---
 id: R-003-reife-der-html-zu-pdf-bibliothek
 type: Risk
-title: 'Wartungszustand der HTML-zu-PDF-Bibliothek'
+title: 'Maintenance state of the HTML-to-PDF library'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'openhtmltopdf wird von einer kleinen Community gepflegt; Fehler oder Stillstand treffen den Kern.'
+summary: 'openhtmltopdf is maintained by a small community; bugs or standstill hit the core.'
 tags:
 - risk
-- abhaengigkeit
+- dependency
 - rendering
 relations:
 - type: affects
   target: QS-001-pdfa-konformitaet
   status: proposed
-  rationale: 'Fehler in der Bibliothek können die PDF/A-Konformität brechen.'
+  rationale: 'Bugs in the library can break PDF/A conformance.'
   reviewed: false
 - type: affects
   target: QS-002-barrierefreies-pdf
   status: proposed
-  rationale: 'Fehler im Tagging verletzen PDF/UA.'
+  rationale: 'Bugs in the tagging violate PDF/UA.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-003-reife-der-html-zu-pdf-bibliothek]]
-== R-003: Wartungszustand der HTML-zu-PDF-Bibliothek
+== R-003: Maintenance State of the HTML-to-PDF Library
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil openhtmltopdf ein Community-Projekt mit wenigen Maintainern ist, können Fehler unbehoben bleiben oder Updates ausbleiben, was die Konformität und die Sicherheit der PDF-Erzeugung gefährdet.
+Because openhtmltopdf is a community project with few maintainers, bugs may remain unfixed or updates may not come, which endangers the conformance and the security of the PDF generation.
 
 === Assessment
 
@@ -50,28 +50,28 @@ Weil openhtmltopdf ein Community-Projekt mit wenigen Maintainern ist, können Fe
 | Confidence | Low.
 |===
 
-Wartungsstand geprüft am 2026-11-21: `io.github.openhtmltopdf` hat am 2026-11-16
-Version 1.1.114 veröffentlicht, das Repository ist nicht archiviert. Das senkt die
-Wahrscheinlichkeit, ändert die Bewertung aber erst nach dem Review durch den
-Owner.
+Maintenance state checked on 2026-11-21: `io.github.openhtmltopdf` released
+version 1.1.114 on 2026-11-16, and the repository is not archived. This lowers
+the likelihood, but changes the rating only after the review by the
+owner.
 
 === Mitigation Options
 
-* Renderer hinter dem Port `Renderer` kapseln.
-* Wartungsstand und Lizenz (LGPL) vor Annahme von ADR-004 prüfen.
-* Alternative (Apache FOP oder Chromium) als dokumentierte Rückfallebene. Apache
-  FOP mit XSLT akzeptieren Kunden meist; lehnt ein Kunde openhtmltopdf ab, ist es
-  die Rückfallebene nach ADR-004, Option 3. Der Owner wählt es vorerst nicht, weil
-  es ihm zu schwergewichtig ist (2026-11-21).
-* Die PDFBox-Nachbearbeitung der Fußzeile (ADR-004) hängt daran, wie
-  openhtmltopdf den Content-Stream schreibt. Ihr Nachweis bei jeder Erzeugung
-  und ein Test je Update von openhtmltopdf fangen Änderungen ab; der Ausweichweg
-  ist ein regulärer, getaggter Block im Brieflayout.
+* Encapsulate the renderer behind the port `Renderer`.
+* Check the maintenance state and license (LGPL) before accepting ADR-004.
+* An alternative (Apache FOP or Chromium) as a documented fallback. Customers
+  mostly accept Apache FOP with XSLT; if a customer rejects openhtmltopdf, it is
+  the fallback according to ADR-004, option 3. The owner does not choose it for
+  now because it is too heavyweight for him (2026-11-21).
+* The PDFBox post-processing of the footer (ADR-004) depends on how
+  openhtmltopdf writes the content stream. Its verification on every generation
+  and a test for each update of openhtmltopdf catch changes; the alternative
+  path is a regular, tagged block in the letter layout.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -82,7 +82,7 @@ include::generated/r-003-reife-der-html-zu-pdf-bibliothek-impact.adoc[leveloffse
 include::generated/r-003-reife-der-html-zu-pdf-bibliothek-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -90,9 +90,9 @@ include::generated/r-003-reife-der-html-zu-pdf-bibliothek-traceability.adoc[leve
 
 === Open Questions
 
-* Ist ein Fork mit eigener Pflege akzeptabel?
+* Is a fork with our own maintenance acceptable?
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

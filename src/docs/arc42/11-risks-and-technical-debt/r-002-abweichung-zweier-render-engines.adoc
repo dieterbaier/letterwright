@@ -1,37 +1,37 @@
 ---
 id: R-002-abweichung-zweier-render-engines
 type: Risk
-title: 'Abweichungen zwischen Vorschau- und PDF-Engine'
+title: 'Deviations between the preview and PDF engines'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Paged.js und openhtmltopdf können dasselbe HTML unterschiedlich umbrechen.'
+summary: 'Paged.js and openhtmltopdf can break the same HTML differently.'
 tags:
 - risk
 - rendering
-- wiedergabetreue
+- fidelity
 relations:
 - type: affects
   target: QS-004-wiedergabetreue-vorschau-und-pdf
   status: proposed
-  rationale: 'Unterschiedliche Umbrüche verletzen die Wiedergabetreue.'
+  rationale: 'Different breaks violate fidelity.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-002-abweichung-zweier-render-engines]]
-== R-002: Abweichungen zwischen Vorschau- und PDF-Engine
+== R-002: Deviations Between the Preview and PDF Engines
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil Vorschau und PDF von zwei verschiedenen Layout-Engines erzeugt werden, können Seitenumbrüche, Silbentrennung oder Abstände abweichen, was dazu führt, dass das gespeicherte Schreiben nicht der Vorschau entspricht.
+Because the preview and the PDF are produced by two different layout engines, page breaks, hyphenation or spacing may differ, leading to the saved letter not matching the preview.
 
 === Assessment
 
@@ -45,18 +45,18 @@ Weil Vorschau und PDF von zwei verschiedenen Layout-Engines erzeugt werden, kön
 | Confidence | Low.
 |===
 
-Ohne Prototyp ist das Ausmaß nicht abschätzbar; einfache Brieflayouts senken die Wahrscheinlichkeit.
+Without a prototype, the extent cannot be estimated; simple letter layouts lower the likelihood.
 
 === Mitigation Options
 
-* Wiedergabetreue-Test aus QS-004 für alle Referenzvorlagen.
-* Gleiche eingebettete Schriften, keine automatische Silbentrennung.
-* Kandidat Chromium für beide Wege (ADR-004, Option 2), nur nach Nachweis derselben Abnahmekriterien.
+* Fidelity test from QS-004 for all reference templates.
+* The same embedded fonts, no automatic hyphenation.
+* Candidate Chromium for both paths (ADR-004, option 2), only after proof of the same acceptance criteria.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -67,7 +67,7 @@ include::generated/r-002-abweichung-zweier-render-engines-impact.adoc[leveloffse
 include::generated/r-002-abweichung-zweier-render-engines-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -75,9 +75,9 @@ include::generated/r-002-abweichung-zweier-render-engines-traceability.adoc[leve
 
 === Open Questions
 
-* Ab welcher Abweichung ist die Rückfallebene zu ziehen?
+* From what deviation on must the fallback be used?
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

@@ -1,37 +1,37 @@
 ---
 id: R-004-template-injection-durch-vorlagen
 type: Risk
-title: 'Template-Injection über gepflegte Vorlagen'
+title: 'Template injection via maintained templates'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Von Benutzern gepflegte FreeMarker-Vorlagen könnten zur Ausführung von Code im Host missbraucht werden.'
+summary: 'FreeMarker templates maintained by users could be misused to execute code in the host.'
 tags:
 - risk
-- sicherheit
-- platzhalter
+- security
+- placeholders
 relations:
 - type: affects
   target: QS-009-zugriffsschutz-beim-download
   status: proposed
-  rationale: 'Code-Ausführung im Host hebelt jede Zugriffsprüfung aus.'
+  rationale: 'Code execution in the host bypasses every access check.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-004-template-injection-durch-vorlagen]]
-== R-004: Template-Injection über gepflegte Vorlagen
+== R-004: Template Injection via Maintained Templates
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil Vorlagen von Benutzern gepflegt und mit einer mächtigen Template-Sprache ausgewertet werden, kann ein manipulierter Ausdruck Java-Klassen oder -Methoden aufrufen, was zu Codeausführung und Datenabfluss in der Host-Anwendung führt.
+Because templates are maintained by users and evaluated with a powerful template language, a manipulated expression may call Java classes or methods, leading to code execution and data leakage in the host application.
 
 === Assessment
 
@@ -45,19 +45,19 @@ Weil Vorlagen von Benutzern gepflegt und mit einer mächtigen Template-Sprache a
 | Confidence | High.
 |===
 
-Bekanntes Angriffsmuster (SSTI); mit restriktiver Konfiguration gut beherrschbar.
+Known attack pattern (SSTI); well controllable with a restrictive configuration.
 
 === Mitigation Options
 
-* Abgesicherte FreeMarker-Konfiguration nach ADR-008.
-* Datenmodell nur aus Maps, Listen und Strings.
-* Automatisierte Tests mit bekannten SSTI-Payloads.
-* Pflegerecht nur für berechtigte Vorlagenverwalter.
+* Hardened FreeMarker configuration according to ADR-008.
+* Data model made only of maps, lists and strings.
+* Automated tests with known SSTI payloads.
+* Maintenance right only for authorized template managers.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -68,7 +68,7 @@ include::generated/r-004-template-injection-durch-vorlagen-impact.adoc[leveloffs
 include::generated/r-004-template-injection-durch-vorlagen-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -76,9 +76,9 @@ include::generated/r-004-template-injection-durch-vorlagen-traceability.adoc[lev
 
 === Open Questions
 
-* Keine.
+* None.
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.

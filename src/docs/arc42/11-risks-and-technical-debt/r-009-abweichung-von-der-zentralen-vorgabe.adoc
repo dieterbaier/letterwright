@@ -1,37 +1,37 @@
 ---
 id: R-009-abweichung-von-der-zentralen-vorgabe
 type: Risk
-title: 'Abweichung von der zentralen DOCX-Vorgabe'
+title: 'Deviation from the central DOCX specification'
 status: proposed
-owner: 'Architektur'
+owner: 'Architecture'
 created: '2026-11-14'
 reviewed: false
-summary: 'Ändert die zentrale Abteilung ihre DOCX-Vorgabe, veraltet das manuell übertragene Briefpapier unbemerkt.'
+summary: 'If the central department changes its DOCX specification, the manually transferred letterhead becomes outdated unnoticed.'
 tags:
 - risk
-- vorlagen
+- templates
 - governance
 relations:
 - type: affects
   target: QS-013-stiltreue-zur-zentralen-docx-vorgabe
   status: proposed
-  rationale: 'Veraltete Stilvorgaben verletzen die Stiltreue.'
+  rationale: 'Outdated style specifications violate style fidelity.'
   reviewed: false
 metadata_version: '1.0'
 ---
 [[r-009-abweichung-von-der-zentralen-vorgabe]]
-== R-009: Abweichung von der zentralen DOCX-Vorgabe
+== R-009: Deviation from the Central DOCX Specification
 
 === Status
 
-Vorgeschlagen (proposed).
+Proposed.
 
-Dieses Risiko ist KI-gestützt identifiziert. Es benennt ein Thema zur Prüfung
-und entscheidet nicht über die Risikoakzeptanz.
+This risk was identified with AI assistance. It names a topic for review and
+does not decide risk acceptance.
 
 === Risk Statement
 
-Weil die Stilvorgaben aus der zentralen DOCX-Vorgabe manuell in das Briefpapier übertragen werden, können spätere Änderungen der Vorgabe unbemerkt bleiben, was zu Schreiben führt, die nicht mehr dem aktuellen Erscheinungsbild entsprechen.
+Because the style specifications from the central DOCX specification are transferred manually into the letterhead, later changes to the specification may go unnoticed, leading to letters that no longer match the current appearance.
 
 === Assessment
 
@@ -45,18 +45,18 @@ Weil die Stilvorgaben aus der zentralen DOCX-Vorgabe manuell in das Briefpapier 
 | Confidence | Low.
 |===
 
-Änderungshäufigkeit der Vorgabe ist unbekannt (Q-PO-009).
+How often the specification changes is unknown (Q-PO-009).
 
 === Mitigation Options
 
-* Stand oder Kennung der Vorgabe als Attribut am Briefpapier führen.
-* Prozess: Die zentrale Abteilung meldet Änderungen an die Vorlagenverwalter.
-* Später: Import der Stilwerte aus DOCX-Formatvorlagen, um Übertragungsfehler zu vermeiden.
+* Keep the state or identifier of the specification as an attribute on the letterhead.
+* Process: the central department reports changes to the template managers.
+* Later: import of the style values from DOCX styles, to avoid transfer errors.
 
 === Decision or Acceptance
 
-Das Risiko bleibt in Analyse, bis der verantwortliche Owner Bewertung und
-Mitigation bestätigt.
+The risk remains under analysis until the accountable owner confirms the
+assessment and mitigation.
 
 === Impact
 
@@ -67,7 +67,7 @@ include::generated/r-009-abweichung-von-der-zentralen-vorgabe-impact.adoc[levelo
 include::generated/r-009-abweichung-von-der-zentralen-vorgabe-attributes.adoc[]
 
 ifdef::derived_from_description[]
-==== Abgeleitet aus
+==== Derived from
 {derived_from_description}
 endif::[]
 
@@ -75,9 +75,9 @@ include::generated/r-009-abweichung-von-der-zentralen-vorgabe-traceability.adoc[
 
 === Open Questions
 
-* Wie oft ändert sich die Vorgabe? (Q-PO-009)
+* How often does the specification change? (Q-PO-009)
 
 === Review Notes
 
-Vor dem Review sind Eintrittswahrscheinlichkeit, Auswirkung und der
-Mitigationspfad mit dem Owner abzustimmen.
+Before the review, likelihood, impact and the mitigation path must be agreed
+with the owner.
