@@ -1,5 +1,5 @@
 plugins {
-    id("standardschreiben.java-modul")
+    id("letterwright.java-module")
 }
 
 description = "Spring-Boot-Starter: Autokonfiguration und Default-Adapter für die Host-Anwendung. Exportiert nur SPI und Java-API (ADR-016, ADR-023)."
@@ -12,7 +12,7 @@ dependencies {
     implementation(project(":usecases-out"))
     implementation(project(":usecases-service"))
     implementation(project(":adapter-host"))
-    implementation(project(":adapter-persistenz-jdbc"))
+    implementation(project(":adapter-persistence-jdbc"))
     implementation(project(":adapter-rendering"))
     implementation(project(":adapter-web"))
     implementation(project(":adapter-api"))

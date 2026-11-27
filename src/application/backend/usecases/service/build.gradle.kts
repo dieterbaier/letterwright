@@ -1,5 +1,5 @@
 plugins {
-    id("standardschreiben.java-modul")
+    id("letterwright.java-module")
 }
 
 description = "Implementierung der Anwendungsfälle: implementiert die eingehenden Ports und nutzt die ausgehenden (ADR-002)."
@@ -7,5 +7,5 @@ description = "Implementierung der Anwendungsfälle: implementiert die eingehend
 dependencies {
     api(project(":usecases-in"))
     implementation(project(":usecases-out"))
-    implementation(project(":domaene-service"))
+    implementation(project(":domain-service"))
 }
